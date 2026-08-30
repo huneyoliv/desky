@@ -58,8 +58,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               step == 1
                   ? t.tr('forgot_password', fallback: 'Esqueci minha Senha')
                   : step == 2
-                      ? t.tr('confirm', fallback: 'Digite o Código')
-                      : t.tr('password', fallback: 'Nova Senha'),
+                      ? t.tr('enter_verification_code', fallback: 'Digite o Código')
+                      : t.tr('new_password', fallback: 'Nova Senha'),
               style: const TextStyle(color: Colors.white),
             ),
             content: SingleChildScrollView(
@@ -137,7 +137,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       obscureText: true,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: t.tr('password', fallback: 'Nova senha'),
+                        hintText: t.tr('new_password', fallback: 'Nova senha'),
                         hintStyle: const TextStyle(color: AppColors.textMuted),
                         filled: true,
                         fillColor: AppColors.surface,
@@ -224,8 +224,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         step == 1
                             ? t.tr('send_code', fallback: 'Enviar Código')
                             : step == 2
-                                ? t.tr('confirm', fallback: 'Verificar')
-                                : t.tr('save', fallback: 'Redefinir Senha'),
+                                ? t.tr('verify_code', fallback: 'Verificar')
+                                : t.tr('reset_password', fallback: 'Redefinir Senha'),
                         style: const TextStyle(color: Colors.white),
                       ),
               ),
