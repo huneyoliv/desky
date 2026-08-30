@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desky — Desktop Study Client</title>
+  <meta name="description" content="Desky is a free, open-source desktop client for the Yeolpumta study platform. Available for Windows, macOS and Linux." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0f14;
+      --surface: #13151d;
+      --border: #1e2130;
+      --text: #e4e6f0;
+      --muted: #6b7280;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .brand { font-size: 0.95rem; font-weight: 600; color: var(--text); text-decoration: none; }
+    nav .nav-links { display: flex; gap: 1.5rem; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
+    nav a:hover { color: var(--text); }
+
+    .hero {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 100px 2rem 80px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+    .btn-group { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.3rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { border: 1px solid var(--border); color: var(--muted); }
+    .btn-secondary:hover { color: var(--text); border-color: #3a3f55; }
+
+    .section { max-width: 820px; margin: 0 auto; padding: 60px 2rem; }
+    hr { border: none; border-top: 1px solid var(--border); }
+    .label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .section h2 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2rem; }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .feature { background: var(--surface); padding: 1.25rem 1.5rem; }
+    .feature h3 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .feature p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .platform-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s;
+      display: block;
+    }
+    .platform-card:hover { border-color: var(--accent); }
+    .platform-card .os { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.2rem; }
+    .platform-card .filename { font-size: 0.8rem; font-weight: 500; font-family: monospace; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#" class="brand">Desky</a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/huneyoliv/desky" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1>A desktop client<br>for Yeolpumta.</h1>
+    <p>Free and open-source. Built with Flutter for Windows, macOS and Linux.</p>
+    <div class="btn-group">
+      <a href="https://github.com/huneyoliv/desky/releases/latest" class="btn btn-primary" target="_blank" rel="noopener">Download</a>
+      <a href="https://github.com/huneyoliv/desky" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+  </section>
+
+  <hr />
+
+  <section class="section" id="features">
+    <div class="label">Features</div>
+    <h2>Everything you need to stay focused.</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>⏱ Study Timer</h3>
+        <p>Standard and Pomodoro modes with subject tracking and offline sync.</p>
+      </div>
+      <div class="feature">
+        <h3>👥 Study Groups</h3>
+        <p>Live group feed, group chat, real-time member status and social nudges.</p>
+      </div>
+      <div class="feature">
+        <h3>📊 Rankings</h3>
+        <p>Global, regional and category leaderboards with activity heatmap.</p>
+      </div>
+      <div class="feature">
+        <h3>📅 Planner</h3>
+        <p>D-Day countdowns, weekly timetable and smart to-do list.</p>
+      </div>
+      <div class="feature">
+        <h3>🃏 Flashcards & PDF</h3>
+        <p>Spaced repetition decks with a built-in PDF reader.</p>
+      </div>
+      <div class="feature">
+        <h3>🔔 Notifications</h3>
+        <p>Persistent inbox with group alerts and challenge updates.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <section class="section" id="download">
+    <div class="label">Download</div>
+    <h2>Available for all platforms.</h2>
+    <div class="platform-grid">
+      <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe" class="platform-card">
+        <div class="os">Windows</div>
+        <div class="filename">Desky-Windows-Installer-x64.exe</div>
+      </a>
+      <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Store-x64.msix" class="platform-card">
+        <div class="os">Windows Store</div>
+        <div class="filename">Desky-Windows-Store-x64.msix</div>
+      </a>
+      <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg" class="platform-card">
+        <div class="os">macOS</div>
+        <div class="filename">Desky-macOS-Installer.dmg</div>
+      </a>
+      <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb" class="platform-card">
+        <div class="os">Linux — Debian / Ubuntu</div>
+        <div class="filename">Desky-Linux-x64.deb</div>
+      </a>
+      <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.tar.gz" class="platform-card">
+        <div class="os">Linux — Portable</div>
+        <div class="filename">Desky-Linux-x64.tar.gz</div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    Independent open-source project, not affiliated with Pallo Inc. or Yeolpumta. &nbsp;·&nbsp;
+    <a href="https://github.com/huneyoliv/desky/blob/main/LICENSE">MIT License</a>
+  </footer>
+
+</body>
+</html>
