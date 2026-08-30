@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
 import '../../core/localization/app_translation.dart';
 import '../../features/auth/auth_notifier.dart';
 import '../../data/repositories/notification_repository.dart';
@@ -138,6 +139,8 @@ class SidebarNav extends ConsumerWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
+                          fontFamily: AppTextStyles.fontText,
+                          fontFamilyFallback: AppTextStyles.fontFallbacks,
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 14,

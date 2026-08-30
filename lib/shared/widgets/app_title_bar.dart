@@ -109,35 +109,8 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
               behavior: HitTestBehavior.translucent,
               onPanStart: (_) => windowManager.startDragging(),
               onDoubleTap: _toggleMaximize,
-              child: SizedBox(
+              child: const SizedBox(
                 height: 32,
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        widget.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ),

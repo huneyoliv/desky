@@ -10,6 +10,19 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       fontFamily: AppTextStyles.fontText,
+      fontFamilyFallback: AppTextStyles.fontFallbacks,
+      textTheme: ThemeData.dark().textTheme.apply(
+        fontFamily: AppTextStyles.fontText,
+        fontFamilyFallback: AppTextStyles.fontFallbacks,
+        bodyColor: AppColors.textPrimary,
+        displayColor: AppColors.textPrimary,
+      ),
+      primaryTextTheme: ThemeData.dark().primaryTextTheme.apply(
+        fontFamily: AppTextStyles.fontText,
+        fontFamilyFallback: AppTextStyles.fontFallbacks,
+        bodyColor: AppColors.textPrimary,
+        displayColor: AppColors.textPrimary,
+      ),
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
