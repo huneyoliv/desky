@@ -77,6 +77,13 @@ Before creating and pushing any release tag, the version string and build number
 ## [1.0.0] - 2026-08-30
 
 ### Added
+- **Design System & Visual Redesign**:
+  - True AMOLED black background (`#000000`) with Material Design 3 geometry and surface elevations.
+  - Vibrant Lilac brand primary (`#A78BFA`) and hourglass accent (`#4A7FB5`) extracted from new logo.
+  - Apple SF Pro typography (`SF-Pro-Text` & `SF-Pro-Display`) with `AppleEmoji` fallback support.
+  - Lavender study heatmap progression (`heatmapL1` - `heatmapL4`).
+  - Streamlined title bar without brand clutter.
+  - Removed 43 legacy unused icon assets to reduce package footprint.
 - **Focus & Study Timer Engine**:
   - Real-time study stopwatch with standard mode and Pomodoro Technique support.
   - Automatic day boundary rollover adhering to user-configured reset hours.
