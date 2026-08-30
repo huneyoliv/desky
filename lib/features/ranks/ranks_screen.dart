@@ -151,48 +151,60 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     required double height,
     required Color color,
   }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Stack(
-          alignment: Alignment.topRight,
-          children: [
-            StudiconAvatar(studiconId: member.studiconId, size: 70),
-            Image.asset(badgeImage, width: 28, height: 28,
-                errorBuilder: (_, __, ___) => const Icon(Icons.emoji_events,
-                    color: Colors.amber, size: 24)),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          member.userName,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          _formatMs(member.studyMs),
-          style: TextStyle(
-              color: color, fontWeight: FontWeight.w800, fontSize: 13),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          width: 100,
-          height: height,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.2),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            border: Border.all(color: color),
+    return SizedBox(
+      width: 120,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Stack(
+            alignment: Alignment.topRight,
+            children: [
+              StudiconAvatar(studiconId: member.studiconId, size: 70),
+              Image.asset(badgeImage, width: 28, height: 28,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.emoji_events,
+                      color: Colors.amber, size: 24)),
+            ],
           ),
-          child: Center(
+          const SizedBox(height: 8),
+          Tooltip(
+            message: member.userName,
             child: Text(
-              '#${member.rank}',
-              style: TextStyle(
-                  color: color, fontSize: 24, fontWeight: FontWeight.w900),
+              member.userName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            _formatMs(member.studyMs),
+            style: TextStyle(
+                color: color, fontWeight: FontWeight.w800, fontSize: 13),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: 100,
+            height: height,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.2),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              border: Border.all(color: color),
+            ),
+            child: Center(
+              child: Text(
+                '#${member.rank}',
+                style: TextStyle(
+                    color: color, fontSize: 24, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -401,10 +413,15 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                         ),
                                       ],
                                     ),
-                                    title: Text(rank.userName,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600)),
+                                    title: Text(
+                                       rank.userName,
+                                       maxLines: 1,
+                                       overflow: TextOverflow.ellipsis,
+                                       style: const TextStyle(
+                                         color: AppColors.textPrimary,
+                                         fontWeight: FontWeight.w600,
+                                       ),
+                                     ),
                                     subtitle: Text(rank.categoryName,
                                         style: const TextStyle(
                                             color: AppColors.textSecondary,
