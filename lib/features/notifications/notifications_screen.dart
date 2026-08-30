@@ -416,7 +416,7 @@ class NotificationsScreen extends ConsumerWidget {
       return AppColors.primary;
     }
     if (upper.contains('ACHIEVEMENT') || upper.contains('RANK') || upper.contains('GOAL')) {
-      return const Color(0xFFF59E0B);
+      return AppColors.warning;
     }
     if (upper.contains('SYSTEM') || upper.contains('NOTICE') || upper.contains('ANNOUNCEMENT')) {
       return AppColors.primary;

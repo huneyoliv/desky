@@ -64,7 +64,7 @@ class AppShell extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Text(
                           t.tr('exit_focus', fallback: 'Sair do Foco'),
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),

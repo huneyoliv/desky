@@ -248,9 +248,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF141418),
-                    Color(0xFF1E1E26),
-                    Color(0xFF2A2A38),
+                    Colors.black,
+                    AppColors.surface,
+                    AppColors.surfaceLight,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -274,10 +274,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     Text(
                       t.tr('sign_up_title', fallback: 'Crie sua Conta'),
                       style: const TextStyle(
-                        fontFamily: AppTextStyles.fontPretendard,
+                        fontFamily: AppTextStyles.fontDisplay,
+                        fontFamilyFallback: AppTextStyles.fontFallbacks,
                         fontSize: 34,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         letterSpacing: 1.2,
                       ),
                     ),

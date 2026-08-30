@@ -1,8 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
 import '../../core/localization/app_translation.dart';
 import '../../features/auth/auth_notifier.dart';
 import '../../data/repositories/notification_repository.dart';
@@ -138,7 +139,9 @@ class SidebarNav extends ConsumerWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Colors.white,
+                          fontFamily: AppTextStyles.fontText,
+                          fontFamilyFallback: AppTextStyles.fontFallbacks,
+                          color: AppColors.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
                         ),
@@ -190,19 +193,18 @@ class SidebarNav extends ConsumerWidget {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () => context.go(item.route),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 150),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 11),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.15)
+                              ? AppColors.primary.withValues(alpha: 0.12)
                               : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           border: isSelected
-                              ? Border.all(
-                                  color: AppColors.primary.withValues(alpha: 0.5))
+                              ? Border.all(color: AppColors.outline)
                               : null,
                         ),
                         child: Row(
@@ -234,7 +236,7 @@ class SidebarNav extends ConsumerWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: isSelected
-                                      ? Colors.white
+                                      ? AppColors.textPrimary
                                       : AppColors.textSecondary,
                                   fontWeight: isSelected
                                       ? FontWeight.w700

@@ -106,26 +106,31 @@ flutter:
     - assets/lottie/
 
   fonts:
-    - family: Pretendard
+    - family: SF-Pro-Text
       fonts:
-        - asset: assets/fonts/Pretendard-Thin.otf
-          weight: 100
-        - asset: assets/fonts/Pretendard-ExtraLight.otf
-          weight: 200
-        - asset: assets/fonts/Pretendard-Light.otf
+        - asset: assets/fonts/SF-Pro-Text-Light.otf
           weight: 300
-        - asset: assets/fonts/Pretendard-Regular.otf
+        - asset: assets/fonts/SF-Pro-Text-Regular.otf
           weight: 400
-        - asset: assets/fonts/Pretendard-Medium.otf
+        - asset: assets/fonts/SF-Pro-Text-Medium.otf
           weight: 500
-        - asset: assets/fonts/Pretendard-SemiBold.otf
+        - asset: assets/fonts/SF-Pro-Text-Semibold.otf
           weight: 600
-        - asset: assets/fonts/Pretendard-Bold.otf
+        - asset: assets/fonts/SF-Pro-Text-Bold.otf
           weight: 700
-        - asset: assets/fonts/Pretendard-ExtraBold.otf
-          weight: 800
-        - asset: assets/fonts/Pretendard-Black.otf
-          weight: 900
+    - family: SF-Pro-Display
+      fonts:
+        - asset: assets/fonts/SF-Pro-Display-Regular.otf
+          weight: 400
+        - asset: assets/fonts/SF-Pro-Display-Medium.otf
+          weight: 500
+        - asset: assets/fonts/SF-Pro-Display-Semibold.otf
+          weight: 600
+        - asset: assets/fonts/SF-Pro-Display-Bold.otf
+          weight: 700
+    - family: AppleEmoji
+      fonts:
+        - asset: assets/fonts/AppleEmoji.ttf
     - family: E1234
       fonts:
         - asset: assets/fonts/E1234.ttf

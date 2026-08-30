@@ -264,9 +264,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF141418),
-                    Color(0xFF1E1E26),
-                    Color(0xFF2A2A38),
+                    Colors.black,
+                    AppColors.surface,
+                    AppColors.surfaceLight,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -292,10 +292,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const Text(
                           'Desky',
                           style: TextStyle(
-                            fontFamily: AppTextStyles.fontPretendard,
+                            fontFamily: AppTextStyles.fontDisplay,
+                            fontFamilyFallback: AppTextStyles.fontFallbacks,
                             fontSize: 36,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             letterSpacing: 1.2,
                           ),
                         ),
@@ -579,8 +580,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     foregroundColor: const Color(0xFF191919),
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      side: const BorderSide(color: Color(0xFFE5E7EB)),
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: const BorderSide(color: AppColors.border),
                                     ),
                                     padding: const EdgeInsets.symmetric(horizontal: 16),
                                   ),

@@ -797,7 +797,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                           ),
                           title: Text(
                             member.name,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
                           ),
                           trailing: Text(
                             _formatMs(member.studyMs),

@@ -13,10 +13,10 @@ class HeatmapGrid extends ConsumerWidget {
 
   Color _getColor(int minutes) {
     if (minutes <= 0) return AppColors.surface;
-    if (minutes < 15) return const Color(0xFF0E4429);
-    if (minutes < 30) return const Color(0xFF006D32);
-    if (minutes < 45) return const Color(0xFF26A641);
-    return const Color(0xFF39D353);
+    if (minutes < 15) return AppColors.heatmapL1;
+    if (minutes < 30) return AppColors.heatmapL2;
+    if (minutes < 45) return AppColors.heatmapL3;
+    return AppColors.heatmapL4;
   }
 
   @override
@@ -35,7 +35,7 @@ class HeatmapGrid extends ConsumerWidget {
             Text(
               t.tr('heatmap_title', fallback: 'Mapa de Calor de Estudos (24h x 30d)'),
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
@@ -46,13 +46,13 @@ class HeatmapGrid extends ConsumerWidget {
                 Text('${t.tr("less", fallback: "Menos")} ', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
                 Container(width: 10, height: 10, color: AppColors.surface),
                 const SizedBox(width: 4),
-                Container(width: 10, height: 10, color: const Color(0xFF0E4429)),
+                Container(width: 10, height: 10, color: AppColors.heatmapL1),
                 const SizedBox(width: 4),
-                Container(width: 10, height: 10, color: const Color(0xFF006D32)),
+                Container(width: 10, height: 10, color: AppColors.heatmapL2),
                 const SizedBox(width: 4),
-                Container(width: 10, height: 10, color: const Color(0xFF26A641)),
+                Container(width: 10, height: 10, color: AppColors.heatmapL3),
                 const SizedBox(width: 4),
-                Container(width: 10, height: 10, color: const Color(0xFF39D353)),
+                Container(width: 10, height: 10, color: AppColors.heatmapL4),
                 const SizedBox(width: 4),
                 Text(' ${t.tr("more", fallback: "Mais")}', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
               ],
