@@ -368,17 +368,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // App Logo
-                              Image.asset(
-                                'assets/icons/splash_logo.png',
-                                height: 56,
-                                alignment: Alignment.centerLeft,
-                                errorBuilder: (_, __, ___) => const Text(
-                                  'YPT',
-                                  style: AppTextStyles.displayLarge,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
                               Text(
                                 t.tr('login_title', fallback: 'Entrar na sua conta'),
                                 style: AppTextStyles.displayMedium,
