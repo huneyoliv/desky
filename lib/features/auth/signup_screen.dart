@@ -464,7 +464,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       height: 24,
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                     )
-                                  : Text(t.tr('confirm', fallback: 'Verificar Código'), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                                  : Text(t.tr('verify_code', fallback: 'Verificar Código'), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                             ),
                           ),
                         ] else ...[

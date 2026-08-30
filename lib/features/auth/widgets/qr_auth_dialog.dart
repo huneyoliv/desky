@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../../../core/localization/app_translation.dart';
 import '../../../core/oauth/qr_auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../auth_notifier.dart';
@@ -83,6 +84,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
   }
 
   Future<void> _awaitSession(QrAuthSession session) async {
+    final t = ref.read(appTranslationProvider);
     try {
       final token = await session.tokenFuture;
       if (!mounted) return;
@@ -94,7 +96,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
         Navigator.of(context).pop(true);
       } else {
         setState(() {
-          _errorMessage = 'Sessão transferida inválida ou expirada.';
+          _errorMessage = t.tr('qr_session_expired', fallback: 'Sessão transferida inválida ou expirada.');
         });
       }
     } catch (e) {
@@ -108,6 +110,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
   }
 
   Future<void> _submitManualToken() async {
+    final t = ref.read(appTranslationProvider);
     final token = _tokenController.text.trim();
     if (token.isEmpty) return;
 
@@ -124,7 +127,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
         Navigator.of(context).pop(true);
       } else {
         setState(() {
-          _errorMessage = 'Token JWT inválido ou não reconhecido pelo servidor.';
+          _errorMessage = t.tr('qr_invalid_token', fallback: 'Token JWT inválido ou não reconhecido pelo servidor.');
           _isSubmittingManual = false;
         });
       }
@@ -148,6 +151,8 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = ref.watch(appTranslationProvider);
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -176,11 +181,11 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildHeader(),
+              _buildHeader(t),
               Flexible(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(28, 0, 28, 28),
-                  child: _buildBody(),
+                  child: _buildBody(t),
                 ),
               ),
             ],
@@ -190,7 +195,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppTranslation t) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(28, 24, 20, 16),
       child: Row(
@@ -213,7 +218,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Entrar com ${widget.providerName}',
+                  t.tr('sign_in_with_provider', args: [widget.providerName], fallback: 'Entrar com ${widget.providerName}'),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -222,7 +227,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Sincronização via Celular / QR Code',
+                  t.tr('qr_auth_subtitle', fallback: 'Sincronização via Celular / QR Code'),
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white.withOpacity(0.6),
@@ -235,24 +240,24 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
             onPressed: () => Navigator.of(context).pop(false),
             icon: const Icon(LucideIcons.x, color: Colors.white70, size: 20),
             splashRadius: 20,
-            tooltip: 'Fechar',
+            tooltip: t.tr('close', fallback: 'Fechar'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(AppTranslation t) {
     if (_isLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
         child: Column(
           children: [
-            CircularProgressIndicator(color: AppColors.primary, strokeWidth: 3),
-            SizedBox(height: 16),
+            const CircularProgressIndicator(color: AppColors.primary, strokeWidth: 3),
+            const SizedBox(height: 16),
             Text(
-              'Iniciando servidor de pareamento local...',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+              t.tr('qr_starting_server', fallback: 'Iniciando servidor de pareamento local...'),
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),
           ],
         ),
@@ -275,7 +280,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
             ElevatedButton.icon(
               onPressed: _startSession,
               icon: const Icon(LucideIcons.refreshCw, size: 16),
-              label: const Text('Tentar Novamente'),
+              label: Text(t.tr('try_again', fallback: 'Tentar Novamente')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -319,21 +324,21 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
           ),
         ),
         const SizedBox(height: 20),
-        _buildNetworkInterfaceSelector(),
+        _buildNetworkInterfaceSelector(t),
         const SizedBox(height: 14),
         _buildStep(
           number: '1',
-          text: 'Conecte o celular na mesma rede Wi-Fi deste computador.',
+          text: t.tr('qr_step_1', fallback: 'Conecte o celular na mesma rede Wi-Fi deste computador.'),
         ),
         const SizedBox(height: 8),
         _buildStep(
           number: '2',
-          text: 'Abra a câmera ou leitor de QR Code do celular e aponte para o código.',
+          text: t.tr('qr_step_2', fallback: 'Abra a câmera ou leitor de QR Code do celular e aponte para o código.'),
         ),
         const SizedBox(height: 8),
         _buildStep(
           number: '3',
-          text: 'Cole seu token ou confirme no celular para entrar instantaneamente.',
+          text: t.tr('qr_step_3', fallback: 'Cole seu token ou confirme no celular para entrar instantaneamente.'),
         ),
         const SizedBox(height: 18),
         Row(
@@ -347,7 +352,9 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
                   color: _isCopied ? Colors.greenAccent : Colors.white70,
                 ),
                 label: Text(
-                  _isCopied ? 'Link Copiado!' : 'Copiar Link de Pareamento',
+                  _isCopied
+                      ? t.tr('link_copied', fallback: 'Link Copiado!')
+                      : t.tr('copy_pairing_link', fallback: 'Copiar Link de Pareamento'),
                   style: TextStyle(
                     fontSize: 13,
                     color: _isCopied ? Colors.greenAccent : Colors.white,
@@ -368,7 +375,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
                 color: AppColors.primary,
                 size: 20,
               ),
-              tooltip: 'Entrada manual de Token',
+              tooltip: t.tr('manual_token_input', fallback: 'Entrada manual de Token'),
               style: IconButton.styleFrom(
                 backgroundColor: AppColors.primary.withOpacity(0.12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -388,9 +395,9 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Colar Token JWT Manualmente:',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                Text(
+                  t.tr('paste_jwt_token', fallback: 'Colar Token JWT Manualmente:'),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 8),
                 TextField(
@@ -398,7 +405,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
                   maxLines: 2,
                   style: const TextStyle(fontSize: 12, color: AppColors.textPrimary, fontFamily: 'monospace'),
                   decoration: InputDecoration(
-                    hintText: 'Cole o token JWT aqui...',
+                    hintText: t.tr('paste_jwt_placeholder', fallback: 'Cole o token JWT aqui...'),
                     hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                     filled: true,
                     fillColor: AppColors.surfaceLight,
@@ -430,7 +437,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
                             height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('Validar e Entrar', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                        : Text(t.tr('validate_and_sign_in', fallback: 'Validar e Entrar'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                   ),
                 ),
               ],
@@ -452,7 +459,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Prefere entrar com senha? No app do celular vá em Configurações > Conta > Definir Senha. Depois entre direto pelo E-mail no Desky.',
+                  t.tr('qr_hint_prefer_password', fallback: 'Prefere entrar com senha? No app do celular vá em Configurações > Conta > Definir Senha. Depois entre direto pelo E-mail no Desky.'),
                   style: TextStyle(
                     fontSize: 11.5,
                     color: Colors.white.withOpacity(0.8),
@@ -503,7 +510,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
     );
   }
 
-  Widget _buildNetworkInterfaceSelector() {
+  Widget _buildNetworkInterfaceSelector(AppTranslation t) {
     if (_session == null) return const SizedBox.shrink();
 
     final availableIps = _session!.availableIps;
@@ -530,7 +537,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
           ),
           const SizedBox(width: 8),
           Text(
-            'IP Local: ',
+            t.tr('local_ip', fallback: 'IP Local: '),
             style: const TextStyle(
               fontSize: 11.5,
               color: AppColors.textSecondary,
@@ -547,7 +554,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
           if (availableIps.length > 1) ...[
             const SizedBox(width: 4),
             PopupMenuButton<String>(
-              tooltip: 'Trocar interface de rede',
+              tooltip: t.tr('change_network_interface', fallback: 'Trocar interface de rede'),
               padding: EdgeInsets.zero,
               icon: const Icon(
                 LucideIcons.chevronDown,
