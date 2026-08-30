@@ -155,9 +155,9 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
       child: Container(
         width: 520,
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
+          border: Border.all(color: AppColors.border, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.6),
@@ -310,11 +310,11 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
             backgroundColor: Colors.white,
             eyeStyle: const QrEyeStyle(
               eyeShape: QrEyeShape.square,
-              color: Color(0xFF1E1E1E),
+              color: Colors.black,
             ),
             dataModuleStyle: const QrDataModuleStyle(
               dataModuleShape: QrDataModuleShape.square,
-              color: Color(0xFF1E1E1E),
+              color: Colors.black,
             ),
           ),
         ),
@@ -381,31 +381,31 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF141414),
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: AppColors.border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Colar Token JWT Manualmente:',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white70),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _tokenController,
                   maxLines: 2,
-                  style: const TextStyle(fontSize: 12, color: Colors.white, fontFamily: 'monospace'),
+                  style: const TextStyle(fontSize: 12, color: AppColors.textPrimary, fontFamily: 'monospace'),
                   decoration: InputDecoration(
                     hintText: 'Cole o token JWT aqui...',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12),
+                    hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                     filled: true,
-                    fillColor: const Color(0xFF1E1E1E),
+                    fillColor: AppColors.surfaceLight,
                     contentPadding: const EdgeInsets.all(10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                      borderSide: const BorderSide(color: AppColors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -516,9 +516,9 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF161616),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -531,9 +531,9 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
           const SizedBox(width: 8),
           Text(
             'IP Local: ',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11.5,
-              color: Colors.white.withOpacity(0.6),
+              color: AppColors.textSecondary,
             ),
           ),
           Text(
@@ -541,7 +541,7 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
             style: const TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           if (availableIps.length > 1) ...[
@@ -549,15 +549,15 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
             PopupMenuButton<String>(
               tooltip: 'Trocar interface de rede',
               padding: EdgeInsets.zero,
-              icon: Icon(
+              icon: const Icon(
                 LucideIcons.chevronDown,
                 size: 14,
-                color: Colors.white.withOpacity(0.7),
+                color: AppColors.textSecondary,
               ),
-              color: const Color(0xFF222222),
+              color: AppColors.card,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                side: const BorderSide(color: AppColors.border),
               ),
               onSelected: (newIp) {
                 setState(() {

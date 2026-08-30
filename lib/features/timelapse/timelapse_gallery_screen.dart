@@ -203,7 +203,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
           children: [
             Expanded(
               child: Container(
-                color: Colors.black45,
+                color: AppColors.card,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [

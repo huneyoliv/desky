@@ -17,10 +17,10 @@ class StudyCalendar extends ConsumerWidget {
   Color _getDayColor(int ms) {
     if (ms <= 0) return AppColors.card;
     final hours = ms / 3600000;
-    if (hours < 2) return const Color(0xFF0E4429);
-    if (hours < 4) return const Color(0xFF006D32);
-    if (hours < 7) return const Color(0xFF26A641);
-    return const Color(0xFF39D353);
+    if (hours < 2) return AppColors.heatmapL1;
+    if (hours < 4) return AppColors.heatmapL2;
+    if (hours < 7) return AppColors.heatmapL3;
+    return AppColors.heatmapL4;
   }
 
   String _formatMs(int ms) {
@@ -69,7 +69,7 @@ class StudyCalendar extends ConsumerWidget {
             Text(
               '${t.tr("presence_calendar", fallback: "Calendário de Presença")} — $monthHeader',
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
@@ -124,7 +124,7 @@ class StudyCalendar extends ConsumerWidget {
                   context: context,
                   builder: (context) => AlertDialog(
                     backgroundColor: AppColors.card,
-                    title: Text('${t.tr("studies_on", fallback: "Estudos em")} $dateStr', style: const TextStyle(color: Colors.white)),
+                    title: Text('${t.tr("studies_on", fallback: "Estudos em")} $dateStr', style: const TextStyle(color: AppColors.textPrimary)),
                     content: Text(
                       studyMs > 0
                           ? '${t.tr("total_time_studied", fallback: "Tempo total estudado")}: ${_formatMs(studyMs)}'
@@ -157,7 +157,7 @@ class StudyCalendar extends ConsumerWidget {
                     Text(
                       '$dayNum',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: color == AppColors.heatmapL4 ? Colors.black : AppColors.textPrimary,
                         fontWeight: dayNum == now.day ? FontWeight.bold : FontWeight.normal,
                         fontSize: 12,
                       ),
@@ -165,8 +165,8 @@ class StudyCalendar extends ConsumerWidget {
                     if (studyMs > 0)
                       Text(
                         _formatMs(studyMs),
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(
+                          color: color == AppColors.heatmapL4 ? Colors.black87 : AppColors.textSecondary,
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
                         ),

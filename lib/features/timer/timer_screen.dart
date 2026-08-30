@@ -77,10 +77,11 @@ class TimerScreen extends ConsumerWidget {
                             Text(
                               _formatTotalTime(timerState.todayTotalMs),
                               style: const TextStyle(
-                                fontFamily: AppTextStyles.fontPretendard,
+                                fontFamily: AppTextStyles.fontDisplay,
+                                fontFamilyFallback: AppTextStyles.fontFallbacks,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ],

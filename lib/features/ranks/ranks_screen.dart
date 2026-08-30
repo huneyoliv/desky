@@ -202,11 +202,11 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
         4.0, (max, h) => h > max ? h : max);
 
     final colors = [
-      const Color(0xFF5B6AF0),
-      const Color(0xFFFF5247),
-      const Color(0xFF00E676),
-      const Color(0xFFFFAB00),
-      const Color(0xFFE040FB),
+      AppColors.primary,
+      AppColors.flame,
+      AppColors.success,
+      AppColors.warning,
+      AppColors.lavender,
     ];
 
     double totalSubjectHours = _subjectDistribution.values.fold(0.0, (a, b) => a + b);

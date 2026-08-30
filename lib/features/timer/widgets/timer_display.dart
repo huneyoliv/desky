@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
 class TimerDisplay extends StatelessWidget {
@@ -34,7 +35,7 @@ class TimerDisplay extends StatelessWidget {
         fontFamily: AppTextStyles.fontTimer,
         fontSize: fontSize,
         fontWeight: FontWeight.w700,
-        color: Colors.white,
+        color: AppColors.textPrimary,
         letterSpacing: 3.0,
       ),
     );
