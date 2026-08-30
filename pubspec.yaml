@@ -1,0 +1,131 @@
+name: desky
+description: "Desky - Focus & Study Timer Desktop Client"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management & Hooks
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  flutter_hooks: ^0.20.5
+  hooks_riverpod: ^2.5.1
+
+  # Routing
+  go_router: ^14.2.0
+
+  # Networking & Storage
+  dio: ^5.5.0+1
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.2.3
+
+  # Media & Visuals
+  cached_network_image: ^3.3.1
+  just_audio: ^0.9.38
+  fl_chart: ^0.68.0
+  lottie: ^3.1.2
+  flutter_svg: ^2.0.10+1
+
+  # Localization & Utilities
+  easy_localization: ^3.0.7
+  lucide_icons_flutter: any
+  intl: any
+  window_manager: ^0.3.9
+
+  crypto: ^3.0.3
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.1
+  qr_flutter: ^4.1.0
+  flutter_dotenv: ^5.2.1
+
+  # Models & JSON
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  cupertino_icons: ^1.0.8
+  file_picker: ^11.0.3
+  syncfusion_flutter_pdfviewer: ^33.2.13
+  path_provider: ^2.1.6
+  url_launcher: ^6.3.0
+  flutter_markdown: ^0.7.7+1
+  ffi: ^2.1.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.11
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.4.0
+  flutter_launcher_icons: ^0.14.3
+  msix: ^3.16.8
+
+msix_config:
+  display_name: Desky
+  publisher_display_name: Desky
+  identity_name: DevHuney.Desky
+  publisher: CN=B81D5CBC-296B-44D2-9E7C-AF85E6AF4AD8
+  msix_version: 1.0.0.0
+  logo_path: assets/icons/icon.png
+  output_name: Desky-Windows-Store-x64
+  architecture: x64
+  capabilities: internetClient
+  languages: en-us, pt-br, es-es, ko-kr, ja-jp, zh-cn, zh-tw, fr-fr, de-de, it-it, ru-ru
+
+flutter_launcher_icons:
+  image_path: "assets/icons/icon.png"
+  windows:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/icons/icon.png"
+  linux:
+    generate: true
+    image_path: "assets/icons/icon.png"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/translations/
+    - assets/icons/
+    - assets/images/
+    - assets/images/studicon/
+    - assets/lottie/
+
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Thin.otf
+          weight: 100
+        - asset: assets/fonts/Pretendard-ExtraLight.otf
+          weight: 200
+        - asset: assets/fonts/Pretendard-Light.otf
+          weight: 300
+        - asset: assets/fonts/Pretendard-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Pretendard-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Pretendard-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Pretendard-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Pretendard-ExtraBold.otf
+          weight: 800
+        - asset: assets/fonts/Pretendard-Black.otf
+          weight: 900
+    - family: E1234
+      fonts:
+        - asset: assets/fonts/E1234.ttf

@@ -1,0 +1,304 @@
+name: Release - Multiplatform Desktop Installers
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Tag da versão da release (ex: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  quality-gate:
+    name: Code Quality & Automated Tests Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux build dependencies for tests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libsecret-1-dev libjsoncpp-dev
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run Flutter Analyze
+        run: flutter analyze
+
+      - name: Run Full Test Suite
+        run: flutter test
+
+  build-windows:
+    name: Windows Package (.msix) & Installer (.exe)
+    needs: [quality-gate]
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Configure Environment Credentials
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.ENV_FILE }}" ]; then
+            echo "${{ secrets.ENV_FILE }}" > .env
+          fi
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Windows Release for Installer (Standalone)
+        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=true --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+
+      - name: Compile Inno Setup Installer
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer\desky_setup.iss
+
+      - name: Build Windows Release for Microsoft Store (MSIX)
+        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=false --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+
+      - name: Create Windows MSIX Package
+        run: dart run msix:create --store
+
+      - name: Stage Windows Artifacts
+        shell: pwsh
+        run: |
+          Copy-Item "windows\installer\Desky-Windows-Installer-x64.exe" -Destination "Desky-Windows-Installer-x64.exe"
+          Copy-Item "build\windows\x64\runner\Release\Desky-Windows-Store-x64.msix" -Destination "Desky-Windows-Store-x64.msix"
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Desky-Windows-Artifacts
+          path: |
+            Desky-Windows-Installer-x64.exe
+            Desky-Windows-Store-x64.msix
+          if-no-files-found: error
+
+  build-macos:
+    name: macOS Disk Image (.dmg)
+    needs: [quality-gate]
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Configure Environment Credentials
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.ENV_FILE }}" ]; then
+            echo "${{ secrets.ENV_FILE }}" > .env
+          fi
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build macOS Release
+        run: flutter build macos --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+
+      - name: Create DMG Installer
+        run: |
+          mkdir -p dmg_root
+          cp -r build/macos/Build/Products/Release/desky.app dmg_root/
+          ln -s /Applications dmg_root/Applications
+          hdiutil create -volname "Desky" -srcfolder dmg_root -ov -format UDZO Desky-macOS-Installer.dmg
+
+      - name: Upload macOS Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Desky-macOS-Installer
+          path: Desky-macOS-Installer.dmg
+          if-no-files-found: error
+
+  build-linux:
+    name: Linux Debian Package (.deb & .tar.gz)
+    needs: [quality-gate]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libsecret-1-dev libjsoncpp-dev dpkg-dev
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Configure Environment Credentials
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.ENV_FILE }}" ]; then
+            echo "${{ secrets.ENV_FILE }}" > .env
+          fi
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Linux Release
+        run: flutter build linux --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+
+      - name: Package Debian (.deb) & Portable (.tar.gz)
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF_NAME" ]; then
+            VERSION="1.0.0"
+          fi
+          
+          mkdir -p pkg/DEBIAN
+          mkdir -p pkg/usr/lib/desky
+          mkdir -p pkg/usr/bin
+          mkdir -p pkg/usr/share/applications
+          mkdir -p pkg/usr/share/pixmaps
+
+          cp -r build/linux/x64/release/bundle/* pkg/usr/lib/desky/
+          cp assets/icons/icon.png pkg/usr/share/pixmaps/desky.png
+
+          cat << 'EOF' > pkg/usr/bin/desky
+          #!/bin/bash
+          exec /usr/lib/desky/desky "$@"
+          EOF
+          chmod +x pkg/usr/bin/desky
+
+          cat << EOF > pkg/usr/share/applications/desky.desktop
+          [Desktop Entry]
+          Name=Desky
+          Comment=Focus & Study Timer Desktop Client
+          Exec=/usr/bin/desky
+          Icon=desky
+          Terminal=false
+          Type=Application
+          Categories=Utility;Education;
+          EOF
+
+          cat << EOF > pkg/DEBIAN/control
+          Package: desky
+          Version: ${VERSION}
+          Architecture: amd64
+          Maintainer: Desky Project <huney.oliveira@gmail.com>
+          Description: Desky - Focus & Study Timer Desktop Client
+           Client desktop completo e moderno para foco e gerenciamento de tempo de estudos.
+          EOF
+
+          dpkg-deb --build pkg Desky-Linux-x64.deb
+          tar -czf Desky-Linux-x64.tar.gz -C build/linux/x64/release/bundle .
+
+      - name: Upload Linux Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: Desky-Linux-Packages
+          path: |
+            Desky-Linux-x64.deb
+            Desky-Linux-x64.tar.gz
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [quality-gate, build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all installer artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_assets
+          merge-multiple: true
+
+      - name: Identify Release Tag and Extract Changelog
+        id: release_info
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.version_tag }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          python3 scripts/extract_changelog.py "${TAG}"
+
+      - name: Verify All Required Multiplatform Release Artifacts
+        run: |
+          echo "Flattening release assets if any subdirectories were preserved..."
+          find release_assets -mindepth 2 -type f -exec mv -t release_assets/ {} + 2>/dev/null || true
+          
+          echo "Checking release assets directory..."
+          ls -la release_assets/
+          
+          REQUIRED_FILES=(
+            "release_assets/Desky-Windows-Installer-x64.exe"
+            "release_assets/Desky-Windows-Store-x64.msix"
+            "release_assets/Desky-macOS-Installer.dmg"
+            "release_assets/Desky-Linux-x64.deb"
+            "release_assets/Desky-Linux-x64.tar.gz"
+          )
+          
+          MISSING=0
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "::error file=$file::Required release artifact missing: $file"
+              MISSING=1
+            else
+              echo "✅ Verified: $file ($(du -h "$file" | cut -f1))"
+            fi
+          done
+          
+          if [ "$MISSING" -ne 0 ]; then
+            echo "❌ Pipeline failed: One or more platform artifacts are missing."
+            exit 1
+          fi
+          echo "🎉 All 5 platform release artifacts verified successfully!"
+
+      - name: Create Official GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_info.outputs.tag }}
+          name: "Desky ${{ steps.release_info.outputs.tag }}"
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          body_path: release_notes.md
+          generate_release_notes: true
+          files: |
+            release_assets/Desky-Windows-Installer-x64.exe
+            release_assets/Desky-Windows-Store-x64.msix
+            release_assets/Desky-macOS-Installer.dmg
+            release_assets/Desky-Linux-x64.deb
+            release_assets/Desky-Linux-x64.tar.gz

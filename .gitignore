@@ -1,0 +1,74 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+.agents/
+.agents
+
+# IDE & Editor files
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+/build/
+/coverage/
+
+# Ephemeral desktop build directories
+linux/flutter/ephemeral/
+windows/flutter/ephemeral/
+macos/Flutter/ephemeral/
+
+# Symbolication & Obfuscation
+app.*.symbols
+app.*.map.json
+
+# Android build artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# HTTP Archive & reverse-engineering dumps
+*.har
+har/
+har_analysis_new.txt
+openypt/
+tools/
+
+# Installer & Release output artifacts
+windows/installer/Output/
+Output/
+*.iss.log
+*.deb
+*.dmg
+*.pkg
+*.AppImage
+*.tar.gz
+
+# Pending Changelog
+pending_changelog.md
+changelog_pending.md
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
