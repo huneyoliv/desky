@@ -13,11 +13,11 @@ class AppColors {
   // Brand Colors — Lilac/Lavender from logo background as Primary
   static const Color primary = Color(0xFFA78BFA); // Vibrant Lilac
   static const Color primaryDark = Color(0xFF6D4CA7);
-  static const Color primaryLight = Color(0xFFDACDF2);
+  static const Color primaryLight = Color(0xFFCFD3F0); // Pastel Periwinkle/Lavender from logo
 
-  // Secondary / Accent — Blue from the hourglass facets
-  static const Color accent = Color(0xFF4A7FB5);
-  static const Color accentDark = Color(0xFF1C6AAA);
+  // Secondary / Accent — Slate Blue from the hourglass facets
+  static const Color accent = Color(0xFF6D8DBA);
+  static const Color accentDark = Color(0xFF4A6C98);
   static const Color flame = Color(0xFFFF6B6B);
   static const Color flameOrange = Color(0xFFFF9052);
 

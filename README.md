@@ -1,4 +1,6 @@
-﻿<div align="center">
+<div align="center">
+
+<img src="assets/icons/icon.png" alt="Desky Logo" width="128" height="128" />
 
 # ⏱️ Desky — Yeolpumta Desktop Client
 
