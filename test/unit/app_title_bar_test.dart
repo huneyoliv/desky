@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:desky/core/services/update_service.dart';
@@ -36,7 +36,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Desky - Yeolpumta Desktop'), findsOneWidget);
+      expect(find.byType(AppTitleBar), findsOneWidget);
       expect(find.byType(MouseRegion), findsWidgets);
       expect(find.byIcon(Icons.close), findsOneWidget);
     });
