@@ -67,7 +67,7 @@ class SubjectChip extends StatelessWidget {
               Text(
                 subject.title,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   fontSize: 14,
                 ),
@@ -76,7 +76,7 @@ class SubjectChip extends StatelessWidget {
               Text(
                 _formatMs(subject.studyMs),
                 style: TextStyle(
-                  color: isSelected ? Colors.white70 : AppColors.textMuted,
+                  color: isSelected ? AppColors.textSecondary : AppColors.textMuted,
                   fontSize: 12,
                 ),
               ),

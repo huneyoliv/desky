@@ -46,7 +46,7 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
     return Material(
       color: AppColors.card,
       elevation: 8,
-      shadowColor: Colors.black45,
+      shadowColor: Colors.black.withValues(alpha: 0.7),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: AppColors.border),
@@ -111,7 +111,7 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
                             title: Text(
                               notice.title,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                                 fontWeight: notice.isRead ? FontWeight.normal : FontWeight.bold,
                                 fontSize: 13,
                               ),

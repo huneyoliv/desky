@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../core/localization/app_translation.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/utils/package_helper.dart';
 import '../../features/updates/widgets/update_button.dart';
 
@@ -99,7 +100,7 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
 
     return Container(
       height: 32,
-      color: const Color(0xFF141418),
+      color: AppColors.background,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -117,7 +118,7 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
                       width: 6,
                       height: 6,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFFF7A00),
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -130,7 +131,7 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white70,
+                          color: AppColors.textSecondary,
                           letterSpacing: 0.3,
                         ),
                       ),
