@@ -206,7 +206,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
       AppColors.flame,
       AppColors.success,
       AppColors.warning,
-      AppColors.lavender,
+      AppColors.accent,
     ];
 
     double totalSubjectHours = _subjectDistribution.values.fold(0.0, (a, b) => a + b);

@@ -61,7 +61,7 @@ class ColorUtils {
   ];
 
   static Color fromArgbInt(int argb) {
-    if (argb == 0) return const Color(0xFF6B8EF0);
+    if (argb == 0) return const Color(0xFFA78BFA);
     return Color(argb).withValues(alpha: 1.0);
   }
 
