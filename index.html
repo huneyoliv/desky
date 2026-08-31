@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desky — O Cliente Desktop Definitivo para o Yeolpumta</title>
+  
+  <!-- SEO & Meta Tags -->
+  <meta name="description" content="Desky é um cliente desktop nativo, moderno e de alto desempenho para o Yeolpumta (YPT). Cronômetro Pomodoro, grupos de estudo em tempo real, Live Study, rankings, flashcards e bloqueador de distrações." />
+  <meta name="keywords" content="Desky, Yeolpumta, YPT, Pomodoro, Study Timer, Foco, Produtividade, Estudo, Windows, macOS, Linux, Open Source" />
+  <meta name="author" content="DevHuney" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Open Graph / Social Cards -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://huneyoliv.github.io/desky/" />
+  <meta property="og:title" content="Desky — Cliente Desktop Moderno para Yeolpumta" />
+  <meta property="og:description" content="Potencialize seus estudos com cronômetro Pomodoro, grupos em tempo real, heatmap de atividade, flashcards e tema AMOLED." />
+  <meta property="og:image" content="https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/icons/icon.png" />
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons (CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-black: #000000;
+      --bg-surface: #0a0a0d;
+      --bg-surface-raised: #121217;
+      --bg-card: #16161d;
+      --bg-card-hover: #1c1c24;
+      --border-subtle: #23232c;
+      --border-focus: #5b6af0;
+      
+      --primary: #5b6af0;
+      --primary-light: #7b88f6;
+      --primary-dark: #4350ca;
+      --primary-glow: rgba(91, 106, 240, 0.35);
+      
+      --flame: #ff5247;
+      --flame-orange: #ff7a00;
+      --flame-glow: rgba(255, 82, 71, 0.35);
+      
+      --success: #00e676;
+      --text-primary: #f5f5f7;
+      --text-secondary: #9494a0;
+      --text-muted: #62626e;
+
+      --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-black);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, rgba(91, 106, 240, 0.12) 0%, transparent 60%),
+                  radial-gradient(circle at 85% 30%, rgba(255, 82, 71, 0.08) 0%, transparent 50%),
+                  var(--bg-black);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(0, 0, 0, 0.75);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: all 0.3s ease;
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-logo img {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px var(--primary-glow);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-logo:hover img {
+      transform: scale(1.1) rotate(4deg);
+    }
+
+    .brand-text {
+      background: linear-gradient(135deg, #ffffff 40%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 20px var(--primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      filter: brightness(1.1);
+    }
+
+    .btn-outline {
+      background: var(--bg-surface-raised);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-card);
+      border-color: var(--text-muted);
+      transform: translateY(-2px);
+    }
+
+    .btn-flame {
+      background: linear-gradient(135deg, var(--flame) 0%, var(--flame-orange) 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 20px var(--flame-glow);
+    }
+
+    .btn-flame:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 8px 30px var(--flame-glow);
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      padding: 80px 0 60px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(91, 106, 240, 0.12);
+      border: 1px solid rgba(91, 106, 240, 0.3);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary-light);
+      margin-bottom: 24px;
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+
+    .hero-badge i {
+      color: var(--flame);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(91, 106, 240, 0.2); }
+      50% { box-shadow: 0 0 25px rgba(255, 82, 71, 0.3); }
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      line-height: 1.08;
+      margin-bottom: 24px;
+      font-weight: 900;
+    }
+
+    .hero-title span.highlight {
+      background: linear-gradient(135deg, #ffffff 20%, var(--primary-light) 60%, var(--flame-orange) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 780px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .os-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .hero-trust {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 60px;
+    }
+
+    .hero-trust-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-trust-item i {
+      color: var(--success);
+      font-size: 1rem;
+    }
+
+    /* Mockup Frame & Live Simulation */
+    .hero-mockup-wrapper {
+      position: relative;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(91, 106, 240, 0.3) 0%, rgba(255, 82, 71, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+      border-radius: 24px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8), 0 0 60px var(--primary-glow);
+    }
+
+    .window-frame {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .window-titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      background: #101014;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .window-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .window-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mockup-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Floating Widget Box */
+    .floating-timer-widget {
+      position: absolute;
+      bottom: 40px;
+      right: -20px;
+      background: rgba(18, 18, 23, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(91, 106, 240, 0.4);
+      border-radius: 18px;
+      padding: 20px 24px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px var(--primary-glow);
+      text-align: left;
+      z-index: 10;
+      animation: floatSlow 6s infinite ease-in-out;
+      width: 290px;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .widget-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary-light);
+      background: rgba(91, 106, 240, 0.15);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .widget-time {
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .widget-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Stats Bar */
+    .stats-section {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      margin-top: 60px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+      text-align: center;
+    }
+
+    .stat-item h3 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .stat-item p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Features Grid */
+    .features-section {
+      padding: 100px 0;
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 60px;
+    }
+
+    .section-tag {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary-light);
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: var(--bg-surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      background: var(--bg-card);
+      border-color: rgba(91, 106, 240, 0.4);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: rgba(91, 106, 240, 0.12);
+      border: 1px solid rgba(91, 106, 240, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-light);
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon-box {
+      transform: scale(1.1);
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .feature-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Screenshots Showcase Section */
+    .screenshots-section {
+      padding: 100px 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .gallery-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .gallery-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .gallery-tab {
+      padding: 10px 20px;
+      background: var(--bg-surface-raised);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .gallery-tab.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary-light);
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .lang-selector-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .lang-select {
+      background: var(--bg-surface-raised);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .gallery-view {
+      background: var(--bg-black);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    .gallery-view img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Downloads Matrix */
+    .downloads-section {
+      padding: 100px 0;
+    }
+
+    .downloads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .download-card {
+      background: var(--bg-surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .download-card:hover {
+      border-color: var(--primary-light);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .download-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .os-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--primary-light);
+    }
+
+    .download-header h3 {
+      font-size: 1.25rem;
+    }
+
+    .download-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .download-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .download-list li a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .download-list li a:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--primary);
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      padding: 100px 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .faq-accordion {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .faq-item {
+      background: var(--bg-surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .faq-question {
+      padding: 20px 24px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+
+    .faq-answer {
+      padding: 0 24px 20px;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .faq-item.active .faq-answer {
+      display: block;
+    }
+
+    .faq-item.active .faq-chevron {
+      transform: rotate(180deg);
+    }
+
+    .faq-chevron {
+      transition: transform 0.3s ease;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 60px 0 30px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-black);
+      margin-top: auto;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-brand p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 12px;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+
+    .footer-col h4 {
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .nav-links { display: none; }
+      .floating-timer-widget { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo">
+        <img src="assets/icons/icon.png" alt="Desky Icon" />
+        <span class="brand-text">Desky</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#recursos" class="nav-link">Recursos</a></li>
+          <li><a href="#demonstracao" class="nav-link">Galeria</a></li>
+          <li><a href="#downloads" class="nav-link">Downloads</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/huneyoliv/desky" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+          <i data-lucide="github"></i>
+          <span>GitHub</span>
+        </a>
+        <a href="#downloads" class="btn btn-primary btn-sm">
+          <i data-lucide="download"></i>
+          <span>Baixar v1.0.0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <i data-lucide="flame"></i>
+        <span>Desky v1.0.0 Lançado Oficialmente</span>
+      </div>
+
+      <h1 class="hero-title">
+        O cliente desktop definitivo para o <br />
+        <span class="highlight">Yeolpumta</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Foco profundo, cronômetro Pomodoro com matérias coloridas, presença em grupos ao vivo (Live Study) e estatísticas completas em uma interface moderna AMOLED True Black para Windows, macOS e Linux.
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe" class="btn btn-primary" id="primary-download-btn">
+          <i data-lucide="download"></i>
+          <span id="primary-download-label">Baixar para Windows (x64)</span>
+          <span class="os-badge">.exe</span>
+        </a>
+        <a href="https://github.com/huneyoliv/desky/releases/latest" target="_blank" class="btn btn-outline">
+          <i data-lucide="layers"></i>
+          <span>Todos os Instaladores</span>
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        <div class="hero-trust-item">
+          <i data-lucide="shield-check"></i>
+          <span>100% Gratuito & Open Source (MIT)</span>
+        </div>
+        <div class="hero-trust-item">
+          <i data-lucide="zap"></i>
+          <span>Alta Performance Flutter Nativo</span>
+        </div>
+        <div class="hero-trust-item">
+          <i data-lucide="globe"></i>
+          <span>28 Idiomas Nativos</span>
+        </div>
+      </div>
+
+      <!-- Mockup Showcase -->
+      <div class="hero-mockup-wrapper">
+        <div class="window-frame">
+          <div class="window-titlebar">
+            <div class="window-dots">
+              <span class="window-dot dot-red"></span>
+              <span class="window-dot dot-yellow"></span>
+              <span class="window-dot dot-green"></span>
+            </div>
+            <div class="window-title">
+              <i data-lucide="clock" style="width: 14px; height: 14px; color: var(--primary-light);"></i>
+              <span>Desky — Cronômetro de Estudo</span>
+            </div>
+            <div style="width: 40px;"></div>
+          </div>
+          <img src="photos/portuguese/timer.png" alt="Desky Interface" class="mockup-img" id="hero-screenshot" />
+        </div>
+
+        <!-- Live Interactive Simulation Floating Widget -->
+        <div class="floating-timer-widget">
+          <div class="widget-header">
+            <span class="widget-tag">Foco Ativo</span>
+            <i data-lucide="flame" style="color: var(--flame); width: 18px; height: 18px;"></i>
+          </div>
+          <div class="widget-time" id="demo-timer">00:25:00</div>
+          <div class="widget-controls">
+            <button class="btn btn-flame btn-sm" style="flex: 1;" id="demo-toggle-btn" onclick="toggleDemoTimer()">
+              <i data-lucide="play" id="demo-icon" style="width: 14px; height: 14px;"></i>
+              <span id="demo-text">Iniciar</span>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="resetDemoTimer()">
+              <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metrics Bar -->
+  <section class="stats-section">
+    <div class="container stats-grid">
+      <div class="stat-item">
+        <h3>340+</h3>
+        <p>Testes Automatizados Verificados</p>
+      </div>
+      <div class="stat-item">
+        <h3>28</h3>
+        <p>Idiomas com Tradução Completa</p>
+      </div>
+      <div class="stat-item">
+        <h3>0%</h3>
+        <p>Distrações com Modo Foco Estrito</p>
+      </div>
+      <div class="stat-item">
+        <h3>100%</h3>
+        <p>Código Aberto com Licença MIT</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="recursos">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Funcionalidades Completas</span>
+        <h2 class="section-title">Construído para maximizar o seu rendimento</h2>
+        <p class="section-desc">Tudo o que você precisa para manter o foco profundo nos estudos, acompanhar amigos em tempo real e evoluir dia a dia.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <i data-lucide="timer"></i>
+          </div>
+          <h3>Cronômetro & Pomodoro</h3>
+          <p>Ciclos normais e Pomodoro totalmente configuráveis. Organize matérias com cores personalizadas e registre sessões manuais retroativas com sincronização instantânea.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <i data-lucide="users"></i>
+          </div>
+          <h3>Grupos & Live Study</h3>
+          <p>Veja em tempo real quem está estudando no seu grupo. Envie toques motivacionais (Shakes), converse no chat com emojis e use o Live Study com câmera para comprovação de presença.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <i data-lucide="grid"></i>
+          </div>
+          <h3>Activity Heatmap & Streaks</h3>
+          <p>Visualize sua constância ao longo do ano com uma grade de calor estilo GitHub. Mantenha sua ofensiva de chamas diárias e suba nos rankings globais e nacionais.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <i data-lucide="shield-alert"></i>
+          </div>
+          <h3>Bloqueador de Distrações</h3>
+          <p>Identifique automaticamente aplicativos que desviam sua atenção durante as sessões e use o Mini Player flutuante Always-on-Top para manter o timer visível em multitarefa.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <i data-lucide="layers"></i>
+          </div>
+          <h3>Flashcards & Leitor PDF</h3>
+          <p>Crie baralhos de estudo com algoritmo de repetição espaçada SM-2. Leia livros e apostilas pelo leitor PDF integrado e gere cartões de estudo diretamente de trechos.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <i data-lucide="calendar"></i>
+          </div>
+          <h3>Planejador & Metas D-Day</h3>
+          <p>Acompanhe a contagem regressiva para provas, vestibulares e concursos. Organize listas de tarefas com prioridades e monte sua grade de horários semanal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Screenshots Gallery -->
+  <section class="screenshots-section" id="demonstracao">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Galeria de Telas</span>
+        <h2 class="section-title">Interface Imersiva AMOLED True Black</h2>
+        <p class="section-desc">Explore a interface do Desky nos seus idiomas preferidos com design Material Design 3 e tipografia refinada.</p>
+      </div>
+
+      <div class="gallery-controls">
+        <div class="gallery-tabs">
+          <button class="gallery-tab active" onclick="switchGalleryTab('timer', this)">⏱️ Cronômetro</button>
+          <button class="gallery-tab" onclick="switchGalleryTab('chat_de_grupos', this)">👥 Grupos & Chat</button>
+          <button class="gallery-tab" onclick="switchGalleryTab('rankings', this)">📊 Rankings & Heatmap</button>
+          <button class="gallery-tab" onclick="switchGalleryTab('perfil', this)">👤 Perfil do Aluno</button>
+        </div>
+
+        <div class="lang-selector-wrapper">
+          <i data-lucide="languages"></i>
+          <span>Idioma da Tela:</span>
+          <select id="gallery-lang" class="lang-select" onchange="updateGalleryImage()">
+            <option value="portuguese" selected>Português (Brasil)</option>
+            <option value="english">English (US)</option>
+            <option value="spanish">Español</option>
+            <option value="korean">한국어</option>
+            <option value="japanese">日本語</option>
+            <option value="simplified_chinese">简体中文</option>
+            <option value="traditional_chinese">繁體中文</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="gallery-view">
+        <img id="gallery-img" src="photos/portuguese/timer.png" alt="Desky Screenshot" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Downloads Section -->
+  <section class="downloads-section" id="downloads">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Instalação & Downloads</span>
+        <h2 class="section-title">Baixe o Desky para o seu sistema</h2>
+        <p class="section-desc">Instaladores nativos otimizados com suporte a atualizações automáticas integradas.</p>
+      </div>
+
+      <div class="downloads-grid">
+        <!-- Windows -->
+        <div class="download-card">
+          <div>
+            <div class="download-header">
+              <div class="os-icon-box"><i data-lucide="monitor"></i></div>
+              <div>
+                <h3>Windows</h3>
+                <p>Windows 10 / 11 (64-bit)</p>
+              </div>
+            </div>
+            <ul class="download-list">
+              <li>
+                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe">
+                  <span>Instalador Setup (.exe)</span>
+                  <i data-lucide="download" style="width: 16px;"></i>
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/huneyoliv/desky/releases/latest">
+                  <span>Pacote Microsoft Store (.msix)</span>
+                  <i data-lucide="box" style="width: 16px;"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe" class="btn btn-primary" style="width: 100%;">
+            <i data-lucide="download"></i>
+            <span>Baixar para Windows</span>
+          </a>
+        </div>
+
+        <!-- macOS -->
+        <div class="download-card">
+          <div>
+            <div class="download-header">
+              <div class="os-icon-box"><i data-lucide="laptop"></i></div>
+              <div>
+                <h3>macOS</h3>
+                <p>macOS 12.0+ (Apple Silicon & Intel)</p>
+              </div>
+            </div>
+            <ul class="download-list">
+              <li>
+                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg">
+                  <span>Imagem de Disco (.dmg)</span>
+                  <i data-lucide="download" style="width: 16px;"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg" class="btn btn-outline" style="width: 100%;">
+            <i data-lucide="download"></i>
+            <span>Baixar para macOS</span>
+          </a>
+        </div>
+
+        <!-- Linux -->
+        <div class="download-card">
+          <div>
+            <div class="download-header">
+              <div class="os-icon-box"><i data-lucide="terminal"></i></div>
+              <div>
+                <h3>Linux</h3>
+                <p>Ubuntu, Debian, Fedora, Arch</p>
+              </div>
+            </div>
+            <ul class="download-list">
+              <li>
+                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb">
+                  <span>Pacote Debian (.deb)</span>
+                  <i data-lucide="download" style="width: 16px;"></i>
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.tar.gz">
+                  <span>Arquivo Portátil (.tar.gz)</span>
+                  <i data-lucide="download" style="width: 16px;"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb" class="btn btn-outline" style="width: 100%;">
+            <i data-lucide="download"></i>
+            <span>Baixar para Linux (.deb)</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Dúvidas Frequentes</span>
+        <h2 class="section-title">Perguntas e Respostas</h2>
+      </div>
+
+      <div class="faq-accordion">
+        <div class="faq-item active">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>O Desky é gratuito e de código aberto?</span>
+            <i data-lucide="chevron-down" class="faq-chevron"></i>
+          </div>
+          <div class="faq-answer">
+            Sim! O Desky é 100% gratuito e open source sob a licença MIT. O código fonte está disponível no GitHub para qualquer pessoa auditar, compilar e contribuir.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>O Desky é o aplicativo oficial do Yeolpumta?</span>
+            <i data-lucide="chevron-down" class="faq-chevron"></i>
+          </div>
+          <div class="faq-answer">
+            Não. O Desky é um cliente independente desenvolvido pela comunidade para fornecer uma experiência de desktop de primeira classe no computador. Ele não possui afiliação oficial com a Pallo Inc.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Minhas horas de estudo são sincronizadas com o celular?</span>
+            <i data-lucide="chevron-down" class="faq-chevron"></i>
+          </div>
+          <div class="faq-answer">
+            Sim! Todas as matérias, sessões de estudo, presença em grupos e rankings são sincronizados diretamente com a sua conta do Yeolpumta em tempo real.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Como funcionam as atualizações automáticas?</span>
+            <i data-lucide="chevron-down" class="faq-chevron"></i>
+          </div>
+          <div class="faq-answer">
+            O aplicativo possui um verificador integrado que notifica na barra lateral sempre que uma nova versão é publicada no GitHub Releases, permitindo baixar o instalador com um clique.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand-logo">
+            <img src="assets/icons/icon.png" alt="Desky Logo" />
+            <span class="brand-text">Desky</span>
+          </div>
+          <p>O cliente desktop definitivo para focar nos estudos, acompanhar amigos em tempo real e alcançar seus maiores objetivos.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navegação</h4>
+          <ul class="footer-links">
+            <li><a href="#recursos">Recursos</a></li>
+            <li><a href="#demonstracao">Demonstração</a></li>
+            <li><a href="#downloads">Downloads</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Projeto</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/huneyoliv/desky" target="_blank">Repositório GitHub</a></li>
+            <li><a href="https://github.com/huneyoliv/desky/releases" target="_blank">Releases & Notas</a></li>
+            <li><a href="https://github.com/huneyoliv/desky/issues" target="_blank">Relatar um Problema</a></li>
+            <li><a href="https://github.com/huneyoliv/desky/blob/main/LICENSE" target="_blank">Licença MIT</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 DevHuney. Todos os direitos reservados. Desky é um projeto independente de código aberto.</p>
+        <p>Construído com Flutter Desktop & Material Design 3.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // OS Detection for Primary Button
+    (function detectOS() {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      const primaryBtn = document.getElementById('primary-download-btn');
+      const label = document.getElementById('primary-download-label');
+
+      if (userAgent.indexOf('mac') !== -1) {
+        primaryBtn.href = 'https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg';
+        label.innerText = 'Baixar para macOS';
+        primaryBtn.querySelector('.os-badge').innerText = '.dmg';
+      } else if (userAgent.indexOf('linux') !== -1) {
+        primaryBtn.href = 'https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb';
+        label.innerText = 'Baixar para Linux';
+        primaryBtn.querySelector('.os-badge').innerText = '.deb';
+      }
+    })();
+
+    // Gallery Tab & Language Switcher Logic
+    let currentFeature = 'timer';
+
+    function switchGalleryTab(feature, btn) {
+      currentFeature = feature;
+      document.querySelectorAll('.gallery-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateGalleryImage();
+    }
+
+    function updateGalleryImage() {
+      const lang = document.getElementById('gallery-lang').value;
+      const img = document.getElementById('gallery-img');
+      img.style.opacity = '0.3';
+      setTimeout(() => {
+        img.src = `photos/${lang}/${currentFeature}.png`;
+        img.style.opacity = '1';
+      }, 150);
+    }
+
+    // Interactive Demo Timer
+    let timerSeconds = 25 * 60;
+    let timerInterval = null;
+
+    function formatTime(s) {
+      const mins = Math.floor(s / 60).toString().padStart(2, '0');
+      const secs = (s % 60).toString().padStart(2, '0');
+      return `00:${mins}:${secs}`;
+    }
+
+    function toggleDemoTimer() {
+      const btnText = document.getElementById('demo-text');
+      const icon = document.getElementById('demo-icon');
+
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btnText.innerText = 'Continuar';
+        icon.setAttribute('data-lucide', 'play');
+      } else {
+        timerInterval = setInterval(() => {
+          if (timerSeconds > 0) {
+            timerSeconds--;
+            document.getElementById('demo-timer').innerText = formatTime(timerSeconds);
+          } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+        }, 1000);
+        btnText.innerText = 'Pausar';
+        icon.setAttribute('data-lucide', 'pause');
+      }
+      lucide.createIcons();
+    }
+
+    function resetDemoTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerSeconds = 25 * 60;
+      document.getElementById('demo-timer').innerText = formatTime(timerSeconds);
+      document.getElementById('demo-text').innerText = 'Iniciar';
+      document.getElementById('demo-icon').setAttribute('data-lucide', 'play');
+      lucide.createIcons();
+    }
+
+    // FAQ Accordion Toggle
+    function toggleFaq(header) {
+      const item = header.parentElement;
+      item.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>
