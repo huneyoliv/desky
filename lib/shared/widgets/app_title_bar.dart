@@ -100,7 +100,12 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
 
     return Container(
       height: 32,
-      color: AppColors.background,
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(
+          bottom: BorderSide(color: AppColors.border, width: 1),
+        ),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
