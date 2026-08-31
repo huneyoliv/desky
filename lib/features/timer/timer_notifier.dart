@@ -187,6 +187,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   Future<void> loadSubjects() async {
     try {
       final result = await _subjectRepository.fetchSubjectsData();
+      if (!mounted) return;
       final subjects = result.subjects;
       final current = subjects.isNotEmpty ? subjects.first : null;
 
@@ -198,6 +199,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
         lastStudyDate: StudyDateHelper.getStudyDateString(null, _dayResetHour),
       );
     } catch (_) {
+      if (!mounted) return;
       if (state.subjects.isEmpty) {
         const fallbackSubject = SubjectModel(
           id: 1,
