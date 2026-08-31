@@ -1,1379 +1,324 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Desky — O Cliente Desktop Definitivo para o Yeolpumta</title>
-  
-  <!-- SEO & Meta Tags -->
-  <meta name="description" content="Desky é um cliente desktop nativo, moderno e de alto desempenho para o Yeolpumta (YPT). Cronômetro Pomodoro, grupos de estudo em tempo real, Live Study, rankings, flashcards e bloqueador de distrações." />
-  <meta name="keywords" content="Desky, Yeolpumta, YPT, Pomodoro, Study Timer, Foco, Produtividade, Estudo, Windows, macOS, Linux, Open Source" />
+  <title>Desky — The Ultimate Yeolpumta Desktop Client</title>
+  <meta name="description" content="Desky is a native, modern desktop client for Yeolpumta (YPT). Pomodoro timer, real-time study groups, Live Study, rankings, flashcards and distraction blocker." />
+  <meta name="keywords" content="Desky, Yeolpumta, YPT, Pomodoro, Study Timer, Focus, Productivity, Windows, macOS, Linux, Open Source" />
   <meta name="author" content="DevHuney" />
   <meta name="theme-color" content="#000000" />
-
-  <!-- Open Graph / Social Cards -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://huneyoliv.github.io/desky/" />
-  <meta property="og:title" content="Desky — Cliente Desktop Moderno para Yeolpumta" />
-  <meta property="og:description" content="Potencialize seus estudos com cronômetro Pomodoro, grupos em tempo real, heatmap de atividade, flashcards e tema AMOLED." />
+  <meta property="og:title" content="Desky — Modern Yeolpumta Desktop Client" />
+  <meta property="og:description" content="Deep focus Pomodoro timer, real-time study groups, activity heatmap, flashcards and AMOLED true black theme." />
   <meta property="og:image" content="https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png" />
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/icons/icon.png" />
-
-  <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-
-  <!-- Lucide Icons (CDN) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Outfit:wght@400;600;700;800;900&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
-    :root {
-      --bg-black: #000000;
-      --bg-surface: #0a0a0d;
-      --bg-surface-raised: #121217;
-      --bg-card: #16161d;
-      --bg-card-hover: #1c1c24;
-      --border-subtle: #23232c;
-      --border-focus: #5b6af0;
-      
-      --primary: #5b6af0;
-      --primary-light: #7b88f6;
-      --primary-dark: #4350ca;
-      --primary-glow: rgba(91, 106, 240, 0.35);
-      
-      --flame: #ff5247;
-      --flame-orange: #ff7a00;
-      --flame-glow: rgba(255, 82, 71, 0.35);
-      
-      --success: #00e676;
-      --text-primary: #f5f5f7;
-      --text-secondary: #9494a0;
-      --text-muted: #62626e;
-
-      --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      background-color: var(--bg-black);
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      overflow-x: hidden;
-    }
-
-    body {
-      background: radial-gradient(circle at 50% 0%, rgba(91, 106, 240, 0.12) 0%, transparent 60%),
-                  radial-gradient(circle at 85% 30%, rgba(255, 82, 71, 0.08) 0%, transparent 50%),
-                  var(--bg-black);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-      font-family: var(--font-display);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .container {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 24px;
-      width: 100%;
-    }
-
-    /* Navbar */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      background: rgba(0, 0, 0, 0.75);
-      border-bottom: 1px solid var(--border-subtle);
-      transition: all 0.3s ease;
-    }
-
-    .nav-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 72px;
-    }
-
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--font-display);
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .brand-logo img {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px var(--primary-glow);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .brand-logo:hover img {
-      transform: scale(1.1) rotate(4deg);
-    }
-
-    .brand-text {
-      background: linear-gradient(135deg, #ffffff 40%, var(--primary-light) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      list-style: none;
-    }
-
-    .nav-link {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: color 0.2s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--text-primary);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 12px 24px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      border: 1px solid transparent;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 20px var(--primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px var(--primary-glow), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-      filter: brightness(1.1);
-    }
-
-    .btn-outline {
-      background: var(--bg-surface-raised);
-      color: var(--text-primary);
-      border-color: var(--border-subtle);
-    }
-
-    .btn-outline:hover {
-      background: var(--bg-card);
-      border-color: var(--text-muted);
-      transform: translateY(-2px);
-    }
-
-    .btn-flame {
-      background: linear-gradient(135deg, var(--flame) 0%, var(--flame-orange) 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 20px var(--flame-glow);
-    }
-
-    .btn-flame:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.1);
-      box-shadow: 0 8px 30px var(--flame-glow);
-    }
-
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 0.85rem;
-      border-radius: 8px;
-    }
-
-    /* Hero Section */
-    .hero {
-      position: relative;
-      padding: 80px 0 60px;
-      text-align: center;
-      overflow: hidden;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      background: rgba(91, 106, 240, 0.12);
-      border: 1px solid rgba(91, 106, 240, 0.3);
-      border-radius: 999px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--primary-light);
-      margin-bottom: 24px;
-      animation: pulseGlow 3s infinite ease-in-out;
-    }
-
-    .hero-badge i {
-      color: var(--flame);
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(91, 106, 240, 0.2); }
-      50% { box-shadow: 0 0 25px rgba(255, 82, 71, 0.3); }
-    }
-
-    .hero-title {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      line-height: 1.08;
-      margin-bottom: 24px;
-      font-weight: 900;
-    }
-
-    .hero-title span.highlight {
-      background: linear-gradient(135deg, #ffffff 20%, var(--primary-light) 60%, var(--flame-orange) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-subtitle {
-      font-size: clamp(1.05rem, 2vw, 1.25rem);
-      color: var(--text-secondary);
-      max-width: 780px;
-      margin: 0 auto 40px;
-      line-height: 1.6;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .os-badge {
-      font-size: 0.75rem;
-      padding: 2px 8px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
-      font-weight: 700;
-      margin-left: 6px;
-    }
-
-    .hero-trust {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 60px;
-    }
-
-    .hero-trust-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .hero-trust-item i {
-      color: var(--success);
-      font-size: 1rem;
-    }
-
-    /* Mockup Frame & Live Simulation */
-    .hero-mockup-wrapper {
-      position: relative;
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 12px;
-      background: linear-gradient(180deg, rgba(91, 106, 240, 0.3) 0%, rgba(255, 82, 71, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
-      border-radius: 24px;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8), 0 0 60px var(--primary-glow);
-    }
-
-    .window-frame {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 18px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .window-titlebar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 18px;
-      background: #101014;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .window-dots {
-      display: flex;
-      gap: 8px;
-    }
-
-    .window-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .dot-red { background: #ff5f56; }
-    .dot-yellow { background: #ffbd2e; }
-    .dot-green { background: #27c93f; }
-
-    .window-title {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .mockup-img {
-      width: 100%;
-      height: auto;
-      display: block;
-      transition: opacity 0.3s ease;
-    }
-
-    /* Floating Widget Box */
-    .floating-timer-widget {
-      position: absolute;
-      bottom: 40px;
-      right: -20px;
-      background: rgba(18, 18, 23, 0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(91, 106, 240, 0.4);
-      border-radius: 18px;
-      padding: 20px 24px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px var(--primary-glow);
-      text-align: left;
-      z-index: 10;
-      animation: floatSlow 6s infinite ease-in-out;
-      width: 290px;
-    }
-
-    @keyframes floatSlow {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-12px); }
-    }
-
-    .widget-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .widget-tag {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--primary-light);
-      background: rgba(91, 106, 240, 0.15);
-      padding: 3px 8px;
-      border-radius: 6px;
-    }
-
-    .widget-time {
-      font-family: var(--font-mono);
-      font-size: 2rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 12px;
-      letter-spacing: 0.04em;
-    }
-
-    .widget-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Stats Bar */
-    .stats-section {
-      padding: 40px 0;
-      border-top: 1px solid var(--border-subtle);
-      border-bottom: 1px solid var(--border-subtle);
-      background: var(--bg-surface);
-      margin-top: 60px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 32px;
-      text-align: center;
-    }
-
-    .stat-item h3 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #ffffff 40%, var(--primary-light) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 4px;
-    }
-
-    .stat-item p {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    /* Features Grid */
-    .features-section {
-      padding: 100px 0;
-      position: relative;
-    }
-
-    .section-header {
-      text-align: center;
-      max-width: 700px;
-      margin: 0 auto 60px;
-    }
-
-    .section-tag {
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--primary-light);
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    .section-title {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin-bottom: 16px;
-    }
-
-    .section-desc {
-      font-size: 1.05rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 28px;
-    }
-
-    .feature-card {
-      background: var(--bg-surface-raised);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 32px;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--primary), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-6px);
-      background: var(--bg-card);
-      border-color: rgba(91, 106, 240, 0.4);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    .feature-card:hover::before {
-      opacity: 1;
-    }
-
-    .feature-icon-box {
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      background: rgba(91, 106, 240, 0.12);
-      border: 1px solid rgba(91, 106, 240, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-light);
-      margin-bottom: 20px;
-      transition: transform 0.3s ease;
-    }
-
-    .feature-card:hover .feature-icon-box {
-      transform: scale(1.1);
-      background: var(--primary);
-      color: #ffffff;
-      box-shadow: 0 0 20px var(--primary-glow);
-    }
-
-    .feature-card h3 {
-      font-size: 1.3rem;
-      margin-bottom: 12px;
-      font-weight: 700;
-    }
-
-    .feature-card p {
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    /* Screenshots Showcase Section */
-    .screenshots-section {
-      padding: 100px 0;
-      background: var(--bg-surface);
-      border-top: 1px solid var(--border-subtle);
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .gallery-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .gallery-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .gallery-tab {
-      padding: 10px 20px;
-      background: var(--bg-surface-raised);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      font-weight: 600;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .gallery-tab.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary-light);
-      box-shadow: 0 4px 15px var(--primary-glow);
-    }
-
-    .lang-selector-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    .lang-select {
-      background: var(--bg-surface-raised);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      outline: none;
-    }
-
-    .gallery-view {
-      background: var(--bg-black);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-    }
-
-    .gallery-view img {
-      width: 100%;
-      height: auto;
-      display: block;
-      transition: opacity 0.25s ease;
-    }
-
-    /* Downloads Matrix */
-    .downloads-section {
-      padding: 100px 0;
-    }
-
-    .downloads-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-      margin-top: 40px;
-    }
-
-    .download-card {
-      background: var(--bg-surface-raised);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.3s ease;
-    }
-
-    .download-card:hover {
-      border-color: var(--primary-light);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .download-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .os-icon-box {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: var(--primary-light);
-    }
-
-    .download-header h3 {
-      font-size: 1.25rem;
-    }
-
-    .download-header p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .download-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin: 24px 0;
-    }
-
-    .download-list li a {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      font-size: 0.88rem;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .download-list li a:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--primary);
-      color: #ffffff;
-      transform: translateX(4px);
-    }
-
-    /* FAQ Section */
-    .faq-section {
-      padding: 100px 0;
-      background: var(--bg-surface);
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .faq-accordion {
-      max-width: 800px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .faq-item {
-      background: var(--bg-surface-raised);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .faq-question {
-      padding: 20px 24px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      user-select: none;
-    }
-
-    .faq-answer {
-      padding: 0 24px 20px;
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      display: none;
-    }
-
-    .faq-item.active .faq-answer {
-      display: block;
-    }
-
-    .faq-item.active .faq-chevron {
-      transform: rotate(180deg);
-    }
-
-    .faq-chevron {
-      transition: transform 0.3s ease;
-    }
-
-    /* Footer */
-    .footer {
-      padding: 60px 0 30px;
-      border-top: 1px solid var(--border-subtle);
-      background: var(--bg-black);
-      margin-top: auto;
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 40px;
-      margin-bottom: 40px;
-    }
-
-    .footer-brand p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-top: 12px;
-      max-width: 380px;
-      line-height: 1.6;
-    }
-
-    .footer-col h4 {
-      font-size: 0.95rem;
-      margin-bottom: 16px;
-      color: var(--text-primary);
-    }
-
-    .footer-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .footer-links a {
-      color: var(--text-secondary);
-      font-size: 0.88rem;
-      transition: color 0.2s ease;
-    }
-
-    .footer-links a:hover {
-      color: var(--text-primary);
-    }
-
-    .footer-bottom {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-subtle);
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-
-    /* Responsive */
-    @media (max-width: 860px) {
-      .nav-links { display: none; }
-      .floating-timer-widget { display: none; }
-      .footer-grid { grid-template-columns: 1fr; }
-    }
+    :root{--bg-black:#000000;--bg-surface:#0a0a0d;--bg-surface-raised:#121217;--bg-card:#16161d;--bg-card-hover:#1c1c24;--border-subtle:#23232c;--primary:#5b6af0;--primary-light:#7b88f6;--primary-dark:#4350ca;--primary-glow:rgba(91,106,240,0.35);--flame:#ff5247;--flame-orange:#ff7a00;--flame-glow:rgba(255,82,71,0.35);--success:#00e676;--text-primary:#f5f5f7;--text-secondary:#9494a0;--text-muted:#62626e;--font-display:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--font-mono:'JetBrains Mono',monospace}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg-black);color:var(--text-primary);font-family:var(--font-body);overflow-x:hidden}
+    body{background:radial-gradient(circle at 50% 0%,rgba(91,106,240,.12) 0%,transparent 60%),radial-gradient(circle at 85% 30%,rgba(255,82,71,.08) 0%,transparent 50%),var(--bg-black);min-height:100vh;display:flex;flex-direction:column}
+    h1,h2,h3,h4,h5,h6{font-family:var(--font-display);font-weight:700;letter-spacing:-.02em}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1240px;margin:0 auto;padding:0 16px;width:100%}
+    .navbar{position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(0,0,0,.78);border-bottom:1px solid var(--border-subtle);transition:all .3s}
+    .nav-container{display:flex;align-items:center;justify-content:space-between;height:60px}
+    .brand-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:1.25rem;font-weight:800;letter-spacing:-.03em}
+    .brand-logo img{width:34px;height:34px;border-radius:9px;box-shadow:0 0 18px var(--primary-glow);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+    .brand-logo:hover img{transform:scale(1.1) rotate(4deg)}
+    .brand-text{background:linear-gradient(135deg,#fff 40%,var(--primary-light) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-links{display:none;align-items:center;gap:28px;list-style:none}
+    .nav-link{font-size:.9rem;font-weight:500;color:var(--text-secondary);transition:color .2s}
+    .nav-link:hover{color:var(--text-primary)}
+    .nav-right{display:flex;align-items:center;gap:8px}
+    .lang-picker{display:flex;align-items:center;gap:6px;background:var(--bg-surface-raised);border:1px solid var(--border-subtle);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--text-secondary);transition:all .2s;position:relative}
+    .lang-picker:hover{border-color:var(--primary);color:var(--text-primary)}
+    .lang-picker select{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;font-size:14px}
+    .lang-flag{font-size:1rem}.lang-code{font-size:.78rem;font-weight:700;letter-spacing:.04em}
+    .hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:transparent;border:none;cursor:pointer;padding:4px}
+    .hamburger span{display:block;height:2px;background:var(--text-primary);border-radius:2px;transition:all .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .mobile-menu{display:none;flex-direction:column;background:var(--bg-surface);border-bottom:1px solid var(--border-subtle);overflow:hidden;max-height:0;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
+    .mobile-menu.open{max-height:400px}
+    .mobile-menu a{padding:14px 20px;font-size:1rem;font-weight:500;color:var(--text-secondary);border-bottom:1px solid var(--border-subtle);transition:background .2s,color .2s}
+    .mobile-menu a:hover{background:var(--bg-card);color:var(--text-primary)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:.92rem;font-weight:600;border-radius:12px;cursor:pointer;transition:all .25s cubic-bezier(.16,1,.3,1);border:1px solid transparent;white-space:nowrap}
+    .btn-primary{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);color:#fff;box-shadow:0 4px 20px var(--primary-glow),inset 0 1px 1px rgba(255,255,255,.2)}
+    .btn-primary:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 8px 30px var(--primary-glow)}
+    .btn-outline{background:var(--bg-surface-raised);color:var(--text-primary);border-color:var(--border-subtle)}
+    .btn-outline:hover{background:var(--bg-card);border-color:var(--text-muted);transform:translateY(-2px)}
+    .btn-flame{background:linear-gradient(135deg,var(--flame) 0%,var(--flame-orange) 100%);color:#fff;box-shadow:0 4px 20px var(--flame-glow)}
+    .btn-flame:hover{transform:translateY(-2px);filter:brightness(1.1)}
+    .btn-sm{padding:7px 14px;font-size:.82rem;border-radius:8px}
+    .hero{padding:52px 0 48px;text-align:center;overflow:hidden;position:relative}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;background:rgba(91,106,240,.12);border:1px solid rgba(91,106,240,.3);border-radius:999px;font-size:.82rem;font-weight:600;color:var(--primary-light);margin-bottom:20px;animation:pulseGlow 3s infinite ease-in-out}
+    @keyframes pulseGlow{0%,100%{box-shadow:0 0 15px rgba(91,106,240,.2)}50%{box-shadow:0 0 25px rgba(255,82,71,.3)}}
+    .hero-title{font-size:clamp(2rem,7vw,4.5rem);line-height:1.08;margin-bottom:20px;font-weight:900}
+    .hero-title .highlight{background:linear-gradient(135deg,#fff 20%,var(--primary-light) 60%,var(--flame-orange) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hero-subtitle{font-size:clamp(.95rem,2vw,1.15rem);color:var(--text-secondary);max-width:720px;margin:0 auto 32px;line-height:1.65}
+    .hero-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;margin-bottom:24px}
+    .os-badge{font-size:.72rem;padding:2px 7px;background:rgba(255,255,255,.15);border-radius:5px;font-weight:700;margin-left:4px}
+    .hero-trust{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;font-size:.82rem;color:var(--text-muted);margin-bottom:48px}
+    .hero-trust-item{display:flex;align-items:center;gap:6px}
+    .hero-trust-item i{color:var(--success)}
+    .hero-mockup-wrapper{position:relative;max-width:1040px;margin:0 auto;padding:10px;background:linear-gradient(180deg,rgba(91,106,240,.28) 0%,rgba(255,82,71,.08) 50%,transparent 100%);border-radius:22px;box-shadow:0 20px 80px rgba(0,0,0,.8),0 0 60px var(--primary-glow)}
+    .window-frame{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:16px;overflow:hidden}
+    .window-titlebar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#101014;border-bottom:1px solid var(--border-subtle)}
+    .window-dots{display:flex;gap:7px}
+    .window-dot{width:11px;height:11px;border-radius:50%}
+    .dot-red{background:#ff5f56}.dot-yellow{background:#ffbd2e}.dot-green{background:#27c93f}
+    .window-title{font-size:.82rem;font-weight:600;color:var(--text-muted);display:flex;align-items:center;gap:7px}
+    .mockup-img{width:100%;height:auto;display:block;transition:opacity .3s}
+    .floating-timer-widget{display:none;position:absolute;bottom:36px;right:-18px;background:rgba(18,18,23,.92);backdrop-filter:blur(20px);border:1px solid rgba(91,106,240,.4);border-radius:16px;padding:18px 22px;box-shadow:0 15px 40px rgba(0,0,0,.6),0 0 25px var(--primary-glow);text-align:left;z-index:10;animation:floatSlow 6s infinite ease-in-out;width:270px}
+    @keyframes floatSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    .widget-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .widget-tag{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--primary-light);background:rgba(91,106,240,.15);padding:3px 7px;border-radius:5px}
+    .widget-time{font-family:var(--font-mono);font-size:1.85rem;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:.04em}
+    .widget-controls{display:flex;gap:7px}
+    .stats-section{padding:36px 0;border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);background:var(--bg-surface);margin-top:56px}
+    .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;text-align:center}
+    .stat-item h3{font-size:clamp(1.8rem,5vw,2.4rem);font-weight:800;background:linear-gradient(135deg,#fff 40%,var(--primary-light) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+    .stat-item p{font-size:.85rem;color:var(--text-secondary);font-weight:500}
+    .features-section{padding:72px 0;position:relative}
+    .section-header{text-align:center;max-width:680px;margin:0 auto 48px}
+    .section-tag{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary-light);margin-bottom:10px;display:inline-block}
+    .section-title{font-size:clamp(1.75rem,4vw,2.75rem);margin-bottom:14px}
+    .section-desc{font-size:1rem;color:var(--text-secondary);line-height:1.65}
+    .features-grid{display:grid;grid-template-columns:1fr;gap:16px}
+    .feature-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:18px;padding:24px;transition:all .3s cubic-bezier(.16,1,.3,1)}
+    .feature-card:hover{border-color:rgba(91,106,240,.5);background:var(--bg-card-hover);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4),0 0 20px var(--primary-glow)}
+    .feature-icon-box{width:48px;height:48px;border-radius:13px;background:rgba(91,106,240,.14);display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--primary-light)}
+    .feature-icon-box i{width:24px;height:24px}
+    .feature-card h3{font-size:1.05rem;margin-bottom:8px}
+    .feature-card p{font-size:.9rem;color:var(--text-secondary);line-height:1.6}
+    .screenshots-section{padding:72px 0;background:var(--bg-surface)}
+    .gallery-controls{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+    .gallery-tabs{display:flex;flex-wrap:wrap;gap:8px}
+    .gallery-tab{padding:8px 14px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;font-size:.85rem;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s}
+    .gallery-tab.active{background:rgba(91,106,240,.2);border-color:var(--primary);color:var(--primary-light)}
+    .lang-selector-wrapper{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--text-secondary);flex-wrap:wrap}
+    .lang-select{background:var(--bg-card);border:1px solid var(--border-subtle);color:var(--text-primary);padding:7px 10px;border-radius:9px;font-size:.85rem;cursor:pointer;font-family:var(--font-body)}
+    .gallery-view{border-radius:18px;overflow:hidden;border:1px solid var(--border-subtle);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .gallery-view img{width:100%;height:auto;display:block;transition:opacity .25s}
+    .downloads-section{padding:72px 0}
+    .downloads-grid{display:grid;grid-template-columns:1fr;gap:16px}
+    .download-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:18px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;transition:all .3s;min-height:220px}
+    .download-card:hover{border-color:rgba(91,106,240,.4);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+    .download-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+    .os-icon-box{width:48px;height:48px;border-radius:13px;background:rgba(91,106,240,.14);display:flex;align-items:center;justify-content:center;color:var(--primary-light);flex-shrink:0}
+    .os-icon-box i{width:24px;height:24px}
+    .download-header h3{font-size:1.1rem;margin-bottom:2px}
+    .download-header p{font-size:.82rem;color:var(--text-muted)}
+    .download-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .download-list a{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-surface-raised);border:1px solid var(--border-subtle);border-radius:10px;font-size:.88rem;transition:all .2s}
+    .download-list a:hover{border-color:var(--primary);background:rgba(91,106,240,.08)}
+    .faq-section{padding:72px 0;background:var(--bg-surface)}
+    .faq-accordion{display:flex;flex-direction:column;gap:12px;max-width:800px;margin:0 auto}
+    .faq-item{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;overflow:hidden;transition:border-color .2s}
+    .faq-item.active{border-color:rgba(91,106,240,.4)}
+    .faq-question{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;font-weight:600;font-size:.95rem;gap:12px}
+    .faq-chevron{width:18px;height:18px;color:var(--text-muted);flex-shrink:0;transition:transform .3s}
+    .faq-item.active .faq-chevron{transform:rotate(180deg)}
+    .faq-answer{max-height:0;overflow:hidden;padding:0 20px;color:var(--text-secondary);line-height:1.65;font-size:.9rem;transition:max-height .35s cubic-bezier(.4,0,.2,1),padding .25s}
+    .faq-item.active .faq-answer{max-height:300px;padding:0 20px 18px}
+    .footer{background:var(--bg-surface);border-top:1px solid var(--border-subtle);padding:56px 0 28px;margin-top:auto}
+    .footer-grid{display:grid;grid-template-columns:1fr;gap:36px;margin-bottom:36px}
+    .footer-brand p{color:var(--text-secondary);font-size:.88rem;margin-top:10px;line-height:1.6}
+    .footer-col h4{font-size:.9rem;margin-bottom:14px;color:var(--text-primary)}
+    .footer-links{list-style:none;display:flex;flex-direction:column;gap:9px}
+    .footer-links a{color:var(--text-secondary);font-size:.85rem;transition:color .2s}
+    .footer-links a:hover{color:var(--text-primary)}
+    .footer-bottom{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--border-subtle);font-size:.8rem;color:var(--text-muted);gap:8px}
+    @media(min-width:640px){.container{padding:0 24px}.nav-container{height:68px}.stats-grid{grid-template-columns:repeat(4,1fr)}.features-grid{grid-template-columns:repeat(2,1fr)}.downloads-grid{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:2fr 1fr 1fr}}
+    @media(min-width:900px){.container{padding:0 32px}.nav-links{display:flex}.hamburger{display:none}.mobile-menu{display:none!important}.features-grid{grid-template-columns:repeat(3,1fr)}.downloads-grid{grid-template-columns:repeat(3,1fr)}.floating-timer-widget{display:block}.gallery-controls{flex-direction:row;align-items:center;justify-content:space-between}}
   </style>
 </head>
 <body>
+<header class="navbar">
+  <div class="container nav-container">
+    <a href="#" class="brand-logo"><img src="assets/icons/icon.png" alt="Desky"/><span class="brand-text">Desky</span></a>
+    <nav><ul class="nav-links">
+      <li><a href="#features" class="nav-link" data-i18n="nav_features">Features</a></li>
+      <li><a href="#gallery" class="nav-link" data-i18n="nav_gallery">Gallery</a></li>
+      <li><a href="#downloads" class="nav-link" data-i18n="nav_downloads">Downloads</a></li>
+      <li><a href="#faq" class="nav-link">FAQ</a></li>
+    </ul></nav>
+    <div class="nav-right">
+      <div class="lang-picker">
+        <span class="lang-flag" id="lang-flag">🇺🇸</span>
+        <span class="lang-code" id="lang-code">EN</span>
+        <select id="lang-select" onchange="setLang(this.value)" aria-label="Language">
+          <option value="en">🇺🇸 English</option>
+          <option value="pt">🇧🇷 Português</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="ko">🇰🇷 한국어</option>
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="zh-cn">🇨🇳 简体中文</option>
+          <option value="zh-tw">🇹🇼 繁體中文</option>
+        </select>
+      </div>
+      <a href="https://github.com/huneyoliv/desky" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><i data-lucide="github"></i><span>GitHub</span></a>
+      <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#features" onclick="closeMenu()" data-i18n="nav_features">Features</a>
+    <a href="#gallery" onclick="closeMenu()" data-i18n="nav_gallery">Gallery</a>
+    <a href="#downloads" onclick="closeMenu()" data-i18n="nav_downloads">Downloads</a>
+    <a href="#faq" onclick="closeMenu()">FAQ</a>
+    <a href="https://github.com/huneyoliv/desky" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</header>
 
-  <!-- Navigation -->
-  <header class="navbar">
-    <div class="container nav-container">
-      <a href="#" class="brand-logo">
-        <img src="assets/icons/icon.png" alt="Desky Icon" />
-        <span class="brand-text">Desky</span>
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge"><i data-lucide="flame"></i><span data-i18n="hero_badge">Desky v1.0.0 — Now Available</span></div>
+    <h1 class="hero-title" data-i18n="hero_title">The ultimate desktop client<br/>for <span class="highlight">Yeolpumta</span></h1>
+    <p class="hero-subtitle" data-i18n="hero_subtitle">Deep focus, colorful Pomodoro timer, real-time Live Study groups and full statistics in a stunning AMOLED True Black interface for Windows, macOS and Linux.</p>
+    <div class="hero-actions">
+      <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe" class="btn btn-primary" id="primary-download-btn">
+        <i data-lucide="download"></i>
+        <span id="primary-download-label" data-i18n="hero_dl_win">Download for Windows (x64)</span>
+        <span class="os-badge" id="primary-ext">.exe</span>
       </a>
-
-      <nav>
-        <ul class="nav-links">
-          <li><a href="#recursos" class="nav-link">Recursos</a></li>
-          <li><a href="#demonstracao" class="nav-link">Galeria</a></li>
-          <li><a href="#downloads" class="nav-link">Downloads</a></li>
-          <li><a href="#faq" class="nav-link">FAQ</a></li>
-        </ul>
-      </nav>
-
-      <div class="nav-actions">
-        <a href="https://github.com/huneyoliv/desky" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
-          <i data-lucide="github"></i>
-          <span>GitHub</span>
-        </a>
-        <a href="#downloads" class="btn btn-primary btn-sm">
-          <i data-lucide="download"></i>
-          <span>Baixar v1.0.0</span>
-        </a>
-      </div>
+      <a href="https://github.com/huneyoliv/desky/releases/latest" target="_blank" class="btn btn-outline"><i data-lucide="layers"></i><span data-i18n="hero_all_installers">All Installers</span></a>
     </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-badge">
-        <i data-lucide="flame"></i>
-        <span>Desky v1.0.0 Lançado Oficialmente</span>
+    <div class="hero-trust">
+      <div class="hero-trust-item"><i data-lucide="shield-check"></i><span data-i18n="trust_free">100% Free &amp; Open Source (MIT)</span></div>
+      <div class="hero-trust-item"><i data-lucide="zap"></i><span data-i18n="trust_perf">Native Flutter Performance</span></div>
+      <div class="hero-trust-item"><i data-lucide="globe"></i><span data-i18n="trust_langs">7 Native Languages</span></div>
+    </div>
+    <div class="hero-mockup-wrapper">
+      <div class="window-frame">
+        <div class="window-titlebar">
+          <div class="window-dots"><span class="window-dot dot-red"></span><span class="window-dot dot-yellow"></span><span class="window-dot dot-green"></span></div>
+          <div class="window-title"><i data-lucide="clock" style="width:13px;height:13px;color:var(--primary-light)"></i><span data-i18n="mockup_title">Desky — Study Timer</span></div>
+          <div style="width:36px"></div>
+        </div>
+        <img src="photos/english/timer.png" alt="Desky Interface" class="mockup-img" id="hero-screenshot"/>
       </div>
-
-      <h1 class="hero-title">
-        O cliente desktop definitivo para o <br />
-        <span class="highlight">Yeolpumta</span>
-      </h1>
-
-      <p class="hero-subtitle">
-        Foco profundo, cronômetro Pomodoro com matérias coloridas, presença em grupos ao vivo (Live Study) e estatísticas completas em uma interface moderna AMOLED True Black para Windows, macOS e Linux.
-      </p>
-
-      <div class="hero-actions">
-        <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe" class="btn btn-primary" id="primary-download-btn">
-          <i data-lucide="download"></i>
-          <span id="primary-download-label">Baixar para Windows (x64)</span>
-          <span class="os-badge">.exe</span>
-        </a>
-        <a href="https://github.com/huneyoliv/desky/releases/latest" target="_blank" class="btn btn-outline">
-          <i data-lucide="layers"></i>
-          <span>Todos os Instaladores</span>
-        </a>
-      </div>
-
-      <div class="hero-trust">
-        <div class="hero-trust-item">
-          <i data-lucide="shield-check"></i>
-          <span>100% Gratuito & Open Source (MIT)</span>
-        </div>
-        <div class="hero-trust-item">
-          <i data-lucide="zap"></i>
-          <span>Alta Performance Flutter Nativo</span>
-        </div>
-        <div class="hero-trust-item">
-          <i data-lucide="globe"></i>
-          <span>7 Idiomas Nativos</span>
-        </div>
-      </div>
-
-      <!-- Mockup Showcase -->
-      <div class="hero-mockup-wrapper">
-        <div class="window-frame">
-          <div class="window-titlebar">
-            <div class="window-dots">
-              <span class="window-dot dot-red"></span>
-              <span class="window-dot dot-yellow"></span>
-              <span class="window-dot dot-green"></span>
-            </div>
-            <div class="window-title">
-              <i data-lucide="clock" style="width: 14px; height: 14px; color: var(--primary-light);"></i>
-              <span>Desky — Cronômetro de Estudo</span>
-            </div>
-            <div style="width: 40px;"></div>
-          </div>
-          <img src="photos/portuguese/timer.png" alt="Desky Interface" class="mockup-img" id="hero-screenshot" />
-        </div>
-
-        <!-- Live Interactive Simulation Floating Widget -->
-        <div class="floating-timer-widget">
-          <div class="widget-header">
-            <span class="widget-tag">Foco Ativo</span>
-            <i data-lucide="flame" style="color: var(--flame); width: 18px; height: 18px;"></i>
-          </div>
-          <div class="widget-time" id="demo-timer">00:25:00</div>
-          <div class="widget-controls">
-            <button class="btn btn-flame btn-sm" style="flex: 1;" id="demo-toggle-btn" onclick="toggleDemoTimer()">
-              <i data-lucide="play" id="demo-icon" style="width: 14px; height: 14px;"></i>
-              <span id="demo-text">Iniciar</span>
-            </button>
-            <button class="btn btn-outline btn-sm" onclick="resetDemoTimer()">
-              <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
-            </button>
-          </div>
+      <div class="floating-timer-widget">
+        <div class="widget-header"><span class="widget-tag" data-i18n="widget_focus">Focus Active</span><i data-lucide="flame" style="color:var(--flame);width:17px;height:17px"></i></div>
+        <div class="widget-time" id="demo-timer">00:25:00</div>
+        <div class="widget-controls">
+          <button class="btn btn-flame btn-sm" style="flex:1" onclick="toggleDemoTimer()"><i data-lucide="play" id="demo-icon" style="width:13px;height:13px"></i><span id="demo-text" data-i18n="widget_start">Start</span></button>
+          <button class="btn btn-outline btn-sm" onclick="resetDemoTimer()"><i data-lucide="rotate-ccw" style="width:13px;height:13px"></i></button>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Metrics Bar -->
-  <section class="stats-section">
-    <div class="container stats-grid">
-      <div class="stat-item">
-        <h3>340+</h3>
-        <p>Testes Automatizados Verificados</p>
+<section class="stats-section">
+  <div class="container stats-grid">
+    <div class="stat-item"><h3>340+</h3><p data-i18n="stat_tests">Automated Tests</p></div>
+    <div class="stat-item"><h3>7</h3><p data-i18n="stat_langs">Languages Supported</p></div>
+    <div class="stat-item"><h3>0%</h3><p data-i18n="stat_distractions">Distractions (Focus Mode)</p></div>
+    <div class="stat-item"><h3>100%</h3><p data-i18n="stat_opensource">Open Source (MIT)</p></div>
+  </div>
+</section>
+
+<section class="features-section" id="features">
+  <div class="container">
+    <div class="section-header"><span class="section-tag" data-i18n="features_tag">Full Feature Set</span><h2 class="section-title" data-i18n="features_title">Built to maximize your study output</h2><p class="section-desc" data-i18n="features_desc">Everything you need for deep focus, tracking friends in real time, and improving day after day.</p></div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon-box"><i data-lucide="timer"></i></div><h3 data-i18n="feat1_title">Timer &amp; Pomodoro</h3><p data-i18n="feat1_desc">Fully customizable normal and Pomodoro cycles. Organize subjects with custom colors and log past sessions with instant cloud sync.</p></div>
+      <div class="feature-card"><div class="feature-icon-box"><i data-lucide="users"></i></div><h3 data-i18n="feat2_title">Groups &amp; Live Study</h3><p data-i18n="feat2_desc">See who is studying in your group in real time. Send Shakes, chat with emoji and use Live Study camera verification.</p></div>
+      <div class="feature-card"><div class="feature-icon-box"><i data-lucide="grid"></i></div><h3 data-i18n="feat3_title">Heatmap &amp; Streaks</h3><p data-i18n="feat3_desc">Visualize your consistency with a GitHub-style annual heatmap. Keep your flame streak alive and climb global leaderboards.</p></div>
+      <div class="feature-card"><div class="feature-icon-box"><i data-lucide="shield-alert"></i></div><h3 data-i18n="feat4_title">Distraction Blocker</h3><p data-i18n="feat4_desc">Automatically detect apps stealing your focus. Use the floating Always-on-Top Mini Player to keep the timer visible while multitasking.</p></div>
+      <div class="feature-card"><div class="feature-icon-box"><i data-lucide="layers"></i></div><h3 data-i18n="feat5_title">Flashcards &amp; PDF Reader</h3><p data-i18n="feat5_desc">Study decks with SM-2 spaced repetition. Built-in PDF reader with bookmarks and instant card creation.</p></div>
+      <div class="feature-card"><div class="feature-icon-box"><i data-lucide="calendar"></i></div><h3 data-i18n="feat6_title">Planner &amp; D-Day</h3><p data-i18n="feat6_desc">Visual countdown timers for exams and goals. Task lists with priorities and deadlines, plus weekly timetable planning.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="screenshots-section" id="gallery">
+  <div class="container">
+    <div class="section-header"><span class="section-tag" data-i18n="gallery_tag">Screenshot Gallery</span><h2 class="section-title" data-i18n="gallery_title">Immersive AMOLED True Black Interface</h2><p class="section-desc" data-i18n="gallery_desc">Explore Desky’s interface in your preferred language with Material Design 3.</p></div>
+    <div class="gallery-controls">
+      <div class="gallery-tabs">
+        <button class="gallery-tab active" onclick="switchGalleryTab('timer',this)" data-i18n="tab_timer">⏱️ Timer</button>
+        <button class="gallery-tab" onclick="switchGalleryTab('chat_de_grupos',this)" data-i18n="tab_groups">👥 Groups &amp; Chat</button>
+        <button class="gallery-tab" onclick="switchGalleryTab('rankings',this)" data-i18n="tab_rankings">📊 Rankings</button>
+        <button class="gallery-tab" onclick="switchGalleryTab('perfil',this)" data-i18n="tab_profile">👤 Profile</button>
       </div>
-      <div class="stat-item">
-        <h3>7</h3>
-        <p>Idiomas com Tradução Completa</p>
-      </div>
-      <div class="stat-item">
-        <h3>0%</h3>
-        <p>Distrações com Modo Foco Estrito</p>
-      </div>
-      <div class="stat-item">
-        <h3>100%</h3>
-        <p>Código Aberto com Licença MIT</p>
+      <div class="lang-selector-wrapper">
+        <i data-lucide="languages"></i>
+        <span data-i18n="gallery_lang_label">Screen language:</span>
+        <select id="gallery-lang" class="lang-select" onchange="updateGalleryImage()">
+          <option value="portuguese">Português (Brasil)</option>
+          <option value="english" selected>English (US)</option>
+          <option value="spanish">Español</option>
+          <option value="korean">한국어</option>
+          <option value="japanese">日本語</option>
+          <option value="simplified_chinese">简体中文</option>
+          <option value="traditional_chinese">繁體中文</option>
+        </select>
       </div>
     </div>
-  </section>
+    <div class="gallery-view"><img id="gallery-img" src="photos/english/timer.png" alt="Desky Screenshot"/></div>
+  </div>
+</section>
 
-  <!-- Features Section -->
-  <section class="features-section" id="recursos">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Funcionalidades Completas</span>
-        <h2 class="section-title">Construído para maximizar o seu rendimento</h2>
-        <p class="section-desc">Tudo o que você precisa para manter o foco profundo nos estudos, acompanhar amigos em tempo real e evoluir dia a dia.</p>
-      </div>
-
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon-box">
-            <i data-lucide="timer"></i>
-          </div>
-          <h3>Cronômetro & Pomodoro</h3>
-          <p>Ciclos normais e Pomodoro totalmente configuráveis. Organize matérias com cores personalizadas e registre sessões manuais retroativas com sincronização instantânea.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box">
-            <i data-lucide="users"></i>
-          </div>
-          <h3>Grupos & Live Study</h3>
-          <p>Veja em tempo real quem está estudando no seu grupo. Envie toques motivacionais (Shakes), converse no chat com emojis e use o Live Study com câmera para comprovação de presença.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box">
-            <i data-lucide="grid"></i>
-          </div>
-          <h3>Activity Heatmap & Streaks</h3>
-          <p>Visualize sua constância ao longo do ano com uma grade de calor estilo GitHub. Mantenha sua ofensiva de chamas diárias e suba nos rankings globais e nacionais.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box">
-            <i data-lucide="shield-alert"></i>
-          </div>
-          <h3>Bloqueador de Distrações</h3>
-          <p>Identifique automaticamente aplicativos que desviam sua atenção durante as sessões e use o Mini Player flutuante Always-on-Top para manter o timer visível em multitarefa.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box">
-            <i data-lucide="layers"></i>
-          </div>
-          <h3>Flashcards & Leitor PDF</h3>
-          <p>Crie baralhos de estudo com algoritmo de repetição espaçada SM-2. Leia livros e apostilas pelo leitor PDF integrado e gere cartões de estudo diretamente de trechos.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box">
-            <i data-lucide="calendar"></i>
-          </div>
-          <h3>Planejador & Metas D-Day</h3>
-          <p>Acompanhe a contagem regressiva para provas, vestibulares e concursos. Organize listas de tarefas com prioridades e monte sua grade de horários semanal.</p>
-        </div>
-      </div>
+<section class="downloads-section" id="downloads">
+  <div class="container">
+    <div class="section-header"><span class="section-tag" data-i18n="dl_tag">Installation &amp; Downloads</span><h2 class="section-title" data-i18n="dl_title">Download Desky for your system</h2><p class="section-desc" data-i18n="dl_desc">Native installers with built-in auto-update support.</p></div>
+    <div class="downloads-grid">
+      <div class="download-card"><div><div class="download-header"><div class="os-icon-box"><i data-lucide="monitor"></i></div><div><h3>Windows</h3><p>Windows 10 / 11 (64-bit)</p></div></div><ul class="download-list"><li><a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe"><span data-i18n="win_installer">Setup Installer (.exe)</span><i data-lucide="download" style="width:15px"></i></a></li><li><a href="https://github.com/huneyoliv/desky/releases/latest"><span data-i18n="win_msix">Microsoft Store Package (.msix)</span><i data-lucide="box" style="width:15px"></i></a></li></ul></div><a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe" class="btn btn-primary" style="width:100%"><i data-lucide="download"></i><span data-i18n="dl_win">Download for Windows</span></a></div>
+      <div class="download-card"><div><div class="download-header"><div class="os-icon-box"><i data-lucide="laptop"></i></div><div><h3>macOS</h3><p>macOS 12.0+ (Apple Silicon &amp; Intel)</p></div></div><ul class="download-list"><li><a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg"><span data-i18n="mac_dmg">Disk Image (.dmg)</span><i data-lucide="download" style="width:15px"></i></a></li></ul></div><a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg" class="btn btn-outline" style="width:100%"><i data-lucide="download"></i><span data-i18n="dl_mac">Download for macOS</span></a></div>
+      <div class="download-card"><div><div class="download-header"><div class="os-icon-box"><i data-lucide="terminal"></i></div><div><h3>Linux</h3><p>Ubuntu, Debian, Fedora, Arch</p></div></div><ul class="download-list"><li><a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb"><span data-i18n="linux_deb">Debian Package (.deb)</span><i data-lucide="download" style="width:15px"></i></a></li><li><a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.tar.gz"><span data-i18n="linux_tar">Portable Archive (.tar.gz)</span><i data-lucide="download" style="width:15px"></i></a></li></ul></div><a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb" class="btn btn-outline" style="width:100%"><i data-lucide="download"></i><span data-i18n="dl_linux">Download for Linux (.deb)</span></a></div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Interactive Screenshots Gallery -->
-  <section class="screenshots-section" id="demonstracao">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Galeria de Telas</span>
-        <h2 class="section-title">Interface Imersiva AMOLED True Black</h2>
-        <p class="section-desc">Explore a interface do Desky nos seus idiomas preferidos com design Material Design 3 e tipografia refinada.</p>
-      </div>
-
-      <div class="gallery-controls">
-        <div class="gallery-tabs">
-          <button class="gallery-tab active" onclick="switchGalleryTab('timer', this)">⏱️ Cronômetro</button>
-          <button class="gallery-tab" onclick="switchGalleryTab('chat_de_grupos', this)">👥 Grupos & Chat</button>
-          <button class="gallery-tab" onclick="switchGalleryTab('rankings', this)">📊 Rankings & Heatmap</button>
-          <button class="gallery-tab" onclick="switchGalleryTab('perfil', this)">👤 Perfil do Aluno</button>
-        </div>
-
-        <div class="lang-selector-wrapper">
-          <i data-lucide="languages"></i>
-          <span>Idioma da Tela:</span>
-          <select id="gallery-lang" class="lang-select" onchange="updateGalleryImage()">
-            <option value="portuguese" selected>Português (Brasil)</option>
-            <option value="english">English (US)</option>
-            <option value="spanish">Español</option>
-            <option value="korean">한국어</option>
-            <option value="japanese">日本語</option>
-            <option value="simplified_chinese">简体中文</option>
-            <option value="traditional_chinese">繁體中文</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="gallery-view">
-        <img id="gallery-img" src="photos/portuguese/timer.png" alt="Desky Screenshot" />
-      </div>
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="section-header"><span class="section-tag" data-i18n="faq_tag">FAQ</span><h2 class="section-title" data-i18n="faq_title">Frequently Asked Questions</h2></div>
+    <div class="faq-accordion">
+      <div class="faq-item active"><div class="faq-question" onclick="toggleFaq(this)"><span data-i18n="faq1_q">Is Desky free and open source?</span><i data-lucide="chevron-down" class="faq-chevron"></i></div><div class="faq-answer" data-i18n="faq1_a">Yes! Desky is 100% free and open source under the MIT license.</div></div>
+      <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><span data-i18n="faq2_q">Is Desky the official Yeolpumta app?</span><i data-lucide="chevron-down" class="faq-chevron"></i></div><div class="faq-answer" data-i18n="faq2_a">No. Desky is an independent, community-built client with no official affiliation with Pallo Inc.</div></div>
+      <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><span data-i18n="faq3_q">Are my study hours synced with mobile?</span><i data-lucide="chevron-down" class="faq-chevron"></i></div><div class="faq-answer" data-i18n="faq3_a">Yes! All subjects, sessions, group attendance and rankings are synced with your Yeolpumta account in real time.</div></div>
+      <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><span data-i18n="faq4_q">How do automatic updates work?</span><i data-lucide="chevron-down" class="faq-chevron"></i></div><div class="faq-answer" data-i18n="faq4_a">Desky notifies you in the sidebar when a new version is published on GitHub Releases, letting you download with one click.</div></div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Downloads Section -->
-  <section class="downloads-section" id="downloads">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Instalação & Downloads</span>
-        <h2 class="section-title">Baixe o Desky para o seu sistema</h2>
-        <p class="section-desc">Instaladores nativos otimizados com suporte a atualizações automáticas integradas.</p>
-      </div>
-
-      <div class="downloads-grid">
-        <!-- Windows -->
-        <div class="download-card">
-          <div>
-            <div class="download-header">
-              <div class="os-icon-box"><i data-lucide="monitor"></i></div>
-              <div>
-                <h3>Windows</h3>
-                <p>Windows 10 / 11 (64-bit)</p>
-              </div>
-            </div>
-            <ul class="download-list">
-              <li>
-                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe">
-                  <span>Instalador Setup (.exe)</span>
-                  <i data-lucide="download" style="width: 16px;"></i>
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/huneyoliv/desky/releases/latest">
-                  <span>Pacote Microsoft Store (.msix)</span>
-                  <i data-lucide="box" style="width: 16px;"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Windows-Installer-x64.exe" class="btn btn-primary" style="width: 100%;">
-            <i data-lucide="download"></i>
-            <span>Baixar para Windows</span>
-          </a>
-        </div>
-
-        <!-- macOS -->
-        <div class="download-card">
-          <div>
-            <div class="download-header">
-              <div class="os-icon-box"><i data-lucide="laptop"></i></div>
-              <div>
-                <h3>macOS</h3>
-                <p>macOS 12.0+ (Apple Silicon & Intel)</p>
-              </div>
-            </div>
-            <ul class="download-list">
-              <li>
-                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg">
-                  <span>Imagem de Disco (.dmg)</span>
-                  <i data-lucide="download" style="width: 16px;"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg" class="btn btn-outline" style="width: 100%;">
-            <i data-lucide="download"></i>
-            <span>Baixar para macOS</span>
-          </a>
-        </div>
-
-        <!-- Linux -->
-        <div class="download-card">
-          <div>
-            <div class="download-header">
-              <div class="os-icon-box"><i data-lucide="terminal"></i></div>
-              <div>
-                <h3>Linux</h3>
-                <p>Ubuntu, Debian, Fedora, Arch</p>
-              </div>
-            </div>
-            <ul class="download-list">
-              <li>
-                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb">
-                  <span>Pacote Debian (.deb)</span>
-                  <i data-lucide="download" style="width: 16px;"></i>
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.tar.gz">
-                  <span>Arquivo Portátil (.tar.gz)</span>
-                  <i data-lucide="download" style="width: 16px;"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <a href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb" class="btn btn-outline" style="width: 100%;">
-            <i data-lucide="download"></i>
-            <span>Baixar para Linux (.deb)</span>
-          </a>
-        </div>
-      </div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="brand-logo"><img src="assets/icons/icon.png" alt="Desky"/><span class="brand-text">Desky</span></div><p data-i18n="footer_desc">The ultimate desktop client to focus on your studies, track friends in real time and achieve your biggest goals.</p></div>
+      <div class="footer-col"><h4 data-i18n="footer_nav">Navigation</h4><ul class="footer-links"><li><a href="#features" data-i18n="nav_features">Features</a></li><li><a href="#gallery" data-i18n="nav_gallery">Gallery</a></li><li><a href="#downloads" data-i18n="nav_downloads">Downloads</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+      <div class="footer-col"><h4 data-i18n="footer_project">Project</h4><ul class="footer-links"><li><a href="https://github.com/huneyoliv/desky" target="_blank" data-i18n="footer_repo">GitHub Repository</a></li><li><a href="https://github.com/huneyoliv/desky/releases" target="_blank" data-i18n="footer_releases">Releases &amp; Notes</a></li><li><a href="https://github.com/huneyoliv/desky/issues" target="_blank" data-i18n="footer_issues">Report an Issue</a></li><li><a href="https://github.com/huneyoliv/desky/blob/main/LICENSE" target="_blank">MIT License</a></li></ul></div>
     </div>
-  </section>
+    <div class="footer-bottom"><p data-i18n="footer_copy">© 2026 DevHuney. All rights reserved. Desky is an independent open-source project.</p><p data-i18n="footer_built">Built with Flutter Desktop &amp; Material Design 3.</p></div>
+  </div>
+</footer>
 
-  <!-- FAQ Section -->
-  <section class="faq-section" id="faq">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Dúvidas Frequentes</span>
-        <h2 class="section-title">Perguntas e Respostas</h2>
-      </div>
-
-      <div class="faq-accordion">
-        <div class="faq-item active">
-          <div class="faq-question" onclick="toggleFaq(this)">
-            <span>O Desky é gratuito e de código aberto?</span>
-            <i data-lucide="chevron-down" class="faq-chevron"></i>
-          </div>
-          <div class="faq-answer">
-            Sim! O Desky é 100% gratuito e open source sob a licença MIT. O código fonte está disponível no GitHub para qualquer pessoa auditar, compilar e contribuir.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
-            <span>O Desky é o aplicativo oficial do Yeolpumta?</span>
-            <i data-lucide="chevron-down" class="faq-chevron"></i>
-          </div>
-          <div class="faq-answer">
-            Não. O Desky é um cliente independente desenvolvido pela comunidade para fornecer uma experiência de desktop de primeira classe no computador. Ele não possui afiliação oficial com a Pallo Inc.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
-            <span>Minhas horas de estudo são sincronizadas com o celular?</span>
-            <i data-lucide="chevron-down" class="faq-chevron"></i>
-          </div>
-          <div class="faq-answer">
-            Sim! Todas as matérias, sessões de estudo, presença em grupos e rankings são sincronizados diretamente com a sua conta do Yeolpumta em tempo real.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
-            <span>Como funcionam as atualizações automáticas?</span>
-            <i data-lucide="chevron-down" class="faq-chevron"></i>
-          </div>
-          <div class="faq-answer">
-            O aplicativo possui um verificador integrado que notifica na barra lateral sempre que uma nova versão é publicada no GitHub Releases, permitindo baixar o instalador com um clique.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <div class="brand-logo">
-            <img src="assets/icons/icon.png" alt="Desky Logo" />
-            <span class="brand-text">Desky</span>
-          </div>
-          <p>O cliente desktop definitivo para focar nos estudos, acompanhar amigos em tempo real e alcançar seus maiores objetivos.</p>
-        </div>
-
-        <div class="footer-col">
-          <h4>Navegação</h4>
-          <ul class="footer-links">
-            <li><a href="#recursos">Recursos</a></li>
-            <li><a href="#demonstracao">Demonstração</a></li>
-            <li><a href="#downloads">Downloads</a></li>
-            <li><a href="#faq">FAQ</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h4>Projeto</h4>
-          <ul class="footer-links">
-            <li><a href="https://github.com/huneyoliv/desky" target="_blank">Repositório GitHub</a></li>
-            <li><a href="https://github.com/huneyoliv/desky/releases" target="_blank">Releases & Notas</a></li>
-            <li><a href="https://github.com/huneyoliv/desky/issues" target="_blank">Relatar um Problema</a></li>
-            <li><a href="https://github.com/huneyoliv/desky/blob/main/LICENSE" target="_blank">Licença MIT</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>© 2026 DevHuney. Todos os direitos reservados. Desky é um projeto independente de código aberto.</p>
-        <p>Construído com Flutter Desktop & Material Design 3.</p>
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    // Initialize Lucide Icons
-    lucide.createIcons();
-
-    // OS Detection for Primary Button
-    (function detectOS() {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      const primaryBtn = document.getElementById('primary-download-btn');
-      const label = document.getElementById('primary-download-label');
-
-      if (userAgent.indexOf('mac') !== -1) {
-        primaryBtn.href = 'https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg';
-        label.innerText = 'Baixar para macOS';
-        primaryBtn.querySelector('.os-badge').innerText = '.dmg';
-      } else if (userAgent.indexOf('linux') !== -1) {
-        primaryBtn.href = 'https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb';
-        label.innerText = 'Baixar para Linux';
-        primaryBtn.querySelector('.os-badge').innerText = '.deb';
-      }
-    })();
-
-    // Gallery Tab & Language Switcher Logic
-    let currentFeature = 'timer';
-
-    function switchGalleryTab(feature, btn) {
-      currentFeature = feature;
-      document.querySelectorAll('.gallery-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      updateGalleryImage();
-    }
-
-    function updateGalleryImage() {
-      const lang = document.getElementById('gallery-lang').value;
-      const img = document.getElementById('gallery-img');
-      img.style.opacity = '0.3';
-      setTimeout(() => {
-        img.src = `photos/${lang}/${currentFeature}.png`;
-        img.style.opacity = '1';
-      }, 150);
-    }
-
-    // Interactive Demo Timer
-    let timerSeconds = 25 * 60;
-    let timerInterval = null;
-
-    function formatTime(s) {
-      const mins = Math.floor(s / 60).toString().padStart(2, '0');
-      const secs = (s % 60).toString().padStart(2, '0');
-      return `00:${mins}:${secs}`;
-    }
-
-    function toggleDemoTimer() {
-      const btnText = document.getElementById('demo-text');
-      const icon = document.getElementById('demo-icon');
-
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        btnText.innerText = 'Continuar';
-        icon.setAttribute('data-lucide', 'play');
-      } else {
-        timerInterval = setInterval(() => {
-          if (timerSeconds > 0) {
-            timerSeconds--;
-            document.getElementById('demo-timer').innerText = formatTime(timerSeconds);
-          } else {
-            clearInterval(timerInterval);
-            timerInterval = null;
-          }
-        }, 1000);
-        btnText.innerText = 'Pausar';
-        icon.setAttribute('data-lucide', 'pause');
-      }
-      lucide.createIcons();
-    }
-
-    function resetDemoTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      timerSeconds = 25 * 60;
-      document.getElementById('demo-timer').innerText = formatTime(timerSeconds);
-      document.getElementById('demo-text').innerText = 'Iniciar';
-      document.getElementById('demo-icon').setAttribute('data-lucide', 'play');
-      lucide.createIcons();
-    }
-
-    // FAQ Accordion Toggle
-    function toggleFaq(header) {
-      const item = header.parentElement;
-      item.classList.toggle('active');
-    }
-  </script>
+<script>
+const I18N={"en": {"nav_features": "Features", "nav_gallery": "Gallery", "nav_downloads": "Downloads", "hero_badge": "Desky v1.0.0 — Now Available", "hero_title": "The ultimate desktop client<br/>for <span class=\"highlight\">Yeolpumta</span>", "hero_subtitle": "Deep focus, colorful Pomodoro timer, real-time Live Study groups and full statistics in a stunning AMOLED True Black interface for Windows, macOS and Linux.", "hero_dl_win": "Download for Windows (x64)", "hero_dl_mac": "Download for macOS", "hero_dl_linux": "Download for Linux", "hero_all_installers": "All Installers", "trust_free": "100% Free &amp; Open Source (MIT)", "trust_perf": "Native Flutter Performance", "trust_langs": "7 Native Languages", "mockup_title": "Desky — Study Timer", "widget_focus": "Focus Active", "widget_start": "Start", "stat_tests": "Automated Tests", "stat_langs": "Languages Supported", "stat_distractions": "Distractions (Focus Mode)", "stat_opensource": "Open Source (MIT)", "features_tag": "Full Feature Set", "features_title": "Built to maximize your study output", "features_desc": "Everything you need for deep focus, tracking friends in real time, and improving day after day.", "feat1_title": "Timer &amp; Pomodoro", "feat1_desc": "Fully customizable normal and Pomodoro cycles. Organize subjects with custom colors and log past sessions with instant cloud sync.", "feat2_title": "Groups &amp; Live Study", "feat2_desc": "See who is studying in your group in real time. Send Shakes, chat with emoji and use Live Study camera verification.", "feat3_title": "Heatmap &amp; Streaks", "feat3_desc": "Visualize your consistency with a GitHub-style annual heatmap. Keep your flame streak alive and climb global leaderboards.", "feat4_title": "Distraction Blocker", "feat4_desc": "Automatically detect apps stealing your focus. Use the floating Always-on-Top Mini Player to keep the timer visible while multitasking.", "feat5_title": "Flashcards &amp; PDF Reader", "feat5_desc": "Study decks with SM-2 spaced repetition. Built-in PDF reader with bookmarks and instant card creation.", "feat6_title": "Planner &amp; D-Day", "feat6_desc": "Visual countdown timers for exams and goals. Task lists with priorities and deadlines, plus weekly timetable planning.", "gallery_tag": "Screenshot Gallery", "gallery_title": "Immersive AMOLED True Black Interface", "gallery_desc": "Explore Desky’s interface in your preferred language with Material Design 3.", "gallery_lang_label": "Screen language:", "tab_timer": "⏱️ Timer", "tab_groups": "👥 Groups &amp; Chat", "tab_rankings": "📊 Rankings", "tab_profile": "👤 Profile", "dl_tag": "Installation &amp; Downloads", "dl_title": "Download Desky for your system", "dl_desc": "Native installers with built-in auto-update support.", "win_installer": "Setup Installer (.exe)", "win_msix": "Microsoft Store Package (.msix)", "mac_dmg": "Disk Image (.dmg)", "linux_deb": "Debian Package (.deb)", "linux_tar": "Portable Archive (.tar.gz)", "dl_win": "Download for Windows", "dl_mac": "Download for macOS", "dl_linux": "Download for Linux (.deb)", "faq_tag": "FAQ", "faq_title": "Frequently Asked Questions", "faq1_q": "Is Desky free and open source?", "faq1_a": "Yes! Desky is 100% free and open source under the MIT license. Source code is available on GitHub for anyone to audit, build, and contribute to.", "faq2_q": "Is Desky the official Yeolpumta app?", "faq2_a": "No. Desky is an independent, community-built client. It has no official affiliation with Pallo Inc.", "faq3_q": "Are my study hours synced with mobile?", "faq3_a": "Yes! All subjects, sessions, group attendance and rankings are synced with your Yeolpumta account in real time.", "faq4_q": "How do automatic updates work?", "faq4_a": "Desky notifies you in the sidebar when a new version is published on GitHub Releases, letting you download with one click.", "footer_desc": "The ultimate desktop client to focus on your studies, track friends in real time and achieve your biggest goals.", "footer_nav": "Navigation", "footer_project": "Project", "footer_repo": "GitHub Repository", "footer_releases": "Releases &amp; Notes", "footer_issues": "Report an Issue", "footer_copy": "© 2026 DevHuney. All rights reserved. Desky is an independent open-source project.", "footer_built": "Built with Flutter Desktop &amp; Material Design 3."}, "pt": {"nav_features": "Recursos", "nav_gallery": "Galeria", "nav_downloads": "Downloads", "hero_badge": "Desky v1.0.0 — Lançado Oficialmente", "hero_title": "O cliente desktop definitivo<br/>para o <span class=\"highlight\">Yeolpumta</span>", "hero_subtitle": "Foco profundo, cronômetro Pomodoro com matérias coloridas, presença em grupos ao vivo e estatísticas completas em uma interface moderna AMOLED True Black para Windows, macOS e Linux.", "hero_dl_win": "Baixar para Windows (x64)", "hero_dl_mac": "Baixar para macOS", "hero_dl_linux": "Baixar para Linux", "hero_all_installers": "Todos os Instaladores", "trust_free": "100% Gratuito &amp; Open Source (MIT)", "trust_perf": "Alta Performance Flutter Nativo", "trust_langs": "7 Idiomas Nativos", "mockup_title": "Desky — Cronômetro de Estudo", "widget_focus": "Foco Ativo", "widget_start": "Iniciar", "stat_tests": "Testes Automatizados", "stat_langs": "Idiomas Suportados", "stat_distractions": "Distrações (Modo Foco)", "stat_opensource": "Código Aberto (MIT)", "features_tag": "Funcionalidades Completas", "features_title": "Construído para maximizar o seu rendimento", "features_desc": "Tudo o que você precisa para manter o foco profundo, acompanhar amigos em tempo real e evoluir dia a dia.", "feat1_title": "Cronômetro &amp; Pomodoro", "feat1_desc": "Ciclos normais e Pomodoro totalmente configuráveis. Organize matérias com cores personalizadas e registre sessões com sincronização instantânea.", "feat2_title": "Grupos &amp; Live Study", "feat2_desc": "Veja em tempo real quem está estudando no seu grupo. Envie Shakes, converse com emojis e use o Live Study com câmera.", "feat3_title": "Activity Heatmap &amp; Streaks", "feat3_desc": "Visualize sua constância com uma grade de calor estilo GitHub. Mantenha sua ofensiva de chamas e suba nos rankings globais.", "feat4_title": "Bloqueador de Distrações", "feat4_desc": "Identifique automaticamente aplicativos que desviam sua atenção. Use o Mini Player flutuante Always-on-Top para manter o timer visível.", "feat5_title": "Flashcards &amp; Leitor PDF", "feat5_desc": "Baralhos com algoritmo de repetição espaçada SM-2. Leitor PDF integrado com marcadores e criação rápida de cartões.", "feat6_title": "Planejador &amp; D-Day", "feat6_desc": "Contagens regressivas visuais para provas e metas. Listas de tarefas com prioridades e grade de horários semanal.", "gallery_tag": "Galeria de Telas", "gallery_title": "Interface Imersiva AMOLED True Black", "gallery_desc": "Explore a interface do Desky nos seus idiomas preferidos com Material Design 3.", "gallery_lang_label": "Idioma da tela:", "tab_timer": "⏱️ Cronômetro", "tab_groups": "👥 Grupos &amp; Chat", "tab_rankings": "📊 Rankings", "tab_profile": "👤 Perfil", "dl_tag": "Instalação &amp; Downloads", "dl_title": "Baixe o Desky para o seu sistema", "dl_desc": "Instaladores nativos com suporte a atualizações automáticas integradas.", "win_installer": "Instalador Setup (.exe)", "win_msix": "Pacote Microsoft Store (.msix)", "mac_dmg": "Imagem de Disco (.dmg)", "linux_deb": "Pacote Debian (.deb)", "linux_tar": "Arquivo Portátil (.tar.gz)", "dl_win": "Baixar para Windows", "dl_mac": "Baixar para macOS", "dl_linux": "Baixar para Linux (.deb)", "faq_tag": "Dúvidas Frequentes", "faq_title": "Perguntas e Respostas", "faq1_q": "O Desky é gratuito e de código aberto?", "faq1_a": "Sim! O Desky é 100% gratuito e open source sob a licença MIT. O código-fonte está disponível no GitHub para auditar, compilar e contribuir.", "faq2_q": "O Desky é o aplicativo oficial do Yeolpumta?", "faq2_a": "Não. O Desky é um cliente independente desenvolvido pela comunidade. Ele não possui afiliação oficial com a Pallo Inc.", "faq3_q": "Minhas horas de estudo são sincronizadas com o celular?", "faq3_a": "Sim! Todas as matérias, sessões, presença em grupos e rankings são sincronizados com sua conta do Yeolpumta em tempo real.", "faq4_q": "Como funcionam as atualizações automáticas?", "faq4_a": "O Desky notifica na barra lateral quando uma nova versão é publicada no GitHub Releases, permitindo baixar o instalador com um clique.", "footer_desc": "O cliente desktop definitivo para focar nos estudos, acompanhar amigos em tempo real e alcançar seus maiores objetivos.", "footer_nav": "Navegação", "footer_project": "Projeto", "footer_repo": "Repositório GitHub", "footer_releases": "Releases &amp; Notas", "footer_issues": "Relatar um Problema", "footer_copy": "© 2026 DevHuney. Todos os direitos reservados. Desky é um projeto independente de código aberto.", "footer_built": "Construído com Flutter Desktop &amp; Material Design 3."}, "es": {"nav_features": "Funciones", "nav_gallery": "Galería", "nav_downloads": "Descargas", "hero_badge": "Desky v1.0.0 — Ya Disponible", "hero_title": "El cliente de escritorio definitivo<br/>para <span class=\"highlight\">Yeolpumta</span>", "hero_subtitle": "Concentración profunda, temporizador Pomodoro colorido, grupos Live Study en tiempo real y estadísticas completas con diseño AMOLED True Black para Windows, macOS y Linux.", "hero_dl_win": "Descargar para Windows (x64)", "hero_dl_mac": "Descargar para macOS", "hero_dl_linux": "Descargar para Linux", "hero_all_installers": "Todos los Instaladores", "trust_free": "100% Gratis &amp; Open Source (MIT)", "trust_perf": "Alto Rendimiento Flutter Nativo", "trust_langs": "7 Idiomas Nativos", "mockup_title": "Desky — Temporizador de Estudio", "widget_focus": "Enfoque Activo", "widget_start": "Iniciar", "stat_tests": "Tests Automatizados", "stat_langs": "Idiomas Soportados", "stat_distractions": "Distracciones (Modo Enfoque)", "stat_opensource": "Código Abierto (MIT)", "features_tag": "Funciones Completas", "features_title": "Diseñado para maximizar tu rendimiento", "features_desc": "Todo lo que necesitas para concentrarte, seguir amigos en tiempo real y mejorar día a día.", "feat1_title": "Temporizador &amp; Pomodoro", "feat1_desc": "Ciclos normales y Pomodoro totalmente configurables. Organiza asignaturas con colores personalizados y registra sesiones al instante.", "feat2_title": "Grupos &amp; Live Study", "feat2_desc": "Observa quién estudia en tu grupo en tiempo real. Envía Shakes, chatea con emojis y usa Live Study con cámara.", "feat3_title": "Heatmap &amp; Rachas", "feat3_desc": "Visualiza tu constancia con un heatmap anual estilo GitHub. Mantén tu racha de llamas y sube en los rankings globales.", "feat4_title": "Bloqueador de Distracciones", "feat4_desc": "Detecta automáticamente apps que roban tu atención. Usa el Mini Player flotante Always-on-Top para mantener el timer visible.", "feat5_title": "Flashcards &amp; Lector PDF", "feat5_desc": "Barajas con algoritmo SM-2 de repetición espaciada. Lector PDF integrado con marcadores y creación rápida de tarjetas.", "feat6_title": "Planificador &amp; D-Day", "feat6_desc": "Cuenta regresiva visual para exámenes y objetivos. Listas de tareas con prioridades y horario semanal interactivo.", "gallery_tag": "Galería de Pantallas", "gallery_title": "Interfaz Inmersiva AMOLED True Black", "gallery_desc": "Explora la interfaz de Desky en tus idiomas preferidos con Material Design 3.", "gallery_lang_label": "Idioma de la pantalla:", "tab_timer": "⏱️ Temporizador", "tab_groups": "👥 Grupos &amp; Chat", "tab_rankings": "📊 Rankings", "tab_profile": "👤 Perfil", "dl_tag": "Instalación &amp; Descargas", "dl_title": "Descarga Desky para tu sistema", "dl_desc": "Instaladores nativos con soporte de actualización automática.", "win_installer": "Instalador Setup (.exe)", "win_msix": "Paquete Microsoft Store (.msix)", "mac_dmg": "Imagen de Disco (.dmg)", "linux_deb": "Paquete Debian (.deb)", "linux_tar": "Archivo Portátil (.tar.gz)", "dl_win": "Descargar para Windows", "dl_mac": "Descargar para macOS", "dl_linux": "Descargar para Linux (.deb)", "faq_tag": "Preguntas Frecuentes", "faq_title": "Preguntas y Respuestas", "faq1_q": "¿Desky es gratuito y de código abierto?", "faq1_a": "Sí. Desky es 100% gratuito y open source bajo licencia MIT. El código fuente está en GitHub.", "faq2_q": "¿Desky es la app oficial de Yeolpumta?", "faq2_a": "No. Desky es un cliente independiente desarrollado por la comunidad sin afiliación oficial con Pallo Inc.", "faq3_q": "¿Mis horas se sincronizan con el móvil?", "faq3_a": "Sí. Todas las sesiones, asignaturas, grupos y rankings se sincronizan en tiempo real con tu cuenta de Yeolpumta.", "faq4_q": "¿Cómo funcionan las actualizaciones automáticas?", "faq4_a": "Desky notifica en la barra lateral cuando hay una nueva versión en GitHub Releases para descargar con un clic.", "footer_desc": "El cliente de escritorio definitivo para concentrarte, seguir amigos en tiempo real y alcanzar tus metas.", "footer_nav": "Navegación", "footer_project": "Proyecto", "footer_repo": "Repositorio GitHub", "footer_releases": "Releases &amp; Notas", "footer_issues": "Reportar un Problema", "footer_copy": "© 2026 DevHuney. Todos los derechos reservados. Desky es un proyecto open source independiente.", "footer_built": "Desarrollado con Flutter Desktop &amp; Material Design 3."}, "ko": {"nav_features": "기능", "nav_gallery": "갤러리", "nav_downloads": "다운로드", "hero_badge": "Desky v1.0.0 정식 출시", "hero_title": "<span class=\"highlight\">열품타</span>를 위한<br/>최고의 데스크톱 클라이언트", "hero_subtitle": "깊은 집중, 컨러풀 뽀모도로 타이머, 실시간 캐스터디 그룹과 완전한 통계를 담은 AMOLED 트루 블랙 인터페이스. Windows·macOS·Linux 지원.", "hero_dl_win": "Windows (x64) 다운로드", "hero_dl_mac": "macOS 다운로드", "hero_dl_linux": "Linux 다운로드", "hero_all_installers": "전체 설치 파일", "trust_free": "100% 무료 &amp; 오픈 소스 (MIT)", "trust_perf": "네이티브 Flutter 고성능", "trust_langs": "7개 언어 지원", "mockup_title": "Desky — 스터디 타이머", "widget_focus": "집중 중", "widget_start": "시작", "stat_tests": "자동화 테스트", "stat_langs": "지원 언어", "stat_distractions": "딸짓 차단 (집중 모드)", "stat_opensource": "오픈 소스 (MIT)", "features_tag": "전체 기능", "features_title": "학습 성과를 극대화하기 위해 설계", "features_desc": "깊은 집중, 실시간 그룹 확인, 매일의 성장을 위한 모든 것.", "feat1_title": "타이머 &amp; 뽀모도로", "feat1_desc": "완전 맞치형 일반 및 뽀모도로 모드. 색상별 과목 관리, 과거 세션 수동 등록 및 즉시 클라우드 동기화.", "feat2_title": "그룹 &amp; 캐스터디", "feat2_desc": "그룹원의 실시간 공부 현황 확인. 흔들기(Shake), 이모티콘 채팅, 카메라 인증 캐스터디.", "feat3_title": "활동 잔디 &amp; 연속 기록", "feat3_desc": "깨시운 스타일 연간 잔디로 꼼준함 시각화. 불꽃 연속 기록 유지, 글로벌 랝킹 상승.", "feat4_title": "딸짓 방지 기능", "feat4_desc": "집중 방해 앱 자동 감지. 항상 위 플로팅 미니 플레이어로 타이머 항상 표시.", "feat5_title": "플래시카드 &amp; PDF 븷어", "feat5_desc": "SM-2 반복 알고리즘 플래시카드. 내장 PDF 리더로 즉시 카드 생성.", "feat6_title": "플래너 &amp; 디데이", "feat6_desc": "시험과 목표를 위한 시각적 디데이. 우선순위 할 일 목록, 주간 시간표 플래너.", "gallery_tag": "스크린샷 갤러리", "gallery_title": "몰입감 있는 AMOLED 트루 블랙 UI", "gallery_desc": "Material Design 3으로 제작된 Desky의 7개 언어 인터페이스를 탐색하세요.", "gallery_lang_label": "화면 언어:", "tab_timer": "⏱️ 타이머", "tab_groups": "👥 그룹 &amp; 채팅", "tab_rankings": "📊 랝킹", "tab_profile": "👤 프로필", "dl_tag": "설치 &amp; 다운로드", "dl_title": "내 시스템에 맞는 Desky 다운로드", "dl_desc": "자동 업데이트가 내장된 네이티브 설치 파일.", "win_installer": "설치 프로그램 (.exe)", "win_msix": "Microsoft Store 패키지 (.msix)", "mac_dmg": "디스크 이미지 (.dmg)", "linux_deb": "Debian 패키지 (.deb)", "linux_tar": "포터블 (.tar.gz)", "dl_win": "Windows 다운로드", "dl_mac": "macOS 다운로드", "dl_linux": "Linux 다운로드 (.deb)", "faq_tag": "자주 묻는 질문", "faq_title": "FAQ", "faq1_q": "Desky는 무료이고 오픈 소스인가요?", "faq1_a": "네! Desky는 MIT 라이선스 하에 100% 무료 오픈 소스입니다.", "faq2_q": "Desky는 열품타 공식 앱인가요?", "faq2_a": "아니요. Desky는 커뮤니티가 만든 독립 클라이언트로 Pallo Inc.와 공식적인 관련이 없습니다.", "faq3_q": "공부 시간이 모바일과 동기화되나요?", "faq3_a": "네! 모든 과목·세션·그룹 출석·랝킹이 열품타 계정과 실시간으로 동기화됩니다.", "faq4_q": "자동 업데이트는 어떻게 작동하나요?", "faq4_a": "GitHub Releases에 새 버전이 출시되면 사이드바에 알림이 표시되어 한 번의 클릭으로 다운로드할 수 있습니다.", "footer_desc": "집중, 실시간 그룹 공부, 최대의 목표 달성을 위한 최고의 데스크톱 클라이언트.", "footer_nav": "메뉴", "footer_project": "프로젝트", "footer_repo": "GitHub 저장소", "footer_releases": "릴리즈 &amp; 노트", "footer_issues": "문제 신고", "footer_copy": "© 2026 DevHuney. All rights reserved. Desky는 독립 오픈 소스 프로젝트입니다.", "footer_built": "Flutter Desktop &amp; Material Design 3으로 제작."}, "ja": {"nav_features": "機能", "nav_gallery": "ギャラリー", "nav_downloads": "ダウンロード", "hero_badge": "Desky v1.0.0 — 正式リリース", "hero_title": "<span class=\"highlight\">Yeolpumta</span>のための<br/>最高のデスクトップクライアント", "hero_subtitle": "深い集中、カラフルなポモドーロタイマー、リアルタイムのライブスタディグループと完全な統計。Windows・macOS・Linux対応。", "hero_dl_win": "Windows (x64) をダウンロード", "hero_dl_mac": "macOS をダウンロード", "hero_dl_linux": "Linux をダウンロード", "hero_all_installers": "全インストーラー", "trust_free": "100% 無料 &amp; オープンソース (MIT)", "trust_perf": "ネイティブFlutter高性能", "trust_langs": "7言語ネイティブ対応", "mockup_title": "Desky — 学習タイマー", "widget_focus": "集中中", "widget_start": "スタート", "stat_tests": "自動テスト", "stat_langs": "対応言語", "stat_distractions": "誤差ゼロ (集中モード)", "stat_opensource": "オープンソース (MIT)", "features_tag": "全機能", "features_title": "学習効率を最大化するために設計", "features_desc": "深い集中、リアルタイムの仲間確認、毎日の成長に必要なすべてがここに。", "feat1_title": "タイマー &amp; ポモドーロ", "feat1_desc": "完全カスタマイズ対応。科目別カラー管理、過去セッションの手動登録・即時クラウド同期。", "feat2_title": "グループ &amp; ライブスタディ", "feat2_desc": "グループの学習状況をリアルタイムで確認。Shake送信、絵文字チャット、カメラ認証。", "feat3_title": "ヒートマップ &amp; ストリーク", "feat3_desc": "GitHubスタイルの年間ヒートマップで継続性を可視化。炎ストリーク維持、グローバルランキング上昇。", "feat4_title": "誤差ブロック", "feat4_desc": "集中を妨げるアプリを自動検知。最前面フローティングミニプレイヤーでタイマーを常時表示。", "feat5_title": "暗記カード &amp; PDFリーダー", "feat5_desc": "SM-2分散学習アルゴリズム暗記カード。PDFリーダーでブックマークと即時カード作成。", "feat6_title": "プランナー &amp; D-Day", "feat6_desc": "試験・目標へのカウントダウン表示。優先度付きToDoListと週間時間割。", "gallery_tag": "スクリーンショット", "gallery_title": "沈浸感あるAMOLEDトゥルーブラックUI", "gallery_desc": "Material Design 3で作られたDeskyの7言語対応インターフェースを探索。", "gallery_lang_label": "画面の言語:", "tab_timer": "⏱️ タイマー", "tab_groups": "👥 グループ &amp; チャット", "tab_rankings": "📊 ランキング", "tab_profile": "👤 プロフィール", "dl_tag": "インストール &amp; ダウンロード", "dl_title": "お使いのシステム向けにDeskyをダウンロード", "dl_desc": "自動アップデート内蔵のネイティブインストーラー。", "win_installer": "セットアップ (.exe)", "win_msix": "Microsoft Store パッケージ (.msix)", "mac_dmg": "ディスクイメージ (.dmg)", "linux_deb": "Debian パッケージ (.deb)", "linux_tar": "ポータブル (.tar.gz)", "dl_win": "Windows をダウンロード", "dl_mac": "macOS をダウンロード", "dl_linux": "Linux をダウンロード (.deb)", "faq_tag": "よくある質問", "faq_title": "FAQ", "faq1_q": "Deskyは無料でオープンソースですか？", "faq1_a": "はい！DeskyはMITライセンスの100%無料オープンソースです。ソースコードはGitHubで公開しています。", "faq2_q": "Deskyは公式Yeolpumtaアプリですか？", "faq2_a": "いいえ。Deskyはコミュニティによる独立クライアントで、Pallo Inc.との公式な関係はありません。", "faq3_q": "学習時間はモバイルと同期されますか？", "faq3_a": "はい！科目・セッション・グループ出席・ランキングがリアルタイムでアカウントと同期されます。", "faq4_q": "自動アップデートはどのように動作しますか？", "faq4_a": "GitHub Releasesに新バージョンが公開されるとサイドバーに通知が表示され、ワンクリックでダウンロードできます。", "footer_desc": "集中、リアルタイムの仲間確認、最大の目標達成のための最高のデスクトップクライアント。", "footer_nav": "ナビゲーション", "footer_project": "プロジェクト", "footer_repo": "GitHubリポジトリ", "footer_releases": "リリース &amp; ノート", "footer_issues": "問題を報告", "footer_copy": "© 2026 DevHuney. All rights reserved. Deskyは独立したオープンソースプロジェクトです。", "footer_built": "Flutter Desktop &amp; Material Design 3で構築。"}, "zh-cn": {"nav_features": "功能", "nav_gallery": "截图", "nav_downloads": "下载", "hero_badge": "Desky v1.0.0 正式发布", "hero_title": "为 <span class=\"highlight\">Yeolpumta</span><br/>打造的终极桌面客户端", "hero_subtitle": "深度专注、炫彩番茄钟、实时 Live Study 小组与完整统计，融于 AMOLED 纯黑界面。支持 Windows、macOS 和 Linux。", "hero_dl_win": "下载 Windows 版 (x64)", "hero_dl_mac": "下载 macOS 版", "hero_dl_linux": "下载 Linux 版", "hero_all_installers": "全部安装包", "trust_free": "100% 免费 &amp; 开源 (MIT)", "trust_perf": "Flutter 原生高性能", "trust_langs": "7 种语言原生支持", "mockup_title": "Desky — 学习计时器", "widget_focus": "专注中", "widget_start": "开始", "stat_tests": "自动化测试", "stat_langs": "支持语言", "stat_distractions": "零分心 (专注模式)", "stat_opensource": "开源 (MIT)", "features_tag": "全功能", "features_title": "专为提升学习效率而生", "features_desc": "深度专注、实时追踪好友、每天进步所需的一切。", "feat1_title": "计时器 &amp; 番茄钟", "feat1_desc": "完全自定义模式。科目颜色管理，历史学习时间补录及即时云端同步。", "feat2_title": "学习小组 &amp; Live Study", "feat2_desc": "实时查看小组成员学习状态。发送唤醒振动，表情群聊，拍照打卡认证。", "feat3_title": "热力图 &amp; 连续打卡", "feat3_desc": "GitHub 风格年度热力图可视化坚持度。保持火苗连续记录，冲全球排行榜。", "feat4_title": "防分心拦截", "feat4_desc": "自动检测分心软件。始终置顶的悬浮过关计时器，多任务时保持时间可见。", "feat5_title": "记忆卡片 &amp; PDF 阅读器", "feat5_desc": "SM-2 间隔重复算法记忆卡片。内置 PDF 阅读器，阅读中一键生成卡片。", "feat6_title": "日程规划 &amp; 倒计时", "feat6_desc": "考试与目标可视化倒数。优先级待办清单，周课程表规划。", "gallery_tag": "截图展示", "gallery_title": "沉浸式 AMOLED 纯黑界面", "gallery_desc": "以 Material Design 3 打造，探索 Desky 支持 7 种语言的精美界面。", "gallery_lang_label": "界面语言:", "tab_timer": "⏱️ 计时器", "tab_groups": "👥 小组 &amp; 聊天", "tab_rankings": "📊 排行榜", "tab_profile": "👤 个人资料", "dl_tag": "安装 &amp; 下载", "dl_title": "为您的系统下载 Desky", "dl_desc": "内置自动更新支持的原生安装包。", "win_installer": "安装程序 (.exe)", "win_msix": "微软商店包 (.msix)", "mac_dmg": "磁盘映像 (.dmg)", "linux_deb": "Debian 包 (.deb)", "linux_tar": "便携版 (.tar.gz)", "dl_win": "下载 Windows 版", "dl_mac": "下载 macOS 版", "dl_linux": "下载 Linux 版 (.deb)", "faq_tag": "常见问题", "faq_title": "常见问题解答", "faq1_q": "Desky 是免费开源的吗？", "faq1_a": "是的！Desky 在 MIT 许可证下 100% 免费开源，源码托管于 GitHub。", "faq2_q": "Desky 是 Yeolpumta 官方应用吗？", "faq2_a": "不是。Desky 是社区构建的独立客户端，与 Pallo Inc. 无官方关联。", "faq3_q": "学习时间会与手机同步吗？", "faq3_a": "会！所有科目、会话、小组出勤与排行榜均与您的 Yeolpumta 账户实时同步。", "faq4_q": "自动更新如何工作？", "faq4_a": "GitHub Releases 发布新版本后，Desky 侧边栏弹出通知，一键下载安装。", "footer_desc": "专注学习、实时追踪好友、实现最大目标的终极桌面客户端。", "footer_nav": "导航", "footer_project": "项目", "footer_repo": "GitHub 仓库", "footer_releases": "版本 &amp; 说明", "footer_issues": "反馈问题", "footer_copy": "© 2026 DevHuney。保留所有权利。Desky 是独立开源项目。", "footer_built": "基于 Flutter Desktop &amp; Material Design 3 构建。"}, "zh-tw": {"nav_features": "功能", "nav_gallery": "截圖", "nav_downloads": "下載", "hero_badge": "Desky v1.0.0 正式發布", "hero_title": "為 <span class=\"highlight\">Yeolpumta</span><br/>打造的終極桐面客戶端", "hero_subtitle": "深度專注、煤彩番茄鐘、即時 Live Study 小組與完整統計，融於 AMOLED 純黑介面。支援 Windows、macOS 和 Linux。", "hero_dl_win": "下載 Windows 版 (x64)", "hero_dl_mac": "下載 macOS 版", "hero_dl_linux": "下載 Linux 版", "hero_all_installers": "全部安裝包", "trust_free": "100% 免費 &amp; 開源 (MIT)", "trust_perf": "Flutter 原生高效能", "trust_langs": "7 種語言原生支援", "mockup_title": "Desky — 學習計時器", "widget_focus": "專注中", "widget_start": "開始", "stat_tests": "自動化測試", "stat_langs": "支援語言", "stat_distractions": "零分心 (專注模式)", "stat_opensource": "開源 (MIT)", "features_tag": "全功能", "features_title": "專為提升學習效率而生", "features_desc": "深度專注、即時追蹤好友、每天進步所需的一切。", "feat1_title": "計時器 &amp; 番茄鐘", "feat1_desc": "完全自訂普通與番茄鐘模式。科目顏色管理，歷史學習時間补錄及即時雲端同步。", "feat2_title": "學習小組 &amp; Live Study", "feat2_desc": "即時查看小組成員學習狀態。發送提醒振動，表情群聊，拍照打卡認證。", "feat3_title": "熱力圖 &amp; 連續打卡", "feat3_desc": "GitHub 風格年度熱力圖可視化堅持度。保持火苗連續記錄，衝全球排行榜。", "feat4_title": "防分心攔截", "feat4_desc": "自動偵測分心軟體。始終置頂的懸浮達關計時器，多工時保持時間可見。", "feat5_title": "記憶卡片 &amp; PDF 閱讀器", "feat5_desc": "SM-2 間隔重複演算法記憶卡片。內建 PDF 閱讀器，閱讀中一鍵生成卡片。", "feat6_title": "日程規劃 &amp; 倒數日", "feat6_desc": "考試與目標可視化倒數。優先級待辦清單，週課程表規劃。", "gallery_tag": "截圖展示", "gallery_title": "沈浸式 AMOLED 純黑介面", "gallery_desc": "以 Material Design 3 打造，探索 Desky 支援 7 種語言的精美介面。", "gallery_lang_label": "介面語言:", "tab_timer": "⏱️ 計時器", "tab_groups": "👥 小組 &amp; 聊天", "tab_rankings": "📊 排行榜", "tab_profile": "👤 個人資料", "dl_tag": "安裝 &amp; 下載", "dl_title": "為您的系統下載 Desky", "dl_desc": "內建自動更新支援的原生安裝包。", "win_installer": "安裝程式 (.exe)", "win_msix": "微軟商店包 (.msix)", "mac_dmg": "磁碟映像 (.dmg)", "linux_deb": "Debian 包 (.deb)", "linux_tar": "便攜版 (.tar.gz)", "dl_win": "下載 Windows 版", "dl_mac": "下載 macOS 版", "dl_linux": "下載 Linux 版 (.deb)", "faq_tag": "常見問題", "faq_title": "常見問題解答", "faq1_q": "Desky 是免費開源的嗎？", "faq1_a": "是的！Desky 在 MIT 授權下 100% 免費開源，原始碼托管於 GitHub。", "faq2_q": "Desky 是 Yeolpumta 官方應用嗎？", "faq2_a": "不是。Desky 是社群構建的獨立客戶端，與 Pallo Inc. 無官方關聯。", "faq3_q": "學習時間會與手機同步嗎？", "faq3_a": "會！所有科目、會話、小組出勤與排行榜均與您的 Yeolpumta 帳戶即時同步。", "faq4_q": "自動更新如何運作？", "faq4_a": "GitHub Releases 發布新版本後，Desky 側邊欄很出通知，一鍵下載安裝。", "footer_desc": "專注學習、即時追蹤好友、實現最大目標的終極桐面客戶端。", "footer_nav": "導航", "footer_project": "專案", "footer_repo": "GitHub 倉庫", "footer_releases": "版本 &amp; 說明", "footer_issues": "回報問題", "footer_copy": "© 2026 DevHuney。保留所有權利。Desky 是獨立開源專案。", "footer_built": "基於 Flutter Desktop &amp; Material Design 3 構建。"}};
+const LANG_META={"en": {"flag": "🇺🇸", "code": "EN", "gallery": "english", "htmlLang": "en"}, "pt": {"flag": "🇧🇷", "code": "PT", "gallery": "portuguese", "htmlLang": "pt-BR"}, "es": {"flag": "🇪🇸", "code": "ES", "gallery": "spanish", "htmlLang": "es"}, "ko": {"flag": "🇰🇷", "code": "KO", "gallery": "korean", "htmlLang": "ko"}, "ja": {"flag": "🇯🇵", "code": "JA", "gallery": "japanese", "htmlLang": "ja"}, "zh-cn": {"flag": "🇨🇳", "code": "中文", "gallery": "simplified_chinese", "htmlLang": "zh-CN"}, "zh-tw": {"flag": "🇹🇼", "code": "繁中", "gallery": "traditional_chinese", "htmlLang": "zh-TW"}};
+let currentLang="en";
+function detectBrowserLang(){const r=(navigator.language||navigator.languages?.[0]||"en").toLowerCase();if(r.startsWith("pt"))return"pt";if(r.startsWith("es"))return"es";if(r.startsWith("ko"))return"ko";if(r.startsWith("ja"))return"ja";if(r==="zh-tw"||r==="zh-hk"||r==="zh-hant")return"zh-tw";if(r.startsWith("zh"))return"zh-cn";return"en"}
+function setLang(lang){if(!I18N[lang])lang="en";currentLang=lang;const d=I18N[lang],m=LANG_META[lang];document.documentElement.lang=m.htmlLang;document.getElementById("lang-flag").textContent=m.flag;document.getElementById("lang-code").textContent=m.code;document.getElementById("lang-select").value=lang;document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n");if(d[k]!==undefined)el.innerHTML=d[k]});const hs=document.getElementById("hero-screenshot");if(hs)hs.src="photos/"+m.gallery+"/timer.png";const gs=document.getElementById("gallery-lang");if(gs){gs.value=m.gallery;updateGalleryImage()}try{localStorage.setItem("desky_lang",lang)}catch(e){}lucide.createIcons()}
+(function detectOS(){const ua=navigator.userAgent.toLowerCase();const btn=document.getElementById("primary-download-btn");const ext=document.getElementById("primary-ext");if(!btn)return;if(ua.includes("mac")){btn.href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-macOS-Installer.dmg";ext.textContent=".dmg"}else if(ua.includes("linux")){btn.href="https://github.com/huneyoliv/desky/releases/latest/download/Desky-Linux-x64.deb";ext.textContent=".deb"}})();
+let currentFeature="timer";
+function switchGalleryTab(f,el){currentFeature=f;document.querySelectorAll(".gallery-tab").forEach(b=>b.classList.remove("active"));el.classList.add("active");updateGalleryImage()}
+function updateGalleryImage(){const lang=document.getElementById("gallery-lang").value;const img=document.getElementById("gallery-img");img.style.opacity="0.3";setTimeout(()=>{img.src="photos/"+lang+"/"+currentFeature+".png";img.style.opacity="1"},150)}
+let timerSeconds=25*60,timerInterval=null;
+function formatTime(s){return"00:"+Math.floor(s/60).toString().padStart(2,"0")+":"+(s%60).toString().padStart(2,"0")}
+function toggleDemoTimer(){const d=I18N[currentLang]||I18N.en;const t=document.getElementById("demo-text");const ic=document.getElementById("demo-icon");if(timerInterval){clearInterval(timerInterval);timerInterval=null;t.textContent=d.widget_start||"Start";ic.setAttribute("data-lucide","play")}else{timerInterval=setInterval(()=>{if(timerSeconds>0){timerSeconds--;document.getElementById("demo-timer").textContent=formatTime(timerSeconds)}else{clearInterval(timerInterval);timerInterval=null}},1000);t.textContent="⏸";ic.setAttribute("data-lucide","pause")}lucide.createIcons()}
+function resetDemoTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null}timerSeconds=25*60;document.getElementById("demo-timer").textContent=formatTime(timerSeconds);const d=I18N[currentLang]||I18N.en;document.getElementById("demo-text").textContent=d.widget_start||"Start";document.getElementById("demo-icon").setAttribute("data-lucide","play");lucide.createIcons()}
+function toggleFaq(h){h.parentElement.classList.toggle("active")}
+function toggleMenu(){const m=document.getElementById("mobile-menu");const b=document.getElementById("hamburger");m.classList.toggle("open");b.classList.toggle("open");m.style.display=m.classList.contains("open")?"flex":""}
+function closeMenu(){const m=document.getElementById("mobile-menu");const b=document.getElementById("hamburger");m.classList.remove("open");b.classList.remove("open")}
+document.addEventListener("DOMContentLoaded",()=>{lucide.createIcons();let saved;try{saved=localStorage.getItem("desky_lang")}catch(e){}setLang(saved||detectBrowserLang())});
+</script>
 </body>
 </html>
