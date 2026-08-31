@@ -14,7 +14,10 @@ void main() {
     expect(sfDisplay.lengthInBytes, greaterThan(0));
 
     final emoji = await rootBundle.load('assets/fonts/AppleEmoji.ttf');
-    expect(emoji.lengthInBytes, greaterThan(0));
+    // Must be the real font file, not a Git LFS pointer (which is ~134 bytes).
+    expect(emoji.lengthInBytes, greaterThan(1000),
+        reason: 'AppleEmoji.ttf appears to be a Git LFS pointer. '
+            'Ensure the CI checkout step uses lfs: true.');
   });
 
   test('AppTheme darkTheme configures fontFamily and textTheme properly', () {
