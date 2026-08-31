@@ -81,6 +81,7 @@ msix_config:
   architecture: x64
   capabilities: internetClient
   languages: en-us, pt-br, es-es, ko-kr, ja-jp, zh-cn, zh-tw, fr-fr, de-de, it-it, ru-ru
+  store: true
 
 flutter_launcher_icons:
   image_path: "assets/icons/icon.png"
