@@ -80,7 +80,7 @@ msix_config:
   output_name: Desky-Windows-Store-x64
   architecture: x64
   capabilities: internetClient
-  languages: en-us, pt-br, es-es, ko-kr, ja-jp, zh-cn, zh-tw, fr-fr, de-de, it-it, ru-ru
+  languages: en-us, pt-br, es-es, ko-kr, ja-jp, zh-cn, zh-tw
   store: true
 
 flutter_launcher_icons:
