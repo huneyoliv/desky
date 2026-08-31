@@ -1,40 +1,5 @@
 ﻿Field,ID,Type (Tipo),default,en-us,pt-br,es-es,ko-kr,ja-jp,zh-cn,zh-tw,fr-fr,de-de,it-it,ru-ru
-Description,2,Texto,"O Desky e o cliente desktop definitivo para a plataforma de estudos Yeolpumta (YPT), desenvolvido para Windows 10 e Windows 11 com interface otimizada para foco profundo e alto desempenho.
-
-Principais Recursos:
-
-Cronometro de Estudo e Pomodoro
-- Modos Normal e Pomodoro personalizaveis (tempo de foco, intervalos curtos e longos).
-- Gestao completa de materias com paleta de cores vibrante.
-- Registro de estudos manual e sincronizacao inteligente em nuvem.
-
-Grupos de Estudo e Live Study
-- Acompanhe a presenca dos seus colegas em tempo real.
-- Live Study com verificacao por camera e fotos periodicas.
-- Chat integrado do grupo com reacoes em emoji e suporte a figurinhas.
-- Envie toques motivacionais (Shakes) para incentivar seus amigos.
-
-Estatisticas, Heatmap e Rankings
-- Heatmap anual no estilo GitHub para visualizar sua constancia diaria.
-- Calendario mensal detalhado com streaks de ofensiva (chamas).
-- Rankings em tempo real: global, nacional e por categoria de estudo.
-
-Modo Foco e Bloqueador de Distracoes
-- Deteccao e alertas automaticos de programas nao autorizados abertos durante o estudo.
-- Mini Player flutuante Always-on-Top para acompanhar seu tempo enquanto le ou assiste a aulas.
-
-Flashcards e SmartBook (Leitor de PDF)
-- Decks organizados com algoritmo de repeticao espacada SM-2.
-- Leitor de PDF integrado com marcadores e criacao rapida de flashcards.
-
-Planejador e Metas (D-Day)
-- Contagens regressivas visuais para suas provas, concursos e vestibulares.
-- To-Do list inteligente com niveis de prioridade e prazos.
-- Grade de horarios semanal personalizavel.
-
-Design Moderno AMOLED True Black
-- Interface inspirada no Material Design 3 e Fluent Design, com tema escuro profundo para maximo conforto visual.
-- Suporte nativo completo a 7 idiomas.","Desky is the ultimate, modern desktop client for the Yeolpumta (YPT) study platform, built natively for Windows 10 and Windows 11 with an interface optimized for deep focus and high performance.
+Description,2,Texto,,"Desky is the ultimate, modern desktop client for the Yeolpumta (YPT) study platform, built natively for Windows 10 and Windows 11 with an interface optimized for deep focus and high performance.
 
 Key Features:
 
@@ -280,15 +245,7 @@ Diseno Moderno AMOLED True Black
 現代 AMOLED 純黑設計
 - 靈感源自 Material Design 3，極致深色模式保護視力。
 - 原生支援 7 種主流語言。",,,,
-ReleaseNotes,3,Texto,"Versao 1.0.0:
-- Lancamento oficial do Desky para Microsoft Store no Windows 10/11 (x64).
-- Novo design moderno AMOLED True Black com interface Material Design 3.
-- Cronometro de Estudo e Pomodoro com suporte a materias personalizadas.
-- Grupos de estudo em tempo real, chat com emojis e Live Study.
-- Activity Heatmap anual e rankings globais/nacionais.
-- Bloqueador de distracoes e Mini Player flutuante Always-on-Top.
-- Flashcards com algoritmo SM-2 e leitor de PDF integrado.
-- Sincronizacao em nuvem e suporte nativo a 7 idiomas.","Version 1.0.0:
+ReleaseNotes,3,Texto,,"Version 1.0.0:
 - Official release of Desky for Microsoft Store on Windows 10/11 (x64).
 - Modern AMOLED True Black design with Material Design 3 interface.
 - Study Timer and Pomodoro with custom color subjects.
@@ -308,7 +265,7 @@ ReleaseNotes,3,Texto,"Versao 1.0.0:
 - Lanzamiento oficial de Desky para Microsoft Store en Windows 10/11 (x64).
 - Nuevo diseno moderno AMOLED True Black con interfaz Material Design 3.
 - Temporizador de Estudio y Pomodoro con asignaturas personalizadas.
-- Grupos de estudio en tiempo real, chat con emojis y Live Study.
+- Grupos de estudio en tiempo real, chat con emojis e Live Study.
 - Heatmap anual de actividad y clasificaciones globales.
 - Bloqueador de distracciones y Mini Player flotante Always-on-Top.
 - Flashcards con algoritmo SM-2 y lector de PDF integrado.
@@ -345,18 +302,18 @@ ReleaseNotes,3,Texto,"Versao 1.0.0:
 - 防分心軟體提醒與始終置頂懸浮迷你計時器。
 - SM-2 演算法記憶卡片與內建 PDF 閱讀器。
 - 即時雲端同步與 7 種語言支援。",,,,
-Title,4,Texto,Desky,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
-ShortTitle,5,Texto,Desky,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
-SortTitle,6,Texto,Desky,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
-VoiceTitle,7,Texto,Desky,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
-ShortDescription,8,Texto,"O cliente desktop definitivo para foco, cronometro Pomodoro e grupos de estudo do Yeolpumta no Windows.","The ultimate desktop client for focus, Pomodoro study timer, and Yeolpumta study groups on Windows.","O cliente desktop definitivo para foco, cronometro Pomodoro e grupos de estudo do Yeolpumta no Windows.","El cliente de escritorio definitivo para enfoque, temporizador Pomodoro y grupos de Yeolpumta en Windows.","Windows를 위한 열품타(YPT) 데스크톱 스터디 타이머, 뽀모도로, 그룹 캠스터디 클라이언트.",Windows向けYeolpumta（YPT）集中タイマー、ポモドーロ、グループ学習クライアント。,专为 Windows 打造的 Yeolpumta (YPT) 桌面端学习计时器、番茄钟与小组自习工具。,專為 Windows 打造的 Yeolpumta (YPT) 桌面端學習計時器、番茄鐘與小組自習工具。,,,,
-DevStudio,9,Texto,DevHuney,DevHuney,DevHuney,DevHuney,DevHuney,DevHuney,DevHuney,DevHuney,,,,
-CopyrightTrademarkInformation,12,Texto,Copyright (c) 2026 DevHuney. Desky e um cliente independente e de codigo aberto.,Copyright (c) 2026 DevHuney. Desky is an independent open-source client.,Copyright (c) 2026 DevHuney. Desky e um cliente independente e de codigo aberto.,Copyright (c) 2026 DevHuney. Desky es un cliente independiente de codigo abierto.,Copyright (c) 2026 DevHuney. Desky는 독립적인 오픈 소스 클라이언트입니다.,Copyright (c) 2026 DevHuney. Deskyは独立したオープンソースクライアントです。,Copyright (c) 2026 DevHuney. Desky 是独立的开源客户端。,Copyright (c) 2026 DevHuney. Desky 是獨立的開源客戶端。,,,,
-AdditionalLicenseTerms,13,Texto,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,,,,
-DesktopScreenshot1,100,Caminho relativo (ou URL para arquivo no Partner Center),photos/portuguese/timer.png,photos/english/timer.png,photos/portuguese/timer.png,photos/spanish/timer.png,photos/korean/timer.png,photos/japanese/timer.png,photos/simplified_chinese/timer.png,photos/traditional_chinese/timer.png,,,,
-DesktopScreenshot2,101,Caminho relativo (ou URL para arquivo no Partner Center),photos/portuguese/chat_de_grupos.png,photos/english/chat_de_grupos.png,photos/portuguese/chat_de_grupos.png,photos/spanish/chat_de_grupos.png,photos/korean/chat_de_grupos.png,photos/japanese/chat_de_grupos.png,photos/simplified_chinese/chat_de_grupos.png,photos/traditional_chinese/chat_de_grupos.png,,,,
-DesktopScreenshot3,102,Caminho relativo (ou URL para arquivo no Partner Center),photos/portuguese/rankings.png,photos/english/rankings.png,photos/portuguese/rankings.png,photos/spanish/rankings.png,photos/korean/rankings.png,photos/japanese/rankings.png,photos/simplified_chinese/rankings.png,photos/traditional_chinese/rankings.png,,,,
-DesktopScreenshot4,103,Caminho relativo (ou URL para arquivo no Partner Center),photos/portuguese/perfil.png,photos/english/perfil.png,photos/portuguese/perfil.png,photos/spanish/perfil.png,photos/korean/perfil.png,photos/japanese/perfil.png,photos/simplified_chinese/perfil.png,photos/traditional_chinese/perfil.png,,,,
+Title,4,Texto,,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
+ShortTitle,5,Texto,,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
+SortTitle,6,Texto,,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
+VoiceTitle,7,Texto,,Desky,Desky,Desky,Desky,Desky,Desky,Desky,,,,
+ShortDescription,8,Texto,,"The ultimate desktop client for focus, Pomodoro study timer, and Yeolpumta study groups on Windows.","O cliente desktop definitivo para foco, cronometro Pomodoro e grupos de estudo do Yeolpumta no Windows.","El cliente de escritorio definitivo para enfoque, temporizador Pomodoro y grupos de Yeolpumta en Windows.","Windows를 위한 열품타(YPT) 데스크톱 스터디 타이머, 뽀모도로, 그룹 캠스터디 클라이언트.",Windows向けYeolpumta（YPT）集中タイマー、ポモドーロ、グループ学習クライアント。,专为 Windows 打造的 Yeolpumta (YPT) 桌面端学习计时器、番茄钟与小组自习工具。,專為 Windows 打造的 Yeolpumta (YPT) 桌面端學習計時器、番茄鐘與小組自習工具。,,,,
+DevStudio,9,Texto,,DevHuney,DevHuney,DevHuney,DevHuney,DevHuney,DevHuney,DevHuney,,,,
+CopyrightTrademarkInformation,12,Texto,,Copyright (c) 2026 DevHuney. Desky is an independent open-source client.,Copyright (c) 2026 DevHuney. Desky e um cliente independente e de codigo aberto.,Copyright (c) 2026 DevHuney. Desky es un cliente independiente de codigo abierto.,Copyright (c) 2026 DevHuney. Desky는 독립적인 오픈 소스 클라이언트입니다.,Copyright (c) 2026 DevHuney. Deskyは独立したオープンソースクライアントです。,Copyright (c) 2026 DevHuney. Desky 是独立的开源客户端。,Copyright (c) 2026 DevHuney. Desky 是獨立的開源客戶端。,,,,
+AdditionalLicenseTerms,13,Texto,,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,https://github.com/huneyoliv/desky/blob/main/LICENSE,,,,
+DesktopScreenshot1,100,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
+DesktopScreenshot2,101,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
+DesktopScreenshot3,102,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
+DesktopScreenshot4,103,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 DesktopScreenshot5,104,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 DesktopScreenshot6,105,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 DesktopScreenshot7,106,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
@@ -383,10 +340,10 @@ DesktopScreenshot27,126,Caminho relativo (ou URL para arquivo no Partner Center)
 DesktopScreenshot28,127,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 DesktopScreenshot29,128,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 DesktopScreenshot30,129,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
-DesktopScreenshotCaption1,150,Texto,Cronometro de Estudo e Pomodoro com Materias Personalizadas,Study Timer and Pomodoro with Customizable Subject Colors,Cronometro de Estudo e Pomodoro com Materias Personalizadas,Temporizador de Estudio y Pomodoro con Asignaturas Personalizadas,맞춤 과목 색상 스터디 타이머 및 뽀모도로,科目別カラー学習タイマー & ポモドーロ,支持自定义科目颜色的学习计时器与番茄钟,支援自訂科目顏色的學習計時器與番茄鐘,,,,
-DesktopScreenshotCaption2,151,Texto,"Grupos de Estudo em Tempo Real, Chat e Live Study","Real-Time Study Groups, Chat, and Live Study Camera Feed","Grupos de Estudo em Tempo Real, Chat e Live Study","Grupos de Estudio en Tiempo Real, Chat y Live Study","실시간 스터디 그룹, 그룹 채팅 및 캠스터디",リアルタイムスタディグループ、チャット & ライブ学習,实时学习小组、群聊互动与拍照自习打卡,即時學習小組、群聊互動與拍照自習打卡,,,,
-DesktopScreenshotCaption3,152,Texto,"Rankings Globais, Calendario e Heatmap de Produtividade","Global Leaderboards, Monthly Calendar, and Activity Heatmap","Rankings Globais, Calendario e Heatmap de Produtividade","Clasificaciones Globales, Calendario y Heatmap de Productividad","글로벌 랭킹, 월간 캘린더 및 활동 잔디 (Heatmap)",グローバルランキング、月間カレンダー & 活動ヒートマップ,全球排行榜、月度日历与年度学习热力图,全球排行榜、月度日曆與年度學習熱力圖,,,,
-DesktopScreenshotCaption4,153,Texto,"Perfil do Estudante, Estatisticas Detalhadas e Customizacao","Student Profile, Detailed Statistics, and Customization","Perfil do Estudante, Estatisticas Detalhadas e Customizacao","Perfil del Estudiante, Estadisticas Detalladas y Personalizacion","학습자 프로필, 상세 통계 및 맞춤 설정",学習者プロフィール、詳細統計 & カスタマイズ,个人档案、详细学习统计与个性化设置,個人檔案、詳細學習統計與個人化設定,,,,
+DesktopScreenshotCaption1,150,Texto,,Study Timer and Pomodoro with Customizable Subject Colors,Cronometro de Estudo e Pomodoro com Materias Personalizadas,Temporizador de Estudio y Pomodoro con Asignaturas Personalizadas,맞춤 과목 색상 스터디 타이머 및 뽀모도로,科目別カラー学習タイマー & ポモドーロ,支持自定义科目颜色的学习计时器与番茄钟,支援自訂科目顏色的學習計時器與番茄鐘,,,,
+DesktopScreenshotCaption2,151,Texto,,"Real-Time Study Groups, Chat, and Live Study Camera Feed","Grupos de Estudo em Tempo Real, Chat e Live Study","Grupos de Estudio en Tiempo Real, Chat y Live Study","실시간 스터디 그룹, 그룹 채팅 및 캠스터디",リアルタイムスタディグループ、チャット & ライブ学習,实时学习小组、群聊互动与拍照自习打卡,即時學習小組、群聊互動與拍照自習打卡,,,,
+DesktopScreenshotCaption3,152,Texto,,"Global Leaderboards, Monthly Calendar, and Activity Heatmap","Rankings Globais, Calendario e Heatmap de Produtividade","Clasificaciones Globales, Calendario y Heatmap de Productividad","글로벌 랭킹, 월간 캘린더 및 활동 잔디 (Heatmap)",グローバルランキング、月間カレンダー & 活動ヒートマップ,全球排行榜、月度日历与年度学习热力图,全球排行榜、月度日曆與年度學習熱力圖,,,,
+DesktopScreenshotCaption4,153,Texto,,"Student Profile, Detailed Statistics, and Customization","Perfil do Estudante, Estatisticas Detalhadas e Customizacao","Perfil del Estudiante, Estadisticas Detalladas y Personalizacion","학습자 프로필, 상세 통계 및 맞춤 설정",学習者プロフィール、詳細統計 & カスタマイズ,个人档案、详细学习统计与个性化设置,個人檔案、詳細學習統計與個人化設定,,,,
 DesktopScreenshotCaption5,154,Texto,,,,,,,,,,,,
 DesktopScreenshotCaption6,155,Texto,,,,,,,,,,,,
 DesktopScreenshotCaption7,156,Texto,,,,,,,,,,,,
@@ -634,9 +591,9 @@ SurfaceHubScreenshotCaption28,577,Texto,,,,,,,,,,,,
 SurfaceHubScreenshotCaption29,578,Texto,,,,,,,,,,,,
 SurfaceHubScreenshotCaption30,579,Texto,,,,,,,,,,,,
 StoreLogo720x1080,600,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
-StoreLogo1080x1080,601,Caminho relativo (ou URL para arquivo no Partner Center),assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,,,,
-StoreLogo300x300,602,Caminho relativo (ou URL para arquivo no Partner Center),assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,assets/icons/icon.png,,,,
-OverrideLogosForWin10,603,True/False,False,False,False,False,False,False,False,False,,,,
+StoreLogo1080x1080,601,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
+StoreLogo300x300,602,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
+OverrideLogosForWin10,603,True/False,,False,False,False,False,False,False,False,,,,
 StoreLogoOverride150x150,604,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 StoreLogoOverride71x71,605,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 PromoImage1920x1080,606,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
@@ -647,16 +604,16 @@ XboxFeaturedPromo1080x1080,610,Caminho relativo (ou URL para arquivo no Partner 
 OptionalPromo358x358,611,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 OptionalPromo1000x800,612,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 OptionalPromo414x180,613,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
-Feature1,700,Texto,Cronometro de estudo e Pomodoro personalizavel com materias coloridas,Customizable study timer and Pomodoro mode with colored subjects,Cronometro de estudo e Pomodoro personalizavel com materias coloridas,Temporizador de estudio y Pomodoro personalizable con materias en color,과목별 맞춤 스터디 타이머 및 뽀모도로 기능,科目別カラー対応の学習タイマーおよびポモドーロ機能,支持自定义科目颜色的学习计时器与番茄钟,支援自訂科目顏色的學習計時器與番茄鐘,,,,
-Feature2,701,Texto,Grupos de estudo em tempo real com lista de presenca e Live Study,Real-time study groups with active attendance and Live Study,Grupos de estudo em tempo real com lista de presenca e Live Study,Grupos de estudio en tiempo real con lista de asistencia y Live Study,실시간 출석 확인 스터디 그룹 및 캠스터디(Live Study),リアルタイム出席スタディグループおよびライブスタディ,实时出勤学习小组与拍照自习打卡 (Live Study),即時出勤學習小組與拍照自習打卡 (Live Study),,,,
-Feature3,702,Texto,Heatmap anual de produtividade e calendario de consistencia,Annual productivity heatmap grid and consistency streaks,Heatmap anual de produtividade e calendario de consistencia,Heatmap anual de productividad y rachas de constancia,연간 생산성 활동 잔디(Heatmap) 및 연속 공부 기록,年間生産性ヒートマップおよび連続学習ストリーク,年度学习热力图与连续打卡火苗记录,年度學習熱力圖與連續打卡火苗記錄,,,,
-Feature4,703,Texto,"Rankings globais, nacionais e por categoria de estudo","Global, national, and category-based leaderboards","Rankings globais, nacionais e por categoria de estudo","Clasificaciones globales, nacionales y por categoria de estudio","실시간 글로벌, 국가별, 카테고리별 랭킹 시스템",グローバル、国別、カテゴリー別ランキング,全球、国家及分类实时学习排行榜,全球、國家及分類即時學習排行榜,,,,
-Feature5,704,Texto,Bloqueador de distracoes e modo de foco estrito,Distraction app blocker and strict focus mode,Bloqueador de distracoes e modo de foco estrito,Bloqueador de distracciones y modo de concentracion estricto,딴짓 앱 실행 감지 및 엄격 집중 모드,誘惑アプリ検知および集中ロックモード,防分心软件自动检测与严格专注模式,防分心軟體自動偵測與嚴格專注模式,,,,
-Feature6,705,Texto,Mini player flutuante Always-on-Top para estudar em multitarefa,Floating Always-on-Top Mini Player for multitasking,Mini player flutuante Always-on-Top para estudar em multitarefa,Mini reproductor flotante Always-on-Top para multitarea,멀티태스킹을 위한 항상 위 플로팅 미니 타이머 플레이어,マルチタスク用最前面フローティングミニタイマー,始终置顶的悬浮迷你计时器，助力多任务学习,始終置頂的懸浮迷你計時器，助力多工學習,,,,
-Feature7,706,Texto,Flashcards com algoritmo de repeticao espacada SM-2 e leitor de PDF,Flashcards with SM-2 spaced repetition algorithm and PDF reader,Flashcards com algoritmo de repeticao espacada SM-2 e leitor de PDF,Tarjetas de memoria con algoritmo SM-2 y lector de PDF integrado,SM-2 반복 알고리즘 플래시카드 및 내장 PDF 뷰어,SM-2アルゴリズム搭載暗記カードおよびPDFリーダー,SM-2 间隔重复记忆卡片与内置 PDF 阅读器,SM-2 間隔重複記憶卡片與內建 PDF 閱讀器,,,,
-Feature8,707,Texto,Gravador de timelapse de sessoes de estudo,Timelapse screen recorder for study sessions,Gravador de timelapse de sessoes de estudo,Grabador de timelapse de sesiones de estudio,공부 세션 타임랩스 화면 녹화 기능,学習セッションのタイムラプス録画機能,学习过程延时摄影 (Timelapse) 录制,學習過程縮時攝影 (Timelapse) 錄影,,,,
-Feature9,708,Texto,Contagem regressiva para exames e metas (D-Day) e grade de horarios,D-Day exam countdown timers and weekly timetable planner,Contagem regressiva para exames e metas (D-Day) e grade de horarios,Cuenta regresiva para examenes (D-Day) y horario semanal,시험 목표 디데이(D-Day) 카운트다운 및 주간 시간표,試験カウントダウン（D-Day）および週間時間割,考试目标倒计时 (D-Day) 与周课程时间表,考試目標倒數計時 (D-Day) 與週課程時間表,,,,
-Feature10,709,Texto,Interface moderna AMOLED True Black com suporte nativo a 7 idiomas,Modern AMOLED True Black interface with 7 native languages,Interface moderna AMOLED True Black com suporte nativo a 7 idiomas,Interfaz moderna AMOLED True Black con soporte para 7 idiomas,7개 국어를 지원하는 AMOLED 트루 블랙 디자인,7言語をサポートするAMOLEDトゥルーブラックUI,支持 7 种语言的 AMOLED 纯黑现代化界面,支援 7 種語言的 AMOLED 純黑現代化介面,,,,
+Feature1,700,Texto,,Customizable study timer and Pomodoro mode with colored subjects,Cronometro de estudo e Pomodoro personalizavel com materias coloridas,Temporizador de estudio y Pomodoro personalizable con materias en color,과목별 맞춤 스터디 타이머 및 뽀모도로 기능,科目別カラー対応の学習タイマーおよびポモドーロ機能,支持自定义科目颜色的学习计时器与番茄钟,支援自訂科目顏色的學習計時器與番茄鐘,,,,
+Feature2,701,Texto,,Real-time study groups with active attendance and Live Study,Grupos de estudo em tempo real com lista de presenca e Live Study,Grupos de estudio en tiempo real con lista de asistencia y Live Study,실시간 출석 확인 스터디 그룹 및 캠스터디(Live Study),リアルタイム出席スタディグループおよびライブスタディ,实时出勤学习小组与拍照自习打卡 (Live Study),即時出勤學習小組與拍照自習打卡 (Live Study),,,,
+Feature3,702,Texto,,Annual productivity heatmap grid and consistency streaks,Heatmap anual de produtividade e calendario de consistencia,Heatmap anual de productividad y rachas de constancia,연간 생산성 활동 잔디(Heatmap) 및 연속 공부 기록,年間生産性ヒートマップおよび連続学習ストリーク,年度学习热力图与连续打卡火苗记录,年度學習熱力圖與連續打卡火苗記錄,,,,
+Feature4,703,Texto,,"Global, national, and category-based leaderboards","Rankings globais, nacionais e por categoria de estudo","Clasificaciones globales, nacionales y por categoria de estudio","실시간 글로벌, 국가별, 카테고리별 랭킹 시스템",グローバル、国別、カテゴリー別ランキング,全球、国家及分类实时学习排行榜,全球、國家及分類即時學習排行榜,,,,
+Feature5,704,Texto,,Distraction app blocker and strict focus mode,Bloqueador de distracoes e modo de foco estrito,Bloqueador de distracciones y modo de concentracion estricto,딴짓 앱 실행 감지 및 엄격 집중 모드,誘惑アプリ検知および集中ロックモード,防分心软件自动检测与严格专注模式,防分心軟體自動偵測與嚴格專注模式,,,,
+Feature6,705,Texto,,Floating Always-on-Top Mini Player for multitasking,Mini player flutuante Always-on-Top para estudar em multitarefa,Mini reproductor flotante Always-on-Top para multitarea,멀티태스킹을 위한 항상 위 플로팅 미니 타이머 플레이어,マルチタスク用最前面フローティングミニタイマー,始终置顶的悬浮迷你计时器，助力多任务学习,始終置頂的懸浮迷你計時器，助力多工學習,,,,
+Feature7,706,Texto,,Flashcards with SM-2 spaced repetition algorithm and PDF reader,Flashcards com algoritmo de repeticao espacada SM-2 e leitor de PDF,Tarjetas de memoria con algoritmo SM-2 y lector de PDF integrado,SM-2 반복 알고리즘 플래시카드 및 내장 PDF 뷰어,SM-2アルゴリズム搭載暗記カードおよびPDFリーダー,SM-2 间隔重复记忆卡片与内置 PDF 阅读器,SM-2 間隔重複記憶卡片與內建 PDF 閱讀器,,,,
+Feature8,707,Texto,,Timelapse screen recorder for study sessions,Gravador de timelapse de sessoes de estudo,Grabador de timelapse de sesiones de estudio,공부 세션 타임랩스 화면 녹화 기능,学習セッションのタイムラプス録画機能,学习过程延时摄影 (Timelapse) 录制,學習過程縮時攝影 (Timelapse) 錄影,,,,
+Feature9,708,Texto,,D-Day exam countdown timers and weekly timetable planner,Contagem regressiva para exames e metas (D-Day) e grade de horarios,Cuenta regresiva para examenes (D-Day) y horario semanal,시험 목표 디데이(D-Day) 카운트다운 및 주간 시간표,試験カウントダウン（D-Day）および週間時間割,考试目标倒计时 (D-Day) 与周课程时间表,考試目標倒數計時 (D-Day) 與週課程時間表,,,,
+Feature10,709,Texto,,Modern AMOLED True Black interface with 7 native languages,Interface moderna AMOLED True Black com suporte nativo a 7 idiomas,Interfaz moderna AMOLED True Black con soporte para 7 idiomas,7개 국어를 지원하는 AMOLED 트루 블랙 디자인,7言語をサポートするAMOLEDトゥルーブラックUI,支持 7 种语言的 AMOLED 纯黑现代化界面,支援 7 種語言的 AMOLED 純黑現代化介面,,,,
 Feature11,710,Texto,,,,,,,,,,,,
 Feature12,711,Texto,,,,,,,,,,,,
 Feature13,712,Texto,,,,,,,,,,,,
@@ -667,9 +624,9 @@ Feature17,716,Texto,,,,,,,,,,,,
 Feature18,717,Texto,,,,,,,,,,,,
 Feature19,718,Texto,,,,,,,,,,,,
 Feature20,719,Texto,,,,,,,,,,,,
-MinimumHardwareReq1,800,Texto,Sistema Operacional: Windows 10 versao 17763.0 ou superior (x64),Operating System: Windows 10 version 17763.0 or higher (x64),Sistema Operacional: Windows 10 versao 17763.0 ou superior (x64),Sistema operativo: Windows 10 version 17763.0 o superior (x64),운영 체제: Windows 10 버전 17763.0 이상 (x64),オペレーティング システム: Windows 10 バージョン 17763.0 以降 (x64),操作系统: Windows 10 版本 17763.0 或更高版本 (x64),作業系統: Windows 10 版本 17763.0 或更高版本 (x64),,,,
-MinimumHardwareReq2,801,Texto,Memoria: 2 GB de RAM,Memory: 2 GB RAM,Memoria: 2 GB de RAM,Memoria: 2 GB de RAM,메모리: 2 GB RAM,メモリ: 2 GB RAM,内存: 2 GB 内存,記憶體: 2 GB 記憶體,,,,
-MinimumHardwareReq3,802,Texto,Processador: Processador Intel ou AMD de 1 GHz ou superior (x64),Processor: 1 GHz Intel or AMD processor (x64),Processador: Processador Intel ou AMD de 1 GHz ou superior (x64),Procesador: Procesador Intel o AMD de 1 GHz (x64),프로세서: 1 GHz Intel 또는 AMD 프로세서 (x64),プロセッサ: 1 GHz Intel または AMD プロセッサ (x64),处理器: 1 GHz Intel 或 AMD 处理器 (x64),處理器: 1 GHz Intel 或 AMD 處理器 (x64),,,,
+MinimumHardwareReq1,800,Texto,,Operating System: Windows 10 version 17763.0 or higher (x64),Sistema Operacional: Windows 10 versao 17763.0 ou superior (x64),Sistema operativo: Windows 10 version 17763.0 o superior (x64),운영 체제: Windows 10 버전 17763.0 이상 (x64),オペレーティング システム: Windows 10 バージョン 17763.0 以降 (x64),操作系统: Windows 10 版本 17763.0 或更高版本 (x64),作業系統: Windows 10 版本 17763.0 或更高版本 (x64),,,,
+MinimumHardwareReq2,801,Texto,,Memory: 2 GB RAM,Memoria: 2 GB de RAM,Memoria: 2 GB de RAM,메모리: 2 GB RAM,メモリ: 2 GB RAM,内存: 2 GB 内存,記憶體: 2 GB 記憶體,,,,
+MinimumHardwareReq3,802,Texto,,Processor: 1 GHz Intel or AMD processor (x64),Processador: Processador Intel ou AMD de 1 GHz ou superior (x64),Procesador: Procesador Intel o AMD de 1 GHz (x64),프로세서: 1 GHz Intel 또는 AMD 프로세서 (x64),プロセッサ: 1 GHz Intel または AMD プロセッサ (x64),处理器: 1 GHz Intel 或 AMD 处理器 (x64),處理器: 1 GHz Intel 或 AMD 處理器 (x64),,,,
 MinimumHardwareReq4,803,Texto,,,,,,,,,,,,
 MinimumHardwareReq5,804,Texto,,,,,,,,,,,,
 MinimumHardwareReq6,805,Texto,,,,,,,,,,,,
@@ -678,9 +635,9 @@ MinimumHardwareReq8,807,Texto,,,,,,,,,,,,
 MinimumHardwareReq9,808,Texto,,,,,,,,,,,,
 MinimumHardwareReq10,809,Texto,,,,,,,,,,,,
 MinimumHardwareReq11,810,Texto,,,,,,,,,,,,
-RecommendedHardwareReq1,850,Texto,Sistema Operacional: Windows 11 (x64),Operating System: Windows 11 (x64),Sistema Operacional: Windows 11 (x64),Sistema operativo: Windows 11 (x64),운영 체제: Windows 11 (x64),オペレーティング システム: Windows 11 (x64),操作系统: Windows 11 (x64),作業系統: Windows 11 (x64),,,,
-RecommendedHardwareReq2,851,Texto,Memoria: 4 GB de RAM ou superior,Memory: 4 GB RAM or higher,Memoria: 4 GB de RAM ou superior,Memoria: 4 GB de RAM o superior,메모리: 4 GB RAM 이상,メモリ: 4 GB RAM 以上,内存: 4 GB 内存或更高,記憶體: 4 GB 記憶體或更高,,,,
-RecommendedHardwareReq3,852,Texto,Processador: Processador Dual-Core 2.0 GHz ou superior,Processor: Dual-Core 2.0 GHz processor or higher,Processador: Processador Dual-Core 2.0 GHz ou superior,Procesador: Procesador Dual-Core de 2.0 GHz o superior,프로세서: Dual-Core 2.0 GHz 프로세서 이상,プロセッサ: Dual-Core 2.0 GHz プロセッサ以上,处理器: Dual-Core 2.0 GHz 或更高配置处理器,處理器: Dual-Core 2.0 GHz 或更高配置處理器,,,,
+RecommendedHardwareReq1,850,Texto,,Operating System: Windows 11 (x64),Sistema Operacional: Windows 11 (x64),Sistema operativo: Windows 11 (x64),운영 체제: Windows 11 (x64),オペレーティング システム: Windows 11 (x64),操作系统: Windows 11 (x64),作業系統: Windows 11 (x64),,,,
+RecommendedHardwareReq2,851,Texto,,Memory: 4 GB RAM or higher,Memoria: 4 GB de RAM ou superior,Memoria: 4 GB de RAM o superior,메모리: 4 GB RAM 이상,メモリ: 4 GB RAM 以上,内存: 4 GB 内存或更高,記憶體: 4 GB 記憶體或更高,,,,
+RecommendedHardwareReq3,852,Texto,,Processor: Dual-Core 2.0 GHz processor or higher,Processador: Processador Dual-Core 2.0 GHz ou superior,Procesador: Procesador Dual-Core de 2.0 GHz o superior,프로세서: Dual-Core 2.0 GHz 프로세서 이상,プロセッサ: Dual-Core 2.0 GHz プロセッサ以上,处理器: Dual-Core 2.0 GHz 或更高配置处理器,處理器: Dual-Core 2.0 GHz 或更高配置處理器,,,,
 RecommendedHardwareReq4,853,Texto,,,,,,,,,,,,
 RecommendedHardwareReq5,854,Texto,,,,,,,,,,,,
 RecommendedHardwareReq6,855,Texto,,,,,,,,,,,,
@@ -689,13 +646,13 @@ RecommendedHardwareReq8,857,Texto,,,,,,,,,,,,
 RecommendedHardwareReq9,858,Texto,,,,,,,,,,,,
 RecommendedHardwareReq10,859,Texto,,,,,,,,,,,,
 RecommendedHardwareReq11,860,Texto,,,,,,,,,,,,
-SearchTerm1,900,Texto,Yeolpumta,Yeolpumta,Yeolpumta,Yeolpumta,열품타,Yeolpumta,Yeolpumta,Yeolpumta,,,,
-SearchTerm2,901,Texto,YPT,YPT,YPT,YPT,YPT,YPT,YPT,YPT,,,,
-SearchTerm3,902,Texto,Pomodoro,Pomodoro,Pomodoro,Pomodoro,뽀모도로,ポモドーロ,番茄钟,番茄鐘,,,,
-SearchTerm4,903,Texto,Study Timer,Study Timer,Study Timer,Temporizador de Estudio,스터디타이머,勉強タイマー,学习计时器,學習計時器,,,,
-SearchTerm5,904,Texto,Cronometro de Estudo,Focus,Cronometro de Estudo,Concentracion,공부,集中,专注,專注,,,,
-SearchTerm6,905,Texto,Produtividade,Productivity,Produtividade,Productividad,집중,勉強時間,学习打卡,學習打卡,,,,
-SearchTerm7,906,Texto,Foco,Study Tracker,Foco,Estudio,열정품은타이머,学習記録,考研,備考,,,,
+SearchTerm1,900,Texto,,Yeolpumta,Yeolpumta,Yeolpumta,열품타,Yeolpumta,Yeolpumta,Yeolpumta,,,,
+SearchTerm2,901,Texto,,YPT,YPT,YPT,YPT,YPT,YPT,YPT,,,,
+SearchTerm3,902,Texto,,Pomodoro,Pomodoro,Pomodoro,뽀모도로,ポモドーロ,番茄钟,番茄鐘,,,,
+SearchTerm4,903,Texto,,Study Timer,Study Timer,Temporizador de Estudio,스터디타이머,勉強タイマー,学习计时器,學習計時器,,,,
+SearchTerm5,904,Texto,,Focus,Cronometro de Estudo,Concentracion,공부,集中,专注,專注,,,,
+SearchTerm6,905,Texto,,Productivity,Produtividade,Productividad,집중,勉強時間,学习打卡,學習打卡,,,,
+SearchTerm7,906,Texto,,Study Tracker,Foco,Estudio,열정품은타이머,学習記録,考研,備考,,,,
 TrailerToPlayAtTopOfListing,999,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 Trailer1,1000,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
 Trailer2,1001,Caminho relativo (ou URL para arquivo no Partner Center),,,,,,,,,,,,
