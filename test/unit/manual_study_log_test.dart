@@ -1,4 +1,4 @@
-﻿import 'package:desky/core/api/api_client.dart';
+import 'package:desky/core/api/api_client.dart';
 import 'package:desky/core/api/api_exception.dart';
 import 'package:desky/data/repositories/subject_repository.dart';
 import 'package:desky/data/repositories/timer_repository.dart';
@@ -54,7 +54,7 @@ void main() {
             options.path.contains('/user/v2/reload/info')) {
           return {
             'status': 200,
-            'data': '{"s":true,"ss":[{"id":10,"tt":"História","co":4292557552,"sm":1800000,"or":100,"dl":false,"ia":false}]}',
+            'data': '{"s":true,"ss":[{"id":10,"tt":"História","co":4292557552,"sm":1800000,"or":100,"dl":false,"ia":false}],"dl":{"sm":1800000,"ls":[{"id":10,"sb":"História","sm":1800000}]}}',
           };
         }
         return {'status': 404, 'data': '{"s":false}'};
