@@ -265,6 +265,13 @@ void main() {
       expect(pt.tr('legal_disclaimer'), contains('Desky é um cliente desktop independente'));
       expect(en.tr('legal_disclaimer'), contains('Desky is an independent third-party client'));
       expect(ko.tr('legal_disclaimer'), contains('Desky는 독립적인 서드파티 클라이언트'));
+
+      // 8. Rankings Position
+      expect(pt.tr('my_position'), 'Minha Posição');
+      expect(en.tr('my_position'), 'My Rank');
+      expect(ko.tr('my_position'), '내 순위');
+      expect(es.tr('my_position'), 'Mi Posición');
+      expect(ja.tr('my_position'), 'マイランク');
     });
   });
 }

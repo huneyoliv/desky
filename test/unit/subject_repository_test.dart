@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/subject_model.dart';
@@ -66,6 +66,14 @@ void main() {
             'co': 4292557552,
             'dl': false,
           },
+          {
+            'id': 102,
+            'tt': 'Física Quântica',
+            'sm': 7200000, // weekly accumulated time
+            'or': 2,
+            'co': 4292557552,
+            'dl': false,
+          },
         ],
         'dl': {
           'sm': 3600000,
@@ -76,10 +84,36 @@ void main() {
       };
 
       final result = await repository.fetchSubjectsData();
-      expect(result.subjects.length, equals(1));
-      expect(result.subjects.first.title, equals('Química Orgânica'));
-      expect(result.subjects.first.studyMs, equals(3600000));
+      expect(result.subjects.length, equals(2));
+      // Studied today: uses today's time
+      expect(result.subjects[0].title, equals('Química Orgânica'));
+      expect(result.subjects[0].studyMs, equals(3600000));
+      // Not studied today: should be 0ms, NOT weekly accumulated total (7200000)
+      expect(result.subjects[1].title, equals('Física Quântica'));
+      expect(result.subjects[1].studyMs, equals(0));
       expect(result.todayTotalMs, equals(3600000));
+    });
+
+    test('fetchSubjects handles null dl gracefully setting 0ms for all subjects', () async {
+      mockApiClient.postResponse = {
+        'ss': [
+          {
+            'id': 101,
+            'tt': 'Matemática',
+            'sm': 5400000, // weekly accumulated time
+            'or': 1,
+            'co': 4292557552,
+            'dl': false,
+          },
+        ],
+        'dl': null,
+      };
+
+      final result = await repository.fetchSubjectsData();
+      expect(result.subjects.length, equals(1));
+      expect(result.subjects.first.title, equals('Matemática'));
+      expect(result.subjects.first.studyMs, equals(0));
+      expect(result.todayTotalMs, equals(0));
     });
 
     test('updateSubject sends POST and returns true', () async {

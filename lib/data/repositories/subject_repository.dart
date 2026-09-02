@@ -96,14 +96,38 @@ class SubjectRepository {
       }
     }
 
-    final Map<String, int> subjectTimes = {};
-    if (dl != null && dl['ls'] is List) {
-      for (final item in dl['ls']) {
-        if (item is Map<String, dynamic>) {
-          final name = item['sb'] as String? ?? '';
-          final ms = item['sm'] as int? ?? 0;
-          if (name.isNotEmpty) {
-            subjectTimes[name] = (subjectTimes[name] ?? 0) + ms;
+    final Map<String, int> subjectTimesByName = {};
+    final Map<int, int> subjectTimesById = {};
+
+    if (dl != null) {
+      if (dl['ls'] is List) {
+        for (final item in dl['ls']) {
+          if (item is Map<String, dynamic>) {
+            final name = item['sb'] as String? ?? '';
+            final id = item['id'] as int? ?? item['subjectId'] as int?;
+            final ms = item['sm'] as int? ?? 0;
+            if (name.isNotEmpty) {
+              subjectTimesByName[name] = (subjectTimesByName[name] ?? 0) + ms;
+            }
+            if (id != null) {
+              subjectTimesById[id] = (subjectTimesById[id] ?? 0) + ms;
+            }
+          }
+        }
+      }
+
+      if (dl['ss'] is List) {
+        for (final item in dl['ss']) {
+          if (item is Map<String, dynamic>) {
+            final id = item['id'] as int?;
+            final name = item['tt'] as String? ?? '';
+            final ms = item['sm'] as int? ?? 0;
+            if (id != null) {
+              subjectTimesById[id] = (subjectTimesById[id] ?? 0) + ms;
+            }
+            if (name.isNotEmpty) {
+              subjectTimesByName[name] = (subjectTimesByName[name] ?? 0) + ms;
+            }
           }
         }
       }
@@ -114,7 +138,9 @@ class SubjectRepository {
       subjects = rawList
           .map((item) {
             final model = SubjectModel.fromJson(item as Map<String, dynamic>);
-            final ms = subjectTimes[model.title] ?? model.studyMs;
+            // Daily study time should only reflect today's study logs (0 if not studied today),
+            // never falling back to the weekly/all-time accumulated total in model.studyMs.
+            final ms = subjectTimesById[model.id] ?? subjectTimesByName[model.title] ?? 0;
             return model.copyWith(studyMs: ms);
           })
           .where((s) => !s.isDeleted)

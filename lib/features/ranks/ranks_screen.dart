@@ -331,7 +331,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                           border: Border.all(color: AppColors.primary),
                         ),
                         child: Text(
-                          '${t.tr("ranking", fallback: "Seu Ranking")}: #$_myRank',
+                          '${t.tr("my_position", fallback: "Minha Posição")}: #$_myRank',
                           style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
