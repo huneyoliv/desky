@@ -2345,6 +2345,15 @@ class AppTranslation {
       'zh-cn': '我了解上述后果，并确认要永久注销我的账户。',
       'zh-tw': '我瞭解上述後果，並確認要永久刪除我的帳戶。',
     },
+    'delete_confirm_phrase': {
+      'pt': 'delete',
+      'en': 'delete',
+      'es': 'delete',
+      'ko': 'delete',
+      'ja': 'delete',
+      'zh-cn': 'delete',
+      'zh-tw': 'delete',
+    },
     'type_to_confirm': {
       'pt': 'Digite exatamente',
       'en': 'Type exactly',
