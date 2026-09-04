@@ -73,6 +73,33 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.1] - 2026-09-04
+
+### Added
+- **Google Sign-Up Flow (Cadastro via Google)**:
+  - Implemented complete account creation flow using Google authentication when an account does not yet exist on the YPT platform.
+  - Introduced `SocialSignUpRequiredException` for detection of unregistered social accounts from backend responses (error code `111` / absence of JWT).
+  - Automatically redirects new Google users to the profile completion step in `SignUpScreen`, pre-filling email and name while omitting password requirements.
+  - Streamlined UI showing connected Google account badge, nickname selection, country and study category pickers, and localized "Concluir Cadastro" CTA.
+  - Added localized strings and aliases across all 7 supported languages (pt, en, es, ko, ja, zh-CN, zh-TW) in `AppTranslation`.
+
+- **Discord Rich Presence (RPC)**:
+  - Added native Discord Rich Presence integration enabled by default, showcasing real-time study status on the desktop.
+  - **Dynamic Large Image Poses**: Automatically updates the avatar image based on today's accumulated study duration (`todayTotalMs`) using YPT CDN avatar poses (`normal1`, `sweat1-3`, `smoke1-2`, `ignite1-2`, `fire1`, `explosion1`), or user custom avatar when equipped.
+  - **Status & Details**: Displays current activity localized in the user's selected language (e.g., `"Estudando: Matéria"`, `"Studying: Subject"`, `"공부 중: 과목"`), study session start timestamp, and accumulated time today tooltip.
+  - **Desky Branding & Small Icon**: Small image badge featuring the Desky logo directly from public repository assets with `"Desky"` tooltip and clean status line.
+  - **Settings Preference**: Added a toggle in `StudyPreferencesDialog` to enable or disable Discord Rich Presence at any time, persisted via `SettingsRepository`.
+  - **Fail-safe Non-blocking IPC**: Utilizes `PeekNamedPipe` and microtask scheduling to guarantee immediate window display and zero UI blocking on Windows, macOS, and Linux.
+
+### Fixed
+- **Timer & Subject Daily Study Time**:
+  - Corrected `SubjectRepository._parseSplashData` to accurately compute daily study durations strictly from today's daily log (`data['dl']['ls']` / `data['dl']['ss']`).
+  - Fixed a fallback issue where subjects with no study records today were erroneously displaying the weekly/all-time accumulated total (`data['ss'][i]['sm']`).
+  - Ensured subjects without study logs today default to `0 ms` (`0m`) and `todayTotalMs` remains accurate.
+
+- **Ranking User Position Badge**:
+  - Updated the user rank badge label in `RanksScreen` from the generic `"Rankings #XXX"` to `"Minha Posição: #XXX"` (`My Rank: #XXX` in English).
+  - Added the dedicated `my_position` and `my_rank` localization keys and aliases across all supported languages in `AppTranslation`.
 
 ## [1.0.0] - 2026-08-30
 

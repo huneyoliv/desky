@@ -1,6 +1,6 @@
 ; Script generated for Inno Setup compiler to package Desky for Windows
 #define MyAppName "Desky"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Desky"
 #define MyAppURL "https://github.com/huneyoliv/desky"
 #define MyAppExeName "desky.exe"

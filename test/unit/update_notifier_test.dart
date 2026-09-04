@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:desky/core/constants/app_constants.dart';
 import 'package:desky/core/services/update_service.dart';
 import 'package:desky/features/updates/models/update_model.dart';
 import 'package:desky/features/updates/update_notifier.dart';
@@ -64,11 +65,11 @@ void main() {
       expect(notifier.state.latestRelease?.tagName, 'v1.0.0');
     });
 
-    test('default constructor uses AppConstants.appVersion 1.0.0 and marks v1.0.0 as up to date', () async {
-      final fakeRelease = const AppRelease(
+    test('default constructor uses AppConstants.appVersion and marks as up to date', () async {
+      final fakeRelease = AppRelease(
         id: 1,
-        tagName: 'v1.0.0',
-        name: 'Desky 1.0.0',
+        tagName: 'v${AppConstants.appVersion}',
+        name: 'Desky ${AppConstants.appVersion}',
         body: 'Release notes',
         htmlUrl: 'https://github.com',
       );
@@ -76,7 +77,7 @@ void main() {
       final service = FakeUpdateService(simulatedRelease: fakeRelease);
       final notifier = UpdateNotifier(service: service);
 
-      expect(notifier.state.currentVersion, '1.0.0');
+      expect(notifier.state.currentVersion, AppConstants.appVersion);
 
       await Future.delayed(const Duration(milliseconds: 50));
       while (notifier.state.isChecking) {
@@ -84,7 +85,7 @@ void main() {
       }
 
       expect(notifier.state.hasUpdate, isFalse);
-      expect(notifier.state.latestRelease?.tagName, 'v1.0.0');
+      expect(notifier.state.latestRelease?.tagName, 'v${AppConstants.appVersion}');
     });
 
     test('handles errors during update check', () async {
