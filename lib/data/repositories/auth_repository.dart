@@ -194,12 +194,18 @@ class AuthRepository {
     try {
       final splashData = await splashLogin(language: language);
       if (splashData != null) {
+        if (splashData['n'] != null && (splashData['n'] as String).trim().isNotEmpty) {
+          data['n'] = splashData['n'];
+        }
         if (splashData['gs'] != null) data['gs'] = splashData['gs'];
         if (splashData['scs'] != null) data['scs'] = splashData['scs'];
         if (splashData['fl'] != null) data['fl'] = splashData['fl'];
         if (splashData['sd'] != null) data['sd'] = splashData['sd'];
         if (splashData['p'] is Map) {
           final p = splashData['p'] as Map;
+          if (p['n'] != null && (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
+            data['n'] = p['n'];
+          }
           if (p['sd'] != null) data['sd'] = p['sd'];
           if (p['ssd'] != null) data['ssd'] = p['ssd'];
           if (p['csd'] != null) data['csd'] = p['csd'];
@@ -207,8 +213,18 @@ class AuthRepository {
       }
     } catch (_) {}
 
+    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) && name.trim().isNotEmpty) {
+      data['n'] = name.trim();
+      data['name'] = name.trim();
+    }
+
     await _cacheUserData(data, token);
-    return UserModel.fromJson(data, token);
+    var user = UserModel.fromJson(data, token);
+    if (user.name.trim().isEmpty && name.trim().isNotEmpty) {
+      user = user.copyWith(name: name.trim());
+      await cacheUser(user);
+    }
+    return user;
   }
 
   Future<UserModel> signUpWithSocial({
@@ -274,6 +290,12 @@ class AuthRepository {
 
     await _saveToken(token);
 
+    final chosenNickname = nickname.trim().isNotEmpty ? nickname.trim() : name.trim();
+    if (chosenNickname.isNotEmpty) {
+      data['n'] = chosenNickname;
+      data['name'] = chosenNickname;
+    }
+
     if (nickname.isNotEmpty) {
       try {
         final nickRes = await _apiClient.post(
@@ -306,12 +328,18 @@ class AuthRepository {
     try {
       final splashData = await splashLogin(language: language);
       if (splashData != null) {
+        if (splashData['n'] != null && (splashData['n'] as String).trim().isNotEmpty) {
+          data['n'] = splashData['n'];
+        }
         if (splashData['gs'] != null) data['gs'] = splashData['gs'];
         if (splashData['scs'] != null) data['scs'] = splashData['scs'];
         if (splashData['fl'] != null) data['fl'] = splashData['fl'];
         if (splashData['sd'] != null) data['sd'] = splashData['sd'];
         if (splashData['p'] is Map) {
           final p = splashData['p'] as Map;
+          if (p['n'] != null && (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
+            data['n'] = p['n'];
+          }
           if (p['sd'] != null) data['sd'] = p['sd'];
           if (p['ssd'] != null) data['ssd'] = p['ssd'];
           if (p['csd'] != null) data['csd'] = p['csd'];
@@ -319,8 +347,18 @@ class AuthRepository {
       }
     } catch (_) {}
 
+    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) && chosenNickname.isNotEmpty) {
+      data['n'] = chosenNickname;
+      data['name'] = chosenNickname;
+    }
+
     await _cacheUserData(data, token);
-    return UserModel.fromJson(data, token);
+    var user = UserModel.fromJson(data, token);
+    if (user.name.trim().isEmpty && chosenNickname.isNotEmpty) {
+      user = user.copyWith(name: chosenNickname);
+      await cacheUser(user);
+    }
+    return user;
   }
 
   Future<UserModel> signInWithJwt(String token, {String language = ApiConstants.defaultLanguage}) async {
@@ -582,6 +620,12 @@ class AuthRepository {
 
     await _saveToken(token);
 
+    final chosenNickname = nickname.trim();
+    if (chosenNickname.isNotEmpty) {
+      data['n'] = chosenNickname;
+      data['name'] = chosenNickname;
+    }
+
     if (nickname.isNotEmpty) {
       try {
         final nickRes = await _apiClient.post(
@@ -614,14 +658,35 @@ class AuthRepository {
     try {
       final splashData = await splashLogin(language: language);
       if (splashData != null) {
+        if (splashData['n'] != null && (splashData['n'] as String).trim().isNotEmpty) {
+          data['n'] = splashData['n'];
+        }
         if (splashData['gs'] != null) data['gs'] = splashData['gs'];
-        if (splashData['p'] != null) data['p'] = splashData['p'];
+        if (splashData['p'] != null) {
+          data['p'] = splashData['p'];
+          if (splashData['p'] is Map) {
+            final p = splashData['p'] as Map;
+            if (p['n'] != null && (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
+              data['n'] = p['n'];
+            }
+          }
+        }
         if (splashData['dl'] != null) data['dl'] = splashData['dl'];
       }
     } catch (_) {}
 
+    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) && chosenNickname.isNotEmpty) {
+      data['n'] = chosenNickname;
+      data['name'] = chosenNickname;
+    }
+
     await _cacheUserData(data, token);
-    return UserModel.fromJson(data, token);
+    var user = UserModel.fromJson(data, token);
+    if (user.name.trim().isEmpty && chosenNickname.isNotEmpty) {
+      user = user.copyWith(name: chosenNickname);
+      await cacheUser(user);
+    }
+    return user;
   }
 
   Future<String?> getStoredToken() async {
