@@ -46,6 +46,20 @@ typedef _WriteFileDart = int Function(
     Pointer<Uint32> lpNumberOfBytesWritten,
     Pointer<Void> lpOverlapped);
 
+typedef _ReadFileC = Int32 Function(
+    IntPtr hFile,
+    Pointer<Uint8> lpBuffer,
+    Uint32 nNumberOfBytesToRead,
+    Pointer<Uint32> lpNumberOfBytesRead,
+    Pointer<Void> lpOverlapped);
+
+typedef _ReadFileDart = int Function(
+    int hFile,
+    Pointer<Uint8> lpBuffer,
+    int nNumberOfBytesToRead,
+    Pointer<Uint32> lpNumberOfBytesRead,
+    Pointer<Void> lpOverlapped);
+
 typedef _CloseHandleC = Int32 Function(IntPtr hObject);
 typedef _CloseHandleDart = int Function(int hObject);
 
@@ -55,11 +69,21 @@ final _CreateFileDart? _createFile = _kernel32
 final _WriteFileDart? _writeFile = _kernel32
     ?.lookupFunction<_WriteFileC, _WriteFileDart>('WriteFile');
 
+final _ReadFileDart? _readFile = _kernel32
+    ?.lookupFunction<_ReadFileC, _ReadFileDart>('ReadFile');
+
 final _CloseHandleDart? _closeHandle = _kernel32
     ?.lookupFunction<_CloseHandleC, _CloseHandleDart>('CloseHandle');
 
+class _DiscordPacket {
+  final int opcode;
+  final String body;
+  const _DiscordPacket(this.opcode, this.body);
+}
+
 abstract class _DiscordIpcConnection {
   Future<bool> writePacket(int opcode, String jsonString);
+  Future<_DiscordPacket?> readPacket();
   void close();
 }
 
@@ -94,6 +118,38 @@ class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
   }
 
   @override
+  Future<_DiscordPacket?> readPacket() async {
+    if (_readFile == null || handle == 0 || handle == -1) return null;
+    try {
+      final headerBuffer = calloc<Uint8>(8);
+      final pBytesRead = calloc<Uint32>();
+      try {
+        final res = _readFile!(handle, headerBuffer, 8, pBytesRead, nullptr);
+        if (res == 0 || pBytesRead.value < 8) return null;
+        final headerData = ByteData.sublistView(headerBuffer.asTypedList(8));
+        final opcode = headerData.getUint32(0, Endian.little);
+        final length = headerData.getUint32(4, Endian.little);
+
+        if (length == 0) return _DiscordPacket(opcode, '');
+        final bodyBuffer = calloc<Uint8>(length);
+        try {
+          final bodyRes = _readFile!(handle, bodyBuffer, length, pBytesRead, nullptr);
+          if (bodyRes == 0 || pBytesRead.value < length) return null;
+          final bodyString = utf8.decode(bodyBuffer.asTypedList(length));
+          return _DiscordPacket(opcode, bodyString);
+        } finally {
+          calloc.free(bodyBuffer);
+        }
+      } finally {
+        calloc.free(headerBuffer);
+        calloc.free(pBytesRead);
+      }
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
   void close() {
     if (_closeHandle != null && handle != 0 && handle != -1) {
       try {
@@ -121,6 +177,21 @@ class _UnixSocketConnection implements _DiscordIpcConnection {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  @override
+  Future<_DiscordPacket?> readPacket() async {
+    try {
+      final data = await socket.first.timeout(const Duration(milliseconds: 500));
+      if (data.length < 8) return null;
+      final byteData = ByteData.sublistView(Uint8List.fromList(data));
+      final opcode = byteData.getUint32(0, Endian.little);
+      final length = byteData.getUint32(4, Endian.little);
+      final body = utf8.decode(data.sublist(8, 8 + length));
+      return _DiscordPacket(opcode, body);
+    } catch (_) {
+      return null;
     }
   }
 
@@ -328,8 +399,17 @@ class DiscordRpcService {
           'client_id': _clientId,
         });
         final ok = await _connection!.writePacket(0, handshakePayload);
-        _connected = ok;
-        if (!ok) {
+        if (ok) {
+          final resp = await _connection!.readPacket();
+          if (resp != null && resp.opcode == 1) {
+            _connected = true;
+          } else {
+            _connected = false;
+            _connection?.close();
+            _connection = null;
+          }
+        } else {
+          _connected = false;
           _connection?.close();
           _connection = null;
         }
