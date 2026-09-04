@@ -73,6 +73,16 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.2] - 2026-09-04
+
+### Added
+- **Google Sign-Up Confirmation Modal**: Added pre-check for account existence (`POST /user/exist-username`) and a confirmation dialog when no account is linked to the Google profile, preventing automatic creation of unconfigured accounts and guiding the user to complete their profile (nickname, study category, and country).
+- **OAuth Callback Localhost Page Theme & i18n**: Redesigned OAuth loopback completion page (`http://127.0.0.1`) with Desky AMOLED Dark theme, vibrant lilac accents, glassmorphic card, and automatic browser language detection (`Accept-Language` + `navigator.languages` supporting PT, EN, ES, KO, JA, ZH).
+
+### Fixed
+- **Immediate Nickname Display on Sign-Up**: Fixed an issue where the nickname chosen during social or email registration did not appear immediately after account creation, requiring a logout and login cycle to show up.
+- **Account Deletion Confirmation Word**: Simplified confirmation keyword in the account deletion dialog to typing "delete" instead of the full localized phrase ("Excluir Minha Conta").
+
 ## [1.0.1] - 2026-09-04
 
 ### Added

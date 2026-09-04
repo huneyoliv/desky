@@ -134,6 +134,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final userInfo = await _googleOAuthService.authenticate();
+      final formattedProviderId = userInfo.socialId.startsWith('g')
+          ? userInfo.socialId
+          : 'g${userInfo.socialId}';
+      final accountExists = await _repository.checkUsernameExists(formattedProviderId);
+
+      if (!accountExists) {
+        state = state.copyWith(isLoading: false);
+        if (onSignUpRequired != null) {
+          onSignUpRequired(userInfo);
+        }
+        return;
+      }
+
       try {
         final user = await _repository.signInWithSocial(
           provider: userInfo.provider,

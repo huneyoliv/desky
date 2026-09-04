@@ -319,6 +319,57 @@ void main() {
       expect(capturedData!['categoryId'], equals(10));
     });
 
+    test('signUpWithSocial assigns and caches nickname when server returns empty name', () async {
+      final socialDio = Dio();
+      socialDio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path.contains('/user/social/sign-up-jwt')) {
+              return handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {
+                    's': true,
+                    'jwt': 'social_jwt_created_empty_name',
+                    'id': 998877,
+                    'n': '',
+                    'e': 'user@gmail.com',
+                    'pv': 1,
+                  },
+                ),
+              );
+            }
+            if (options.path.contains('/user/nickname/change')) {
+              return handler.resolve(
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
+              );
+            }
+            if (options.path.contains('/user/v2/splash-login')) {
+              return handler.resolve(
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
+              );
+            }
+            return handler.next(options);
+          },
+        ),
+      );
+      final repo = AuthRepository(apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
+
+      final user = await repo.signUpWithSocial(
+        provider: 'Google',
+        socialId: 'google_sub_empty_name',
+        email: 'user@gmail.com',
+        name: 'Google Profile Name',
+        nickname: 'ExpectedNickname',
+        countryId: 23,
+        categoryId: 439,
+      );
+
+      expect(user.id, equals(998877));
+      expect(user.name, equals('ExpectedNickname'));
+    });
+
     test('signInWithJwt saves token and returns user model on valid splashLogin', () async {
       final jwtDio = Dio();
       jwtDio.interceptors.add(
@@ -655,6 +706,55 @@ void main() {
 
       expect(restored, isNotNull);
       expect(restored!.studiconId, equals(100));
+    });
+
+    test('checkUsernameExists returns true when server responds with s: true', () async {
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path.contains(ApiConstants.existUsername)) {
+              expect(options.data['username'], equals('g105942101025713079965'));
+              return handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {'s': true},
+                ),
+              );
+            }
+            return handler.next(options);
+          },
+        ),
+      );
+
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final exists = await repo.checkUsernameExists('g105942101025713079965');
+      expect(exists, isTrue);
+    });
+
+    test('checkUsernameExists returns false when server responds with s: false', () async {
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path.contains(ApiConstants.existUsername)) {
+              return handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {'s': false, 'c': '109'},
+                ),
+              );
+            }
+            return handler.next(options);
+          },
+        ),
+      );
+
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final exists = await repo.checkUsernameExists('g999999999999999999999999');
+      expect(exists, isFalse);
     });
   });
 }

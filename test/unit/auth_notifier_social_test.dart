@@ -12,6 +12,14 @@ class MockAuthRepository extends AuthRepository {
   Map<String, dynamic>? lastSocialSignUp;
   bool shouldFail = false;
   bool shouldRequireSignUp = false;
+  bool userExists = true;
+  String? checkedUsername;
+
+  @override
+  Future<bool> checkUsernameExists(String username) async {
+    checkedUsername = username;
+    return userExists;
+  }
 
   @override
   Future<UserModel> signInWithSocial({
@@ -181,6 +189,23 @@ void main() {
       expect(capturedInfo, isNotNull);
       expect(capturedInfo?.email, equals('user@gmail.com'));
       expect(capturedInfo?.name, equals('Google User'));
+    });
+
+    test('signInWithGoogle checks account existence and calls onSignUpRequired when account does not exist', () async {
+      mockRepo.userExists = false;
+      OAuthUserInfo? capturedInfo;
+
+      await notifier.signInWithGoogle(
+        onSignUpRequired: (info) => capturedInfo = info,
+      );
+
+      expect(notifier.state.isAuthenticated, isFalse);
+      expect(notifier.state.isLoading, isFalse);
+      expect(notifier.state.errorMessage, isNull);
+      expect(mockRepo.checkedUsername, equals('google_sub_10987654321'));
+      expect(capturedInfo, isNotNull);
+      expect(capturedInfo?.email, equals('user@gmail.com'));
+      expect(mockRepo.lastSocialLogin, isNull);
     });
 
     test('signUpWithGoogle registers new user and updates auth state', () async {

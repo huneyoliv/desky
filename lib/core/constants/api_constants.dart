@@ -19,6 +19,7 @@ class ApiConstants {
   static const String unregister = '/user/unregister';
   static const String nicknameChange = '/user/nickname/change';
   static const String categoryByCountry = '/category/category-by-country';
+  static const String existUsername = '/user/exist-username';
 
   // Subjects
   static const String subjectCreate = '/user/subject/create';

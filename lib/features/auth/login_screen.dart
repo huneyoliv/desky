@@ -6,6 +6,7 @@ import '../../core/localization/app_translation.dart';
 import '../../core/cdn/cdn_resolver.dart';
 import '../settings/settings_notifier.dart';
 import '../settings/widgets/select_language_dialog.dart';
+import '../../core/oauth/oauth_user_info.dart';
 import 'auth_notifier.dart';
 import 'signup_screen.dart';
 
@@ -13,10 +14,10 @@ class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -42,16 +43,103 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.read(authStateProvider.notifier).signInWithGoogle(
       onSignUpRequired: (userInfo) {
         if (!mounted) return;
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => SignUpScreen(
-              oauthInfo: userInfo,
-              initialEmail: userInfo.email,
-              initialName: userInfo.name,
+        showAccountNotFoundDialog(context, userInfo);
+      },
+    );
+  }
+
+  void showAccountNotFoundDialog(BuildContext context, OAuthUserInfo userInfo) {
+    final t = ref.read(appTranslationProvider);
+    final desc = t.tr(
+      'google_account_not_found_desc',
+      fallback: 'Nenhuma conta do Desky / Yeolpumta está vinculada a este e-mail do Google (${userInfo.email}). Deseja criar uma nova conta agora?',
+    ).replaceAll('{email}', userInfo.email);
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.border),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.person_add_alt_1_outlined,
+                color: AppColors.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                t.tr('account_not_found', fallback: 'Conta não encontrada'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          desc,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              t.tr('cancel', fallback: 'Cancelar'),
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-        );
-      },
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              if (!mounted) return;
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SignUpScreen(
+                    oauthInfo: userInfo,
+                    initialEmail: userInfo.email,
+                    initialName: userInfo.name,
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
+            child: Text(
+              t.tr('create_account', fallback: 'Criar Conta'),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
