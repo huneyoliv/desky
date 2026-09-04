@@ -31,8 +31,13 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
     super.dispose();
   }
 
-  bool _canDelete(String requiredPhrase) =>
-      _isConsentChecked && _confirmationController.text.trim().toLowerCase() == requiredPhrase.toLowerCase();
+  bool _canDelete(String requiredPhrase) {
+    final input = _confirmationController.text.trim().toLowerCase();
+    return _isConsentChecked &&
+        (input == requiredPhrase.toLowerCase() ||
+            input == 'delete' ||
+            input == 'excluir minha conta');
+  }
 
   Future<void> _handleDeleteAccount() async {
     setState(() {
@@ -59,7 +64,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(appTranslationProvider);
-    final requiredPhrase = t.tr('delete_account', fallback: 'Excluir conta');
+    final requiredPhrase = t.tr('delete_confirm_phrase', fallback: 'delete');
 
     return AlertDialog(
       backgroundColor: AppColors.card,
