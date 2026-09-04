@@ -5,13 +5,23 @@ import '../../core/cdn/cdn_resolver.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/localization/app_translation.dart';
+import '../../core/oauth/oauth_user_info.dart';
 import '../../data/models/category_model.dart';
 import '../../data/models/country_model.dart';
 import '../settings/settings_notifier.dart';
 import 'auth_notifier.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
-  const SignUpScreen({super.key});
+  final OAuthUserInfo? oauthInfo;
+  final String? initialEmail;
+  final String? initialName;
+
+  const SignUpScreen({
+    super.key,
+    this.oauthInfo,
+    this.initialEmail,
+    this.initialName,
+  });
 
   @override
   ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
@@ -41,6 +51,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.oauthInfo != null) {
+      _currentStep = 3;
+      _emailController.text = widget.initialEmail ?? widget.oauthInfo!.email;
+      _nicknameController.text = widget.initialName ?? widget.oauthInfo!.name;
+    }
     _loadInitialData();
   }
 
@@ -179,6 +194,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
     final code = _codeController.text.trim();
+    final bool isSocial = widget.oauthInfo != null;
 
     if (nickname.isEmpty) {
       setState(() => _errorMessage = t.tr('enter_nickname', fallback: 'Por favor, insira seu apelido/nickname.'));
@@ -192,13 +208,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       setState(() => _errorMessage = t.tr('alert_user_nickname_error2', fallback: 'O apelido deve ter menos de 60 caracteres.'));
       return;
     }
-    if (password.length < 8) {
-      setState(() => _errorMessage = t.tr('sign_up_password_rule', fallback: 'A senha deve conter no mínimo 8 caracteres.'));
-      return;
-    }
-    if (password != confirmPassword) {
-      setState(() => _errorMessage = t.tr('alert_user_sign_up_error1', fallback: 'As senhas digitadas não coincidem.'));
-      return;
+    if (!isSocial) {
+      if (password.length < 8) {
+        setState(() => _errorMessage = t.tr('sign_up_password_rule', fallback: 'A senha deve conter no mínimo 8 caracteres.'));
+        return;
+      }
+      if (password != confirmPassword) {
+        setState(() => _errorMessage = t.tr('alert_user_sign_up_error1', fallback: 'As senhas digitadas não coincidem.'));
+        return;
+      }
     }
     if (_selectedCountry == null) {
       setState(() => _errorMessage = t.tr('select_country', fallback: 'Selecione um país.'));
@@ -212,14 +230,24 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       _errorMessage = null;
     });
 
-    final success = await ref.read(authStateProvider.notifier).signUp(
-          email: _emailController.text.trim(),
-          password: password,
-          code: code,
-          nickname: nickname,
-          categoryId: categoryId,
-          countryId: _selectedCountry!.id,
-        );
+    final bool success;
+    if (isSocial) {
+      success = await ref.read(authStateProvider.notifier).signUpWithGoogle(
+            userInfo: widget.oauthInfo!,
+            nickname: nickname,
+            categoryId: categoryId,
+            countryId: _selectedCountry!.id,
+          );
+    } else {
+      success = await ref.read(authStateProvider.notifier).signUp(
+            email: _emailController.text.trim(),
+            password: password,
+            code: code,
+            nickname: nickname,
+            categoryId: categoryId,
+            countryId: _selectedCountry!.id,
+          );
+    }
 
     if (mounted) {
       setState(() {
@@ -272,7 +300,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      t.tr('sign_up_title', fallback: 'Crie sua Conta'),
+                      widget.oauthInfo != null
+                          ? t.tr('complete_profile', fallback: 'Complete seu Perfil')
+                          : t.tr('sign_up_title', fallback: 'Crie sua Conta'),
                       style: const TextStyle(
                         fontFamily: AppTextStyles.fontDisplay,
                         fontFamilyFallback: AppTextStyles.fontFallbacks,
@@ -281,11 +311,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         color: AppColors.textPrimary,
                         letterSpacing: 1.2,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      t.tr('sign_up_slogan', fallback: 'Junte-se à maior comunidade de estudos focados'),
+                      widget.oauthInfo != null
+                          ? t.tr('complete_profile_desc', fallback: 'Defina seu apelido e categoria de estudos para começar.')
+                          : t.tr('sign_up_slogan', fallback: 'Junte-se à maior comunidade de estudos focados'),
                       style: const TextStyle(color: AppColors.textSecondary, fontSize: 15),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
@@ -313,16 +347,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             IconButton(
                               icon: const Icon(Icons.arrow_back, color: Colors.white),
                               onPressed: () {
-                                if (_currentStep > 1) {
-                                  setState(() => _currentStep--);
-                                } else {
+                                if (widget.oauthInfo != null || _currentStep == 1) {
                                   Navigator.of(context).pop();
+                                } else {
+                                  setState(() => _currentStep--);
                                 }
                               },
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${t.tr("step", fallback: "Passo")} $_currentStep ${t.tr("of", fallback: "de")} 3',
+                              widget.oauthInfo != null
+                                  ? t.tr('complete_profile', fallback: 'Complete seu Perfil')
+                                  : '${t.tr("step", fallback: "Passo")} $_currentStep ${t.tr("of", fallback: "de")} 3',
                               style: const TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
@@ -334,23 +370,57 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         const SizedBox(height: 16),
 
                         Text(
-                          _currentStep == 1
-                              ? t.tr('what_is_your_email', fallback: 'Qual é o seu e-mail?')
-                              : _currentStep == 2
-                                  ? t.tr('confirm_code', fallback: 'Confirme o código')
-                                  : t.tr('profile_info', fallback: 'Informações do Perfil'),
+                          widget.oauthInfo != null
+                              ? t.tr('profile_info', fallback: 'Informações do Perfil')
+                              : (_currentStep == 1
+                                  ? t.tr('what_is_your_email', fallback: 'Qual é o seu e-mail?')
+                                  : _currentStep == 2
+                                      ? t.tr('confirm_code', fallback: 'Confirme o código')
+                                      : t.tr('profile_info', fallback: 'Informações do Perfil')),
                           style: AppTextStyles.displayMedium,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _currentStep == 1
-                              ? t.tr('email_code_desc', fallback: 'Enviaremos um código de 6 dígitos para verificar seu endereço.')
-                              : _currentStep == 2
-                                  ? '${t.tr("enter_code_sent_to", fallback: "Digite o código enviado para")} ${_emailController.text}'
-                                  : t.tr('profile_setup_desc', fallback: 'Defina seu apelido, senha de acesso e categoria de estudos.'),
+                          widget.oauthInfo != null
+                              ? t.tr('complete_profile_desc', fallback: 'Defina seu apelido e categoria de estudos para começar.')
+                              : (_currentStep == 1
+                                  ? t.tr('email_code_desc', fallback: 'Enviaremos um código de 6 dígitos para verificar seu endereço.')
+                                  : _currentStep == 2
+                                      ? '${t.tr("enter_code_sent_to", fallback: "Digite o código enviado para")} ${_emailController.text}'
+                                      : t.tr('profile_setup_desc', fallback: 'Defina seu apelido, senha de acesso e categoria de estudos.')),
                           style: AppTextStyles.bodyMedium,
                         ),
                         const SizedBox(height: 24),
+
+                        if (widget.oauthInfo != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  'assets/icons/google_icon.png',
+                                  height: 18,
+                                  width: 18,
+                                  errorBuilder: (_, __, ___) => const Icon(Icons.account_circle, size: 18, color: Colors.white),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    '${t.tr("connected_as", fallback: "Conectado como")} ${widget.oauthInfo!.email}',
+                                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
 
                         if (_errorMessage != null) ...[
                           Container(
@@ -486,51 +556,53 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           ),
                           const SizedBox(height: 16),
 
-                          // Password Field
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: t.tr('password', fallback: 'Senha (mínimo 8 caracteres)'),
-                              labelStyle: const TextStyle(color: AppColors.textSecondary),
-                              filled: true,
-                              fillColor: AppColors.surface,
-                              prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
-                              suffixIcon: IconButton(
-                                icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textSecondary),
-                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: AppColors.border),
+                          if (widget.oauthInfo == null) ...[
+                            // Password Field
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                labelText: t.tr('password', fallback: 'Senha (mínimo 8 caracteres)'),
+                                labelStyle: const TextStyle(color: AppColors.textSecondary),
+                                filled: true,
+                                fillColor: AppColors.surface,
+                                prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                                suffixIcon: IconButton(
+                                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textSecondary),
+                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: AppColors.border),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
+                            const SizedBox(height: 16),
 
-                          // Confirm Password Field
-                          TextFormField(
-                            controller: _confirmPasswordController,
-                            obscureText: _obscureConfirmPassword,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: t.tr('confirm_password', fallback: 'Confirmar Senha'),
-                              labelStyle: const TextStyle(color: AppColors.textSecondary),
-                              filled: true,
-                              fillColor: AppColors.surface,
-                              prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
-                              suffixIcon: IconButton(
-                                icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textSecondary),
-                                onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(color: AppColors.border),
+                            // Confirm Password Field
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: _obscureConfirmPassword,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                labelText: t.tr('confirm_password', fallback: 'Confirmar Senha'),
+                                labelStyle: const TextStyle(color: AppColors.textSecondary),
+                                filled: true,
+                                fillColor: AppColors.surface,
+                                prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                                suffixIcon: IconButton(
+                                  icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, color: AppColors.textSecondary),
+                                  onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: AppColors.border),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
+                            const SizedBox(height: 16),
+                          ],
 
                           // Category Dropdown
                           if (_isLoadingCategories)
@@ -579,7 +651,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       height: 24,
                                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                     )
-                                  : Text(t.tr('sign_up', fallback: 'Concluir Cadastro'), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                                  : Text(
+                                      widget.oauthInfo != null
+                                          ? t.tr('complete_registration', fallback: 'Concluir Cadastro')
+                                          : t.tr('sign_up', fallback: 'Concluir Cadastro'),
+                                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                                    ),
                             ),
                           ),
                         ],

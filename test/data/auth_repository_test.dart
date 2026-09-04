@@ -1,10 +1,11 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/core/api/api_exception.dart';
 import 'package:desky/core/constants/api_constants.dart';
+import 'package:desky/core/oauth/social_signup_exception.dart';
 import 'package:desky/data/repositories/auth_repository.dart';
 
 class MockStorage extends FlutterSecureStorage {
@@ -238,7 +239,7 @@ void main() {
       expect(capturedData!['loginProvider'], equals('Google'));
     });
 
-    test('signInWithSocial throws ApiException on error c:111 (social id not found)', () async {
+    test('signInWithSocial throws SocialSignUpRequiredException on error c:111 (social id not found)', () async {
       final errorDio = Dio();
       errorDio.interceptors.add(
         InterceptorsWrapper(
@@ -262,8 +263,60 @@ void main() {
           email: 'ghost@gmail.com',
           name: 'Ghost',
         ),
-        throwsA(predicate((e) => e.toString().contains('111') || e.toString().contains('Erro'))),
+        throwsA(isA<SocialSignUpRequiredException>()),
       );
+    });
+
+    test('signUpWithSocial completes registration and returns user model', () async {
+      Map<String, dynamic>? capturedData;
+      final socialDio = Dio();
+      socialDio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path.contains('/user/social/sign-up-jwt')) {
+              capturedData = options.data as Map<String, dynamic>?;
+              return handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {
+                    's': true,
+                    'jwt': 'social_jwt_created',
+                    'id': 112233,
+                    'n': 'NewUser',
+                    'e': 'new@gmail.com',
+                    'pv': 1,
+                  },
+                ),
+              );
+            }
+            if (options.path.contains('/user/v2/splash-login')) {
+              return handler.resolve(
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
+              );
+            }
+            return handler.next(options);
+          },
+        ),
+      );
+      final repo = AuthRepository(apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
+
+      final user = await repo.signUpWithSocial(
+        provider: 'Google',
+        socialId: 'google_new_sub',
+        email: 'new@gmail.com',
+        name: 'New Google User',
+        nickname: 'NewUser',
+        countryId: 1,
+        categoryId: 10,
+      );
+
+      expect(user.id, equals(112233));
+      expect(user.name, equals('NewUser'));
+      expect(capturedData, isNotNull);
+      expect(capturedData!['nickname'], equals('NewUser'));
+      expect(capturedData!['countryId'], equals(1));
+      expect(capturedData!['categoryId'], equals(10));
     });
 
     test('signInWithJwt saves token and returns user model on valid splashLogin', () async {

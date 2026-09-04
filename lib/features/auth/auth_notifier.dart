@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/oauth/oauth_exception.dart';
+import '../../core/oauth/oauth_user_info.dart';
+import '../../core/oauth/social_signup_exception.dart';
 import '../../core/oauth/providers/google_oauth_service.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
@@ -126,17 +128,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> signInWithGoogle() async {
+  Future<void> signInWithGoogle({
+    void Function(OAuthUserInfo userInfo)? onSignUpRequired,
+  }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final userInfo = await _googleOAuthService.authenticate();
-      final user = await _repository.signInWithSocial(
-        provider: userInfo.provider,
-        socialId: userInfo.socialId,
-        email: userInfo.email,
-        name: userInfo.name,
-      );
-      state = AuthState(user: user, isLoading: false);
+      try {
+        final user = await _repository.signInWithSocial(
+          provider: userInfo.provider,
+          socialId: userInfo.socialId,
+          email: userInfo.email,
+          name: userInfo.name,
+        );
+        state = AuthState(user: user, isLoading: false);
+      } on SocialSignUpRequiredException {
+        state = state.copyWith(isLoading: false);
+        if (onSignUpRequired != null) {
+          onSignUpRequired(userInfo);
+        }
+      }
     } catch (e) {
       if (e is OAuthException && e.isCancelled) {
         state = state.copyWith(isLoading: false);
@@ -146,6 +157,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
         errorMessage: _formatError(e),
       );
+    }
+  }
+
+  Future<bool> signUpWithGoogle({
+    required OAuthUserInfo userInfo,
+    required String nickname,
+    required int categoryId,
+    required int countryId,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final user = await _repository.signUpWithSocial(
+        provider: userInfo.provider,
+        socialId: userInfo.socialId,
+        email: userInfo.email,
+        name: userInfo.name,
+        nickname: nickname,
+        categoryId: categoryId,
+        countryId: countryId,
+      );
+      state = AuthState(user: user, isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _formatError(e),
+      );
+      return false;
     }
   }
 

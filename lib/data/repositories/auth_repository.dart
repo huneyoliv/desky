@@ -5,6 +5,7 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/auth_interceptor.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/oauth/social_signup_exception.dart';
 import '../../core/utils/json_utils.dart';
 import '../models/user_model.dart';
 import '../models/group_model.dart';
@@ -149,14 +150,103 @@ class AuthRepository {
 
     final data = response.data;
     if (data is! Map<String, dynamic> || data['s'] != true) {
+      if (data is Map) {
+        final code = data['c']?.toString();
+        if (code == '111' || code == '113') {
+          throw SocialSignUpRequiredException(
+            provider: provider,
+            socialId: socialId,
+            email: email,
+            name: name,
+          );
+        }
+        final msg = data['m']?.toString() ??
+            data['message']?.toString() ??
+            (code != null ? 'Erro de autenticação [$code]' : 'Falha ao autenticar via $provider');
+        throw ApiException(msg, statusCode: response.statusCode);
+      }
+      throw ApiException('Falha ao autenticar via $provider', statusCode: response.statusCode);
+    }
+
+    final token = (data['jwt'] ?? '').toString();
+    if (token.isEmpty) {
+      throw ApiException('Token JWT via $provider não retornado pelo servidor');
+    }
+
+    await _saveToken(token);
+
+    try {
+      final splashData = await splashLogin(language: language);
+      if (splashData != null) {
+        if (splashData['gs'] != null) data['gs'] = splashData['gs'];
+        if (splashData['scs'] != null) data['scs'] = splashData['scs'];
+        if (splashData['fl'] != null) data['fl'] = splashData['fl'];
+        if (splashData['sd'] != null) data['sd'] = splashData['sd'];
+        if (splashData['p'] is Map) {
+          final p = splashData['p'] as Map;
+          if (p['sd'] != null) data['sd'] = p['sd'];
+          if (p['ssd'] != null) data['ssd'] = p['ssd'];
+          if (p['csd'] != null) data['csd'] = p['csd'];
+        }
+      }
+    } catch (_) {}
+
+    await _cacheUserData(data, token);
+    return UserModel.fromJson(data, token);
+  }
+
+  Future<UserModel> signUpWithSocial({
+    required String provider,
+    required String socialId,
+    required String email,
+    required String name,
+    required String nickname,
+    required int countryId,
+    required int categoryId,
+    String language = ApiConstants.defaultLanguage,
+  }) async {
+    final String formattedProviderId = switch (provider.toLowerCase()) {
+      'google' => socialId.startsWith('g') ? socialId : 'g$socialId',
+      'apple' => socialId.startsWith('a') ? socialId : 'a$socialId',
+      'kakao' => socialId.startsWith('k') ? socialId : 'k$socialId',
+      'naver' => socialId.startsWith('n') ? socialId : 'n$socialId',
+      _ => socialId,
+    };
+
+    final payload = {
+      'accessToken': '',
+      'providerId': formattedProviderId,
+      'email': email,
+      'loginProvider': provider,
+      'nickname': nickname,
+      'countryId': countryId,
+      'categoryId': categoryId,
+      'new': true,
+      'getx': true,
+      'version': ApiConstants.defaultVersion,
+      'language': language,
+    };
+    final response = await _apiClient.post(
+      ApiConstants.socialSignUpJwt,
+      data: payload,
+    );
+
+    final data = response.data;
+    if (data is! Map<String, dynamic> || data['s'] != true) {
       String msg;
       if (data is Map) {
         final code = data['c']?.toString();
-        msg = data['m']?.toString() ??
-            data['message']?.toString() ??
-            (code != null ? 'Erro de autenticação [$code]' : 'Falha ao autenticar via $provider');
+        if (code == '104') {
+          msg = 'Este apelido já está em uso. Insira outro apelido.';
+        } else if (code == '103' || code == '116') {
+          msg = 'Não é possível usar este apelido. Insira outro apelido.';
+        } else {
+          msg = data['m']?.toString() ??
+              data['message']?.toString() ??
+              (code != null ? 'Erro de cadastro [$code]' : 'Falha ao cadastrar via $provider');
+        }
       } else {
-        msg = 'Falha ao autenticar via $provider';
+        msg = 'Falha ao cadastrar via $provider';
       }
       throw ApiException(msg, statusCode: response.statusCode);
     }
@@ -167,6 +257,35 @@ class AuthRepository {
     }
 
     await _saveToken(token);
+
+    if (nickname.isNotEmpty) {
+      try {
+        final nickRes = await _apiClient.post(
+          ApiConstants.nicknameChange,
+          data: {'nickname': nickname},
+        );
+        final nickData = nickRes.data;
+        if (nickData is Map && nickData['s'] == false) {
+          final nc = nickData['c']?.toString();
+          if (nc == '104') {
+            throw const ApiException('Este apelido já está em uso. Insira outro apelido.');
+          } else if (nc == '103' || nc == '116') {
+            throw const ApiException('Não é possível usar este apelido. Insira outro apelido.');
+          }
+        }
+      } catch (e) {
+        if (e is ApiException) rethrow;
+      }
+    }
+
+    if (categoryId > 0) {
+      try {
+        await _apiClient.post(
+          ApiConstants.categoryByCountry,
+          data: {'category_id': categoryId},
+        );
+      } catch (_) {}
+    }
 
     try {
       final splashData = await splashLogin(language: language);

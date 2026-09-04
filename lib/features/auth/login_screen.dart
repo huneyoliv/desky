@@ -38,6 +38,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  void _handleGoogleSignIn() {
+    ref.read(authStateProvider.notifier).signInWithGoogle(
+      onSignUpRequired: (userInfo) {
+        if (!mounted) return;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => SignUpScreen(
+              oauthInfo: userInfo,
+              initialEmail: userInfo.email,
+              initialName: userInfo.name,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showForgotPasswordDialog(BuildContext context) {
     final t = ref.read(appTranslationProvider);
     int step = 1; // 1: Send Code, 2: Verify Code, 3: Reset Password
@@ -561,9 +578,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 height: 46,
                                 width: double.infinity,
                                 child: ElevatedButton(
-                                  onPressed: authState.isLoading
-                                      ? null
-                                      : () => ref.read(authStateProvider.notifier).signInWithGoogle(),
+                                  onPressed: authState.isLoading ? null : _handleGoogleSignIn,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     foregroundColor: const Color(0xFF191919),
