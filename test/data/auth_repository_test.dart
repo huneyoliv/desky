@@ -656,5 +656,54 @@ void main() {
       expect(restored, isNotNull);
       expect(restored!.studiconId, equals(100));
     });
+
+    test('checkUsernameExists returns true when server responds with s: true', () async {
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path.contains(ApiConstants.existUsername)) {
+              expect(options.data['username'], equals('g105942101025713079965'));
+              return handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {'s': true},
+                ),
+              );
+            }
+            return handler.next(options);
+          },
+        ),
+      );
+
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final exists = await repo.checkUsernameExists('g105942101025713079965');
+      expect(exists, isTrue);
+    });
+
+    test('checkUsernameExists returns false when server responds with s: false', () async {
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            if (options.path.contains(ApiConstants.existUsername)) {
+              return handler.resolve(
+                Response(
+                  requestOptions: options,
+                  statusCode: 200,
+                  data: {'s': false, 'c': '109'},
+                ),
+              );
+            }
+            return handler.next(options);
+          },
+        ),
+      );
+
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final exists = await repo.checkUsernameExists('g999999999999999999999999');
+      expect(exists, isFalse);
+    });
   });
 }

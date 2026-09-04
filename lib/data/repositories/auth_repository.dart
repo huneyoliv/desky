@@ -118,6 +118,22 @@ class AuthRepository {
     return UserModel.fromJson(data, token);
   }
 
+  Future<bool> checkUsernameExists(String username) async {
+    try {
+      final response = await _apiClient.post(
+        ApiConstants.existUsername,
+        data: {'username': username},
+      );
+      final data = response.data;
+      if (data is Map) {
+        return data['s'] == true;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<UserModel> signInWithSocial({
     required String provider, // "Google", "Apple", "Kakao", "Naver"
     required String socialId,
