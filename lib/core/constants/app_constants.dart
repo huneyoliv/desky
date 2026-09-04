@@ -12,6 +12,10 @@ class AppConstants {
     'ENABLE_IN_APP_UPDATER',
     defaultValue: true,
   );
+
+  /// Public PNG icon URL for Discord RPC small image and external services.
+  static const String deskyIconUrl =
+      'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png';
 }
 
 

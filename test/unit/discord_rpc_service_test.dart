@@ -53,9 +53,9 @@ void main() {
       );
 
       expect(payload.details, 'Estudando: Matemática');
-      expect(payload.state, 'Powered by Desky');
-      expect(payload.smallImage, 'desky_logo');
-      expect(payload.smallText, 'Desky - Focus & Study');
+      expect(payload.state, isNull);
+      expect(payload.smallImage, contains('assets/icons/icon.png'));
+      expect(payload.smallText, 'Desky');
       expect(payload.largeImage, contains('/sc.v2/1/sweat1.png'));
       expect(payload.largeText, contains('01h 00m'));
       expect(payload.startTime, sessionStart);

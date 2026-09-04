@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../cdn/cdn_resolver.dart';
 import '../config/env_config.dart';
+import '../constants/app_constants.dart';
 import '../localization/app_translation.dart';
 import '../../data/models/user_model.dart';
 import '../../features/timer/timer_notifier.dart';
@@ -246,22 +247,22 @@ class _UnixSocketConnection implements _DiscordIpcConnection {
 
 class DiscordPresencePayload {
   final String details;
-  final String state;
+  final String? state;
   final String largeImage;
   final String largeText;
-  final String smallImage;
-  final String smallText;
+  final String? smallImage;
+  final String? smallText;
   final DateTime? startTime;
   final String? buttonLabel;
   final String? buttonUrl;
 
   const DiscordPresencePayload({
     required this.details,
-    required this.state,
+    this.state,
     required this.largeImage,
     required this.largeText,
-    required this.smallImage,
-    required this.smallText,
+    this.smallImage,
+    this.smallText,
     this.startTime,
     this.buttonLabel,
     this.buttonUrl,
@@ -341,9 +342,6 @@ class DiscordRpcService {
     final totalTimeLabel = translation.tr('today_study_time', fallback: 'Tempo Total');
     final largeImageTooltip = '$totalTimeLabel: $totalTimeFormatted';
 
-    final stateText = translation.tr('discord_powered_by', fallback: 'Powered by Desky');
-    final smallImageTooltip = 'Desky - Focus & Study';
-
     String detailsText;
     DateTime? startTime;
 
@@ -368,11 +366,11 @@ class DiscordRpcService {
 
     return DiscordPresencePayload(
       details: detailsText,
-      state: stateText,
+      state: null,
       largeImage: avatarUrl,
       largeText: largeImageTooltip,
-      smallImage: 'desky_logo',
-      smallText: smallImageTooltip,
+      smallImage: AppConstants.deskyIconUrl,
+      smallText: 'Desky',
       startTime: startTime,
       buttonLabel: 'Desky',
       buttonUrl: 'https://desky.app',
@@ -473,16 +471,26 @@ class DiscordRpcService {
       }
       if (!_connected || _connection == null) return;
 
+      final assets = <String, dynamic>{
+        'large_image': payload.largeImage,
+        'large_text': payload.largeText,
+      };
+
+      if (payload.smallImage != null && payload.smallImage!.isNotEmpty) {
+        assets['small_image'] = payload.smallImage;
+        if (payload.smallText != null && payload.smallText!.isNotEmpty) {
+          assets['small_text'] = payload.smallText;
+        }
+      }
+
       final activity = <String, dynamic>{
         'details': payload.details,
-        'state': payload.state,
-        'assets': {
-          'large_image': payload.largeImage,
-          'large_text': payload.largeText,
-          'small_image': payload.smallImage,
-          'small_text': payload.smallText,
-        },
+        'assets': assets,
       };
+
+      if (payload.state != null && payload.state!.isNotEmpty) {
+        activity['state'] = payload.state;
+      }
 
       if (payload.startTime != null) {
         activity['timestamps'] = {
