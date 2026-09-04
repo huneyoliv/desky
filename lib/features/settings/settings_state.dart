@@ -15,6 +15,7 @@ class SettingsState {
   final bool wakeNotifications;
   final bool soundEffects;
   final List<String> blockedUsers;
+  final bool discordRpcEnabled;
 
   const SettingsState({
     this.selectedCountry = SettingsRepository.defaultCountry,
@@ -29,6 +30,7 @@ class SettingsState {
     this.wakeNotifications = true,
     this.soundEffects = true,
     this.blockedUsers = const [],
+    this.discordRpcEnabled = true,
   });
 
   SettingsState copyWith({
@@ -44,6 +46,7 @@ class SettingsState {
     bool? wakeNotifications,
     bool? soundEffects,
     List<String>? blockedUsers,
+    bool? discordRpcEnabled,
   }) {
     return SettingsState(
       selectedCountry: selectedCountry ?? this.selectedCountry,
@@ -58,6 +61,7 @@ class SettingsState {
       wakeNotifications: wakeNotifications ?? this.wakeNotifications,
       soundEffects: soundEffects ?? this.soundEffects,
       blockedUsers: blockedUsers ?? this.blockedUsers,
+      discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
     );
   }
 }

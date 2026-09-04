@@ -9,6 +9,7 @@ class EnvConfig {
   static const String defaultGoogleClientId =
       '203174165071-6ig6ng4dmiciop1uo471ndmbbr4fa3nd.apps.googleusercontent.com';
   static const String defaultGoogleClientSecret = '';
+  static const String defaultDiscordClientId = '1346800000000000000';
 
   static Future<void> init() async {
     loadSync();
@@ -97,5 +98,20 @@ class EnvConfig {
     if (fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
 
     return defaultGoogleClientSecret;
+  }
+
+  static const String _dartDefineDiscordClientId = String.fromEnvironment('DISCORD_CLIENT_ID');
+
+  static String get discordClientId {
+    if (_dartDefineDiscordClientId.isNotEmpty) return _dartDefineDiscordClientId;
+    if (!_initialized) loadSync();
+
+    final fromMap = _envMap['DISCORD_CLIENT_ID'];
+    if (fromMap != null && fromMap.isNotEmpty) return fromMap;
+
+    final fromEnv = Platform.environment['DISCORD_CLIENT_ID'];
+    if (fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
+
+    return defaultDiscordClientId;
   }
 }

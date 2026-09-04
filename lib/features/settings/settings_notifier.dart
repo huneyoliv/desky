@@ -36,6 +36,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final wakeNotifications = await _repository.getWakeNotifications();
       final soundEffects = await _repository.getSoundEffects();
       final blockedUsers = await _repository.getBlockedUsers();
+      final discordRpc = await _repository.getDiscordRpcEnabled();
 
       if (!mounted) return;
       state = state.copyWith(
@@ -46,6 +47,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         wakeNotifications: wakeNotifications,
         soundEffects: soundEffects,
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
+        discordRpcEnabled: discordRpc,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
       );
@@ -126,6 +128,11 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleSoundEffects(bool value) async {
     state = state.copyWith(soundEffects: value);
     await _repository.saveSoundEffects(value);
+  }
+
+  Future<void> toggleDiscordRpc(bool value) async {
+    state = state.copyWith(discordRpcEnabled: value);
+    await _repository.saveDiscordRpcEnabled(value);
   }
 
   Future<void> blockUser(String nickname) async {

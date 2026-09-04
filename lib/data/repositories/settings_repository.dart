@@ -24,6 +24,7 @@ class SettingsRepository {
   static const String keyWakeNotifications = 'wake_notifications';
   static const String keySoundEffects = 'sound_effects';
   static const String keyBlockedUsers = 'blocked_users_list';
+  static const String keyDiscordRpc = 'discord_rpc_enabled';
 
   static const CountryModel defaultCountry = CountryModel(
     id: 23,
@@ -302,6 +303,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setStringList(keyBlockedUsers, users);
+    } catch (_) {}
+  }
+
+  Future<bool> getDiscordRpcEnabled() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getBool(keyDiscordRpc) ?? true;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  Future<void> saveDiscordRpcEnabled(bool value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setBool(keyDiscordRpc, value);
     } catch (_) {}
   }
 }

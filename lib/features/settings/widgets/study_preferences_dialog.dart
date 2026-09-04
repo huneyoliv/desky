@@ -137,6 +137,23 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       value: settings.soundEffects,
                       onChanged: (val) => notifier.toggleSoundEffects(val),
                     ),
+                    const Divider(color: AppColors.border, height: 16),
+
+                    // Discord Rich Presence Toggle
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      activeColor: AppColors.primary,
+                      title: Text(
+                        t.tr('discord_rpc_title', fallback: 'Discord Rich Presence'),
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(
+                        t.tr('discord_rpc_desc', fallback: 'Exibir matéria e tempo de estudo em tempo real no status do Discord'),
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                      ),
+                      value: settings.discordRpcEnabled,
+                      onChanged: (val) => notifier.toggleDiscordRpc(val),
+                    ),
                   ],
                 ),
               ),

@@ -32,6 +32,7 @@ class UserModel {
 
   String get nickname => name;
   int get avatarStudiconId => studiconId;
+  bool get hasCustomAvatar => profilePhotoUrl != null && profilePhotoUrl!.isNotEmpty;
 
   factory UserModel.fromJson(Map<String, dynamic> json, String token) {
     final p = json['p'] is Map<String, dynamic> ? json['p'] as Map<String, dynamic> : null;

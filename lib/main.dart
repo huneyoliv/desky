@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
+import 'core/services/discord_rpc_coordinator.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
@@ -62,6 +63,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(authStateProvider.notifier).checkAuthStatus();
+      ref.read(discordRpcCoordinatorProvider);
     });
   }
 
