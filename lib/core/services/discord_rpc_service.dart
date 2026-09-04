@@ -1,12 +1,136 @@
+import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
+import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_discord_rpc/flutter_discord_rpc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../cdn/cdn_resolver.dart';
 import '../config/env_config.dart';
 import '../localization/app_translation.dart';
 import '../../data/models/user_model.dart';
 import '../../features/timer/timer_notifier.dart';
+
+final DynamicLibrary? _kernel32 = !kIsWeb && Platform.isWindows
+    ? DynamicLibrary.open('kernel32.dll')
+    : null;
+
+typedef _CreateFileC = IntPtr Function(
+    Pointer<Utf16> lpFileName,
+    Uint32 dwDesiredAccess,
+    Uint32 dwShareMode,
+    Pointer<Void> lpSecurityAttributes,
+    Uint32 dwCreationDisposition,
+    Uint32 dwFlagsAndAttributes,
+    IntPtr hTemplateFile);
+
+typedef _CreateFileDart = int Function(
+    Pointer<Utf16> lpFileName,
+    int dwDesiredAccess,
+    int dwShareMode,
+    Pointer<Void> lpSecurityAttributes,
+    int dwCreationDisposition,
+    int dwFlagsAndAttributes,
+    int hTemplateFile);
+
+typedef _WriteFileC = Int32 Function(
+    IntPtr hFile,
+    Pointer<Uint8> lpBuffer,
+    Uint32 nNumberOfBytesToWrite,
+    Pointer<Uint32> lpNumberOfBytesWritten,
+    Pointer<Void> lpOverlapped);
+
+typedef _WriteFileDart = int Function(
+    int hFile,
+    Pointer<Uint8> lpBuffer,
+    int nNumberOfBytesToWrite,
+    Pointer<Uint32> lpNumberOfBytesWritten,
+    Pointer<Void> lpOverlapped);
+
+typedef _CloseHandleC = Int32 Function(IntPtr hObject);
+typedef _CloseHandleDart = int Function(int hObject);
+
+final _CreateFileDart? _createFile = _kernel32
+    ?.lookupFunction<_CreateFileC, _CreateFileDart>('CreateFileW');
+
+final _WriteFileDart? _writeFile = _kernel32
+    ?.lookupFunction<_WriteFileC, _WriteFileDart>('WriteFile');
+
+final _CloseHandleDart? _closeHandle = _kernel32
+    ?.lookupFunction<_CloseHandleC, _CloseHandleDart>('CloseHandle');
+
+abstract class _DiscordIpcConnection {
+  Future<bool> writePacket(int opcode, String jsonString);
+  void close();
+}
+
+class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
+  final int handle;
+  _WindowsNamedPipeConnection(this.handle);
+
+  @override
+  Future<bool> writePacket(int opcode, String jsonString) async {
+    if (_writeFile == null || handle == 0 || handle == -1) return false;
+    try {
+      final payloadBytes = utf8.encode(jsonString);
+      final buffer = Uint8List(8 + payloadBytes.length);
+      final byteData = ByteData.sublistView(buffer);
+      byteData.setUint32(0, opcode, Endian.little);
+      byteData.setUint32(4, payloadBytes.length, Endian.little);
+      buffer.setRange(8, 8 + payloadBytes.length, payloadBytes);
+
+      final pBuffer = calloc<Uint8>(buffer.length);
+      final pWritten = calloc<Uint32>();
+      try {
+        pBuffer.asTypedList(buffer.length).setAll(0, buffer);
+        final result = _writeFile!(handle, pBuffer, buffer.length, pWritten, nullptr);
+        return result != 0;
+      } finally {
+        calloc.free(pBuffer);
+        calloc.free(pWritten);
+      }
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  void close() {
+    if (_closeHandle != null && handle != 0 && handle != -1) {
+      try {
+        _closeHandle!(handle);
+      } catch (_) {}
+    }
+  }
+}
+
+class _UnixSocketConnection implements _DiscordIpcConnection {
+  final Socket socket;
+  _UnixSocketConnection(this.socket);
+
+  @override
+  Future<bool> writePacket(int opcode, String jsonString) async {
+    try {
+      final payloadBytes = utf8.encode(jsonString);
+      final header = Uint8List(8);
+      final byteData = ByteData.sublistView(header);
+      byteData.setUint32(0, opcode, Endian.little);
+      byteData.setUint32(4, payloadBytes.length, Endian.little);
+      socket.add(header);
+      socket.add(payloadBytes);
+      await socket.flush();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  void close() {
+    try {
+      socket.destroy();
+    } catch (_) {}
+  }
+}
 
 class DiscordPresencePayload {
   final String details;
@@ -62,9 +186,10 @@ class DiscordPresencePayload {
 
 class DiscordRpcService {
   final String _clientId;
-  bool _initialized = false;
+  _DiscordIpcConnection? _connection;
   bool _connected = false;
   DiscordPresencePayload? _lastPayload;
+  int _nonceCounter = 0;
 
   DiscordRpcService({String? clientId})
       : _clientId = clientId ?? EnvConfig.discordClientId;
@@ -143,27 +268,78 @@ class DiscordRpcService {
   }
 
   Future<void> initialize() async {
-    if (_initialized) return;
-    if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
-      try {
-        await FlutterDiscordRPC.initialize(_clientId);
-        _initialized = true;
-      } catch (_) {
-        _initialized = false;
-      }
-    }
+    await connect();
   }
 
   Future<void> connect() async {
-    if (!_initialized) {
-      await initialize();
-    }
-    if (!_initialized || _connected) return;
+    if (_connected && _connection != null) return;
+    if (kIsWeb) return;
+
     try {
-      await FlutterDiscordRPC.instance.connect();
-      _connected = true;
+      if (Platform.isWindows && _createFile != null) {
+        const genericReadWrite = 0xC0000000;
+        const openExisting = 3;
+
+        for (int i = 0; i < 10; i++) {
+          final pipeName = r'\\.\pipe\discord-ipc-' + i.toString();
+          final nativeName = pipeName.toNativeUtf16();
+          try {
+            final handle = _createFile!(
+              nativeName,
+              genericReadWrite,
+              0,
+              nullptr,
+              openExisting,
+              0,
+              0,
+            );
+            if (handle != 0 && handle != -1) {
+              _connection = _WindowsNamedPipeConnection(handle);
+              break;
+            }
+          } finally {
+            calloc.free(nativeName);
+          }
+        }
+      } else if (Platform.isLinux || Platform.isMacOS) {
+        final tempDir = Platform.environment['XDG_RUNTIME_DIR'] ??
+            Platform.environment['TMPDIR'] ??
+            Platform.environment['TMP'] ??
+            Platform.environment['TEMP'] ??
+            '/tmp';
+
+        for (int i = 0; i < 10; i++) {
+          try {
+            final socketPath = '$tempDir/discord-ipc-$i';
+            final socket = await Socket.connect(
+              InternetAddress(socketPath, type: InternetAddressType.unix),
+              0,
+              timeout: const Duration(milliseconds: 300),
+            );
+            _connection = _UnixSocketConnection(socket);
+            break;
+          } catch (_) {}
+        }
+      }
+
+      if (_connection != null) {
+        final handshakePayload = jsonEncode({
+          'v': 1,
+          'client_id': _clientId,
+        });
+        final ok = await _connection!.writePacket(0, handshakePayload);
+        _connected = ok;
+        if (!ok) {
+          _connection?.close();
+          _connection = null;
+        }
+      } else {
+        _connected = false;
+      }
     } catch (_) {
       _connected = false;
+      _connection?.close();
+      _connection = null;
     }
   }
 
@@ -171,63 +347,91 @@ class DiscordRpcService {
     if (_lastPayload == payload && _connected) return;
 
     try {
-      if (!_connected) {
+      if (!_connected || _connection == null) {
         await connect();
       }
-      if (!_initialized || !_connected) return;
+      if (!_connected || _connection == null) return;
 
-      final buttons = <RPCButton>[];
-      if (payload.buttonLabel != null && payload.buttonUrl != null) {
-        buttons.add(RPCButton(
-          label: payload.buttonLabel!,
-          url: payload.buttonUrl!,
-        ));
+      final activity = <String, dynamic>{
+        'details': payload.details,
+        'state': payload.state,
+        'assets': {
+          'large_image': payload.largeImage,
+          'large_text': payload.largeText,
+          'small_image': payload.smallImage,
+          'small_text': payload.smallText,
+        },
+      };
+
+      if (payload.startTime != null) {
+        activity['timestamps'] = {
+          'start': (payload.startTime!.millisecondsSinceEpoch / 1000).round(),
+        };
       }
 
-      await FlutterDiscordRPC.instance.setActivity(
-        activity: RPCActivity(
-          details: payload.details,
-          state: payload.state,
-          assets: RPCAssets(
-            largeImage: payload.largeImage,
-            largeText: payload.largeText,
-            smallImage: payload.smallImage,
-            smallText: payload.smallText,
-          ),
-          timestamps: payload.startTime != null
-              ? RPCTimestamps(start: payload.startTime!.millisecondsSinceEpoch)
-              : null,
-          buttons: buttons.isNotEmpty ? buttons : null,
-        ),
-      );
+      if (payload.buttonLabel != null && payload.buttonUrl != null) {
+        activity['buttons'] = [
+          {
+            'label': payload.buttonLabel!,
+            'url': payload.buttonUrl!,
+          }
+        ];
+      }
 
-      _lastPayload = payload;
-      _connected = true;
+      _nonceCounter++;
+      final packetPayload = jsonEncode({
+        'cmd': 'SET_ACTIVITY',
+        'args': {
+          'pid': pid,
+          'activity': activity,
+        },
+        'nonce': _nonceCounter.toString(),
+      });
+
+      final success = await _connection!.writePacket(1, packetPayload);
+      if (success) {
+        _lastPayload = payload;
+      } else {
+        _connected = false;
+        _connection?.close();
+        _connection = null;
+      }
     } catch (_) {
       _connected = false;
+      _connection?.close();
+      _connection = null;
     }
   }
 
   Future<void> clearPresence() async {
     _lastPayload = null;
-    if (!_initialized || !_connected) return;
+    if (!_connected || _connection == null) return;
     try {
-      await FlutterDiscordRPC.instance.clearActivity();
+      _nonceCounter++;
+      final packetPayload = jsonEncode({
+        'cmd': 'SET_ACTIVITY',
+        'args': {
+          'pid': pid,
+          'activity': null,
+        },
+        'nonce': _nonceCounter.toString(),
+      });
+      await _connection!.writePacket(1, packetPayload);
     } catch (_) {
       _connected = false;
     }
   }
 
   void dispose() {
-    if (_initialized) {
-      try {
-        clearPresence();
-        FlutterDiscordRPC.instance.disconnect();
-        FlutterDiscordRPC.instance.dispose();
-      } catch (_) {}
-    }
+    try {
+      if (_connected && _connection != null) {
+        _connection!.writePacket(2, '{}');
+      }
+      _connection?.close();
+    } catch (_) {}
+    _connection = null;
     _connected = false;
-    _initialized = false;
+    _lastPayload = null;
   }
 }
 
