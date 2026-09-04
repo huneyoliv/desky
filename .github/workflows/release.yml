@@ -76,14 +76,14 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows Release for Installer (Standalone)
-        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=true --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=true --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
 
       - name: Compile Inno Setup Installer
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer\desky_setup.iss
 
       - name: Build Windows Release for Microsoft Store (MSIX)
-        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=false --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=false --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
 
       - name: Create Windows MSIX Package
         run: dart run msix:create --store
@@ -131,7 +131,7 @@ jobs:
         run: flutter pub get
 
       - name: Build macOS Release
-        run: flutter build macos --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        run: flutter build macos --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
 
       - name: Create DMG Installer
         run: |
@@ -180,7 +180,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Linux Release
-        run: flutter build linux --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        run: flutter build linux --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
 
       - name: Package Debian (.deb) & Portable (.tar.gz)
         run: |
