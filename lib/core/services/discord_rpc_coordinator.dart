@@ -15,7 +15,10 @@ class DiscordRpcCoordinator {
   }
 
   void _init() {
-    _rpcService.initialize();
+    Future.microtask(() async {
+      await _rpcService.initialize();
+      _syncPresence();
+    });
 
     // Listen to changes in timer state
     _ref.listen<TimerState>(timerNotifierProvider, (prev, next) {
@@ -39,9 +42,6 @@ class DiscordRpcCoordinator {
     _ref.listen<AppTranslation>(appTranslationProvider, (prev, next) {
       _syncPresence();
     });
-
-    // Initial sync
-    _syncPresence();
   }
 
   void _syncPresence() {

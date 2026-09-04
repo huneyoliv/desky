@@ -35,7 +35,6 @@ void main() async {
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.setAsFrameless();
     await windowManager.show();
     await windowManager.focus();
   });
@@ -61,7 +60,11 @@ class _DeskyAppState extends ConsumerState<DeskyApp> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await windowManager.show();
+        await windowManager.focus();
+      } catch (_) {}
       ref.read(authStateProvider.notifier).checkAuthStatus();
       ref.read(discordRpcCoordinatorProvider);
     });

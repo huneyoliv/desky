@@ -60,6 +60,22 @@ typedef _ReadFileDart = int Function(
     Pointer<Uint32> lpNumberOfBytesRead,
     Pointer<Void> lpOverlapped);
 
+typedef _PeekNamedPipeC = Int32 Function(
+    IntPtr hNamedPipe,
+    Pointer<Void> lpBuffer,
+    Uint32 nBufferSize,
+    Pointer<Uint32> lpBytesRead,
+    Pointer<Uint32> lpTotalBytesAvail,
+    Pointer<Uint32> lpBytesLeftThisMessage);
+
+typedef _PeekNamedPipeDart = int Function(
+    int hNamedPipe,
+    Pointer<Void> lpBuffer,
+    int nBufferSize,
+    Pointer<Uint32> lpBytesRead,
+    Pointer<Uint32> lpTotalBytesAvail,
+    Pointer<Uint32> lpBytesLeftThisMessage);
+
 typedef _CloseHandleC = Int32 Function(IntPtr hObject);
 typedef _CloseHandleDart = int Function(int hObject);
 
@@ -72,6 +88,9 @@ final _WriteFileDart? _writeFile = _kernel32
 final _ReadFileDart? _readFile = _kernel32
     ?.lookupFunction<_ReadFileC, _ReadFileDart>('ReadFile');
 
+final _PeekNamedPipeDart? _peekNamedPipe = _kernel32
+    ?.lookupFunction<_PeekNamedPipeC, _PeekNamedPipeDart>('PeekNamedPipe');
+
 final _CloseHandleDart? _closeHandle = _kernel32
     ?.lookupFunction<_CloseHandleC, _CloseHandleDart>('CloseHandle');
 
@@ -83,7 +102,7 @@ class _DiscordPacket {
 
 abstract class _DiscordIpcConnection {
   Future<bool> writePacket(int opcode, String jsonString);
-  Future<_DiscordPacket?> readPacket();
+  Future<_DiscordPacket?> readPacket({Duration timeout});
   void close();
 }
 
@@ -118,9 +137,22 @@ class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
   }
 
   @override
-  Future<_DiscordPacket?> readPacket() async {
-    if (_readFile == null || handle == 0 || handle == -1) return null;
+  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(milliseconds: 150)}) async {
+    if (_readFile == null || _peekNamedPipe == null || handle == 0 || handle == -1) return null;
+    final stopwatch = Stopwatch()..start();
+    final pTotalAvail = calloc<Uint32>();
+
     try {
+      while (stopwatch.elapsed < timeout) {
+        final peekRes = _peekNamedPipe!(handle, nullptr, 0, nullptr, pTotalAvail, nullptr);
+        if (peekRes != 0 && pTotalAvail.value >= 8) {
+          break;
+        }
+        await Future.delayed(const Duration(milliseconds: 15));
+      }
+
+      if (pTotalAvail.value < 8) return null;
+
       final headerBuffer = calloc<Uint8>(8);
       final pBytesRead = calloc<Uint32>();
       try {
@@ -131,6 +163,13 @@ class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
         final length = headerData.getUint32(4, Endian.little);
 
         if (length == 0) return _DiscordPacket(opcode, '');
+
+        while (stopwatch.elapsed < timeout) {
+          _peekNamedPipe!(handle, nullptr, 0, nullptr, pTotalAvail, nullptr);
+          if (pTotalAvail.value >= length) break;
+          await Future.delayed(const Duration(milliseconds: 15));
+        }
+
         final bodyBuffer = calloc<Uint8>(length);
         try {
           final bodyRes = _readFile!(handle, bodyBuffer, length, pBytesRead, nullptr);
@@ -146,6 +185,8 @@ class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
       }
     } catch (_) {
       return null;
+    } finally {
+      calloc.free(pTotalAvail);
     }
   }
 
@@ -181,9 +222,9 @@ class _UnixSocketConnection implements _DiscordIpcConnection {
   }
 
   @override
-  Future<_DiscordPacket?> readPacket() async {
+  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(milliseconds: 150)}) async {
     try {
-      final data = await socket.first.timeout(const Duration(milliseconds: 500));
+      final data = await socket.first.timeout(timeout);
       if (data.length < 8) return null;
       final byteData = ByteData.sublistView(Uint8List.fromList(data));
       final opcode = byteData.getUint32(0, Endian.little);
