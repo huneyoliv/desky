@@ -67,9 +67,15 @@ class UserModel {
       }
     }
 
+    String parsedName = safeString(json['n']);
+    if (parsedName.isEmpty) parsedName = safeString(json['name']);
+    if (parsedName.isEmpty && p != null) {
+      parsedName = safeString(p['n'] ?? p['name'] ?? p['nickname']);
+    }
+
     return UserModel(
       id: userId,
-      name: safeString(json['n'] ?? json['name']),
+      name: parsedName,
       email: safeString(json['e'] ?? json['email']),
       statusMessage: safeString(json['stm'] ?? json['statusMsg'] ?? p?['stm']),
       categoryName: safeString(json['ct'] ?? json['categoryName']),
