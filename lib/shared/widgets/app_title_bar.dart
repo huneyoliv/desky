@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -124,27 +125,30 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
               height: 22,
               padding: EdgeInsets.only(right: 8),
             ),
-          _TitleBarButton(
-            tooltip: t.tr('minimize', fallback: 'Minimizar'),
-            onTap: () => windowManager.minimize(),
-            child: const _MinimizeIcon(color: Colors.white70),
-          ),
-          _TitleBarButton(
-            tooltip: _isMaximized
-                ? t.tr('restore', fallback: 'Restaurar')
-                : t.tr('maximize', fallback: 'Maximizar'),
-            onTap: _toggleMaximize,
-            child: _MaximizeRestoreIcon(
-              isMaximized: _isMaximized,
-              color: Colors.white70,
+          if (!Platform.isMacOS) ...[
+            _TitleBarButton(
+              tooltip: t.tr('minimize', fallback: 'Minimizar'),
+              onTap: () => windowManager.minimize(),
+              child: const _MinimizeIcon(color: Colors.white70),
             ),
-          ),
-          _TitleBarButton(
-            tooltip: t.tr('close', fallback: 'Fechar'),
-            hoverColor: const Color(0xFFE81123),
-            onTap: () => windowManager.close(),
-            child: const _CloseIcon(color: Colors.white70),
-          ),
+            _TitleBarButton(
+              tooltip: _isMaximized
+                  ? t.tr('restore', fallback: 'Restaurar')
+                  : t.tr('maximize', fallback: 'Maximizar'),
+              onTap: _toggleMaximize,
+              child: _MaximizeRestoreIcon(
+                isMaximized: _isMaximized,
+                color: Colors.white70,
+              ),
+            ),
+            _TitleBarButton(
+              tooltip: t.tr('close', fallback: 'Fechar'),
+              hoverColor: const Color(0xFFE81123),
+              onTap: () => windowManager.close(),
+              child: const _CloseIcon(color: Colors.white70),
+            ),
+          ] else
+            const SizedBox(width: 8),
         ],
       ),
     );
