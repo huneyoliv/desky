@@ -73,6 +73,25 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.3] - 2026-09-04
+
+### Fixed
+- **Discord Rich Presence Connection & IPC Handshake**: Resolved Windows named pipe handshake timeouts by sanitizing the client ID string, ensuring robust packet framing, and adding defensive fallback handling.
+- **Discord Rich Presence Activity & State**:
+  - Disabled presence publishing when the user is logged out or idle (removed the "No Desky" placeholder).
+  - Fixed study timer synchronization on Discord by providing timestamps in Unix epoch milliseconds instead of seconds, eliminating the 0:00 counter freeze.
+  - Added localized "Paused" status (`"Em pausa"`, `"Paused"`, `"En pausa"`, `"일시정지"`, `"一時停止中"`, `"暂停中"`) with frozen study timer during breaks, preserving the current subject name.
+  - Continuously resumes the study timer from the exact accumulated elapsed time upon unpausing.
+- **Study Timer Pausing & Accumulated Time**: Fixed `TimerNotifier.pauseStudy()` resetting `sessionElapsedMs` to zero; introduced differential session tracking (`lastSyncedSessionElapsedMs`) so the study timer freezes on screen during breaks and smoothly resumes without resetting or duplicating server sync.
+- **Purchased & Custom Avatar Persistence**:
+  - Fixed an issue where equipping purchased YPT studicons would revert to the default avatar (`-1`) upon initial login or after logging out and back in.
+  - Implemented `UserModel.extractStudiconId` to strictly validate positive IDs (`> 0`) and prioritize custom studicon fields (`csd`) over negative fallback indicators (`ssd: -1`).
+  - Added user-indexed local preference caching in `AuthRepository` (`keyUserEquippedStudiconId_<id>`), ensuring paid studicons remain equipped across app sessions.
+- **Process Exit & Window Close Handling**:
+  - Configured `windowManager.setPreventClose(true)` and `WidgetsBindingObserver.didRequestAppExit` to intercept the custom title bar 'X' button, OS close commands, and system shutdown signals.
+  - Automatically stops active study sessions with a 3-second defensive network timeout, enqueuing sessions to the offline sync queue (`OfflineSyncRepository`) if the network is unavailable or slow.
+  - Flushes accumulated break duration on exit and cleanly releases Discord RPC IPC connections (`clearPresence()` and `dispose()`) before terminating the application process via `windowManager.destroy()`.
+
 ## [1.0.2] - 2026-09-04
 
 ### Added

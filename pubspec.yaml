@@ -2,7 +2,7 @@ name: desky
 description: "Desky - Focus & Study Timer Desktop Client"
 publish_to: 'none'
 
-version: 1.0.2+3
+version: 1.0.3+4
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -75,7 +75,7 @@ msix_config:
   publisher_display_name: Desky
   identity_name: DevHuney.Desky
   publisher: CN=B81D5CBC-296B-44D2-9E7C-AF85E6AF4AD8
-  msix_version: 1.0.2.0
+  msix_version: 1.0.3.0
   logo_path: assets/icons/icon.png
   output_name: Desky-Windows-Store-x64
   architecture: x64
