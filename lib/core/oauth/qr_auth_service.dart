@@ -110,7 +110,14 @@ class QrAuthService {
   }) async {
     await cancel();
 
-    final server = await HttpServer.bind(InternetAddress.anyIPv4, 0);
+    final HttpServer server;
+    try {
+      server = await HttpServer.bind(InternetAddress.anyIPv4, 0);
+    } on SocketException catch (e) {
+      throw OAuthException(
+        'Falha ao iniciar servidor local para autenticação por QR Code: ${e.message} (código ${e.osError?.errorCode ?? -1}). Verifique as permissões de rede do aplicativo.',
+      );
+    }
     _server = server;
 
     final completer = Completer<String>();

@@ -91,7 +91,14 @@ class OAuthDesktopService {
   }) async {
     await cancel();
 
-    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final HttpServer server;
+    try {
+      server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    } on SocketException catch (e) {
+      throw OAuthException(
+        'Falha ao iniciar porta de redirecionamento local para autenticação: ${e.message} (código ${e.osError?.errorCode ?? -1}). Verifique as permissões de rede do aplicativo.',
+      );
+    }
     _server = server;
     final completer = Completer<Map<String, String>>();
     _completer = completer;

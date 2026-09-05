@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -63,12 +65,15 @@ class DeskyApp extends ConsumerStatefulWidget {
 class _DeskyAppState extends ConsumerState<DeskyApp>
     with WindowListener, WidgetsBindingObserver {
   bool _isExiting = false;
+  StreamSubscription<ProcessSignal>? _sigtermSub;
+  StreamSubscription<ProcessSignal>? _sigintSub;
 
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
     WidgetsBinding.instance.addObserver(this);
+    _setupSignalHandlers();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await windowManager.show();
@@ -80,8 +85,23 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
     });
   }
 
+  void _setupSignalHandlers() {
+    if (!Platform.isWindows) {
+      try {
+        _sigtermSub = ProcessSignal.sigterm.watch().listen((_) async {
+          await _handleAppExit();
+        });
+        _sigintSub = ProcessSignal.sigint.watch().listen((_) async {
+          await _handleAppExit();
+        });
+      } catch (_) {}
+    }
+  }
+
   @override
   void dispose() {
+    _sigtermSub?.cancel();
+    _sigintSub?.cancel();
     windowManager.removeListener(this);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -93,9 +113,14 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
     try {
       final timerNotifier = ref.read(timerNotifierProvider.notifier);
       final timerState = ref.read(timerNotifierProvider);
-      if (timerState.isRunning || timerState.isPaused) {
+      final hasActiveSession = timerState.isRunning ||
+          timerState.isPaused ||
+          timerState.sessionStartAt != null ||
+          (timerState.sessionElapsedMs - timerState.lastSyncedSessionElapsedMs > 0);
+
+      if (hasActiveSession) {
         await timerNotifier.stopStudy().timeout(
-          const Duration(seconds: 3),
+          const Duration(seconds: 4),
           onTimeout: () => null,
         );
       }
@@ -110,6 +135,8 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
     try {
       await windowManager.destroy();
     } catch (_) {}
+
+    exit(0);
   }
 
   @override

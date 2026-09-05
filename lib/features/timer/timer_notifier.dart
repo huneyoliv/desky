@@ -446,20 +446,24 @@ class TimerNotifier extends StateNotifier<TimerState> {
   }
 
   Future<void> _syncCompletedFocusSession() async {
-    final elapsed = state.sessionElapsedMs - state.lastSyncedSessionElapsedMs;
+    int elapsed = state.sessionElapsedMs - state.lastSyncedSessionElapsedMs;
+    final now = DateTime.now();
+    if (elapsed <= 0 && state.sessionStartAt != null) {
+      elapsed = now.difference(state.sessionStartAt!).inMilliseconds;
+    }
     final currentSub = state.currentSubject;
 
-    if (currentSub != null && elapsed > 0) {
-      final now = DateTime.now();
-      final startAt = state.sessionStartAt ?? now.subtract(Duration(milliseconds: elapsed));
-      final stopAt = startAt.add(Duration(milliseconds: elapsed));
+    if (currentSub != null && (elapsed > 0 || state.isRunning)) {
+      final safeElapsed = elapsed > 0 ? elapsed : 0;
+      final startAt = state.sessionStartAt ?? now.subtract(Duration(milliseconds: safeElapsed));
+      final stopAt = startAt.add(Duration(milliseconds: safeElapsed));
       try {
         final res = await _timerRepository.stopStudy(
           subjectTitle: currentSub.title,
           subjectId: currentSub.id,
           startAt: startAt,
           stopAt: stopAt,
-          studyMs: elapsed,
+          studyMs: safeElapsed,
         ).timeout(const Duration(seconds: 3), onTimeout: () => null);
 
         if (res != null) {
@@ -467,7 +471,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           final serverTotalMs = safeInt(dl?['sm'] ?? dl?['tp']);
           final updatedSubjects = state.subjects.map((s) {
             if (s.id == currentSub.id) {
-              return s.copyWith(studyMs: s.studyMs + elapsed);
+              return s.copyWith(studyMs: s.studyMs + safeElapsed);
             }
             return s;
           }).toList();
@@ -476,7 +480,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
             lastSyncedSessionElapsedMs: state.sessionElapsedMs,
             subjects: updatedSubjects,
             todayTotalMs: serverTotalMs > 0 ? serverTotalMs : state.todayTotalMs,
-            currentSubject: currentSub.copyWith(studyMs: currentSub.studyMs + elapsed),
+            currentSubject: currentSub.copyWith(studyMs: currentSub.studyMs + safeElapsed),
           );
         } else {
           state = state.copyWith(lastSyncedSessionElapsedMs: state.sessionElapsedMs);
@@ -485,7 +489,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
             subjectTitle: currentSub.title,
             startAt: startAt,
             stopAt: stopAt,
-            studyMs: elapsed,
+            studyMs: safeElapsed,
           );
         }
       } catch (_) {
@@ -495,7 +499,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           subjectTitle: currentSub.title,
           startAt: startAt,
           stopAt: stopAt,
-          studyMs: elapsed,
+          studyMs: safeElapsed,
         );
       }
     }
@@ -537,7 +541,9 @@ class TimerNotifier extends StateNotifier<TimerState> {
       } catch (_) {}
     }
 
-    if (state.isRunning || (state.sessionElapsedMs - state.lastSyncedSessionElapsedMs) > 0) {
+    if (state.isRunning ||
+        state.sessionStartAt != null ||
+        (state.sessionElapsedMs - state.lastSyncedSessionElapsedMs) > 0) {
       await _syncCompletedFocusSession();
     }
 
