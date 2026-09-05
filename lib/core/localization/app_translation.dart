@@ -236,19 +236,6 @@ class AppTranslation {
       'it': 'Ripristina',
       'ru': 'Восстановить',
     },
-    'close': {
-      'pt': 'Fechar',
-      'en': 'Close',
-      'es': 'Cerrar',
-      'ko': '닫기',
-      'ja': '閉じる',
-      'zh-cn': '关闭',
-      'zh-tw': '關閉',
-      'fr': 'Fermer',
-      'de': 'Schließen',
-      'it': 'Chiudi',
-      'ru': 'Закрыть',
-    },
 
     // OAuth & Socket Errors
     'oauth_socket_server_error': {
