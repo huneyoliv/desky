@@ -101,16 +101,25 @@ class EnvConfig {
   }
 
   static const String _dartDefineDiscordClientId = String.fromEnvironment('DISCORD_CLIENT_ID');
+  static final RegExp _snowflakeRegex = RegExp(r'^\d{17,20}$');
+
+  static String? _sanitizeSnowflake(String? value) {
+    if (value == null) return null;
+    final cleaned = value.trim().replaceAll('"', '').replaceAll("'", '');
+    return _snowflakeRegex.hasMatch(cleaned) ? cleaned : null;
+  }
 
   static String get discordClientId {
-    if (_dartDefineDiscordClientId.isNotEmpty) return _dartDefineDiscordClientId;
+    final fromDartDefine = _sanitizeSnowflake(_dartDefineDiscordClientId);
+    if (fromDartDefine != null) return fromDartDefine;
+
     if (!_initialized) loadSync();
 
-    final fromMap = _envMap['DISCORD_CLIENT_ID'];
-    if (fromMap != null && fromMap.isNotEmpty) return fromMap;
+    final fromMap = _sanitizeSnowflake(_envMap['DISCORD_CLIENT_ID']);
+    if (fromMap != null) return fromMap;
 
-    final fromEnv = Platform.environment['DISCORD_CLIENT_ID'];
-    if (fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
+    final fromEnv = _sanitizeSnowflake(Platform.environment['DISCORD_CLIENT_ID']);
+    if (fromEnv != null) return fromEnv;
 
     return defaultDiscordClientId;
   }
