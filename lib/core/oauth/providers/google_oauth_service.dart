@@ -121,7 +121,7 @@ class GoogleOAuthService {
       );
     } catch (e) {
       if (e is OAuthException) rethrow;
-      throw OAuthException('Erro ao autenticar com Google: $e');
+      throw const OAuthException('oauth_google_error');
     }
   }
 

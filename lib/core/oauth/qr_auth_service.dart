@@ -113,10 +113,8 @@ class QrAuthService {
     final HttpServer server;
     try {
       server = await HttpServer.bind(InternetAddress.anyIPv4, 0);
-    } on SocketException catch (e) {
-      throw OAuthException(
-        'Falha ao iniciar servidor local para autenticação por QR Code: ${e.message} (código ${e.osError?.errorCode ?? -1}). Verifique as permissões de rede do aplicativo.',
-      );
+    } on SocketException catch (_) {
+      throw const OAuthException('oauth_qr_server_error');
     }
     _server = server;
 
@@ -217,7 +215,7 @@ class QrAuthService {
       timeout,
       onTimeout: () {
         cancel();
-        throw const OAuthException('Tempo limite para pareamento QR Code excedido (5 minutos).');
+        throw const OAuthException('oauth_qr_timeout_error');
       },
     );
 
@@ -234,7 +232,7 @@ class QrAuthService {
   Future<void> cancel() async {
     if (_completer != null && !_completer!.isCompleted) {
       _completer!.completeError(
-        const OAuthException('Pareamento QR Code cancelado.', isCancelled: true),
+        const OAuthException('oauth_cancelled_error', isCancelled: true),
       );
     }
     if (_server != null) {

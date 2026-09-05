@@ -76,9 +76,11 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
       _awaitSession(session);
     } catch (e) {
       if (!mounted) return;
+      final t = ref.read(appTranslationProvider);
+      final rawKey = e.toString().replaceAll('Exception: ', '').replaceAll('OAuthException: ', '');
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Falha ao iniciar servidor local: $e';
+        _errorMessage = t.tr(rawKey, fallback: rawKey);
       });
     }
   }
@@ -101,9 +103,10 @@ class _QrAuthDialogState extends ConsumerState<QrAuthDialog> {
       }
     } catch (e) {
       if (!mounted) return;
-      if (!e.toString().contains('cancelado')) {
+      if (!e.toString().contains('cancelado') && !e.toString().contains('cancelled')) {
+        final rawKey = e.toString().replaceAll('Exception: ', '').replaceAll('OAuthException: ', '');
         setState(() {
-          _errorMessage = e.toString().replaceAll('Exception: ', '').replaceAll('OAuthException: ', '');
+          _errorMessage = t.tr(rawKey, fallback: rawKey);
         });
       }
     }

@@ -94,10 +94,8 @@ class OAuthDesktopService {
     final HttpServer server;
     try {
       server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-    } on SocketException catch (e) {
-      throw OAuthException(
-        'Falha ao iniciar porta de redirecionamento local para autenticação: ${e.message} (código ${e.osError?.errorCode ?? -1}). Verifique as permissões de rede do aplicativo.',
-      );
+    } on SocketException catch (_) {
+      throw const OAuthException('oauth_socket_server_error');
     }
     _server = server;
     final completer = Completer<Map<String, String>>();
@@ -166,13 +164,13 @@ class OAuthDesktopService {
         mode: LaunchMode.externalApplication,
       );
       if (!launched) {
-        throw const OAuthException('Não foi possível abrir o navegador padrão.');
+        throw const OAuthException('oauth_browser_error');
       }
 
       final result = await completer.future.timeout(
         timeout,
         onTimeout: () {
-          throw const OAuthException('Tempo limite de autenticação excedido (3 minutos).');
+          throw const OAuthException('oauth_timeout_error');
         },
       );
       return result;
@@ -184,7 +182,7 @@ class OAuthDesktopService {
   Future<void> cancel() async {
     if (_completer != null && !_completer!.isCompleted) {
       _completer!.completeError(
-        const OAuthException('Autenticação cancelada pelo usuário.', isCancelled: true),
+        const OAuthException('oauth_cancelled_error', isCancelled: true),
       );
     }
     if (_server != null) {
