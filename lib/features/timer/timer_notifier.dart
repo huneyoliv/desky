@@ -460,7 +460,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           startAt: startAt,
           stopAt: stopAt,
           studyMs: elapsed,
-        );
+        ).timeout(const Duration(seconds: 3), onTimeout: () => null);
 
         if (res != null) {
           final dl = res['dl'] as Map<String, dynamic>?;
@@ -528,14 +528,16 @@ class TimerNotifier extends StateNotifier<TimerState> {
     final now = DateTime.now();
 
     if (state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
-      _timerRepository.recordRest(
-        startAt: state.restStartAt!,
-        stopAt: now,
-        restMs: state.sessionRestMs,
-      );
+      try {
+        await _timerRepository.recordRest(
+          startAt: state.restStartAt!,
+          stopAt: now,
+          restMs: state.sessionRestMs,
+        ).timeout(const Duration(seconds: 2), onTimeout: () => false);
+      } catch (_) {}
     }
 
-    if (state.isRunning) {
+    if (state.isRunning || (state.sessionElapsedMs - state.lastSyncedSessionElapsedMs) > 0) {
       await _syncCompletedFocusSession();
     }
 

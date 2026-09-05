@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,12 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
 import 'core/services/discord_rpc_coordinator.dart';
+import 'core/services/discord_rpc_service.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/localization/app_translation.dart';
 import 'features/auth/auth_notifier.dart';
 import 'features/settings/settings_notifier.dart';
+import 'features/timer/timer_notifier.dart';
 import 'shared/widgets/app_title_bar.dart';
 
 void main() async {
@@ -37,6 +40,7 @@ void main() async {
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
+    await windowManager.setPreventClose(true);
   });
 
   runApp(
@@ -56,18 +60,67 @@ class DeskyApp extends ConsumerStatefulWidget {
   ConsumerState<DeskyApp> createState() => _DeskyAppState();
 }
 
-class _DeskyAppState extends ConsumerState<DeskyApp> {
+class _DeskyAppState extends ConsumerState<DeskyApp>
+    with WindowListener, WidgetsBindingObserver {
+  bool _isExiting = false;
+
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await windowManager.show();
         await windowManager.focus();
+        await windowManager.setPreventClose(true);
       } catch (_) {}
       ref.read(authStateProvider.notifier).checkAuthStatus();
       ref.read(discordRpcCoordinatorProvider);
     });
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  Future<void> _handleAppExit() async {
+    if (_isExiting) return;
+    _isExiting = true;
+    try {
+      final timerNotifier = ref.read(timerNotifierProvider.notifier);
+      final timerState = ref.read(timerNotifierProvider);
+      if (timerState.isRunning || timerState.isPaused) {
+        await timerNotifier.stopStudy().timeout(
+          const Duration(seconds: 3),
+          onTimeout: () => null,
+        );
+      }
+    } catch (_) {}
+
+    try {
+      final rpcService = ref.read(discordRpcServiceProvider);
+      await rpcService.clearPresence();
+      rpcService.dispose();
+    } catch (_) {}
+
+    try {
+      await windowManager.destroy();
+    } catch (_) {}
+  }
+
+  @override
+  void onWindowClose() async {
+    await _handleAppExit();
+  }
+
+  @override
+  Future<AppExitResponse> didRequestAppExit() async {
+    await _handleAppExit();
+    return AppExitResponse.exit;
   }
 
   @override
