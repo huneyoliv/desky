@@ -220,6 +220,7 @@ jobs:
           Version: ${VERSION}
           Architecture: amd64
           Maintainer: Desky Project <huney.oliveira@gmail.com>
+          Depends: libgtk-3-0, libsecret-1-0, xdg-utils
           Description: Desky - Focus & Study Timer Desktop Client
            Client desktop completo e moderno para foco e gerenciamento de tempo de estudos.
           EOF
