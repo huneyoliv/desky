@@ -33,6 +33,7 @@ class TimerState {
   final bool isRunning;
   final bool isPaused;
   final int sessionElapsedMs;
+  final int lastSyncedSessionElapsedMs;
   final int todayTotalMs;
   final int sessionRestMs;
   final int todayRestMs;
@@ -59,6 +60,7 @@ class TimerState {
     this.isRunning = false,
     this.isPaused = false,
     this.sessionElapsedMs = 0,
+    this.lastSyncedSessionElapsedMs = 0,
     this.todayTotalMs = 0,
     this.sessionRestMs = 0,
     this.todayRestMs = 0,
@@ -85,6 +87,7 @@ class TimerState {
     bool? isRunning,
     bool? isPaused,
     int? sessionElapsedMs,
+    int? lastSyncedSessionElapsedMs,
     int? todayTotalMs,
     int? sessionRestMs,
     int? todayRestMs,
@@ -110,6 +113,7 @@ class TimerState {
       isRunning: isRunning ?? this.isRunning,
       isPaused: isPaused ?? this.isPaused,
       sessionElapsedMs: sessionElapsedMs ?? this.sessionElapsedMs,
+      lastSyncedSessionElapsedMs: lastSyncedSessionElapsedMs ?? this.lastSyncedSessionElapsedMs,
       todayTotalMs: todayTotalMs ?? this.todayTotalMs,
       sessionRestMs: sessionRestMs ?? this.sessionRestMs,
       todayRestMs: todayRestMs ?? this.todayRestMs,
@@ -216,7 +220,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   void selectSubject(SubjectModel subject) {
     if (state.isRunning) return;
-    state = state.copyWith(currentSubject: subject);
+    state = state.copyWith(
+      currentSubject: subject,
+      sessionElapsedMs: 0,
+      lastSyncedSessionElapsedMs: 0,
+    );
   }
 
   void setTimerMode(TimerMode mode) {
@@ -225,6 +233,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       mode: mode,
       isPaused: false,
       sessionElapsedMs: 0,
+      lastSyncedSessionElapsedMs: 0,
       pomodoroRemainingMs: state.pomodoroFocusMinutes * 60 * 1000,
       pomodoroPhase: PomodoroPhase.focus,
     );
@@ -376,6 +385,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           isRunning: state.autoStartBreaks,
           isPaused: !state.autoStartBreaks,
           sessionElapsedMs: 0,
+          lastSyncedSessionElapsedMs: 0,
           sessionStartAt: null,
           restStartAt: now,
           sessionRestMs: 0,
@@ -388,6 +398,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           isRunning: state.autoStartBreaks,
           isPaused: !state.autoStartBreaks,
           sessionElapsedMs: 0,
+          lastSyncedSessionElapsedMs: 0,
           sessionStartAt: null,
           restStartAt: now,
           sessionRestMs: 0,
@@ -422,6 +433,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
         isRunning: state.autoStartFocus,
         isPaused: !state.autoStartFocus,
         sessionElapsedMs: 0,
+        lastSyncedSessionElapsedMs: 0,
         sessionStartAt: state.autoStartFocus ? now : null,
         restStartAt: null,
         sessionRestMs: 0,
@@ -434,7 +446,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   }
 
   Future<void> _syncCompletedFocusSession() async {
-    final elapsed = state.sessionElapsedMs;
+    final elapsed = state.sessionElapsedMs - state.lastSyncedSessionElapsedMs;
     final currentSub = state.currentSubject;
 
     if (currentSub != null && elapsed > 0) {
@@ -461,11 +473,13 @@ class TimerNotifier extends StateNotifier<TimerState> {
           }).toList();
 
           state = state.copyWith(
+            lastSyncedSessionElapsedMs: state.sessionElapsedMs,
             subjects: updatedSubjects,
             todayTotalMs: serverTotalMs > 0 ? serverTotalMs : state.todayTotalMs,
             currentSubject: currentSub.copyWith(studyMs: currentSub.studyMs + elapsed),
           );
         } else {
+          state = state.copyWith(lastSyncedSessionElapsedMs: state.sessionElapsedMs);
           await _offlineSyncRepository?.enqueueSession(
             subjectId: currentSub.id,
             subjectTitle: currentSub.title,
@@ -475,6 +489,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           );
         }
       } catch (_) {
+        state = state.copyWith(lastSyncedSessionElapsedMs: state.sessionElapsedMs);
         await _offlineSyncRepository?.enqueueSession(
           subjectId: currentSub.id,
           subjectTitle: currentSub.title,
@@ -497,7 +512,6 @@ class TimerNotifier extends StateNotifier<TimerState> {
     state = state.copyWith(
       isRunning: false,
       isPaused: true,
-      sessionElapsedMs: 0,
       sessionStartAt: null,
       restStartAt: now,
       sessionRestMs: 0,
@@ -530,6 +544,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       isRunning: false,
       isPaused: false,
       sessionElapsedMs: 0,
+      lastSyncedSessionElapsedMs: 0,
       sessionRestMs: 0,
       sessionStartAt: null,
       restStartAt: null,

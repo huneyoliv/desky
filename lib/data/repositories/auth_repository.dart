@@ -101,6 +101,7 @@ class AuthRepository {
     try {
       final splashData = await splashLogin(language: language);
       if (splashData != null) {
+        if (splashData['p'] != null) data['p'] = splashData['p'];
         if (splashData['gs'] != null) data['gs'] = splashData['gs'];
         if (splashData['scs'] != null) data['scs'] = splashData['scs'];
         if (splashData['fl'] != null) data['fl'] = splashData['fl'];
@@ -115,7 +116,19 @@ class AuthRepository {
     } catch (_) {}
 
     await _cacheUserData(data, token);
-    return UserModel.fromJson(data, token);
+    var user = UserModel.fromJson(data, token);
+    if (user.studiconId <= 0 && user.id > 0) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
+            prefs.getInt(keyUserEquippedStudiconId);
+        if (savedSd != null && savedSd > 0) {
+          user = user.copyWith(studiconId: savedSd);
+          await cacheUser(user);
+        }
+      } catch (_) {}
+    }
+    return user;
   }
 
   Future<bool> checkUsernameExists(String username) async {
@@ -197,6 +210,7 @@ class AuthRepository {
         if (splashData['n'] != null && (splashData['n'] as String).trim().isNotEmpty) {
           data['n'] = splashData['n'];
         }
+        if (splashData['p'] != null) data['p'] = splashData['p'];
         if (splashData['gs'] != null) data['gs'] = splashData['gs'];
         if (splashData['scs'] != null) data['scs'] = splashData['scs'];
         if (splashData['fl'] != null) data['fl'] = splashData['fl'];
@@ -223,6 +237,17 @@ class AuthRepository {
     if (user.name.trim().isEmpty && name.trim().isNotEmpty) {
       user = user.copyWith(name: name.trim());
       await cacheUser(user);
+    }
+    if (user.studiconId <= 0 && user.id > 0) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
+            prefs.getInt(keyUserEquippedStudiconId);
+        if (savedSd != null && savedSd > 0) {
+          user = user.copyWith(studiconId: savedSd);
+          await cacheUser(user);
+        }
+      } catch (_) {}
     }
     return user;
   }
@@ -376,7 +401,19 @@ class AuthRepository {
     }
 
     await _cacheUserData(splashData, cleanToken);
-    return UserModel.fromJson(splashData, cleanToken);
+    var user = UserModel.fromJson(splashData, cleanToken);
+    if (user.studiconId <= 0 && user.id > 0) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
+            prefs.getInt(keyUserEquippedStudiconId);
+        if (savedSd != null && savedSd > 0) {
+          user = user.copyWith(studiconId: savedSd);
+          await cacheUser(user);
+        }
+      } catch (_) {}
+    }
+    return user;
   }
 
   Future<Map<String, dynamic>?> splashLogin({
@@ -708,6 +745,9 @@ class AuthRepository {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(keyCachedUser, jsonEncode(user.toJson()));
       await prefs.setInt(keyUserEquippedStudiconId, user.studiconId);
+      if (user.id > 0) {
+        await prefs.setInt('${keyUserEquippedStudiconId}_${user.id}', user.studiconId);
+      }
     } catch (_) {}
   }
 
@@ -741,8 +781,12 @@ class AuthRepository {
         final decoded = jsonDecode(userStr);
         if (decoded is Map<String, dynamic>) {
           user = UserModel.fromJson(decoded, token);
-          if (savedEquippedStudiconId != null) {
-            user = user.copyWith(studiconId: savedEquippedStudiconId);
+          final userSavedSd = user.id > 0
+              ? prefs.getInt('${keyUserEquippedStudiconId}_${user.id}')
+              : null;
+          final effectiveSaved = userSavedSd ?? savedEquippedStudiconId;
+          if (effectiveSaved != null && effectiveSaved > 0) {
+            user = user.copyWith(studiconId: effectiveSaved);
           }
         }
       }
@@ -761,11 +805,14 @@ class AuthRepository {
         }
 
         final p = splashData['p'] is Map ? splashData['p'] as Map<String, dynamic> : null;
-        final rawStudiconId = p?['sd'] ?? p?['ssd'] ?? p?['csd'] ?? splashData['sd'] ?? splashData['ssd'] ?? splashData['csd'] ?? splashData['studiconId'];
-        final serverSd = rawStudiconId != null ? safeInt(rawStudiconId) : null;
-        final resolvedStudiconId = (serverSd != null && serverSd > 0)
+        final serverSd = UserModel.extractStudiconId(p, splashData);
+        final prefs = await SharedPreferences.getInstance();
+        final userSavedSd = (user != null && user.id > 0)
+            ? prefs.getInt('${keyUserEquippedStudiconId}_${user.id}')
+            : null;
+        final resolvedStudiconId = (serverSd > 0)
             ? serverSd
-            : (savedEquippedStudiconId ?? (user?.studiconId ?? -1));
+            : (userSavedSd ?? savedEquippedStudiconId ?? (user?.studiconId ?? -1));
 
         List<int>? resolvedOwnedIds;
         final rawScs = splashData['scs'];
@@ -808,12 +855,10 @@ class AuthRepository {
           int? serverReloadSd;
           String? updatedStm;
           if (p is Map) {
-            final rawSd = p['sd'] ?? p['ssd'] ?? p['csd'];
-            if (rawSd != null) {
-              final val = safeInt(rawSd);
-              if (val > 0) {
-                serverReloadSd = val;
-              }
+            final pMap = p is Map<String, dynamic> ? p : Map<String, dynamic>.from(p);
+            final extSd = UserModel.extractStudiconId(pMap, data);
+            if (extSd > 0) {
+              serverReloadSd = extSd;
             }
             updatedStm = (p['stm'] ?? user.statusMessage).toString();
           }
@@ -828,7 +873,12 @@ class AuthRepository {
             }
           }
 
-          final finalStudiconId = serverReloadSd ?? (user.studiconId > 0 ? user.studiconId : (savedEquippedStudiconId ?? user.studiconId));
+          final prefs = await SharedPreferences.getInstance();
+          final userSavedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}');
+          final finalStudiconId = serverReloadSd ??
+              (user.studiconId > 0
+                  ? user.studiconId
+                  : (userSavedSd ?? savedEquippedStudiconId ?? user.studiconId));
 
           user = user.copyWith(
             statusMessage: updatedStm ?? user.statusMessage,

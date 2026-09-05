@@ -34,13 +34,30 @@ class UserModel {
   int get avatarStudiconId => studiconId;
   bool get hasCustomAvatar => profilePhotoUrl != null && profilePhotoUrl!.isNotEmpty;
 
+  static int extractStudiconId(Map<String, dynamic>? p, [Map<String, dynamic>? root]) {
+    final candidates = [
+      p?['sd'],
+      p?['csd'],
+      p?['ssd'],
+      p?['studiconId'],
+      root?['sd'],
+      root?['csd'],
+      root?['ssd'],
+      root?['studiconId'],
+    ];
+    for (final c in candidates) {
+      if (c != null) {
+        final val = safeInt(c);
+        if (val > 0) return val;
+      }
+    }
+    return -1;
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> json, String token) {
     final p = json['p'] is Map<String, dynamic> ? json['p'] as Map<String, dynamic> : null;
     final userId = safeInt(json['id'] ?? json['ud'] ?? json['userId']);
-    final rawStudiconId = p?['sd'] ?? p?['ssd'] ?? p?['csd'] ?? json['sd'] ?? json['ssd'] ?? json['csd'] ?? json['studiconId'];
-    final int studiconId = (rawStudiconId != null && safeInt(rawStudiconId) > 0)
-        ? safeInt(rawStudiconId)
-        : -1;
+    final int studiconId = extractStudiconId(p, json);
     final hasCustomAvatar = safeBool(json['hasCustomAvatar']);
 
     final groupsRaw = json['gs'] ?? json['groups'] ?? json['userGroups'];

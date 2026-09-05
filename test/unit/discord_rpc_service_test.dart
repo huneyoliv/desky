@@ -52,16 +52,17 @@ void main() {
         translation: translation,
       );
 
-      expect(payload.details, 'Estudando: Matemática');
-      expect(payload.state, isNull);
+      expect(payload, isNotNull);
+      expect(payload!.details, 'Matemática');
+      expect(payload.state, 'Estudando');
       expect(payload.smallImage, contains('assets/icons/icon.png'));
       expect(payload.smallText, 'Desky');
       expect(payload.largeImage, contains('/sc.v2/1/sweat1.png'));
       expect(payload.largeText, contains('01h 00m'));
-      expect(payload.startTime, sessionStart);
+      expect(payload.startTime, isNotNull);
     });
 
-    test('buildPayload localizes Studying details for other languages', () {
+    test('buildPayload localizes Studying state for other languages', () {
       final sessionStart = DateTime(2026, 9, 4, 8, 0, 0);
       final timerState = TimerState(
         isRunning: true,
@@ -75,7 +76,9 @@ void main() {
         user: mockUser,
         translation: const AppTranslation(languageCode: 'en'),
       );
-      expect(payloadEn.details, 'Studying: Matemática');
+      expect(payloadEn, isNotNull);
+      expect(payloadEn!.details, 'Matemática');
+      expect(payloadEn.state, 'Studying');
 
       // Spanish
       final payloadEs = DiscordRpcService.buildPayload(
@@ -83,7 +86,9 @@ void main() {
         user: mockUser,
         translation: const AppTranslation(languageCode: 'es'),
       );
-      expect(payloadEs.details, 'Estudiando: Matemática');
+      expect(payloadEs, isNotNull);
+      expect(payloadEs!.details, 'Matemática');
+      expect(payloadEs.state, 'Estudiando');
 
       // Korean
       final payloadKo = DiscordRpcService.buildPayload(
@@ -91,7 +96,9 @@ void main() {
         user: mockUser,
         translation: const AppTranslation(languageCode: 'ko'),
       );
-      expect(payloadKo.details, '공부 중: Matemática');
+      expect(payloadKo, isNotNull);
+      expect(payloadKo!.details, 'Matemática');
+      expect(payloadKo.state, '공부 중');
 
       // Japanese
       final payloadJa = DiscordRpcService.buildPayload(
@@ -99,7 +106,9 @@ void main() {
         user: mockUser,
         translation: const AppTranslation(languageCode: 'ja'),
       );
-      expect(payloadJa.details, '勉強中: Matemática');
+      expect(payloadJa, isNotNull);
+      expect(payloadJa!.details, 'Matemática');
+      expect(payloadJa.state, '勉強中');
 
       // Simplified Chinese
       final payloadZh = DiscordRpcService.buildPayload(
@@ -107,7 +116,9 @@ void main() {
         user: mockUser,
         translation: const AppTranslation(languageCode: 'zh-cn'),
       );
-      expect(payloadZh.details, '学习中: Matemática');
+      expect(payloadZh, isNotNull);
+      expect(payloadZh!.details, 'Matemática');
+      expect(payloadZh.state, '学习中');
     });
 
     test('buildPayload alters large image according to elapsed time poses', () {
@@ -119,7 +130,8 @@ void main() {
         user: mockUser,
         translation: translation,
       );
-      expect(pNormal.largeImage, contains('/sc.v2/1/normal1.png'));
+      expect(pNormal, isNotNull);
+      expect(pNormal!.largeImage, contains('/sc.v2/1/normal1.png'));
 
       // >= 2h -> sweat2
       final pSweat2 = DiscordRpcService.buildPayload(
@@ -127,7 +139,8 @@ void main() {
         user: mockUser,
         translation: translation,
       );
-      expect(pSweat2.largeImage, contains('/sc.v2/1/sweat2.png'));
+      expect(pSweat2, isNotNull);
+      expect(pSweat2!.largeImage, contains('/sc.v2/1/sweat2.png'));
 
       // >= 4h -> smoke1
       final pSmoke1 = DiscordRpcService.buildPayload(
@@ -135,7 +148,8 @@ void main() {
         user: mockUser,
         translation: translation,
       );
-      expect(pSmoke1.largeImage, contains('/sc.v2/1/smoke1.png'));
+      expect(pSmoke1, isNotNull);
+      expect(pSmoke1!.largeImage, contains('/sc.v2/1/smoke1.png'));
 
       // >= 8h -> fire1
       final pFire1 = DiscordRpcService.buildPayload(
@@ -143,7 +157,8 @@ void main() {
         user: mockUser,
         translation: translation,
       );
-      expect(pFire1.largeImage, contains('/sc.v2/1/fire1.png'));
+      expect(pFire1, isNotNull);
+      expect(pFire1!.largeImage, contains('/sc.v2/1/fire1.png'));
 
       // >= 10h -> explosion1
       final pExplosion1 = DiscordRpcService.buildPayload(
@@ -151,7 +166,8 @@ void main() {
         user: mockUser,
         translation: translation,
       );
-      expect(pExplosion1.largeImage, contains('/sc.v2/1/explosion1.png'));
+      expect(pExplosion1, isNotNull);
+      expect(pExplosion1!.largeImage, contains('/sc.v2/1/explosion1.png'));
     });
 
     test('buildPayload returns correct Paused and Idle states', () {
@@ -167,7 +183,9 @@ void main() {
         user: mockUser,
         translation: translation,
       );
-      expect(pPaused.details, 'Em pausa: Matemática');
+      expect(pPaused, isNotNull);
+      expect(pPaused!.details, 'Matemática');
+      expect(pPaused.state, 'Em pausa');
       expect(pPaused.startTime, isNull);
       expect(pPaused.largeImage, contains('/sc.v2/1/smoke1.png'));
 
@@ -177,9 +195,7 @@ void main() {
         user: mockUser,
         translation: translation,
       );
-      expect(pIdle.details, 'No Desky');
-      expect(pIdle.startTime, isNull);
-      expect(pIdle.largeImage, contains('/sc.v2/1/normal1.png'));
+      expect(pIdle, isNull);
     });
   });
 

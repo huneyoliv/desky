@@ -51,8 +51,19 @@ class DiscordRpcCoordinator {
       return;
     }
 
+    final authState = _ref.read(authStateProvider);
+    final user = authState.user;
+    if (!authState.isAuthenticated || user == null) {
+      _rpcService.clearPresence();
+      return;
+    }
+
     final timerState = _ref.read(timerNotifierProvider);
-    final user = _ref.read(authStateProvider).user;
+    if (!timerState.isRunning && !timerState.isPaused) {
+      _rpcService.clearPresence();
+      return;
+    }
+
     final translation = _ref.read(appTranslationProvider);
 
     final payload = DiscordRpcService.buildPayload(
@@ -60,6 +71,11 @@ class DiscordRpcCoordinator {
       user: user,
       translation: translation,
     );
+
+    if (payload == null) {
+      _rpcService.clearPresence();
+      return;
+    }
 
     _rpcService.updatePresence(payload);
   }

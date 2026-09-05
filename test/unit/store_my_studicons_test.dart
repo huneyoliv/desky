@@ -1,4 +1,4 @@
-﻿import 'package:desky/core/cdn/cdn_resolver.dart';
+import 'package:desky/core/cdn/cdn_resolver.dart';
 import 'package:desky/data/models/user_model.dart';
 import 'package:desky/data/repositories/store_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -61,6 +61,24 @@ void main() {
       expect(user.studiconId, equals(354));
       expect(user.ownedStudiconIds, contains(354));
       expect(user.ownedStudiconIds, contains(100));
+    });
+
+    test('UserModel.fromJson parses csd correctly when ssd is -1 (real YPT paid avatar payload)', () {
+      final json = {
+        'id': 3928648,
+        'n': 'Huney',
+        'e': 'huney@test.com',
+        'p': {
+          'csd': 369,
+          'ssd': -1,
+          'stm': 'Stu(dying) ',
+        },
+        'scs': [369],
+      };
+
+      final user = UserModel.fromJson(json, 'test-jwt');
+      expect(user.studiconId, equals(369));
+      expect(user.ownedStudiconIds, contains(369));
     });
   });
 }

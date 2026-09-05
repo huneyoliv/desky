@@ -98,7 +98,7 @@ void main() {
       expect(notifier.state.isRunning, isFalse);
       expect(notifier.state.isPaused, isTrue);
       expect(notifier.state.restStartAt, isNotNull);
-      expect(notifier.state.sessionElapsedMs, equals(0));
+      expect(notifier.state.sessionElapsedMs, equals(12000));
       expect(timerRepo.stopStudyCalled, isTrue);
       expect(timerRepo.lastStudyMs, equals(12000));
     });

@@ -54,13 +54,15 @@ void main() {
         translation: translation,
       );
 
-      expect(payload.details, contains('Matemática'));
-      expect(payload.startTime, equals(startTime));
+      expect(payload, isNotNull);
+      expect(payload!.details, contains('Matemática'));
+      expect(payload.state, equals('Estudando'));
+      expect(payload.startTime, isNotNull);
       expect(payload.buttonLabel, equals('Desky'));
       expect(payload.buttonUrl, equals('https://desky.app'));
     });
 
-    test('buildPayload creates paused payload without startTime', () {
+    test('buildPayload creates paused payload with state Em pausa and without startTime', () {
       const translation = AppTranslation(languageCode: 'pt');
       const subject = SubjectModel(id: 2, title: 'Física', colorInt: 0xFF10B981, order: 1);
       final timerState = TimerState(
@@ -76,11 +78,13 @@ void main() {
         translation: translation,
       );
 
-      expect(payload.details, contains('Física'));
+      expect(payload, isNotNull);
+      expect(payload!.details, contains('Física'));
+      expect(payload.state, equals('Em pausa'));
       expect(payload.startTime, isNull);
     });
 
-    test('buildPayload creates idle payload when timer is not running', () {
+    test('buildPayload returns null when timer is not studying (idle)', () {
       const translation = AppTranslation(languageCode: 'pt');
       final timerState = TimerState();
 
@@ -90,8 +94,7 @@ void main() {
         translation: translation,
       );
 
-      expect(payload.details, equals('No Desky'));
-      expect(payload.startTime, isNull);
+      expect(payload, isNull);
     });
   });
 

@@ -319,7 +319,7 @@ class DiscordRpcService {
     return '${hours.toString().padLeft(2, '0')}h ${minutes.toString().padLeft(2, '0')}m';
   }
 
-  static DiscordPresencePayload buildPayload({
+  static DiscordPresencePayload? buildPayload({
     required TimerState timerState,
     required UserModel? user,
     required AppTranslation translation,
@@ -327,6 +327,11 @@ class DiscordRpcService {
     final isRunning = timerState.isRunning;
     final isPaused = timerState.isPaused;
     final isStudying = isRunning || isPaused;
+
+    if (!isStudying) {
+      return null;
+    }
+
     final studyMs = timerState.todayTotalMs;
     final studiconId = user?.studiconId ?? (timerState.studiconId > 0 ? timerState.studiconId : -1);
     final hasCustomAvatar = user?.hasCustomAvatar ?? false;
@@ -348,30 +353,33 @@ class DiscordRpcService {
     final largeImageTooltip = '$totalTimeLabel: $totalTimeFormatted';
 
     String detailsText;
+    String? stateText;
     DateTime? startTime;
 
     if (isRunning) {
       final studyingLabel = translation.tr('discord_studying', fallback: 'Estudando');
       final subjectTitle = timerState.currentSubject?.title;
       detailsText = subjectTitle != null && subjectTitle.isNotEmpty
-          ? '$studyingLabel: $subjectTitle'
+          ? subjectTitle
           : studyingLabel;
-      startTime = timerState.sessionStartAt ?? DateTime.now();
+      stateText = studyingLabel;
+      final elapsedMs = timerState.sessionElapsedMs;
+      startTime = DateTime.now().subtract(Duration(milliseconds: elapsedMs));
     } else if (isPaused) {
       final pausedLabel = translation.tr('discord_paused', fallback: 'Em pausa');
       final subjectTitle = timerState.currentSubject?.title;
       detailsText = subjectTitle != null && subjectTitle.isNotEmpty
-          ? '$pausedLabel: $subjectTitle'
+          ? subjectTitle
           : pausedLabel;
+      stateText = pausedLabel;
       startTime = null;
     } else {
-      detailsText = translation.tr('discord_idle', fallback: 'No Desky');
-      startTime = null;
+      return null;
     }
 
     return DiscordPresencePayload(
       details: detailsText,
-      state: null,
+      state: stateText,
       largeImage: avatarUrl,
       largeText: largeImageTooltip,
       smallImage: AppConstants.deskyIconUrl,
@@ -499,7 +507,7 @@ class DiscordRpcService {
 
       if (payload.startTime != null) {
         activity['timestamps'] = {
-          'start': (payload.startTime!.millisecondsSinceEpoch / 1000).round(),
+          'start': payload.startTime!.millisecondsSinceEpoch,
         };
       }
 
