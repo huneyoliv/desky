@@ -103,7 +103,7 @@ class _DiscordPacket {
 
 abstract class _DiscordIpcConnection {
   Future<bool> writePacket(int opcode, String jsonString);
-  Future<_DiscordPacket?> readPacket({Duration timeout});
+  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(seconds: 3)});
   void close();
 }
 
@@ -138,18 +138,18 @@ class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
   }
 
   @override
-  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(milliseconds: 150)}) async {
+  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(seconds: 3)}) async {
     if (_readFile == null || _peekNamedPipe == null || handle == 0 || handle == -1) return null;
-    final stopwatch = Stopwatch()..start();
+    final headerStopwatch = Stopwatch()..start();
     final pTotalAvail = calloc<Uint32>();
 
     try {
-      while (stopwatch.elapsed < timeout) {
+      while (headerStopwatch.elapsed < timeout) {
         final peekRes = _peekNamedPipe!(handle, nullptr, 0, nullptr, pTotalAvail, nullptr);
         if (peekRes != 0 && pTotalAvail.value >= 8) {
           break;
         }
-        await Future.delayed(const Duration(milliseconds: 15));
+        await Future.delayed(const Duration(milliseconds: 20));
       }
 
       if (pTotalAvail.value < 8) return null;
@@ -165,11 +165,14 @@ class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
 
         if (length == 0) return _DiscordPacket(opcode, '');
 
-        while (stopwatch.elapsed < timeout) {
+        final bodyStopwatch = Stopwatch()..start();
+        while (bodyStopwatch.elapsed < timeout) {
           _peekNamedPipe!(handle, nullptr, 0, nullptr, pTotalAvail, nullptr);
           if (pTotalAvail.value >= length) break;
-          await Future.delayed(const Duration(milliseconds: 15));
+          await Future.delayed(const Duration(milliseconds: 20));
         }
+
+        if (pTotalAvail.value < length) return null;
 
         final bodyBuffer = calloc<Uint8>(length);
         try {
@@ -223,7 +226,7 @@ class _UnixSocketConnection implements _DiscordIpcConnection {
   }
 
   @override
-  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(milliseconds: 150)}) async {
+  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(seconds: 3)}) async {
     try {
       final data = await socket.first.timeout(timeout);
       if (data.length < 8) return null;
@@ -303,6 +306,8 @@ class DiscordRpcService {
   bool _connected = false;
   DiscordPresencePayload? _lastPayload;
   int _nonceCounter = 0;
+
+  bool get isConnected => _connected;
 
   DiscordRpcService({String? clientId})
       : _clientId = clientId ?? EnvConfig.discordClientId;
@@ -439,7 +444,7 @@ class DiscordRpcService {
         });
         final ok = await _connection!.writePacket(0, handshakePayload);
         if (ok) {
-          final resp = await _connection!.readPacket();
+          final resp = await _connection!.readPacket(timeout: const Duration(seconds: 5));
           if (resp != null && resp.opcode == 1) {
             _connected = true;
           } else {
