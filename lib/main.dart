@@ -33,7 +33,7 @@ void main() async {
     size: Size(1280, 800),
     minimumSize: Size(1024, 700),
     center: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.background,
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
     title: 'Desky - Focus & Study Timer',

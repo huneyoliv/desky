@@ -9,6 +9,7 @@ import '../../core/oauth/social_signup_exception.dart';
 import '../../core/utils/json_utils.dart';
 import '../models/user_model.dart';
 import '../models/group_model.dart';
+import 'subject_repository.dart';
 
 class AuthRepository {
   final ApiClient _apiClient;
@@ -97,6 +98,7 @@ class AuthRepository {
     }
 
     await _saveToken(token);
+    await SubjectRepository.saveSubjectsFromRawData(data);
 
     try {
       final splashData = await splashLogin(language: language);
@@ -203,6 +205,7 @@ class AuthRepository {
     }
 
     await _saveToken(token);
+    await SubjectRepository.saveSubjectsFromRawData(data);
 
     try {
       final splashData = await splashLogin(language: language);
@@ -400,6 +403,7 @@ class AuthRepository {
       throw const ApiException('Sessão inválida ou expirada no servidor.');
     }
 
+    await SubjectRepository.saveSubjectsFromRawData(splashData);
     await _cacheUserData(splashData, cleanToken);
     var user = UserModel.fromJson(splashData, cleanToken);
     if (user.studiconId <= 0 && user.id > 0) {
@@ -534,6 +538,7 @@ class AuthRepository {
     final token = (data['jwt'] ?? '').toString();
     if (token.isNotEmpty) {
       await _saveToken(token);
+      await SubjectRepository.saveSubjectsFromRawData(data);
       await _cacheUserData(data, token);
     }
     return UserModel.fromJson(data, token);
@@ -656,6 +661,7 @@ class AuthRepository {
     }
 
     await _saveToken(token);
+    await SubjectRepository.saveSubjectsFromRawData(data);
 
     final chosenNickname = nickname.trim();
     if (chosenNickname.isNotEmpty) {

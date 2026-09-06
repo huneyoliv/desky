@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/subject_model.dart';
@@ -30,6 +31,7 @@ void main() {
     late SubjectRepository repository;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       mockApiClient = MockApiClient();
       repository = SubjectRepository(apiClient: mockApiClient);
     });
@@ -144,6 +146,46 @@ void main() {
       mockApiClient.postResponse = {'s': true};
       final success = await repository.reorderSubjects([101, 102, 103]);
       expect(success, isTrue);
+    });
+
+    test('cacheSubjects and getCachedSubjects persist and retrieve subjects', () async {
+      const list = [
+        SubjectModel(id: 301, title: 'Direito Constitucional', colorInt: 4284513675),
+        SubjectModel(id: 302, title: 'Direito Administrativo', colorInt: 4292557552),
+      ];
+      await repository.cacheSubjects(list);
+      final retrieved = await repository.getCachedSubjects();
+      expect(retrieved.length, equals(2));
+      expect(retrieved[0].title, equals('Direito Constitucional'));
+      expect(retrieved[1].title, equals('Direito Administrativo'));
+    });
+
+    test('saveSubjectsFromRawData extracts subjects from login response and caches them', () async {
+      final loginResponse = {
+        's': true,
+        'jwt': 'sample.jwt.token',
+        'ss': [
+          {'id': 401, 'tt': 'Biologia Molecular', 'co': 4284513675, 'dl': false},
+          {'id': 402, 'tt': 'Genética', 'co': 4292557552, 'dl': false},
+        ],
+      };
+      await SubjectRepository.saveSubjectsFromRawData(loginResponse);
+      final cached = await repository.getCachedSubjects();
+      expect(cached.length, equals(2));
+      expect(cached[0].title, equals('Biologia Molecular'));
+      expect(cached[1].title, equals('Genética'));
+    });
+
+    test('fetchSubjectsData falls back to cached subjects when API returns empty list', () async {
+      const cachedList = [
+        SubjectModel(id: 501, title: 'Cálculo I', colorInt: 4284513675),
+      ];
+      await repository.cacheSubjects(cachedList);
+
+      mockApiClient.postResponse = {'s': true, 'ss': []};
+      final result = await repository.fetchSubjectsData();
+      expect(result.subjects.length, equals(1));
+      expect(result.subjects.first.title, equals('Cálculo I'));
     });
   });
 }

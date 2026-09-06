@@ -192,8 +192,12 @@ class TimerNotifier extends StateNotifier<TimerState> {
     try {
       final result = await _subjectRepository.fetchSubjectsData();
       if (!mounted) return;
-      final subjects = result.subjects;
-      final current = subjects.isNotEmpty ? subjects.first : null;
+      final subjects = result.subjects.isNotEmpty ? result.subjects : state.subjects;
+      final current = subjects.isNotEmpty
+          ? (state.currentSubject != null && subjects.any((s) => s.id == state.currentSubject!.id)
+              ? subjects.firstWhere((s) => s.id == state.currentSubject!.id)
+              : subjects.first)
+          : null;
 
       state = state.copyWith(
         subjects: subjects,
@@ -542,7 +546,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     }
 
     if (state.isRunning ||
-        state.sessionStartAt != null ||
+        (state.sessionStartAt != null && !state.isPaused) ||
         (state.sessionElapsedMs - state.lastSyncedSessionElapsedMs) > 0) {
       await _syncCompletedFocusSession();
     }
