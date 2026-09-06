@@ -73,6 +73,17 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.5-beta] - 2026-09-06
+
+### Fixed
+- **macOS Graphics Glitches & Black Screen**: Disabled Flutter Impeller rendering backend on macOS via `FLTEnableImpeller = false` in `macos/Runner/Info.plist`, preventing GPU Metal framebuffer corruption, blank screens, and diagonal artifacts on macOS Monterey and older Intel/Apple Silicon GPUs.
+- **Desktop Window Background Solidification**: Changed desktop `windowOptions.backgroundColor` from transparent to solid dark `AppColors.background`, eliminating window server compositor flicker and blank screens on startup.
+- **Historical Subject Sync (YPT Delta Sync & sbu nullification)**: Fixed subject synchronization in `SubjectRepository.fetchSubjectsData()` to query `/user/v2/reload/info` with `sbu: null` in the `cd` (cache dates) payload, ensuring the full historical subjects catalogue is returned rather than only today's modified subjects.
+- **Immediate Post-Login Subject Caching**: Updated `AuthRepository` to immediately extract and persist `data['ss']` returned by the social login endpoint (`/user/social/sign-up-jwt`) and email login into `SharedPreferences`, ensuring subjects appear instantly post-login.
+- **Resilient Offline Subject Fallback**: Added persistent caching of subjects in `SharedPreferences`, ensuring subjects are never cleared if the network request fails or returns an empty list.
+- **macOS Keychain Entitlement**: Added `keychain-access-groups` to `Release.entitlements` and `DebugProfile.entitlements` to guarantee secure token storage via `flutter_secure_storage` under macOS App Sandbox.
+- **Static Analysis Exclusions**: Added `openypt/**` to `analysis_options.yaml` exclude list to prevent analyzer hangs on decompiled mobile sources.
+
 ## [1.0.4-beta] - 2026-09-05
 
 ### Fixed
