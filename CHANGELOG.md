@@ -73,6 +73,11 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.6-beta] - 2026-09-06
+
+### Fixed
+- **macOS Ad-hoc Codesign SIGKILL Crash**: Removed restricted `keychain-access-groups` entitlement from `Release.entitlements` and `DebugProfile.entitlements`. This entitlement required an Apple Developer Program provisioning profile; under CI/CD ad-hoc code signing (`codesign -s -`), macOS kernel AMFI killed the application on launch with `EXC_CRASH (SIGKILL (Code Signature Invalid))` / `Termination Reason: CODESIGNING 1`. `flutter_secure_storage` safely operates in its isolated App Sandbox keychain without this entitlement.
+
 ## [1.0.5-beta] - 2026-09-06
 
 ### Fixed
