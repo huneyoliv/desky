@@ -73,6 +73,18 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.4-beta] - 2026-09-05
+
+### Fixed
+- **macOS App Sandbox Entitlements**: Added `com.apple.security.network.client`, `com.apple.security.network.server`, `com.apple.security.files.user-selected.read-write`, and `com.apple.security.files.downloads.read-write` to `Release.entitlements` and `DebugProfile.entitlements`, fixing the `SocketException: Operation not permitted (errno = 1)` during Google OAuth login and ensuring PDF/file access.
+- **Window Controls Duplication (macOS & Linux)**:
+  - Hidden custom titlebar buttons (minimize, maximize, close) on macOS, honoring native window traffic light buttons at the top left.
+  - Disabled `GtkHeaderBar` in `linux/runner/my_application.cc` (`use_header_bar = FALSE`), eliminating double title bars and button duplication on Linux GNOME desktop.
+- **Study Session Exit & Cleanup**:
+  - Guaranteed that active, paused, or unsynced study sessions are gracefully ended and synced via `TimerNotifier.stopStudy()` before app shutdown.
+  - Added POSIX signal handlers (`SIGTERM` and `SIGINT`) on macOS and Linux to ensure clean termination with `exit(0)`.
+- **Internationalization (i18n)**: Added comprehensive multi-language translations (11 languages: pt, en, es, ko, ja, zh-cn, zh-tw, fr, de, it, ru) for all OAuth errors, socket errors, and window control tooltips.
+
 ## [1.0.3] - 2026-09-04
 
 ### Fixed
