@@ -46,12 +46,7 @@ class ApiConstants {
   static const String defaultLanguage = 'pt';
   static const String defaultTimezone = 'America/Sao_Paulo';
 
-  static String get defaultDeviceModel {
-    if (Platform.isWindows) return 'Windows Desktop';
-    if (Platform.isMacOS) return 'macOS Desktop';
-    if (Platform.isLinux) return 'Linux Desktop';
-    return 'Desktop';
-  }
+  static const String defaultDeviceModel = 'Desktop';
 
   static String get defaultDeviceType {
     if (Platform.isWindows) return 'WIN';

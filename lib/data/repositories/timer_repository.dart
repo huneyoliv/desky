@@ -57,7 +57,7 @@ class TimerRepository {
     required DateTime startAt,
     required DateTime stopAt,
     required int restMs,
-    String deviceModel = 'Desktop',
+    String deviceModel = ApiConstants.defaultDeviceModel,
   }) async {
     try {
       final response = await _apiClient.post(
@@ -66,7 +66,7 @@ class TimerRepository {
           'startedAt': startAt.millisecondsSinceEpoch,
           'stopAt': stopAt.millisecondsSinceEpoch,
           'rest_ms': restMs,
-          'deviceModel': deviceModel == 'Desktop' ? ApiConstants.defaultDeviceModel : deviceModel,
+          'deviceModel': deviceModel,
         },
       );
       final data = response.data;
@@ -82,7 +82,7 @@ class TimerRepository {
     required DateTime startAt,
     required DateTime stopAt,
     String language = ApiConstants.defaultLanguage,
-    String deviceModel = 'Desktop',
+    String deviceModel = ApiConstants.defaultDeviceModel,
   }) async {
     final studyMs = stopAt.difference(startAt).inMilliseconds;
     if (studyMs <= 0) {
@@ -97,7 +97,7 @@ class TimerRepository {
         'startedAt': startAt.millisecondsSinceEpoch,
         'stopAt': stopAt.millisecondsSinceEpoch,
         'study_ms': studyMs,
-        'deviceModel': deviceModel == 'Desktop' ? ApiConstants.defaultDeviceModel : deviceModel,
+        'deviceModel': deviceModel,
         'language': language,
       },
     );
