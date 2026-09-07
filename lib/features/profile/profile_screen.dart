@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
@@ -21,6 +22,26 @@ import 'widgets/delete_account_dialog.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
+
+  String _getPlatformDisplay() {
+    if (Platform.isWindows) {
+      return 'Desky Desktop (Windows x64)';
+    } else if (Platform.isMacOS) {
+      return 'Desky Desktop (macOS)';
+    } else if (Platform.isLinux) {
+      return 'Desky Desktop (Linux x64)';
+    }
+    return 'Desky Desktop (${Platform.operatingSystem})';
+  }
+
+  IconData _getPlatformIcon() {
+    if (Platform.isMacOS) {
+      return Icons.desktop_mac;
+    } else if (Platform.isWindows) {
+      return Icons.desktop_windows;
+    }
+    return Icons.computer;
+  }
 
   String _formatHours(int ms) {
     final mins = ms ~/ 60000;
@@ -512,9 +533,9 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     const Divider(color: AppColors.border, height: 1),
                     ListTile(
-                      leading: const Icon(Icons.computer, color: AppColors.primary),
+                      leading: Icon(_getPlatformIcon(), color: AppColors.primary),
                       title: Text(t.tr('platform', fallback: 'Plataforma'), style: const TextStyle(color: Colors.white)),
-                      subtitle: Text(t.tr('platform_value', fallback: 'Desky Desktop (Windows x64)'),
+                      subtitle: Text(_getPlatformDisplay(),
                           style: const TextStyle(color: AppColors.textSecondary)),
                     ),
                     const Divider(color: AppColors.border, height: 1),

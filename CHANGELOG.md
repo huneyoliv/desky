@@ -91,6 +91,7 @@ Before creating and pushing any release tag, the version string and build number
 - **Study Session Exit & Cleanup**:
   - Guaranteed that active, paused, or unsynced study sessions are gracefully ended and synced via `TimerNotifier.stopStudy()` before app shutdown.
   - Added POSIX signal handlers (`SIGTERM` and `SIGINT`) on macOS and Linux to ensure clean termination with `exit(0)`.
+- **Dynamic Platform & Device Detection**: Resolved dynamic OS detection for Windows, macOS, and Linux in profile settings and API payloads, eliminating hardcoded Windows desktop identifiers across different operating systems.
 - **Internationalization (i18n)**: Added comprehensive multi-language translations (11 languages: pt, en, es, ko, ja, zh-cn, zh-tw, fr, de, it, ru) for all OAuth errors, socket errors, and window control tooltips.
 
 ## [1.0.3] - 2026-09-04
