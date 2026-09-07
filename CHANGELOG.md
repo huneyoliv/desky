@@ -73,14 +73,10 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
-## [1.0.6-beta] - 2026-09-06
+## [1.0.6] - 2026-09-07
 
 ### Fixed
 - **macOS Ad-hoc Codesign SIGKILL Crash**: Removed restricted `keychain-access-groups` entitlement from `Release.entitlements` and `DebugProfile.entitlements`. This entitlement required an Apple Developer Program provisioning profile; under CI/CD ad-hoc code signing (`codesign -s -`), macOS kernel AMFI killed the application on launch with `EXC_CRASH (SIGKILL (Code Signature Invalid))` / `Termination Reason: CODESIGNING 1`. `flutter_secure_storage` safely operates in its isolated App Sandbox keychain without this entitlement.
-
-## [1.0.5-beta] - 2026-09-06
-
-### Fixed
 - **macOS Graphics Glitches & Black Screen**: Disabled Flutter Impeller rendering backend on macOS via `FLTEnableImpeller = false` in `macos/Runner/Info.plist`, preventing GPU Metal framebuffer corruption, blank screens, and diagonal artifacts on macOS Monterey and older Intel/Apple Silicon GPUs.
 - **Desktop Window Background Solidification**: Changed desktop `windowOptions.backgroundColor` from transparent to solid dark `AppColors.background`, eliminating window server compositor flicker and blank screens on startup.
 - **Historical Subject Sync (YPT Delta Sync & sbu nullification)**: Fixed subject synchronization in `SubjectRepository.fetchSubjectsData()` to query `/user/v2/reload/info` with `sbu: null` in the `cd` (cache dates) payload, ensuring the full historical subjects catalogue is returned rather than only today's modified subjects.
@@ -88,10 +84,6 @@ Before creating and pushing any release tag, the version string and build number
 - **Resilient Offline Subject Fallback**: Added persistent caching of subjects in `SharedPreferences`, ensuring subjects are never cleared if the network request fails or returns an empty list.
 - **macOS Keychain Entitlement**: Added `keychain-access-groups` to `Release.entitlements` and `DebugProfile.entitlements` to guarantee secure token storage via `flutter_secure_storage` under macOS App Sandbox.
 - **Static Analysis Exclusions**: Added `openypt/**` to `analysis_options.yaml` exclude list to prevent analyzer hangs on decompiled mobile sources.
-
-## [1.0.4-beta] - 2026-09-05
-
-### Fixed
 - **macOS App Sandbox Entitlements**: Added `com.apple.security.network.client`, `com.apple.security.network.server`, `com.apple.security.files.user-selected.read-write`, and `com.apple.security.files.downloads.read-write` to `Release.entitlements` and `DebugProfile.entitlements`, fixing the `SocketException: Operation not permitted (errno = 1)` during Google OAuth login and ensuring PDF/file access.
 - **Window Controls Duplication (macOS & Linux)**:
   - Hidden custom titlebar buttons (minimize, maximize, close) on macOS, honoring native window traffic light buttons at the top left.
