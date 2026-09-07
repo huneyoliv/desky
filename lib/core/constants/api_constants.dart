@@ -1,3 +1,5 @@
+import 'dart:io';
+
 class ApiConstants {
   ApiConstants._();
 
@@ -43,6 +45,18 @@ class ApiConstants {
   static const int defaultVersion = 810041;
   static const String defaultLanguage = 'pt';
   static const String defaultTimezone = 'America/Sao_Paulo';
-  static const String defaultDeviceModel = 'Desktop';
-  static const String defaultDeviceType = 'WIN';
+
+  static String get defaultDeviceModel {
+    if (Platform.isWindows) return 'Windows Desktop';
+    if (Platform.isMacOS) return 'macOS Desktop';
+    if (Platform.isLinux) return 'Linux Desktop';
+    return 'Desktop';
+  }
+
+  static String get defaultDeviceType {
+    if (Platform.isWindows) return 'WIN';
+    if (Platform.isMacOS) return 'MAC';
+    if (Platform.isLinux) return 'LINUX';
+    return 'WIN';
+  }
 }
