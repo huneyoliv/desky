@@ -1,4 +1,5 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:desky/core/config/env_config.dart';
 import 'package:desky/core/oauth/providers/google_oauth_service.dart';
 
 void main() {
@@ -13,10 +14,10 @@ void main() {
       expect(service.isConfigured, isTrue);
     });
 
-    test('defaults to environment or default client id', () {
+    test('defaults to environment or fallback client id from EnvConfig', () {
       final service = GoogleOAuthService();
-      expect(service.effectiveClientId.contains('apps.googleusercontent.com'), isTrue);
-      expect(service.isConfigured, isTrue);
+      expect(service.effectiveClientId, equals(EnvConfig.googleClientId));
+      expect(service.isConfigured, equals(EnvConfig.googleClientId.isNotEmpty));
     });
   });
 }
