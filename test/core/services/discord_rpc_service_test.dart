@@ -9,14 +9,12 @@ import 'package:desky/features/timer/timer_notifier.dart';
 
 void main() {
   group('EnvConfig Discord Client ID Validation', () {
-    test('defaultDiscordClientId is a valid snowflake', () {
-      expect(EnvConfig.defaultDiscordClientId, matches(RegExp(r'^\d{17,20}$')));
-      expect(EnvConfig.defaultDiscordClientId, equals('1545409138211823747'));
+    test('defaultDiscordClientId is empty by default when not configured', () {
+      expect(EnvConfig.defaultDiscordClientId, isEmpty);
     });
 
-    test('discordClientId fallback returns default valid snowflake', () {
+    test('discordClientId returns empty when no env or dart-define is provided', () {
       final id = EnvConfig.discordClientId;
-      expect(id, matches(RegExp(r'^\d{17,20}$')));
       expect(id, equals(EnvConfig.defaultDiscordClientId));
     });
   });

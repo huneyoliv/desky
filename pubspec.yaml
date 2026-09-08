@@ -2,7 +2,7 @@ name: desky
 description: "Desky - Focus & Study Timer Desktop Client"
 publish_to: 'none'
 
-version: 1.0.6+7
+version: 1.0.7+8
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -75,13 +75,14 @@ msix_config:
   publisher_display_name: Desky
   identity_name: DevHuney.Desky
   publisher: CN=B81D5CBC-296B-44D2-9E7C-AF85E6AF4AD8
-  msix_version: 1.0.6.0
+  msix_version: 1.0.7.0
   logo_path: assets/icons/icon.png
   output_name: Desky-Windows-Store-x64
   architecture: x64
   capabilities: internetClient
   languages: en-us, pt-br, es-es, ko-kr, ja-jp, zh-cn, zh-tw
   store: true
+  build_windows: false
 
 flutter_launcher_icons:
   image_path: "assets/icons/icon.png"
