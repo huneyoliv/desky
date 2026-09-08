@@ -29,17 +29,20 @@ void main() async {
 
   // Initialize Desktop Window Manager
   await windowManager.ensureInitialized();
-  const windowOptions = WindowOptions(
-    size: Size(1280, 800),
-    minimumSize: Size(1024, 700),
+  final windowOptions = WindowOptions(
+    size: const Size(1280, 800),
+    minimumSize: const Size(1024, 700),
     center: true,
-    backgroundColor: AppColors.background,
+    backgroundColor: Platform.isMacOS ? AppColors.background : Colors.transparent,
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
     title: 'Desky - Focus & Study Timer',
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {
+    if (Platform.isWindows) {
+      await windowManager.setAsFrameless();
+    }
     await windowManager.show();
     await windowManager.focus();
     await windowManager.setPreventClose(true);
