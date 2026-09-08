@@ -396,7 +396,7 @@ class DiscordRpcService {
 
   Future<void> connect() async {
     if (_connected && _connection != null) return;
-    if (kIsWeb) return;
+    if (kIsWeb || _clientId.isEmpty) return;
 
     try {
       if (Platform.isWindows && _createFile != null) {

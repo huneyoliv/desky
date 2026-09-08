@@ -6,10 +6,9 @@ class EnvConfig {
   static final Map<String, String> _envMap = {};
   static bool _initialized = false;
 
-  static const String defaultGoogleClientId =
-      '203174165071-6ig6ng4dmiciop1uo471ndmbbr4fa3nd.apps.googleusercontent.com';
+  static const String defaultGoogleClientId = '';
   static const String defaultGoogleClientSecret = '';
-  static const String defaultDiscordClientId = '1545409138211823747';
+  static const String defaultDiscordClientId = '';
 
   static Future<void> init() async {
     loadSync();
