@@ -73,6 +73,14 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.7] - 2026-09-07
+
+### Fixed
+- **MSIX OAuth Credential Erasure**: Configured `build_windows: false` in `pubspec.yaml` (`msix_config`) and passed `--build-windows false` to `dart run msix:create --store` in `.github/workflows/release.yml`. By default, `msix:create` re-invoked `flutter build windows` without compilation flags, overwriting the release binary and stripping out `--dart-define` credentials (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `DISCORD_CLIENT_ID`). Skipping the redundant build step preserves the credentials compiled into the release binaries for Microsoft Store certification.
+- **Strict Environment Credential Enforcement**: Cleared hardcoded fallback client identifiers in `EnvConfig` (`defaultGoogleClientId = ''` and `defaultDiscordClientId = ''`), guaranteeing that credentials are strictly loaded from local `.env` files in development or via compile-time `--dart-define` arguments injected by GitHub Actions secrets in release builds.
+- **Discord RPC Connection Guard**: Added defensive check to bypass Discord named pipe / socket connection attempts when `_clientId` is empty.
+- **YPT API Device Model Contract**: Restored `defaultDeviceModel` constant to align with YPT backend device model requirements.
+
 ## [1.0.6] - 2026-09-07
 
 ### Fixed
