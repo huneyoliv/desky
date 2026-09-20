@@ -319,10 +319,10 @@ jobs:
 
   deploy-microsoft-store:
     name: Deploy to Microsoft Store (MSIX)
-    needs: [quality-gate, build-windows]
+    needs: [publish-release, build-windows]
     if: |
       always() &&
-      needs.quality-gate.result == 'success' &&
+      needs.publish-release.result == 'success' &&
       needs.build-windows.result == 'success'
     runs-on: windows-latest
 
