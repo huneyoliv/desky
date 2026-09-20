@@ -73,6 +73,15 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.0.8] - 2026-09-20
+
+### Added
+- **Microsoft Store Automated Deployment & Localized Release Notes**: Automated MSIX packaging, upload, metadata localization, and certification submission to Microsoft Store via MSStore CLI and GitHub Actions (`microsoft/microsoft-store-apppublisher@v1.4`), with automatic multilingual translation of release notes across all store locales.
+- **Release Assets Separation**: Configured the CI/CD pipeline to deploy the MSIX package directly to the Microsoft Store without publishing the raw `.msix` file on public GitHub Releases, reserving GitHub Releases strictly for direct standalone installer bundles.
+
+### Fixed
+- **Windows 10 DWM Black Border**: Resolved the 8-pixel black border artifact around the desktop window on Windows 10 by making `windowOptions.backgroundColor` transparent on Windows (`Platform.isMacOS ? AppColors.background : Colors.transparent`) and re-enabling `windowManager.setAsFrameless()` on Windows to eliminate DWM non-client frame insets.
+
 ## [1.0.7] - 2026-09-07
 
 ### Fixed
