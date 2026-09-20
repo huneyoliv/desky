@@ -437,16 +437,10 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $packagePath = (Resolve-Path "store_package\Desky-Windows-Store-x64.msix").Path
+          $appId = $env:MS_STORE_PRODUCT_ID.Trim()
 
-          $targetAppId = $env:MS_STORE_PRODUCT_ID.Trim()
-          if ($targetAppId -eq "9NXJTRJR66X") {
-            Write-Warning "Detected typo in MS_STORE_PRODUCT_ID (11 chars). Auto-correcting to 9NXJTRRJ66X (12 chars)."
-            $targetAppId = "9NXJTRRJ66X"
-          }
-
-          Write-Host "Target Store AppId: $targetAppId"
           Write-Host "Uploading package to Microsoft Store (draft): $packagePath"
-          msstore publish "$packagePath" --appId "$targetAppId" --noCommit -v
+          msstore publish "$packagePath" --appId "$appId" --noCommit -v
           Write-Host "✅ Draft package uploaded."
 
       - name: Localize Release Notes and Update Store Metadata
@@ -454,13 +448,10 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $targetAppId = $env:MS_STORE_PRODUCT_ID.Trim()
-          if ($targetAppId -eq "9NXJTRJR66X") {
-            $targetAppId = "9NXJTRRJ66X"
-          }
+          $appId = $env:MS_STORE_PRODUCT_ID.Trim()
 
-          Write-Host "Retrieving submission metadata JSON for AppId: $targetAppId..."
-          $subJson = msstore submission get "$targetAppId" | Out-String
+          Write-Host "Retrieving submission metadata JSON..."
+          $subJson = msstore submission get "$appId" | Out-String
           [System.IO.File]::WriteAllText("submission.json", $subJson, [System.Text.Encoding]::UTF8)
 
           Write-Host "Translating and injecting release notes into submission..."
@@ -470,7 +461,7 @@ jobs:
             --output-json updated_submission.json
 
           Write-Host "Submitting updated metadata..."
-          msstore submission updateMetadata "$targetAppId" updated_submission.json
+          msstore submission updateMetadata "$appId" updated_submission.json
           Write-Host "✅ Store metadata updated with localized release notes."
 
       - name: Commit and Submit to Microsoft Store
@@ -478,11 +469,8 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $targetAppId = $env:MS_STORE_PRODUCT_ID.Trim()
-          if ($targetAppId -eq "9NXJTRJR66X") {
-            $targetAppId = "9NXJTRRJ66X"
-          }
+          $appId = $env:MS_STORE_PRODUCT_ID.Trim()
 
           Write-Host "Committing submission to Microsoft Store for certification..."
-          msstore submission publish "$targetAppId"
+          msstore submission publish "$appId"
           Write-Host "🎉 Desky successfully submitted to Microsoft Store!"
