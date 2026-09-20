@@ -323,12 +323,7 @@ jobs:
     if: |
       always() &&
       needs.quality-gate.result == 'success' &&
-      needs.build-windows.result == 'success' &&
-      secrets.MS_STORE_CLIENT_ID != '' &&
-      secrets.MS_STORE_CLIENT_SECRET != '' &&
-      secrets.MS_STORE_TENANT_ID != '' &&
-      secrets.MS_STORE_SELLER_ID != '' &&
-      secrets.MS_STORE_PRODUCT_ID != ''
+      needs.build-windows.result == 'success'
     runs-on: windows-latest
 
     env:
@@ -339,23 +334,46 @@ jobs:
       MS_STORE_PRODUCT_ID: ${{ secrets.MS_STORE_PRODUCT_ID }}
 
     steps:
+      - name: Validate Microsoft Store Credentials
+        id: check_credentials
+        shell: pwsh
+        run: |
+          $missing = @()
+          if (-not $env:MS_STORE_CLIENT_ID) { $missing += "MS_STORE_CLIENT_ID" }
+          if (-not $env:MS_STORE_CLIENT_SECRET) { $missing += "MS_STORE_CLIENT_SECRET" }
+          if (-not $env:MS_STORE_TENANT_ID) { $missing += "MS_STORE_TENANT_ID" }
+          if (-not $env:MS_STORE_SELLER_ID) { $missing += "MS_STORE_SELLER_ID" }
+          if (-not $env:MS_STORE_PRODUCT_ID) { $missing += "MS_STORE_PRODUCT_ID" }
+
+          if ($missing.Count -gt 0) {
+            Write-Warning "Missing secrets: $($missing -join ', '). Skipping Microsoft Store deployment."
+            echo "enabled=false" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "All Microsoft Store credentials present."
+            echo "enabled=true" >> $env:GITHUB_OUTPUT
+          }
+
       - name: Checkout repository
+        if: steps.check_credentials.outputs.enabled == 'true'
         uses: actions/checkout@v4
         with:
           lfs: false
 
       - name: Set up Python
+        if: steps.check_credentials.outputs.enabled == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
       - name: Download MSIX Store Package Artifact
+        if: steps.check_credentials.outputs.enabled == 'true'
         uses: actions/download-artifact@v4
         with:
           name: Desky-Windows-Store-Package
           path: store_package
 
       - name: Verify Store Package Integrity
+        if: steps.check_credentials.outputs.enabled == 'true'
         shell: pwsh
         run: |
           $packagePath = "store_package\Desky-Windows-Store-x64.msix"
@@ -372,9 +390,11 @@ jobs:
           Write-Host "✅ MSIX package verified successfully."
 
       - name: Setup Microsoft Store Developer CLI
+        if: steps.check_credentials.outputs.enabled == 'true'
         uses: microsoft/microsoft-store-apppublisher@v1.4
 
       - name: Authenticate with Partner Center
+        if: steps.check_credentials.outputs.enabled == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -387,6 +407,7 @@ jobs:
           Write-Host "✅ MSStore CLI configured."
 
       - name: Identify Release Tag and Extract Changelog
+        if: steps.check_credentials.outputs.enabled == 'true'
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -403,6 +424,7 @@ jobs:
           cat release_notes.md
 
       - name: Upload Package as Draft (noCommit)
+        if: steps.check_credentials.outputs.enabled == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -412,6 +434,7 @@ jobs:
           Write-Host "✅ Draft package uploaded."
 
       - name: Localize Release Notes and Update Store Metadata
+        if: steps.check_credentials.outputs.enabled == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -431,6 +454,7 @@ jobs:
           Write-Host "✅ Store metadata updated with localized release notes."
 
       - name: Commit and Submit to Microsoft Store
+        if: steps.check_credentials.outputs.enabled == 'true'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
