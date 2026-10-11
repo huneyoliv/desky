@@ -78,6 +78,7 @@ Before creating and pushing any release tag, the version string and build number
 ### Fixed
 - **Rank Repository Date Test Determinism**: Fixed CI test failure in `RankRepository Tests fetchGlobalRanks URL does NOT contain zero-padded date` caused by non-deterministic `DateTime.now()` naturally matching two-digit months and days (e.g., October 11th). Added optional `referenceDate` parameter to `RankRepository.fetchGlobalRanks` and made the unit test fully deterministic.
 - **Complete Multilingual UI Localization**: Localized previously hardcoded UI strings across all 28 supported locales in `assets/translations/` and `AppTranslation` fallbacks (notification panel headers/empty states, time reset labels in country dialog, timelapse frame counters, initial subject fallback, and offline synchronization status messages).
+- **Ranks and Profile Screen Translations**: Added missing fallback mappings and aliases in `AppTranslation` for `stats` ("Stats & 24h Map"), `subject_distribution` ("Subject Distribution"), `no_status_msg` ("No status message."), `device` ("Device"), `no_data`, and `no_ranks` across all supported languages.
 
 ## [1.0.8] - 2026-09-20
 
