@@ -3254,5 +3254,13 @@
   "YEMEN": "葉門",
   "ZAMBIA": "尚比亞",
   "ZIMBABWE": "辛巴威",
-  "agree": "同意"
+  "agree": "同意",
+  "notifications_center": "通知中心",
+  "no_recent_notifications": "最近沒有通知。",
+  "reset": "重設",
+  "frame": "影格",
+  "initial_subject": "初始科目",
+  "sessions_synced_success": "{}個工作階段同步成功！",
+  "sessions_sync_failed": "{}個已同步，{}個失敗。",
+  "no_pending_sessions": "沒有擱置的工作階段。"
 }

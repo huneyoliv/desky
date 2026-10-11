@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1-minutsintervall",
   "actionsheet_repeating_delete_title": "Ta bort återkommande händelse",
   "actionsheet_repeating_delete_content": "Detta är en återkommande händelse. Välj vad du vill ta bort.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jemen",
   "ZAMBIA": "Zambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Godkänn"
+  "agree": "Godkänn",
+  "notifications_center": "Notiscenter",
+  "no_recent_notifications": "Inga nya aviseringar.",
+  "reset": "Återställning",
+  "frame": "Bildruta",
+  "initial_subject": "Inledande ämne",
+  "sessions_synced_success": "{} sessioner synkroniserades!",
+  "sessions_sync_failed": "{} synkroniserades, {} misslyckades.",
+  "no_pending_sessions": "Inga väntande sessioner."
 }

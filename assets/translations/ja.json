@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1分単位",
   "actionsheet_repeating_delete_title": "繰り返し予定を削除",
   "actionsheet_repeating_delete_content": "繰り返し予定です。削除範囲を選択してください。",
@@ -3254,5 +3254,13 @@
   "YEMEN": "イエメン",
   "ZAMBIA": "ザンビア",
   "ZIMBABWE": "ジンバブエ",
-  "agree": "同意する"
+  "agree": "同意する",
+  "notifications_center": "通知センター",
+  "no_recent_notifications": "最近の通知はありません。",
+  "reset": "リセット",
+  "frame": "フレーム",
+  "initial_subject": "初期科目",
+  "sessions_synced_success": "{}件のセッションが正常に同期されました！",
+  "sessions_sync_failed": "{}件同期完了、{}件失敗。",
+  "no_pending_sessions": "保留中のセッションはありません。"
 }

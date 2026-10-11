@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1 minutės intervalas",
   "actionsheet_repeating_delete_title": "Ištrinti pasikartojantį įvykį",
   "actionsheet_repeating_delete_content": "Tai pasikartojantis įvykis. Pasirink, ką ištrinti.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jemenas",
   "ZAMBIA": "Zambija",
   "ZIMBABWE": "Zimbabvė",
-  "agree": "Sutinku"
+  "agree": "Sutinku",
+  "notifications_center": "Pranešimų centras",
+  "no_recent_notifications": "Naujų pranešimų nėra.",
+  "reset": "Atkūrimas",
+  "frame": "Kadras",
+  "initial_subject": "Pradinis dalykas",
+  "sessions_synced_success": "Sėkmingai sinchronizuota {} seansų!",
+  "sessions_sync_failed": "{} sinchronizuota, {} nepavyko.",
+  "no_pending_sessions": "Laukiančių seansų nėra."
 }

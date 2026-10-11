@@ -189,7 +189,7 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Frame ${_currentFrameIndex + 1} / ${session.frameCount}',
+                          '${t.tr('frame', fallback: 'Frame')} ${_currentFrameIndex + 1} / ${session.frameCount}',
                           style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                         ),
                       ],
@@ -254,7 +254,7 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
           const Icon(Icons.slow_motion_video_rounded, size: 64, color: AppColors.primary),
           const SizedBox(height: 12),
           Text(
-            'Timelapse • Frame ${_currentFrameIndex + 1} / ${widget.session.frameCount}',
+            '${t.tr('timelapse', fallback: 'Timelapse')} • ${t.tr('frame', fallback: 'Frame')} ${_currentFrameIndex + 1} / ${widget.session.frameCount}',
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 4),

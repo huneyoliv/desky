@@ -8,6 +8,7 @@ import '../../data/repositories/timer_repository.dart';
 import '../../data/repositories/offline_sync_repository.dart';
 import '../auth/auth_notifier.dart';
 import '../settings/settings_notifier.dart';
+import '../../core/localization/app_translation.dart';
 import 'offline_sync_notifier.dart';
 
 enum TimerMode {
@@ -142,6 +143,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   final TimerRepository _timerRepository;
   final SubjectRepository _subjectRepository;
   final OfflineSyncRepository? _offlineSyncRepository;
+  final String? _initialSubjectTitle;
   Timer? _ticker;
   Timer? _dayResetTimer;
   int _dayResetHour;
@@ -152,10 +154,12 @@ class TimerNotifier extends StateNotifier<TimerState> {
     OfflineSyncRepository? offlineSyncRepository,
     int userStudiconId = -1,
     int dayResetHour = 5,
+    String? initialSubjectTitle,
   })  : _timerRepository = timerRepository,
         _subjectRepository = subjectRepository,
         _offlineSyncRepository = offlineSyncRepository,
         _dayResetHour = dayResetHour,
+        _initialSubjectTitle = initialSubjectTitle,
         super(TimerState(
           studiconId: userStudiconId,
           lastStudyDate: StudyDateHelper.getStudyDateString(null, dayResetHour),
@@ -209,9 +213,9 @@ class TimerNotifier extends StateNotifier<TimerState> {
     } catch (_) {
       if (!mounted) return;
       if (state.subjects.isEmpty) {
-        const fallbackSubject = SubjectModel(
+        final fallbackSubject = SubjectModel(
           id: 1,
-          title: 'Matéria Inicial',
+          title: _initialSubjectTitle ?? 'Matéria Inicial',
           colorInt: 4292557552,
         );
         state = state.copyWith(
@@ -711,6 +715,7 @@ final timerNotifierProvider =
     offlineSyncRepository: offlineSyncRepo,
     userStudiconId: user?.studiconId ?? -1,
     dayResetHour: dayResetHour,
+    initialSubjectTitle: ref.watch(appTranslationProvider).tr('initial_subject', fallback: 'Matéria Inicial'),
   );
 
   ref.listen(settingsNotifierProvider.select((s) => s.dayResetHour), (prev, next) {

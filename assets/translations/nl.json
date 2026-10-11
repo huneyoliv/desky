@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "Per 1 minuut",
   "actionsheet_repeating_delete_title": "Herhalende afspraak verwijderen",
   "actionsheet_repeating_delete_content": "Dit is een herhalende afspraak. Selecteer het verwijderbereik.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jemen",
   "ZAMBIA": "Zambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Akkoord"
+  "agree": "Akkoord",
+  "notifications_center": "Berichtencentrum",
+  "no_recent_notifications": "Geen recente meldingen.",
+  "reset": "Resetten",
+  "frame": "Frame",
+  "initial_subject": "Eerste vak",
+  "sessions_synced_success": "{} sessies succesvol gesynchroniseerd!",
+  "sessions_sync_failed": "{} gesynchroniseerd, {} mislukt.",
+  "no_pending_sessions": "Geen openstaande sessies."
 }

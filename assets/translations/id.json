@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "Interval 1 menit",
   "actionsheet_repeating_delete_title": "Hapus jadwal berulang",
   "actionsheet_repeating_delete_content": "Ini adalah jadwal berulang. Pilih rentang yang ingin dihapus.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Yaman",
   "ZAMBIA": "Zambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Setuju"
+  "agree": "Setuju",
+  "notifications_center": "Pusat Pemberitahuan",
+  "no_recent_notifications": "Tidak ada pemberitahuan terbaru.",
+  "reset": "Atur ulang",
+  "frame": "Bingkai",
+  "initial_subject": "Mata Pelajaran Awal",
+  "sessions_synced_success": "{} sesi berhasil disinkronkan!",
+  "sessions_sync_failed": "{} disinkronkan, {} gagal.",
+  "no_pending_sessions": "Tidak ada sesi yang tertunda."
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "Khoảng cách 1 phút",
   "actionsheet_repeating_delete_title": "Xóa sự kiện lặp lại",
   "actionsheet_repeating_delete_content": "Đây là sự kiện lặp lại. Vui lòng chọn phạm vi xóa.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Yemen",
   "ZAMBIA": "Zambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Đồng ý"
+  "agree": "Đồng ý",
+  "notifications_center": "Trung tâm thông báo",
+  "no_recent_notifications": "Không có thông báo gần đây.",
+  "reset": "Đặt lại",
+  "frame": "Khung hình",
+  "initial_subject": "Môn học ban đầu",
+  "sessions_synced_success": "Đã đồng bộ thành công {} phiên!",
+  "sessions_sync_failed": "{} đã đồng bộ, {} thất bại.",
+  "no_pending_sessions": "Không có phiên nào đang chờ xử lý."
 }

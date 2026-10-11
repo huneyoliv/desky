@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1 मिनट के अंतराल में",
   "actionsheet_repeating_delete_title": "आवर्ती इवेंट हटाएं",
   "actionsheet_repeating_delete_content": "यह एक आवर्ती इवेंट है। हटाने की सीमा चुनें।",
@@ -3254,5 +3254,13 @@
   "YEMEN": "यमन",
   "ZAMBIA": "ज़ाम्बिया",
   "ZIMBABWE": "ज़िम्बाब्वे",
-  "agree": "सहमत हों"
+  "agree": "सहमत हों",
+  "notifications_center": "सूचना केंद्र",
+  "no_recent_notifications": "कोई हालिया सूचना नहीं है।",
+  "reset": "रीसेट",
+  "frame": "फ़्रेम",
+  "initial_subject": "प्रारंभिक विषय",
+  "sessions_synced_success": "{} सत्र सफलतापूर्वक सिंक किए गए!",
+  "sessions_sync_failed": "{} सिंक किए गए, {} विफल रहे।",
+  "no_pending_sessions": "कोई लंबित सत्र नहीं है।"
 }

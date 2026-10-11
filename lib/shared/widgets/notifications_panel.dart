@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../core/localization/app_translation.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/notification_model.dart';
@@ -43,6 +44,8 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final t = ref.watch(appTranslationProvider);
+
     return Material(
       color: AppColors.card,
       elevation: 8,
@@ -66,7 +69,7 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
               children: [
                 const Icon(Icons.notifications_active_outlined, color: AppColors.primary, size: 20),
                 const SizedBox(width: 8),
-                const Text('Central de Notificações', style: AppTextStyles.titleMedium),
+                Text(t.tr('notifications_center', fallback: 'Central de Notificações'), style: AppTextStyles.titleMedium),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.refresh, size: 18, color: AppColors.textMuted),
@@ -79,10 +82,10 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
                 : _notifications.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'Nenhuma notificação recente.',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          t.tr('no_recent_notifications', fallback: 'Nenhuma notificação recente.'),
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                         ),
                       )
                     : ListView.separated(

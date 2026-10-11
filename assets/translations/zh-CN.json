@@ -3254,5 +3254,13 @@
   "YEMEN": "也门",
   "ZAMBIA": "赞比亚",
   "ZIMBABWE": "津巴布韦",
-  "agree": "同意"
+  "agree": "同意",
+  "notifications_center": "通知中心",
+  "no_recent_notifications": "最近没有通知。",
+  "reset": "重置",
+  "frame": "帧",
+  "initial_subject": "初始科目",
+  "sessions_synced_success": "{}个会话同步成功！",
+  "sessions_sync_failed": "{}个已同步，{}个失败。",
+  "no_pending_sessions": "没有挂起的会话。"
 }

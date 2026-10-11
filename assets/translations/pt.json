@@ -1,4 +1,12 @@
-﻿{
+{
+  "notifications_center": "Central de Notificações",
+  "no_recent_notifications": "Nenhuma notificação recente.",
+  "reset": "Reinício",
+  "frame": "Frame",
+  "initial_subject": "Matéria Inicial",
+  "sessions_synced_success": "{} sessões sincronizadas com sucesso!",
+  "sessions_sync_failed": "{} sincronizadas, {} falharam.",
+  "no_pending_sessions": "Nenhuma sessão pendente.",
   "1_min_interval": "Intervalo de 1 minuto",
   "actionsheet_repeating_delete_title": "Excluir evento recorrente",
   "actionsheet_repeating_delete_content": "Este é um evento recorrente. Selecione o intervalo para excluir.",

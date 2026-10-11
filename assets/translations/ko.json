@@ -3254,5 +3254,13 @@
   "YEMEN": "예멘",
   "ZAMBIA": "잠비아",
   "ZIMBABWE": "짐바브웨",
-  "agree": "동의하기"
+  "agree": "동의하기",
+  "notifications_center": "알림 센터",
+  "no_recent_notifications": "최근 알림이 없습니다.",
+  "reset": "초기화",
+  "frame": "프레임",
+  "initial_subject": "기본 과목",
+  "sessions_synced_success": "{}개 세션이 성공적으로 동기화되었습니다!",
+  "sessions_sync_failed": "{}개 동기화됨, {}개 실패함.",
+  "no_pending_sessions": "대기 중인 세션이 없습니다."
 }

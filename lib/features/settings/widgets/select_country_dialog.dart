@@ -255,7 +255,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${selectedCountry.timezone} (${selectedCountry.gmtDisplay}) • Reset: ${selectedCountry.startTime ?? "5 AM"}',
+                          '${selectedCountry.timezone} (${selectedCountry.gmtDisplay}) • ${t.tr('reset', fallback: 'Reset')}: ${selectedCountry.startTime ?? "5 AM"}',
                           style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
                         ),
                       ],
@@ -385,7 +385,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Text(
-                                  '${country.timezone} • Reset: ${country.startTime ?? "5 AM"}',
+                                  '${country.timezone} • ${t.tr('reset', fallback: 'Reset')}: ${country.startTime ?? "5 AM"}',
                                   style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                                 ),
                               ),

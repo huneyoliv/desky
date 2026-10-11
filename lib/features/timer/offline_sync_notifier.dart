@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/localization/app_translation.dart';
 import '../../data/models/offline_session_model.dart';
 import '../../data/repositories/offline_sync_repository.dart';
 import '../../data/repositories/timer_repository.dart';
@@ -36,9 +37,13 @@ class OfflineSyncState {
 
 class OfflineSyncNotifier extends StateNotifier<OfflineSyncState> {
   final OfflineSyncRepository _repository;
+  final Ref? _ref;
 
-  OfflineSyncNotifier({required OfflineSyncRepository repository})
-      : _repository = repository,
+  OfflineSyncNotifier({
+    required OfflineSyncRepository repository,
+    Ref? ref,
+  })  : _repository = repository,
+        _ref = ref,
         super(const OfflineSyncState()) {
     loadPending();
   }
@@ -70,13 +75,20 @@ class OfflineSyncNotifier extends StateNotifier<OfflineSyncState> {
     final result = await _repository.syncAllPending();
     final pending = await _repository.getPendingSessions();
 
+    final t = _ref?.read(appTranslationProvider);
     String msg;
     if (result.totalSynced > 0 && result.totalFailed == 0) {
-      msg = '${result.totalSynced} sessões sincronizadas com sucesso!';
+      msg = t != null
+          ? t.tr('sessions_synced_success', args: [result.totalSynced.toString()], fallback: '${result.totalSynced} sessões sincronizadas com sucesso!')
+          : '${result.totalSynced} sessões sincronizadas com sucesso!';
     } else if (result.totalFailed > 0) {
-      msg = '${result.totalSynced} sincronizadas, ${result.totalFailed} falharam.';
+      msg = t != null
+          ? t.tr('sessions_sync_failed', args: [result.totalSynced.toString(), result.totalFailed.toString()], fallback: '${result.totalSynced} sincronizadas, ${result.totalFailed} falharam.')
+          : '${result.totalSynced} sincronizadas, ${result.totalFailed} falharam.';
     } else {
-      msg = 'Nenhuma sessão pendente.';
+      msg = t != null
+          ? t.tr('no_pending_sessions', fallback: 'Nenhuma sessão pendente.')
+          : 'Nenhuma sessão pendente.';
     }
 
     state = state.copyWith(
@@ -92,5 +104,5 @@ class OfflineSyncNotifier extends StateNotifier<OfflineSyncState> {
 final offlineSyncNotifierProvider =
     StateNotifierProvider<OfflineSyncNotifier, OfflineSyncState>((ref) {
   final repo = ref.watch(offlineSyncRepositoryProvider);
-  return OfflineSyncNotifier(repository: repo);
+  return OfflineSyncNotifier(repository: repo, ref: ref);
 });

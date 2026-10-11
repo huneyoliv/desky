@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1 dakikalık aralık",
   "actionsheet_repeating_delete_title": "Yinelenen etkinliği sil",
   "actionsheet_repeating_delete_content": "Bu yinelenen bir etkinliktir. Silme kapsamını seçin.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Yemen",
   "ZAMBIA": "Zambiya",
   "ZIMBABWE": "Zimbabve",
-  "agree": "Kabul et"
+  "agree": "Kabul et",
+  "notifications_center": "Bildirim Merkezi",
+  "no_recent_notifications": "Yeni bildirim yok.",
+  "reset": "Sıfırlama",
+  "frame": "Kare",
+  "initial_subject": "Başlangıç Dersi",
+  "sessions_synced_success": "{} oturum başarıyla senkronize edildi!",
+  "sessions_sync_failed": "{} senkronize edildi, {} başarısız.",
+  "no_pending_sessions": "Bekleyen oturum yok."
 }

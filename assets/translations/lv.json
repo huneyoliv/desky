@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1 minūtes intervāls",
   "actionsheet_repeating_delete_title": "Dzēst atkārtotu notikumu",
   "actionsheet_repeating_delete_content": "Šis ir atkārtots notikums. Izvēlieties, ko dzēst.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jemena",
   "ZAMBIA": "Zambija",
   "ZIMBABWE": "Zimbabve",
-  "agree": "Piekrītu"
+  "agree": "Piekrītu",
+  "notifications_center": "Paziņojumu centrs",
+  "no_recent_notifications": "Nav jaunu paziņojumu.",
+  "reset": "Atiestatīšana",
+  "frame": "Kadrs",
+  "initial_subject": "Sākotnējais mācību priekšmets",
+  "sessions_synced_success": "Veiksmīgi sinhronizētas {} sesijas!",
+  "sessions_sync_failed": "{} sinhronizētas, {} neizdevās.",
+  "no_pending_sessions": "Nav neapstrādātu sesiju."
 }

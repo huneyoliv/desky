@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1 min välein",
   "actionsheet_repeating_delete_title": "Poista toistuva tapahtuma",
   "actionsheet_repeating_delete_content": "Tämä on toistuva tapahtuma. Valitse poistettava aikaväli.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jemen",
   "ZAMBIA": "Sambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Hyväksy"
+  "agree": "Hyväksy",
+  "notifications_center": "Ilmoituskeskus",
+  "no_recent_notifications": "Ei viimeaikaisia ilmoituksia.",
+  "reset": "Nollaus",
+  "frame": "Kuvaruutu",
+  "initial_subject": "Aloitusaine",
+  "sessions_synced_success": "{} istuntoa synkronoitu onnistuneesti!",
+  "sessions_sync_failed": "{} synkronoitu, {} epäonnistui.",
+  "no_pending_sessions": "Ei odottavia istuntoja."
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1-minutiline intervall",
   "actionsheet_repeating_delete_title": "Kustuta korduv sündmus",
   "actionsheet_repeating_delete_content": "See on korduv sündmus. Vali, millised sündmused kustutada.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jeemen",
   "ZAMBIA": "Sambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Nõustu"
+  "agree": "Nõustu",
+  "notifications_center": "Teavituste keskus",
+  "no_recent_notifications": "Hiljutisi teavitusi pole.",
+  "reset": "Lähtestamine",
+  "frame": "Kaader",
+  "initial_subject": "Esialgne aine",
+  "sessions_synced_success": "{} seanssi edukalt sünkroonitud!",
+  "sessions_sync_failed": "{} sünkroonitud, {} ebaõnnestus.",
+  "no_pending_sessions": "Ootel seansse pole."
 }

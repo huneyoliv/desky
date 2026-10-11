@@ -1,4 +1,12 @@
-﻿{
+{
+  "notifications_center": "Notification Center",
+  "no_recent_notifications": "No recent notifications.",
+  "reset": "Reset",
+  "frame": "Frame",
+  "initial_subject": "Initial Subject",
+  "sessions_synced_success": "{} sessions synced successfully!",
+  "sessions_sync_failed": "{} synced, {} failed.",
+  "no_pending_sessions": "No pending sessions.",
   "1_min_interval": "1-minute interval",
   "actionsheet_repeating_delete_title": "Delete recurring event",
   "actionsheet_repeating_delete_content": "This is a recurring event. Select the range to delete.",

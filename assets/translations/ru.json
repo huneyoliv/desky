@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "С шагом в 1 минуту",
   "actionsheet_repeating_delete_title": "Удалить повторяющееся событие",
   "actionsheet_repeating_delete_content": "Это повторяющееся событие. Выберите диапазон для удаления.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Йемен",
   "ZAMBIA": "Замбия",
   "ZIMBABWE": "Зимбабве",
-  "agree": "Согласиться"
+  "agree": "Согласиться",
+  "notifications_center": "Центр уведомлений",
+  "no_recent_notifications": "Нет недавних уведомлений.",
+  "reset": "Сброс",
+  "frame": "Кадр",
+  "initial_subject": "Начальный предмет",
+  "sessions_synced_success": "{} сессий успешно синхронизировано!",
+  "sessions_sync_failed": "{} синхронизировано, {} с ошибкой.",
+  "no_pending_sessions": "Нет ожидающих сессий."
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1-minutsinterval",
   "actionsheet_repeating_delete_title": "Slet gentaget begivenhed",
   "actionsheet_repeating_delete_content": "Dette er en gentaget begivenhed. Vælg, hvad du vil slette.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Yemen",
   "ZAMBIA": "Zambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Accepter"
+  "agree": "Accepter",
+  "notifications_center": "Meddelelsescenter",
+  "no_recent_notifications": "Ingen seneste underretninger.",
+  "reset": "Nulstilling",
+  "frame": "Billede",
+  "initial_subject": "Oprindeligt emne",
+  "sessions_synced_success": "{} sessioner blev synkroniseret!",
+  "sessions_sync_failed": "{} synkroniseret, {} mislykkedes.",
+  "no_pending_sessions": "Ingen ventende sessioner."
 }

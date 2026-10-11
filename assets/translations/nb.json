@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "1-minuttsintervall",
   "actionsheet_repeating_delete_title": "Slett gjentakende hendelse",
   "actionsheet_repeating_delete_content": "Dette er en gjentakende hendelse. Velg hva som skal slettes.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jemen",
   "ZAMBIA": "Zambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Godta"
+  "agree": "Godta",
+  "notifications_center": "Varslingssenter",
+  "no_recent_notifications": "Ingen nylige varsler.",
+  "reset": "Tilbakestilling",
+  "frame": "Ramme",
+  "initial_subject": "Opprinnelig fag",
+  "sessions_synced_success": "{} økter ble synkronisert!",
+  "sessions_sync_failed": "{} synkronisert, {} mislyktes.",
+  "no_pending_sessions": "Ingen ventende økter."
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "ช่วงเวลา 1 นาที",
   "actionsheet_repeating_delete_title": "ลบกิจกรรมที่เกิดซ้ำ",
   "actionsheet_repeating_delete_content": "นี่คือกิจกรรมที่เกิดซ้ำ เลือกช่วงที่ต้องการลบ",
@@ -3254,5 +3254,13 @@
   "YEMEN": "เยเมน",
   "ZAMBIA": "แซมเบีย",
   "ZIMBABWE": "ซิมบับเว",
-  "agree": "ยอมรับ"
+  "agree": "ยอมรับ",
+  "notifications_center": "ศูนย์การแจ้งเตือน",
+  "no_recent_notifications": "ไม่มีการแจ้งเตือนล่าสุด",
+  "reset": "รีเซ็ต",
+  "frame": "เฟรม",
+  "initial_subject": "วิชาเริ่มต้น",
+  "sessions_synced_success": "ซิงค์ {} เซสชันสำเร็จแล้ว!",
+  "sessions_sync_failed": "ซิงค์แล้ว {}, ล้มเหลว {}",
+  "no_pending_sessions": "ไม่มีเซสชันที่รอดำเนินการ"
 }

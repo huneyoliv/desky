@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "In 1-Min.-Schritten",
   "actionsheet_repeating_delete_title": "Wiederkehrenden Termin löschen",
   "actionsheet_repeating_delete_content": "Wiederkehrender Termin. Wähle den Löschbereich aus.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Jemen",
   "ZAMBIA": "Sambia",
   "ZIMBABWE": "Simbabwe",
-  "agree": "Zustimmen"
+  "agree": "Zustimmen",
+  "notifications_center": "Mitteilungszentrale",
+  "no_recent_notifications": "Keine aktuellen Benachrichtigungen.",
+  "reset": "Zurücksetzen",
+  "frame": "Frame",
+  "initial_subject": "Anfangsfach",
+  "sessions_synced_success": "{} Sitzungen erfolgreich synchronisiert!",
+  "sessions_sync_failed": "{} synchronisiert, {} fehlgeschlagen.",
+  "no_pending_sessions": "Keine ausstehenden Sitzungen."
 }

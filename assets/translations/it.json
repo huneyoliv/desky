@@ -1,4 +1,4 @@
-﻿{
+{
   "1_min_interval": "A intervalli di 1 minuto",
   "actionsheet_repeating_delete_title": "Elimina evento ricorrente",
   "actionsheet_repeating_delete_content": "Si tratta di un evento ricorrente. Seleziona l’intervallo da eliminare.",
@@ -3254,5 +3254,13 @@
   "YEMEN": "Yemen",
   "ZAMBIA": "Zambia",
   "ZIMBABWE": "Zimbabwe",
-  "agree": "Accetto"
+  "agree": "Accetto",
+  "notifications_center": "Centro notifiche",
+  "no_recent_notifications": "Nessuna notifica recente.",
+  "reset": "Ripristino",
+  "frame": "Fotogramma",
+  "initial_subject": "Materia iniziale",
+  "sessions_synced_success": "{} sessioni sincronizzate con successo!",
+  "sessions_sync_failed": "{} sincronizzate, {} non riuscite.",
+  "no_pending_sessions": "Nessuna sessione in sospeso."
 }
