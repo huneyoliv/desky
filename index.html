@@ -70,11 +70,6 @@
     .hero-trust-item i{color:var(--success)}
     .hero-mockup-wrapper{position:relative;max-width:1040px;margin:0 auto;padding:10px;background:linear-gradient(180deg,rgba(91,106,240,.28) 0%,rgba(255,82,71,.08) 50%,transparent 100%);border-radius:22px;box-shadow:0 20px 80px rgba(0,0,0,.8),0 0 60px var(--primary-glow)}
     .window-frame{background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:16px;overflow:hidden}
-    .window-titlebar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#101014;border-bottom:1px solid var(--border-subtle)}
-    .window-dots{display:flex;gap:7px}
-    .window-dot{width:11px;height:11px;border-radius:50%}
-    .dot-red{background:#ff5f56}.dot-yellow{background:#ffbd2e}.dot-green{background:#27c93f}
-    .window-title{font-size:.82rem;font-weight:600;color:var(--text-muted);display:flex;align-items:center;gap:7px}
     .mockup-img{width:100%;height:auto;display:block;transition:opacity .3s}
     .floating-timer-widget{display:none;position:absolute;bottom:36px;right:-18px;background:rgba(18,18,23,.92);backdrop-filter:blur(20px);border:1px solid rgba(91,106,240,.4);border-radius:16px;padding:18px 22px;box-shadow:0 15px 40px rgba(0,0,0,.6),0 0 25px var(--primary-glow);text-align:left;z-index:10;animation:floatSlow 6s infinite ease-in-out;width:270px}
     @keyframes floatSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -179,7 +174,6 @@
 
 <section class="hero">
   <div class="container">
-    <div class="hero-badge"><i data-lucide="flame"></i><span data-i18n="hero_badge">Desky v1.0.0 — Now Available</span></div>
     <h1 class="hero-title" data-i18n="hero_title">The ultimate desktop client<br/>for <span class="highlight">Yeolpumta</span></h1>
     <p class="hero-subtitle" data-i18n="hero_subtitle">Deep focus, colorful Pomodoro timer, real-time Live Study groups and full statistics in a stunning AMOLED True Black interface for Windows, macOS and Linux.</p>
     <div class="hero-actions">
@@ -197,11 +191,6 @@
     </div>
     <div class="hero-mockup-wrapper">
       <div class="window-frame">
-        <div class="window-titlebar">
-          <div class="window-dots"><span class="window-dot dot-red"></span><span class="window-dot dot-yellow"></span><span class="window-dot dot-green"></span></div>
-          <div class="window-title"><i data-lucide="clock" style="width:13px;height:13px;color:var(--primary-light)"></i><span data-i18n="mockup_title">Desky — Study Timer</span></div>
-          <div style="width:36px"></div>
-        </div>
         <img src="photos/english/timer.png" alt="Desky Interface" class="mockup-img" id="hero-screenshot"/>
       </div>
       <div class="floating-timer-widget">
