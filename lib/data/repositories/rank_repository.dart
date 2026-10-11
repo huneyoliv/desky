@@ -13,9 +13,10 @@ class RankRepository {
     int categoryId = 0,
     int countryId = ApiConstants.defaultCountryId,
     int page = 1,
+    DateTime? referenceDate,
   }) async {
     try {
-      final now = DateTime.now();
+      final now = referenceDate ?? DateTime.now();
 
       // The YPT ranking API requires the start-of-period reference date without zero-padding:
       // - 'day': today's date (e.g. 2026-8-25)

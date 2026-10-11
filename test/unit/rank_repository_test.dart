@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/repositories/rank_repository.dart';
@@ -89,9 +89,12 @@ void main() {
     });
 
     test('fetchGlobalRanks URL does NOT contain zero-padded date', () async {
-      await repository.fetchGlobalRanks(period: 'day');
+      final sampleDate = DateTime(2026, 8, 5);
+      await repository.fetchGlobalRanks(period: 'day', referenceDate: sampleDate);
 
+      expect(mockApiClient.lastGetPath, contains('date=2026-8-5'));
       expect(mockApiClient.lastGetPath, isNot(matches(RegExp(r'date=\d{4}-\d{2}-\d{2}'))));
+      expect(mockApiClient.lastGetPath, isNot(contains('date=2026-08-05')));
     });
 
     test('fetchGlobalRanks URL includes groupID=0 and isCam=false', () async {

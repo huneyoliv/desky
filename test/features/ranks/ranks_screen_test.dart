@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/core/localization/app_translation.dart';
@@ -21,6 +21,7 @@ class FakeRankRepository extends RankRepository {
     int categoryId = 0,
     int countryId = 23,
     int page = 1,
+    DateTime? referenceDate,
   }) async => mockRanks;
 
   @override
