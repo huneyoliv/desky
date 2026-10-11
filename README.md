@@ -8,11 +8,12 @@
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Platforms](https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/huneyoliv/desky/releases)
+[![Downloads](https://img.shields.io/github/downloads/huneyoliv/desky/total?style=for-the-badge&logo=github&logoColor=white&label=Downloads&color=blueviolet)](https://github.com/huneyoliv/desky/releases)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![CI/CD](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/huneyoliv/desky/actions)
-[![Tests](https://img.shields.io/badge/Tests-339%2B%20Passing-success?style=for-the-badge&logo=dart)](https://github.com/huneyoliv/desky)
+[![Tests](https://img.shields.io/badge/Tests-390%2B%20Passing-success?style=for-the-badge&logo=dart)](https://github.com/huneyoliv/desky)
 
-**[English](README.md)** • **[Português (Brasil)](README.pt-BR.md)**
+**[English](README.md)** • **[Português (Brasil)](README.pt-BR.md)** • **[简体中文](README.zh-CN.md)**
 
 [Features](#-key-features) •
 [Installation](#-installation--downloads) •
@@ -27,7 +28,7 @@
 
 ## 📖 About the Project
 
-**Desky** was built to provide the ultimate desktop focus and productivity experience for students on Windows, macOS, and Linux. Featuring a dark theme inspired by Yeolpumta and optimized for high-resolution displays, it delivers all essential study capabilities natively on your PC.
+**Desky** was built to provide the ultimate desktop focus and productivity experience for students on Windows, macOS, and Linux. Featuring a dark AMOLED True Black interface inspired by Yeolpumta and optimized for high-resolution displays, it delivers all essential study capabilities natively on your PC.
 
 ---
 
@@ -42,13 +43,21 @@
 ### 🛡️ Focus Mode & Distraction Blocker
 - **Process Monitoring**: Automated detection and alerts for unauthorized distraction applications open during study.
 - **Strict Mode**: Locks navigation to maintain deep focus.
-- **Floating Mini Player**: Compact timer overlay to monitor elapsed study time alongside study materials.
+- **Floating Mini Player**: Compact Always-on-Top timer overlay to monitor elapsed study time alongside study materials.
 
 ### 👥 Study Groups & Live Study
-- **Real-Time Attendance Feed**: View active members studying live with real-time status updates.
+- **Real-Time Attendance Feed**: View active members studying live with real-time status updates and animated doll avatars.
 - **Live Study**: Periodic webcam capture and secure upload for study verification.
 - **Group Chat**: Rich messaging with emoji reactions, media attachments, and official YPT stickers.
 - **Social Nudges**: Send "Shakes" to motivate group peers.
+
+### 🎮 Discord Rich Presence (RPC)
+- **Live Status Sync**: Broadcast your current study subject, elapsed timer, and group activity directly to your Discord profile.
+- **Automatic Transitions**: Seamlessly switches between "Studying", "Resting", and "Idle" status.
+
+### 🔒 Secure Desktop Authentication (OAuth PKCE)
+- **Email & Password**: Standard authentication with verification code password recovery.
+- **Google OAuth with PKCE**: Native browser sign-in flow via local loopback port, ensuring secure authentication without embedded webview vulnerabilities.
 
 ### 📅 Planner, Timetable & D-Days
 - **D-Day Countdowns**: Visual countdown timers for exams, tests, and target milestones.
@@ -56,11 +65,11 @@
 - **Weekly Timetable**: Interactive weekly schedule grid organized by subject blocks.
 
 ### 📊 Global Rankings & Activity Heatmap
-- **Multilevel Leaderboards**: Real-time global, national, and category-based leaderboards.
+- **Multilevel Leaderboards**: Real-time global, national, and category-based leaderboards (daily, weekly, monthly).
 - **Activity Heatmap Grid**: GitHub-style annual matrix visualizing daily study intensity and consistency.
 - **Monthly Calendar**: Detailed day-by-day study streaks and goal completion.
 
-### 🃏 Flashcards & PDF Reader
+### 🃏 Flashcards & PDF Reader (Smartbook)
 - **Custom Decks**: Organize study cards by subject and topic with SM-2 spaced repetition algorithm.
 - **Integrated PDF Reader**: Open books and materials with page bookmarking and quick flashcard creation.
 
@@ -69,6 +78,9 @@
 
 ### 🎨 Avatars & Store
 - Customizable doll avatars with outfits, accessories, and dynamic poses reactive to study state.
+
+### 🔔 Notification Center
+- In-app notification center for group announcements, member nudges, and system notices.
 
 ### 🌐 Comprehensive Internationalization (i18n)
 - Native support for 28 languages with instant runtime locale switching.
@@ -86,6 +98,7 @@ Download the latest version directly from our official [**Releases Page**](https
 | Platform | Package / Installer | Format | Installation Instructions |
 | :--- | :--- | :--- | :--- |
 | **Windows** | `Desky-Windows-Installer-x64.exe` | Executable Setup | Run the `.exe` installer and follow the setup wizard. |
+| **Windows** | `Desky-Windows-x64.msix` | MSIX Package | Install directly with Windows App Installer / Microsoft Store format. |
 | **macOS** | `Desky-macOS-Installer.dmg` | Disk Image | Open `.dmg` and drag `Desky.app` to your `Applications` folder. |
 | **Linux (Debian/Ubuntu)** | `Desky-Linux-x64.deb` | Debian Package | Run `sudo apt install ./Desky-Linux-x64.deb` or `sudo dpkg -i Desky-Linux-x64.deb`. |
 | **Linux (Other Distros)** | `Desky-Linux-x64.tar.gz` | Portable Archive | Extract the archive and execute `./desky`. |
@@ -102,17 +115,17 @@ lib/
 │   ├── api/               # HTTP client (Dio) and auth interceptors
 │   ├── cdn/               # Dynamic CDN resolvers for avatars & assets
 │   ├── constants/         # API endpoints and application defaults
-│   ├── localization/      # Translation engine and fallback dictionaries
-│   ├── services/          # System services (Focus, Webcam, Updates, Window)
+│   ├── localization/      # Translation engine and fallback dictionaries (28 languages)
+│   ├── oauth/             # Google OAuth PKCE and loopback server
+│   ├── services/          # System services (Focus, Webcam, Updates, Window, Discord RPC)
 │   └── theme/             # Dark theme palette, typography & styles
 ├── data/                  # Data layer, DTOs and repositories
 │   ├── models/            # Data models with JSON serialization
 │   └── repositories/      # API communication and data access abstraction
 ├── features/              # Feature-first modular components
-│   ├── auth/              # Email authentication & social logins (Google / Apple)
+│   ├── auth/              # Email authentication & Google OAuth PKCE
 │   ├── challenges/        # Study challenges and goals
 │   ├── flashcards/        # Deck management & SM-2 algorithm
-│   ├── focus/             # Process blocker and Mini Player
 │   ├── groups/            # Study groups, attendance, chat & Live Study
 │   ├── notifications/     # Notification center and alerts
 │   ├── planner/           # Planner, To-Do list & timetable grid
@@ -122,7 +135,7 @@ lib/
 │   ├── smartbook/         # Built-in PDF reader and study material viewer
 │   ├── store/             # Avatar inventory & store
 │   ├── timelapse/         # Screen recording & timelapse playback
-│   ├── timer/             # Main study timer, Pomodoro & subject tracker
+│   ├── timer/             # Main study timer, Pomodoro, Mini Player & subject tracker
 │   └── updates/           # Release checker, changelog viewer & installer links
 └── shared/                # Shared widgets (AppShell, SidebarNav, TitleBar, Avatars)
 ```
