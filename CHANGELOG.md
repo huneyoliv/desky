@@ -73,7 +73,7 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
-## [Unreleased]
+## [1.0.9] - 2026-10-11
 
 ### Fixed
 - **Rank Repository Date Test Determinism**: Fixed CI test failure in `RankRepository Tests fetchGlobalRanks URL does NOT contain zero-padded date` caused by non-deterministic `DateTime.now()` naturally matching two-digit months and days (e.g., October 11th). Added optional `referenceDate` parameter to `RankRepository.fetchGlobalRanks` and made the unit test fully deterministic.
