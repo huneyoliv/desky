@@ -383,8 +383,8 @@ void main() {
                   data: {
                     's': true,
                     'id': 77777,
-                    'n': 'QR Synced User',
-                    'e': 'qr@gmail.com',
+                    'n': 'Session Synced User',
+                    'e': 'session@gmail.com',
                     'pv': 19,
                   },
                 ),
@@ -396,14 +396,14 @@ void main() {
       );
       final repo = AuthRepository(apiClient: ApiClient(customDio: jwtDio), storage: mockStorage);
 
-      final user = await repo.signInWithJwt('JWT valid_qr_jwt_token_123');
+      final user = await repo.signInWithJwt('JWT valid_jwt_token_123');
 
       expect(user.id, equals(77777));
-      expect(user.name, equals('QR Synced User'));
-      expect(user.jwtToken, equals('valid_qr_jwt_token_123'));
+      expect(user.name, equals('Session Synced User'));
+      expect(user.jwtToken, equals('valid_jwt_token_123'));
 
       final stored = await mockStorage.read(key: 'jwt_token');
-      expect(stored, equals('valid_qr_jwt_token_123'));
+      expect(stored, equals('valid_jwt_token_123'));
     });
 
     test('signInWithJwt throws ApiException on empty or invalid token', () async {
