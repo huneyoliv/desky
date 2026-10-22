@@ -9,8 +9,9 @@ class AppTextStyles {
   static const String fontTimer = 'E1234';
   // Backward compatibility alias
   static const String fontPretendard = 'SF-Pro-Text';
+  static const String fontEmoji = 'NotoColorEmoji';
 
-  static const List<String> fontFallbacks = ['AppleEmoji', 'Pretendard'];
+  static const List<String> fontFallbacks = ['NotoColorEmoji', 'Pretendard'];
 
   static const TextStyle displayLarge = TextStyle(
     fontFamily: fontDisplay,

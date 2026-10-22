@@ -105,6 +105,7 @@ flutter:
     - assets/images/
     - assets/images/studicon/
     - assets/lottie/
+    - assets/fonts/OFL.txt
 
   fonts:
     - family: SF-Pro-Text
@@ -129,9 +130,9 @@ flutter:
           weight: 600
         - asset: assets/fonts/SF-Pro-Display-Bold.otf
           weight: 700
-    - family: AppleEmoji
+    - family: NotoColorEmoji
       fonts:
-        - asset: assets/fonts/AppleEmoji.ttf
+        - asset: assets/fonts/NotoColorEmoji.ttf
     - family: E1234
       fonts:
         - asset: assets/fonts/E1234.ttf

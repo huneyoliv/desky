@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -23,6 +25,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EnvConfig.init();
   await initializeDateFormatting();
+
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('assets/fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['Noto Color Emoji'], license);
+  });
 
   // Preload SharedPreferences for instant, synchronous settings and language hydration
   final prefs = await SharedPreferences.getInstance();

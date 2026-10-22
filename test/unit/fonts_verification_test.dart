@@ -13,11 +13,11 @@ void main() {
     final sfDisplay = await rootBundle.load('assets/fonts/SF-Pro-Display-Bold.otf');
     expect(sfDisplay.lengthInBytes, greaterThan(0));
 
-    final emoji = await rootBundle.load('assets/fonts/AppleEmoji.ttf');
-    // Must be the real font file, not a Git LFS pointer (which is ~134 bytes).
-    expect(emoji.lengthInBytes, greaterThan(1000),
-        reason: 'AppleEmoji.ttf appears to be a Git LFS pointer. '
-            'Ensure the CI checkout step uses lfs: true.');
+    final emoji = await rootBundle.load('assets/fonts/NotoColorEmoji.ttf');
+    expect(emoji.lengthInBytes, greaterThan(1000));
+
+    final oflLicense = await rootBundle.loadString('assets/fonts/OFL.txt');
+    expect(oflLicense, contains('SIL OPEN FONT LICENSE Version 1.1'));
   });
 
   test('AppTheme darkTheme configures fontFamily and textTheme properly', () {
