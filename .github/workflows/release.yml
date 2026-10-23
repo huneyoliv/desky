@@ -278,7 +278,8 @@ jobs:
             cd /home/builder
             sudo -u builder makepkg --noconfirm --nodeps -f
             
-            cp /home/builder/*.pkg.tar.zst /workspace/Desky-Linux-x64.pkg.tar.zst
+            MAIN_PKG=\$(find /home/builder -maxdepth 1 -name "desky-*.pkg.tar.zst" ! -name "*-debug-*" | head -n 1)
+            cp "\${MAIN_PKG}" /workspace/Desky-Linux-x64.pkg.tar.zst
             chmod 644 /workspace/Desky-Linux-x64.pkg.tar.zst
           "
 
