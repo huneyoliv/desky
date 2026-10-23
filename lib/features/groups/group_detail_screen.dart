@@ -435,7 +435,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           children: [
             Text(widget.group.name, style: AppTextStyles.titleLarge),
             Text(
-              '${studyingMembers.length} ${t.tr("studying_now", fallback: "estudando agora")} • ${t.tr("goal", fallback: "Meta")}: ${widget.group.dailyGoalHours}h/${t.tr("today", fallback: "dia")}',
+              '${studyingMembers.length} ${t.tr("studying_now", fallback: "studying now")} • ${t.tr("goal", fallback: "Goal")}: ${widget.group.dailyGoalHours}h/${t.tr("day", fallback: "day")}',
               style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
@@ -688,9 +688,11 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
 
           // Tab 3: Group Rankings
           (() {
-            final displayList = _weeklyRanks.isNotEmpty
-                ? _weeklyRanks
-                : (_selectedGroupRankPeriod == 'day' ? _members : <GroupMemberModel>[]);
+            final rawFallback = _selectedGroupRankPeriod == 'day'
+                ? [..._members]..sort((a, b) => b.studyMs.compareTo(a.studyMs))
+                : <GroupMemberModel>[];
+            final displayList = _weeklyRanks.isNotEmpty ? _weeklyRanks : rawFallback;
+            final periodTotalMs = displayList.fold<int>(0, (sum, m) => sum + m.studyMs);
             return Column(
               children: [
                 Container(
@@ -732,6 +734,20 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                           setState(() => _selectedGroupRankPeriod = 'month');
                           _loadGroupRanksSilently();
                         },
+                      ),
+                      const Spacer(),
+                      Text(
+                        t.tr('group_rank_total_time', fallback: 'Total time'),
+                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatMs(periodTotalMs),
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -1018,7 +1034,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                 ? '${t.tr("studying", fallback: "Estudando")} (${_formatMs(member.studyMs)})'
                 : member.isPaused
                     ? '${t.tr("paused", fallback: "Pausado")} (${_formatMs(member.studyMs)})'
-                    : '${t.tr("resting", fallback: "Descansando")} (${_formatMs(member.studyMs)})',
+                    : '${t.tr("resting", fallback: "Resting")} (${_formatMs(member.studyMs)})',
             style: TextStyle(
               fontSize: 12,
               color: isActivelyStudying

@@ -57,9 +57,21 @@ class GroupRepository {
     String period = 'week',
     int countryId = ApiConstants.defaultCountryId,
     int categoryId = 0,
+    DateTime? referenceDate,
   }) async {
     try {
-      final dateStr = StudyDateHelper.getStudyDateString();
+      final now = referenceDate ?? DateTime.now();
+      final DateTime refDate;
+      if (period == 'month') {
+        refDate = DateTime(now.year, now.month, 1);
+      } else if (period == 'week') {
+        final monday = now.subtract(Duration(days: now.weekday - 1));
+        refDate = DateTime(monday.year, monday.month, monday.day);
+      } else {
+        refDate = StudyDateHelper.getStudyDate(now);
+      }
+      final dateStr = '${refDate.year}-${refDate.month}-${refDate.day}';
+
       dynamic data;
       try {
         final response = await _apiClient.get(
