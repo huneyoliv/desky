@@ -17,7 +17,9 @@ import '../settings/widgets/faq_help_dialog.dart';
 import '../settings/widgets/open_source_licenses_dialog.dart';
 import '../settings/widgets/change_password_dialog.dart';
 import '../settings/widgets/study_preferences_dialog.dart';
+import '../settings/widgets/theme_selection_dialog.dart';
 import '../settings/widgets/blocked_users_dialog.dart';
+import '../settings/theme_notifier.dart';
 import 'widgets/delete_account_dialog.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -166,6 +168,7 @@ class ProfileScreen extends ConsumerWidget {
     final timerState = ref.watch(timerNotifierProvider);
     final t = ref.watch(appTranslationProvider);
     final user = authState.user;
+    final activeTheme = ref.watch(themeNotifierProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -570,6 +573,18 @@ class ProfileScreen extends ConsumerWidget {
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: [
+                  ListTile(
+                    leading: const Icon(Icons.palette_outlined, color: AppColors.primary),
+                    title: Text(t.tr('theme_appearance', fallback: 'Aparência & Tema'),
+                        style: const TextStyle(color: Colors.white)),
+                    subtitle: Text(
+                      t.tr(activeTheme.nameKey, fallback: activeTheme.id),
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                    ),
+                    trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                    onTap: () => ThemeSelectionDialog.show(context),
+                  ),
+                  const Divider(color: AppColors.border, height: 1),
                   ListTile(
                     leading: const Icon(Icons.tune_rounded, color: AppColors.primary),
                     title: Text(t.tr('study_preferences', fallback: 'Ajustes de Estudo e Alertas'),

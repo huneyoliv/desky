@@ -25,6 +25,7 @@ class SettingsRepository {
   static const String keySoundEffects = 'sound_effects';
   static const String keyBlockedUsers = 'blocked_users_list';
   static const String keyDiscordRpc = 'discord_rpc_enabled';
+  static const String keyThemePreset = 'selected_theme_preset';
 
   static const CountryModel defaultCountry = CountryModel(
     id: 23,
@@ -319,6 +320,30 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setBool(keyDiscordRpc, value);
+    } catch (_) {}
+  }
+
+  Future<String> getThemePresetId() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getString(keyThemePreset) ?? 'amoled_lilac';
+    } catch (_) {
+      return 'amoled_lilac';
+    }
+  }
+
+  String getInitialThemePresetId() {
+    try {
+      return _prefs?.getString(keyThemePreset) ?? 'amoled_lilac';
+    } catch (_) {
+      return 'amoled_lilac';
+    }
+  }
+
+  Future<void> saveThemePresetId(String themeId) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setString(keyThemePreset, themeId);
     } catch (_) {}
   }
 }

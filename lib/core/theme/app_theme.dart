@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
+import 'theme_palette.dart';
 
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get darkTheme {
+  static ThemeData get darkTheme => buildTheme(DeskyThemePalette.amoledLilac);
+
+  static ThemeData buildTheme(DeskyThemePalette palette) {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -14,79 +17,79 @@ class AppTheme {
       textTheme: ThemeData.dark().textTheme.apply(
         fontFamily: AppTextStyles.fontText,
         fontFamilyFallback: AppTextStyles.fontFallbacks,
-        bodyColor: AppColors.textPrimary,
-        displayColor: AppColors.textPrimary,
+        bodyColor: palette.textPrimary,
+        displayColor: palette.textPrimary,
       ),
       primaryTextTheme: ThemeData.dark().primaryTextTheme.apply(
         fontFamily: AppTextStyles.fontText,
         fontFamilyFallback: AppTextStyles.fontFallbacks,
-        bodyColor: AppColors.textPrimary,
-        displayColor: AppColors.textPrimary,
+        bodyColor: palette.textPrimary,
+        displayColor: palette.textPrimary,
       ),
-      scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
+      scaffoldBackgroundColor: palette.background,
+      colorScheme: ColorScheme.dark(
+        primary: palette.primary,
         onPrimary: Colors.black,
-        primaryContainer: AppColors.primaryDark,
-        onPrimaryContainer: AppColors.primaryLight,
-        secondary: AppColors.lavender,
+        primaryContainer: palette.primaryDark,
+        onPrimaryContainer: palette.primaryLight,
+        secondary: palette.accent,
         onSecondary: Colors.black,
-        secondaryContainer: AppColors.accentDark,
-        onSecondaryContainer: AppColors.textPrimary,
-        surface: AppColors.surface,
-        onSurface: AppColors.textPrimary,
-        surfaceContainerHighest: AppColors.surfaceLight,
-        onSurfaceVariant: AppColors.textSecondary,
-        outline: AppColors.outline,
-        outlineVariant: AppColors.border,
+        secondaryContainer: palette.accentDark,
+        onSecondaryContainer: palette.textPrimary,
+        surface: palette.surface,
+        onSurface: palette.textPrimary,
+        surfaceContainerHighest: palette.surfaceLight,
+        onSurfaceVariant: palette.textSecondary,
+        outline: palette.outline,
+        outlineVariant: palette.border,
         error: AppColors.error,
         onError: Colors.black,
       ),
-      cardTheme: const CardThemeData(
-        color: AppColors.card,
+      cardTheme: CardThemeData(
+        color: palette.card,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-          side: BorderSide(color: AppColors.border, width: 1),
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(color: palette.border, width: 1),
         ),
       ),
-      dialogTheme: const DialogThemeData(
-        backgroundColor: AppColors.card,
+      dialogTheme: DialogThemeData(
+        backgroundColor: palette.card,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          side: BorderSide(color: AppColors.border, width: 1),
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          side: BorderSide(color: palette.border, width: 1),
         ),
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: palette.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: AppTextStyles.titleLarge,
+        titleTextStyle: AppTextStyles.titleLarge.copyWith(color: palette.textPrimary),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.border,
+      dividerTheme: DividerThemeData(
+        color: palette.border,
         space: 1,
         thickness: 1,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceLight,
-        hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-        labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+        fillColor: palette.surfaceLight,
+        hintStyle: TextStyle(color: palette.textMuted, fontSize: 14),
+        labelStyle: TextStyle(color: palette.textSecondary, fontSize: 14),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: palette.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: palette.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(color: palette.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -95,7 +98,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: palette.primary,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -106,8 +109,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
-          side: const BorderSide(color: AppColors.border),
+          foregroundColor: palette.textPrimary,
+          side: BorderSide(color: palette.border),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -116,28 +119,31 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: palette.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: AppColors.card,
+        color: palette.card,
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: palette.border),
         ),
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: palette.card,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: palette.border),
         ),
-        textStyle: const TextStyle(color: AppColors.textPrimary, fontSize: 12),
+        textStyle: TextStyle(color: palette.textPrimary, fontSize: 12),
       ),
+      extensions: [
+        DeskyThemeExtension(palette: palette),
+      ],
     );
   }
 }

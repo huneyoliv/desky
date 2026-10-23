@@ -18,6 +18,7 @@ import 'core/router/app_router.dart';
 import 'core/localization/app_translation.dart';
 import 'features/auth/auth_notifier.dart';
 import 'features/settings/settings_notifier.dart';
+import 'features/settings/theme_notifier.dart';
 import 'features/timer/timer_notifier.dart';
 import 'shared/widgets/app_title_bar.dart';
 
@@ -164,11 +165,12 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     final translation = ref.watch(appTranslationProvider);
+    final currentPalette = ref.watch(themeNotifierProvider);
 
     return MaterialApp.router(
       title: 'Desky',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.buildTheme(currentPalette),
       locale: Locale(translation.languageCode.split('-').first),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -196,7 +198,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
           textDirection: TextDirection.ltr,
           child: DragToResizeArea(
             child: Material(
-              color: AppColors.background,
+              color: currentPalette.background,
               clipBehavior: Clip.antiAlias,
               child: Overlay(
                 initialEntries: [

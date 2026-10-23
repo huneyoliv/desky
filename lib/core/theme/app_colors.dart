@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'theme_palette.dart';
 
 class AppColors {
   AppColors._();
+
+  /// Retrieve the active theme palette from BuildContext
+  static DeskyThemePalette palette(BuildContext context) => context.palette;
 
   // Dark Theme Colors — AMOLED True Black
   static const Color background = Color(0xFF000000);

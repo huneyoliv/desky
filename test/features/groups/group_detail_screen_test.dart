@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/core/localization/app_translation.dart';
@@ -33,6 +33,7 @@ class FakeGroupDetailRepository extends GroupRepository {
     String period = 'week',
     int countryId = 23,
     int categoryId = 0,
+    DateTime? referenceDate,
   }) async => mockMembers;
 
   @override
@@ -126,7 +127,7 @@ void main() {
 
     expect(find.text('Grupo de Estudos 101'), findsOneWidget);
     expect(find.text('Líder do Grupo'), findsWidgets);
-    expect(find.textContaining('1 estudando agora'), findsOneWidget);
+    expect(find.textContaining('1 Estudando Agora'), findsOneWidget);
     expect(find.text('Estudando Agora (1)'), findsOneWidget);
   });
 
