@@ -688,9 +688,13 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
 
           // Tab 3: Group Rankings
           (() {
-            final rawFallback = _selectedGroupRankPeriod == 'day'
-                ? [..._members]..sort((a, b) => b.studyMs.compareTo(a.studyMs))
-                : <GroupMemberModel>[];
+            final List<GroupMemberModel> rawFallback;
+            if (_selectedGroupRankPeriod == 'day') {
+              rawFallback = List<GroupMemberModel>.from(_members)
+                ..sort((a, b) => b.studyMs.compareTo(a.studyMs));
+            } else {
+              rawFallback = <GroupMemberModel>[];
+            }
             final displayList = _weeklyRanks.isNotEmpty ? _weeklyRanks : rawFallback;
             final periodTotalMs = displayList.fold<int>(0, (sum, m) => sum + m.studyMs);
             return Column(
