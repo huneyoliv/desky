@@ -73,6 +73,22 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.1.1] - 2026-10-23
+
+### Added
+- **In-App Visual Theme Customizer**: Built-in visual theme picker (`DeskyThemePalette`) with 5 hand-crafted palettes (AMOLED Lilac, Midnight Navy, Cyberpunk Neon, Forest Emerald, Sunset Amber), dynamic runtime palette switching with Riverpod (`ThemeNotifier`), persistent theme preference (`settingsRepository`), and accessible via both the Profile screen header and the Study Preferences modal.
+- **Arch Linux & CachyOS Native Package Support**: Added PKGBUILD packaging recipe (`linux/archpkg/PKGBUILD`), automated local packaging script (`scripts/build_archpkg.sh`), and GitHub Actions CI workflow to build and publish `Desky-Linux-x64.pkg.tar.zst` on every release.
+- **Group Room & Theme Translations**: Added comprehensive fallback translations for all group room states and tabs (`today_study_time`, `focus_rate`, `group_ranking`, `studying_now`, `total_members`, `today_total`, `weekly_total`, `monthly_total`, `all_time_total`, `no_study_records`, `room_type`, `auto_accept`, `public_room`, `private_room`, `theme`, `amoled_lilac`, `midnight_navy`, `cyberpunk_neon`, `forest_emerald`, `sunset_amber`) across 11 languages (PT, EN, ES, KO, JA, ZH-CN, ZH-TW, FR, DE, IT, RU).
+
+### Fixed
+- **Group Ranking YPT API Period Date Format**: Fixed HTTP 400 bad request in group rankings (`fetchGroupRanks`) by sending unpadded period start dates (`YYYY-M-D`) expected by the YPT API instead of unformatted or zero-padded dates, with an optional `referenceDate` parameter for deterministic testing.
+- **Live Study Room Active Members Ordering**: Group room members tab now sorts active members descending by accumulated study time (`studyMs`) for consistent leaderboard display.
+- **Group Detail Screen Header Fallback**: Fixed header member count subtitle fallback when translations are loading or missing.
+- **Resting & Goal Translation Aliases**: Decoupled `resting` from `study_rest_label` and removed duplicate `goal_statistics_text_total_time` from `goal` to prevent incorrect status text overlaps.
+
+### Changed
+- **Multi-language Documentation**: Updated `README.md`, `README.pt-BR.md`, and `README.zh-CN.md` with Arch Linux / CachyOS installation instructions (`pacman -U`) and theme customizer highlights.
+
 ## [1.0.10] - 2026-10-11
 
 ### Fixed
