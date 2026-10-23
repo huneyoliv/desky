@@ -85,6 +85,7 @@ Before creating and pushing any release tag, the version string and build number
 - **Live Study Room Active Members Ordering**: Group room members tab now sorts active members descending by accumulated study time (`studyMs`) for consistent leaderboard display.
 - **Group Detail Screen Header Fallback**: Fixed header member count subtitle fallback when translations are loading or missing.
 - **Resting & Goal Translation Aliases**: Decoupled `resting` from `study_rest_label` and removed duplicate `goal_statistics_text_total_time` from `goal` to prevent incorrect status text overlaps.
+- **Linux Clang 19+ CMake Compatibility**: Suppressed `-Wdeprecated-literal-operator` in `linux/CMakeLists.txt` to prevent legacy header warnings in third-party plugins (such as `flutter_secure_storage`) from triggering `-Werror` build failures on modern compilers.
 
 ### Changed
 - **Multi-language Documentation**: Updated `README.md`, `README.pt-BR.md`, and `README.zh-CN.md` with Arch Linux / CachyOS installation instructions (`pacman -U`) and theme customizer highlights.
