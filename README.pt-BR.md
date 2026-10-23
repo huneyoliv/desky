@@ -79,6 +79,9 @@ O **Desky** foi desenvolvido para oferecer a melhor experiência de produtividad
 ### 🎨 Avatares & Loja
 - Personalização de avatar com roupas, acessórios e poses dinâmicas sincronizadas com o estado de estudo.
 
+### 🎨 Customização de Temas In-App
+- Personalização visual instantânea entre 5 paletas de temas curados (AMOLED Lilás, Azul Meia-Noite, Cyberpunk Neon, Verde Esmeralda, Âmbar Dourado) sem precisar reiniciar o aplicativo.
+
 ### 🔔 Central de Notificações
 - Central interna de notificações para avisos de grupos, toques de amigos e comunicados de novas versões.
 
@@ -101,6 +104,7 @@ Baixe a versão mais recente diretamente na página de [**Releases Oficiais**](h
 | **Windows** | `Desky-Windows-x64.msix` | Pacote MSIX | Instale diretamente pelo Windows App Installer / formato Microsoft Store. |
 | **macOS** | `Desky-macOS-Installer.dmg` | Imagem de Disco | Abra o arquivo `.dmg` e arraste o `Desky.app` para `Applications`. |
 | **Linux (Debian/Ubuntu)** | `Desky-Linux-x64.deb` | Pacote Debian | `sudo apt install ./Desky-Linux-x64.deb` ou `sudo dpkg -i Desky-Linux-x64.deb` |
+| **Linux (Arch/CachyOS)** | `Desky-Linux-x64.pkg.tar.zst` | Pacote Pacman | `sudo pacman -U Desky-Linux-x64.pkg.tar.zst` ou compilação com `makepkg -si` |
 | **Linux (Outras Distros)** | `Desky-Linux-x64.tar.gz` | Arquivo Portável | Extraia o `.tar.gz` e execute o binário `./desky`. |
 
 ---

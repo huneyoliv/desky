@@ -79,6 +79,9 @@
 ### 🎨 虚拟形象与商城
 - 可定制的卡通娃娃形象，支持装扮、配饰以及随学习状态变化的丰富动态姿势。
 
+### 🎨 应用内主题定制
+- 支持在 5 种精心调配的主题调色板间即时切换（AMOLED 丁香紫、午夜深蓝、赛博朋克霓虹、森林翡翠绿、落日琥珀金），无需重启应用。
+
 ### 🔔 消息通知中心
 - 集中管理小组公告、好友互动提醒及新版本更新通知。
 
@@ -101,6 +104,7 @@
 | **Windows** | `Desky-Windows-x64.msix` | MSIX 现代化应用包 | 支持 Windows App Installer / 微软应用商店格式直接安装。 |
 | **macOS** | `Desky-macOS-Installer.dmg` | 磁盘映像 | 打开 `.dmg` 文件并将 `Desky.app` 拖入 `Applications` 文件夹。 |
 | **Linux (Debian/Ubuntu)** | `Desky-Linux-x64.deb` | Debian 软件包 | 终端运行 `sudo apt install ./Desky-Linux-x64.deb` 或 `sudo dpkg -i Desky-Linux-x64.deb`。 |
+| **Linux (Arch/CachyOS)** | `Desky-Linux-x64.pkg.tar.zst` | Pacman 软件包 | 运行 `sudo pacman -U Desky-Linux-x64.pkg.tar.zst` 或通过 `makepkg -si` 构建。 |
 | **Linux (其他发行版)** | `Desky-Linux-x64.tar.gz` | 便携归档文件 | 解压 `.tar.gz` 归档并直接运行 `./desky` 二进制文件。 |
 
 ---

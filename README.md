@@ -79,6 +79,9 @@
 ### 🎨 Avatars & Store
 - Customizable doll avatars with outfits, accessories, and dynamic poses reactive to study state.
 
+### 🎨 In-App Theme & Visual Customizer
+- Instant visual customization across 5 curated themes (AMOLED Lilac, Midnight Navy, Cyberpunk Neon, Forest Emerald, Sunset Amber) without app restarts.
+
 ### 🔔 Notification Center
 - In-app notification center for group announcements, member nudges, and system notices.
 
@@ -101,6 +104,7 @@ Download the latest version directly from our official [**Releases Page**](https
 | **Windows** | `Desky-Windows-x64.msix` | MSIX Package | Install directly with Windows App Installer / Microsoft Store format. |
 | **macOS** | `Desky-macOS-Installer.dmg` | Disk Image | Open `.dmg` and drag `Desky.app` to your `Applications` folder. |
 | **Linux (Debian/Ubuntu)** | `Desky-Linux-x64.deb` | Debian Package | Run `sudo apt install ./Desky-Linux-x64.deb` or `sudo dpkg -i Desky-Linux-x64.deb`. |
+| **Linux (Arch/CachyOS)** | `Desky-Linux-x64.pkg.tar.zst` | Pacman Package | Run `sudo pacman -U Desky-Linux-x64.pkg.tar.zst` or build via `makepkg -si`. |
 | **Linux (Other Distros)** | `Desky-Linux-x64.tar.gz` | Portable Archive | Extract the archive and execute `./desky`. |
 
 ---
