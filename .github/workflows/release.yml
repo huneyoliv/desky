@@ -242,9 +242,54 @@ jobs:
             Desky-Linux-x64.tar.gz
           if-no-files-found: error
 
+  build-archpkg:
+    name: Arch Linux Package (.pkg.tar.zst)
+    needs: [quality-gate, build-linux]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Download Linux .tar.gz artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Desky-Linux-Packages
+          path: linux_artifacts
+
+      - name: Build Arch package in archlinux container
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/workspace" -w /workspace archlinux:latest bash -c "
+            pacman -Sy --noconfirm base-devel sudo
+            useradd -m builder
+            echo 'builder ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+            
+            SHA256=\$(sha256sum linux_artifacts/Desky-Linux-x64.tar.gz | cut -d' ' -f1)
+            cp linux_artifacts/Desky-Linux-x64.tar.gz /home/builder/
+            cp linux/archpkg/PKGBUILD /home/builder/
+            
+            sed -i \"s/sha256sums=('SKIP')/sha256sums=('\${SHA256}')/\" /home/builder/PKGBUILD
+            sed -i \"s|source=.*|source=(\\\"Desky-Linux-x64.tar.gz\\\")|\" /home/builder/PKGBUILD
+            
+            chown -R builder:builder /home/builder
+            cd /home/builder
+            sudo -u builder makepkg --noconfirm -f
+            
+            cp /home/builder/*.pkg.tar.zst /workspace/Desky-Linux-x64.pkg.tar.zst
+          "
+
+      - name: Upload Arch Package Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Desky-Arch-Package
+          path: Desky-Linux-x64.pkg.tar.zst
+          if-no-files-found: error
+
   publish-release:
     name: Publish GitHub Release
-    needs: [quality-gate, build-windows, build-macos, build-linux]
+    needs: [quality-gate, build-windows, build-macos, build-linux, build-archpkg]
     runs-on: ubuntu-latest
 
     steps:
@@ -283,6 +328,7 @@ jobs:
             "release_assets/Desky-macOS-Installer.dmg"
             "release_assets/Desky-Linux-x64.deb"
             "release_assets/Desky-Linux-x64.tar.gz"
+            "release_assets/Desky-Linux-x64.pkg.tar.zst"
           )
           
           MISSING=0
@@ -299,7 +345,7 @@ jobs:
             echo "❌ Pipeline failed: One or more platform artifacts are missing."
             exit 1
           fi
-          echo "🎉 All 4 platform release artifacts verified successfully!"
+          echo "🎉 All 5 platform release artifacts verified successfully!"
 
       - name: Create Official GitHub Release
         uses: softprops/action-gh-release@v2
@@ -316,6 +362,7 @@ jobs:
             release_assets/Desky-macOS-Installer.dmg
             release_assets/Desky-Linux-x64.deb
             release_assets/Desky-Linux-x64.tar.gz
+            release_assets/Desky-Linux-x64.pkg.tar.zst
 
   deploy-microsoft-store:
     name: Deploy to Microsoft Store (MSIX)

@@ -1,0 +1,60 @@
+# Maintainer: Huney Oliveira <huney.oliveira@gmail.com>
+pkgname=desky
+pkgver=1.1.1
+pkgrel=1
+pkgdesc="Desky — Focus & Study Timer Desktop Client for Yeolpumta (YPT)"
+arch=('x86_64')
+url="https://github.com/huneyoliv/desky"
+license=('custom:EULA')
+depends=(
+  'gtk3'
+  'libsecret'
+  'jsoncpp'
+  'xdg-utils'
+  'glib2'
+)
+optdepends=(
+  'libnotify: desktop notifications support'
+)
+provides=('desky')
+conflicts=('desky-git')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/huneyoliv/desky/releases/download/v${pkgver}/Desky-Linux-x64.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  install -dm755 "${pkgdir}/opt/${pkgname}"
+  cp -r "${srcdir}/"* "${pkgdir}/opt/${pkgname}/" 2>/dev/null || true
+  rm -f "${pkgdir}/opt/${pkgname}/${pkgname}-${pkgver}.tar.gz" 2>/dev/null || true
+  rm -f "${pkgdir}/opt/${pkgname}/Desky-Linux-x64.tar.gz" 2>/dev/null || true
+  chmod -R 755 "${pkgdir}/opt/${pkgname}"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  ln -sf "/opt/${pkgname}/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+
+  install -dm755 "${pkgdir}/usr/share/applications"
+  cat > "${pkgdir}/usr/share/applications/${pkgname}.desktop" << EOF
+[Desktop Entry]
+Name=Desky
+GenericName=Study Timer
+Comment=Focus & Study Timer Desktop Client for Yeolpumta (YPT)
+Exec=/usr/bin/${pkgname}
+Icon=${pkgname}
+Terminal=false
+Type=Application
+Categories=Utility;Education;
+Keywords=study;timer;focus;yeolpumta;ypt;pomodoro;
+StartupWMClass=desky
+EOF
+
+  install -dm755 "${pkgdir}/usr/share/pixmaps"
+  if [ -f "${pkgdir}/opt/${pkgname}/data/flutter_assets/assets/icons/icon.png" ]; then
+    install -Dm644 "${pkgdir}/opt/${pkgname}/data/flutter_assets/assets/icons/icon.png" \
+      "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+  fi
+
+  install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+  if [ -f "${pkgdir}/opt/${pkgname}/data/flutter_assets/assets/fonts/OFL.txt" ]; then
+    install -Dm644 "${pkgdir}/opt/${pkgname}/data/flutter_assets/assets/fonts/OFL.txt" \
+      "${pkgdir}/usr/share/licenses/${pkgname}/OFL.txt"
+  fi
+}
