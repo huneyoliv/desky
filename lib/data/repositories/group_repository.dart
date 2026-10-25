@@ -70,19 +70,42 @@ class GroupRepository {
       } else {
         refDate = StudyDateHelper.getStudyDate(now);
       }
-      final dateStr = '${refDate.year}-${refDate.month}-${refDate.day}';
+      final dateStr =
+          '${refDate.year}-${refDate.month.toString().padLeft(2, '0')}-${refDate.day.toString().padLeft(2, '0')}';
 
       dynamic data;
+      // 1. Try authenticated API first
       try {
-        final response = await _apiClient.get(
-          '${ApiConstants.metadataCdnUrl}/logs/group/member/ranks?type=$period&countryID=$countryId&categoryID=$categoryId&groupID=$groupId&isCam=false&date=$dateStr&page=1',
-        );
-        data = response.data;
-      } catch (_) {
         final response = await _apiClient.get(
           '/logs/group/member/ranks?type=$period&countryID=$countryId&categoryID=$categoryId&groupID=$groupId&isCam=false&date=$dateStr&page=1',
         );
-        data = response.data;
+        final respData = response.data;
+        if (respData is Map && respData['s'] != false) {
+          final list = respData['ms'] ?? respData['ranks'] ?? respData['list'] ?? respData['members'];
+          if (list is List && list.isNotEmpty) {
+            data = respData;
+          }
+        } else if (respData is List && respData.isNotEmpty) {
+          data = respData;
+        }
+      } catch (_) {}
+
+      // 2. Fallback to CDN if main API returned nothing
+      if (data == null) {
+        try {
+          final response = await _apiClient.get(
+            '${ApiConstants.metadataCdnUrl}/logs/group/member/ranks?type=$period&countryID=$countryId&categoryID=$categoryId&groupID=$groupId&isCam=false&date=$dateStr&page=1',
+          );
+          final respData = response.data;
+          if (respData is Map && respData['s'] != false) {
+            final list = respData['ms'] ?? respData['ranks'] ?? respData['list'] ?? respData['members'];
+            if (list is List && list.isNotEmpty) {
+              data = respData;
+            }
+          } else if (respData is List && respData.isNotEmpty) {
+            data = respData;
+          }
+        } catch (_) {}
       }
 
       if (data is Map) {
