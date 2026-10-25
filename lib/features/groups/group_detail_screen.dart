@@ -39,7 +39,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
   Timer? _refreshTimer;
 
   List<GroupMemberModel> _members = [];
-  List<GroupMemberModel> _weeklyRanks = [];
+  List<GroupMemberModel> _groupRanks = [];
   List<ChatMessageModel> _chatMessages = [];
   bool _isLoadingMembers = true;
   bool _showStickerPicker = false;
@@ -186,7 +186,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       final ranks = await repo.fetchGroupRanks(widget.group.id, period: _selectedGroupRankPeriod);
       if (mounted) {
         setState(() {
-          _weeklyRanks = ranks;
+          _groupRanks = ranks;
           _isLoadingRanks = false;
         });
       }
@@ -420,6 +420,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
   @override
   Widget build(BuildContext context) {
     final studyingMembers = _members.where((m) => m.isStudying && !m.isPaused).toList();
+    final todayTotalMs = _members.fold<int>(0, (sum, m) => sum + m.studyMs);
     final activeUser = ref.watch(authStateProvider).user;
     final t = ref.watch(appTranslationProvider);
     final isLeader = activeUser != null &&
@@ -435,7 +436,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           children: [
             Text(widget.group.name, style: AppTextStyles.titleLarge),
             Text(
-              '${studyingMembers.length} ${t.tr("studying_now", fallback: "studying now")} • ${t.tr("goal", fallback: "Goal")}: ${widget.group.dailyGoalHours}h/${t.tr("day", fallback: "day")}',
+              '${studyingMembers.length} ${t.tr("studying_now", fallback: "studying now")} • ${t.tr("today_total", fallback: "Total Hoje")}: ${_formatMs(todayTotalMs)} • ${t.tr("goal", fallback: "Goal")}: ${widget.group.dailyGoalHours}h/${t.tr("day", fallback: "day")}',
               style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
@@ -506,7 +507,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           tabs: [
             Tab(text: t.tr('studying_now', fallback: 'Estudando Agora')),
             Tab(text: t.tr('group_chat', fallback: 'Chat do Grupo')),
-            Tab(text: t.tr('weekly_ranking', fallback: 'Ranking Semanal')),
+            Tab(text: t.tr('group_ranking', fallback: 'Ranking do Grupo')),
           ],
         ),
       ),
@@ -695,7 +696,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
             } else {
               rawFallback = <GroupMemberModel>[];
             }
-            final displayList = _weeklyRanks.isNotEmpty ? _weeklyRanks : rawFallback;
+            final displayList = _groupRanks.isNotEmpty ? _groupRanks : rawFallback;
             final periodTotalMs = displayList.fold<int>(0, (sum, m) => sum + m.studyMs);
             return Column(
               children: [
@@ -741,7 +742,11 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                       ),
                       const Spacer(),
                       Text(
-                        t.tr('group_rank_total_time', fallback: 'Total time'),
+                        _selectedGroupRankPeriod == 'day'
+                            ? t.tr('today_total', fallback: 'Total Hoje')
+                            : _selectedGroupRankPeriod == 'week'
+                                ? t.tr('weekly_total', fallback: 'Total Semanal')
+                                : t.tr('monthly_total', fallback: 'Total Mensal'),
                         style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
                       ),
                       const SizedBox(width: 6),

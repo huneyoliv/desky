@@ -33,8 +33,10 @@ class RankEntryModel {
     int studyMs;
     if (dl != null && (dl['sm'] != null || dl['tp'] != null)) {
       studyMs = safeInt(dl['sm'] ?? dl['tp'], 0);
-    } else if (json['sm'] != null || json['studyMs'] != null) {
-      studyMs = safeInt(json['sm'] ?? json['studyMs'], 0);
+    } else if (json['sm'] != null || json['studyMs'] != null || json['totalMs'] != null) {
+      studyMs = safeInt(json['sm'] ?? json['studyMs'] ?? json['totalMs'], 0);
+    } else if (json['tm'] != null) {
+      studyMs = safeInt(json['tm'], 0);
     } else {
       final rawTime = safeInt(json['st'] ?? json['tp'] ?? json['time'] ?? json['duration'], 0);
       if (rawTime > 0 && rawTime < 1000000) {
@@ -44,7 +46,15 @@ class RankEntryModel {
       }
     }
 
-    final studiconId = safeInt(json['sd'] ?? json['si'] ?? (json['sm'] != null ? json['st'] : null) ?? json['studiconID'] ?? json['studiconId'], -1);
+    final studiconId = safeInt(
+      json['pv'] ??
+          json['sd'] ??
+          json['si'] ??
+          (json['sm'] != null ? json['st'] : null) ??
+          json['studiconID'] ??
+          json['studiconId'],
+      -1,
+    );
     final category = safeString(json['ct'] ?? json['c'], 'Geral');
 
     return RankEntryModel(

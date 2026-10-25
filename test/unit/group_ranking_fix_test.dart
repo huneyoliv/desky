@@ -1,5 +1,6 @@
-﻿import 'package:desky/core/api/api_client.dart';
+import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/group_member_model.dart';
+import 'package:desky/data/models/rank_entry_model.dart';
 import 'package:desky/data/repositories/group_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -102,6 +103,46 @@ void main() {
       expect(member.studyMs, 0);
     });
 
+    test('GroupMemberModel.fromJson parses pv and tm/totalMs correctly', () {
+      final jsonMember = {
+        'ud': 555,
+        'n': 'RankingUser',
+        'pv': 42,
+        'tm': 1800000,
+      };
+      final member = GroupMemberModel.fromJson(jsonMember);
+      expect(member.userId, 555);
+      expect(member.name, 'RankingUser');
+      expect(member.studiconId, 42);
+      expect(member.studyMs, 1800000);
+
+      final jsonTotalMs = {
+        'ud': 666,
+        'n': 'TotalUser',
+        'pv': 99,
+        'totalMs': 3600000,
+      };
+      final member2 = GroupMemberModel.fromJson(jsonTotalMs);
+      expect(member2.userId, 666);
+      expect(member2.studiconId, 99);
+      expect(member2.studyMs, 3600000);
+    });
+
+    test('RankEntryModel.fromJson parses pv studicon correctly', () {
+      final jsonRank = {
+        'rank': 1,
+        'ud': 777,
+        'n': 'RankOne',
+        'pv': 88,
+        'tm': 9000000,
+      };
+      final entry = RankEntryModel.fromJson(jsonRank, 1);
+      expect(entry.userId, 777);
+      expect(entry.userName, 'RankOne');
+      expect(entry.studiconId, 88);
+      expect(entry.studyMs, 9000000);
+    });
+
     test('GroupRepository.fetchGroupRanks includes isCam=false and sorts descending by studyMs', () async {
       final dio = Dio();
       final adapter = MockDioWithRankAdapter();
@@ -118,6 +159,21 @@ void main() {
       expect(ranks[1].studyMs, 3600000);
       expect(adapter.lastOptions?.path, contains('isCam=false'));
       expect(adapter.lastOptions?.path, contains('groupID=6487271'));
+    });
+
+    test('GroupRepository.fetchGroupRanks zero-pads month and day and calls relative API endpoint', () async {
+      final dio = Dio();
+      final adapter = MockDioWithRankAdapter();
+      dio.httpClientAdapter = adapter;
+      final apiClient = ApiClient(customDio: dio);
+
+      final repo = GroupRepository(apiClient: apiClient);
+      final refDate = DateTime(2026, 3, 5); // month 3, day 5 (Thursday)
+      await repo.fetchGroupRanks(12345, period: 'week', referenceDate: refDate);
+
+      expect(adapter.lastOptions?.path, startsWith('/logs/group/member/ranks'));
+      expect(adapter.lastOptions?.path, contains('date=2026-03-02')); // Monday of that week zero-padded
+      expect(adapter.lastOptions?.path, isNot(contains('picf.tgclab.com')));
     });
   });
 }

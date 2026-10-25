@@ -40,7 +40,10 @@ class GroupMemberModel {
     final isStudying = safeBool(dl?['is'] ?? json['isStudying'] ?? json['is']);
     final isPaused = safeBool(dl?['ia'] ?? dl?['ip'] ?? json['isPaused'] ?? json['ia'] ?? json['ip']);
 
-    int studiconId = safeInt(json['sd'] ?? json['si'] ?? json['studiconID'] ?? json['studiconId'], -1);
+    int studiconId = safeInt(
+      json['pv'] ?? json['sd'] ?? json['si'] ?? json['studiconID'] ?? json['studiconId'],
+      -1,
+    );
     if (studiconId == -1 && json['sm'] != null && json['st'] != null) {
       studiconId = safeInt(json['st'], -1);
     }
@@ -48,8 +51,10 @@ class GroupMemberModel {
     int studyMs;
     if (dl != null && (dl['sm'] != null || dl['tp'] != null)) {
       studyMs = safeInt(dl['sm'] ?? dl['tp'], 0);
-    } else if (json['studyMs'] != null || json['sm'] != null) {
-      studyMs = safeInt(json['studyMs'] ?? json['sm'], 0);
+    } else if (json['studyMs'] != null || json['sm'] != null || json['totalMs'] != null) {
+      studyMs = safeInt(json['studyMs'] ?? json['sm'] ?? json['totalMs'], 0);
+    } else if (json['tm'] != null) {
+      studyMs = safeInt(json['tm'], 0);
     } else if (json['st'] != null) {
       final rawSt = safeInt(json['st'], 0);
       studyMs = (rawSt > 0 && rawSt < 500000000) ? rawSt * 1000 : rawSt;
