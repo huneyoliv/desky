@@ -47,6 +47,34 @@ void main() {
       }
     });
 
+    test('AppTranslation fallback translations resolve for room and group keys across core languages', () {
+      const roomKeys = [
+        'today_total',
+        'weekly_total',
+        'monthly_total',
+        'all_time_total',
+        'group_ranking',
+        'leader_menu',
+        'leave_group',
+        'leave_group_confirm',
+        'joined_group_success',
+        'joined_group_failed',
+        'shake_sent_to',
+        'notification_sent_to',
+        'theme_appearance',
+        'theme_active_badge',
+      ];
+      for (final lang in ['pt', 'en', 'es', 'ja', 'ko', 'zh-cn', 'fr', 'de', 'it', 'ru']) {
+        final t = AppTranslation(languageCode: lang);
+        for (final key in roomKeys) {
+          final resolved = t.tr(key);
+          expect(resolved, isNot(equals(key)),
+              reason: 'Key "$key" should be translated for lang "$lang"');
+          expect(resolved.isNotEmpty, isTrue);
+        }
+      }
+    });
+
     test('AppTranslation tr replaces placeholder arguments for formatted messages', () {
       final tPt = AppTranslation(languageCode: 'pt');
       final syncSuccessPt = tPt.tr('sessions_synced_success', args: ['5']);
