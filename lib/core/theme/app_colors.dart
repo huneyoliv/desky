@@ -7,6 +7,22 @@ class AppColors {
   /// Retrieve the active theme palette from BuildContext
   static DeskyThemePalette palette(BuildContext context) => context.palette;
 
+  // Context-aware dynamic theme accessors
+  static Color bg(BuildContext context) => context.appBackground;
+  static Color surf(BuildContext context) => context.appSurface;
+  static Color surfLight(BuildContext context) => context.appSurfaceLight;
+  static Color crd(BuildContext context) => context.appCard;
+  static Color brd(BuildContext context) => context.appBorder;
+  static Color pri(BuildContext context) => context.appPrimary;
+  static Color priDark(BuildContext context) => context.appPrimaryDark;
+  static Color priLight(BuildContext context) => context.appPrimaryLight;
+  static Color acc(BuildContext context) => context.appAccent;
+  static Color accDark(BuildContext context) => context.appAccentDark;
+  static Color outl(BuildContext context) => context.appOutline;
+  static Color txtPrimary(BuildContext context) => context.appTextPrimary;
+  static Color txtSecondary(BuildContext context) => context.appTextSecondary;
+  static Color txtMuted(BuildContext context) => context.appTextMuted;
+
   // Dark Theme Colors — AMOLED True Black
   static const Color background = Color(0xFF000000);
   static const Color surface = Color(0xFF0A0A0F);

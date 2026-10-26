@@ -436,17 +436,18 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     final totalCount = _todos.length;
     final progressPct = totalCount > 0 ? completedCount / totalCount : 0.0;
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: palette.background,
         appBar: AppBar(
           toolbarHeight: 0,
           bottom: TabBar(
-            indicatorColor: AppColors.primary,
+            indicatorColor: palette.primary,
             labelColor: Colors.white,
-            unselectedLabelColor: AppColors.textSecondary,
+            unselectedLabelColor: palette.textSecondary,
             tabs: [
               Tab(text: t.tr('todo', fallback: 'Tarefas & D-Days')),
               Tab(text: t.tr('timetable', fallback: 'Grade Horária')),
@@ -461,8 +462,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 Container(
                   width: 380,
                   decoration: const BoxDecoration(
-                    color: AppColors.surface,
-                    border: Border(right: BorderSide(color: AppColors.border)),
+                    color: palette.surface,
+                    border: Border(right: BorderSide(color: palette.border)),
                   ),
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
@@ -503,7 +504,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                       margin: const EdgeInsets.only(right: 12),
                                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                       decoration: BoxDecoration(
-                                        color: AppColors.card,
+                                        color: palette.card,
                                         borderRadius: BorderRadius.circular(14),
                                         border: Border.all(
                                             color: dday.color.withValues(alpha: 0.6)),

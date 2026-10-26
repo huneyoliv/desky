@@ -171,7 +171,7 @@ class ProfileScreen extends ConsumerWidget {
     final activeTheme = ref.watch(themeNotifierProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: activeTheme.background,
       appBar: AppBar(
         title: Text('${t.tr('profile', fallback: 'Perfil')} & ${t.tr('settings', fallback: 'Configurações')}', style: AppTextStyles.titleLarge),
       ),
@@ -183,9 +183,9 @@ class ProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: activeTheme.card,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: activeTheme.border),
               ),
               child: Row(
                 children: [
@@ -405,7 +405,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     child: Column(
                       children: [
-                        const Icon(Icons.timer, color: AppColors.primary, size: 28),
+                        Icon(Icons.timer, color: activeTheme.primary, size: 28),
                         const SizedBox(height: 8),
                         Text(
                           _formatHours(timerState.todayTotalMs),

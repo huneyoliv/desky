@@ -423,13 +423,14 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     final todayTotalMs = _members.fold<int>(0, (sum, m) => sum + m.studyMs);
     final activeUser = ref.watch(authStateProvider).user;
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
     final isLeader = activeUser != null &&
         (widget.group.leaderUserId == activeUser.id ||
             (widget.group.leaderName.isNotEmpty && widget.group.leaderName == activeUser.name));
     final isMember = activeUser != null && activeUser.userGroups.any((g) => g.id == widget.group.id);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: palette.background,
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,9 +502,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
+          indicatorColor: palette.primary,
           labelColor: Colors.white,
-          unselectedLabelColor: AppColors.textSecondary,
+          unselectedLabelColor: palette.textSecondary,
           tabs: [
             Tab(text: t.tr('studying_now', fallback: 'Estudando Agora')),
             Tab(text: t.tr('group_chat', fallback: 'Chat do Grupo')),
@@ -639,7 +640,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                 ),
               Container(
                 padding: const EdgeInsets.all(16),
-                color: AppColors.surface,
+                color: palette.surface,
                 child: Row(
                   children: [
                     IconButton(
@@ -666,7 +667,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                           hintText: t.tr('type_message', fallback: 'Digite sua mensagem...'),
                           hintStyle: const TextStyle(color: AppColors.textMuted),
                           filled: true,
-                          fillColor: AppColors.card,
+                          fillColor: palette.card,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                             borderSide: BorderSide.none,
@@ -702,14 +703,14 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  color: AppColors.surface,
+                  color: palette.surface,
                   child: Row(
                     children: [
                       ChoiceChip(
                         label: Text(t.tr('today', fallback: 'Hoje')),
                         selected: _selectedGroupRankPeriod == 'day',
-                        selectedColor: AppColors.primary,
-                        backgroundColor: AppColors.card,
+                        selectedColor: palette.primary,
+                        backgroundColor: palette.card,
                         labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'day' ? Colors.white : AppColors.textMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'day');
@@ -720,8 +721,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                       ChoiceChip(
                         label: Text(t.tr('this_week', fallback: 'Esta Semana')),
                         selected: _selectedGroupRankPeriod == 'week',
-                        selectedColor: AppColors.primary,
-                        backgroundColor: AppColors.card,
+                        selectedColor: palette.primary,
+                        backgroundColor: palette.card,
                         labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'week' ? Colors.white : AppColors.textMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'week');
@@ -732,8 +733,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                       ChoiceChip(
                         label: Text(t.tr('this_month', fallback: 'Este Mês')),
                         selected: _selectedGroupRankPeriod == 'month',
-                        selectedColor: AppColors.primary,
-                        backgroundColor: AppColors.card,
+                        selectedColor: palette.primary,
+                        backgroundColor: palette.card,
                         labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'month' ? Colors.white : AppColors.textMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'month');
@@ -779,10 +780,10 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: Material(
-                          color: AppColors.card,
+                          color: palette.card,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: AppColors.border),
+                            side: BorderSide(color: palette.border),
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: ListTile(
@@ -806,7 +807,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                 child: Text(
                                   '${index + 1}',
                                   style: TextStyle(
-                                    color: index < 3 ? Colors.black : Colors.white,
+                                    color: index < 3 ? Colors.black : palette.textPrimary,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12,
                                   ),
@@ -815,7 +816,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                               const SizedBox(width: 12),
                               CircleAvatar(
                                 radius: 20,
-                                backgroundColor: AppColors.surface,
+                                backgroundColor: palette.surface,
                                 backgroundImage: NetworkImage(member.avatarUrl),
                               ),
                             ],
@@ -824,12 +825,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                             member.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+                            style: TextStyle(color: palette.textPrimary, fontWeight: FontWeight.w600),
                           ),
                           trailing: Text(
                             _formatMs(member.studyMs),
                             style: const TextStyle(
-                              color: AppColors.primary,
+                              color: palette.primary,
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),
@@ -985,12 +986,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.palette.card,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isActivelyStudying
-              ? AppColors.primary.withValues(alpha: 0.6)
-              : AppColors.border,
+              ? context.palette.primary.withValues(alpha: 0.6)
+              : context.palette.border,
           width: isActivelyStudying ? 2 : 1,
         ),
       ),

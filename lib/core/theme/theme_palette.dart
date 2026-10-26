@@ -201,4 +201,23 @@ extension DeskyThemeContext on BuildContext {
   DeskyThemePalette get palette =>
       Theme.of(this).extension<DeskyThemeExtension>()?.palette ??
       DeskyThemePalette.amoledLilac;
+
+  Color get appBackground => palette.background;
+  Color get appSurface => palette.surface;
+  Color get appSurfaceLight => palette.surfaceLight;
+  Color get appCard => palette.card;
+  Color get appBorder => palette.border;
+  Color get appPrimary => palette.primary;
+  Color get appPrimaryDark => palette.primaryDark;
+  Color get appPrimaryLight => palette.primaryLight;
+  Color get appAccent => palette.accent;
+  Color get appAccentDark => palette.accentDark;
+  Color get appOutline => palette.outline;
+  Color get appTextPrimary => palette.textPrimary;
+  Color get appTextSecondary => palette.textSecondary;
+  Color get appTextMuted => palette.textMuted;
+  Color get appHeatmapL1 => palette.heatmapL1;
+  Color get appHeatmapL2 => palette.heatmapL2;
+  Color get appHeatmapL3 => palette.heatmapL3;
+  Color get appHeatmapL4 => palette.heatmapL4;
 }
