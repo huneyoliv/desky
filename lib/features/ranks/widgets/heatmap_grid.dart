@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/theme_palette.dart';
 import '../../../core/localization/app_translation.dart';
 
 class HeatmapGrid extends ConsumerWidget {
@@ -35,7 +36,7 @@ class HeatmapGrid extends ConsumerWidget {
           children: [
             Text(
               t.tr('heatmap_title', fallback: 'Mapa de Calor de Estudos (24h x 30d)'),
-              style: const TextStyle(
+              style: TextStyle(
                 color: palette.textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
@@ -102,7 +103,7 @@ class HeatmapGrid extends ConsumerWidget {
                             height: 12,
                             margin: const EdgeInsets.only(bottom: 2),
                             decoration: BoxDecoration(
-                              color: _getColor(mins),
+                              color: _getColor(mins, palette),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),

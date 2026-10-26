@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme_palette.dart';
+export 'theme_palette.dart';
 
 class AppColors {
   AppColors._();

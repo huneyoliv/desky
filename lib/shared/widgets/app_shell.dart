@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/theme_palette.dart';
 import '../../core/localization/app_translation.dart';
 import '../../features/timer/focus_mode_notifier.dart';
 import 'sidebar_nav.dart';
