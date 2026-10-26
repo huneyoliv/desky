@@ -73,6 +73,14 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.1.2] - 2026-10-25
+
+### Fixed
+- **Multi-language Group Room & UI Fallbacks**: Resolved untranslated text strings falling back to Portuguese in English and non-Portuguese locales by adding over 120 multilingual entries across 10 languages (EN, ES, KO, JA, ZH-CN, ZH-TW, FR, DE, IT, RU) and harmonizing dictionary keys in `assets/translations/en.json`, `assets/translations/pt.json`, and `_coreFallbackTranslations` (Fixes Issue #2).
+- **Group Room Leaderboard & Period Rankings**: Fixed 404 error on group rankings by querying the authenticated API endpoint `/logs/group/member/ranks` directly with zero-padded date formatting, supporting `pv` studicon identifier and `tm`/`totalMs` time metrics in `GroupMemberModel` and `RankEntryModel`, and displaying active rankings for day, week, and month periods (Fixes Issue #2).
+- **Group Room Accumulated Study Hours**: Added aggregate room study time calculation and display in the group detail room header (`today_total`) and dynamically updated period total time (`today_total`, `weekly_total`, `monthly_total`) with localized labels in the group rankings tab (Fixes Issue #2).
+- **In-App Visual Theme Customizer Dynamic Propagation**: Overhauled theme system to dynamically propagate active theme palette colors (`palette.background`, `palette.surface`, `palette.card`, `palette.border`, `palette.primary`, `palette.textPrimary`, `palette.textSecondary`, `palette.textMuted`, and `palette.heatmapL1..L4`) across all UI shells, sidebar navigation, timer screen, groups screen, planner, global ranks, heatmap grid, study calendar, and user profile (Fixes Issue #2).
+
 ## [1.1.1] - 2026-10-23
 
 ### Added
