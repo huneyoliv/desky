@@ -104,17 +104,18 @@ class SidebarNav extends ConsumerWidget {
     final unreadAsync = ref.watch(unreadNotificationCountProvider);
     final hasUnread = unreadAsync.maybeWhen(data: (cnt) => cnt > 0, orElse: () => true);
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     return Container(
       width: 240,
-      color: AppColors.surface,
+      color: palette.surface,
       child: Column(
         children: [
           // Header: User Profile Card
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.border)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: palette.border)),
             ),
             child: Row(
               children: [
@@ -138,10 +139,10 @@ class SidebarNav extends ConsumerWidget {
                         user?.name ?? t.tr('student', fallback: 'Estudante'),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: AppTextStyles.fontText,
                           fontFamilyFallback: AppTextStyles.fontFallbacks,
-                          color: AppColors.textPrimary,
+                          color: palette.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
                         ),
@@ -153,7 +154,7 @@ class SidebarNav extends ConsumerWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: isStudying ? AppColors.success : AppColors.textMuted.withAlpha(120),
+                              color: isStudying ? AppColors.success : palette.textMuted.withAlpha(120),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -163,7 +164,7 @@ class SidebarNav extends ConsumerWidget {
                                 ? t.tr('studying', fallback: 'Estudando')
                                 : t.tr('idle', fallback: 'Inativo'),
                             style: TextStyle(
-                              color: isStudying ? AppColors.success : AppColors.textMuted,
+                              color: isStudying ? AppColors.success : palette.textMuted,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -200,11 +201,11 @@ class SidebarNav extends ConsumerWidget {
                             horizontal: 14, vertical: 11),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.12)
+                              ? palette.primary.withValues(alpha: 0.12)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                           border: isSelected
-                              ? Border.all(color: AppColors.outline)
+                              ? Border.all(color: palette.outline)
                               : null,
                         ),
                         child: Row(
@@ -216,8 +217,8 @@ class SidebarNav extends ConsumerWidget {
                                 height: 20,
                                 colorFilter: ColorFilter.mode(
                                   isSelected
-                                      ? AppColors.primary
-                                      : AppColors.textSecondary,
+                                      ? palette.primary
+                                      : palette.textSecondary,
                                   BlendMode.srcIn,
                                 ),
                               )
@@ -226,8 +227,8 @@ class SidebarNav extends ConsumerWidget {
                                 item.fallbackIcon,
                                 size: 20,
                                 color: isSelected
-                                    ? AppColors.primary
-                                    : AppColors.textSecondary,
+                                    ? palette.primary
+                                    : palette.textSecondary,
                               ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -236,8 +237,8 @@ class SidebarNav extends ConsumerWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: isSelected
-                                      ? AppColors.textPrimary
-                                      : AppColors.textSecondary,
+                                      ? palette.textPrimary
+                                      : palette.textSecondary,
                                   fontWeight: isSelected
                                       ? FontWeight.w700
                                       : FontWeight.w500,
@@ -269,16 +270,16 @@ class SidebarNav extends ConsumerWidget {
           // Footer: Notification Bell & Logout
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: AppColors.border)),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: palette.border)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const NotificationBell(),
                 IconButton(
-                  icon: const Icon(Icons.logout_rounded,
-                      color: AppColors.textMuted, size: 20),
+                  icon: Icon(Icons.logout_rounded,
+                      color: palette.textMuted, size: 20),
                   tooltip: t.tr('logout', fallback: 'Sair'),
                   onPressed: () {
                     ref.read(authStateProvider.notifier).logout();

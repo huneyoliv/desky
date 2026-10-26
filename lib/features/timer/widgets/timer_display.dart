@@ -35,7 +35,7 @@ class TimerDisplay extends StatelessWidget {
         fontFamily: AppTextStyles.fontTimer,
         fontSize: fontSize,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: context.palette.textPrimary,
         letterSpacing: 3.0,
       ),
     );

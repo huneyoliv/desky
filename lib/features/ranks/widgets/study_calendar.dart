@@ -14,13 +14,13 @@ class StudyCalendar extends ConsumerWidget {
     required this.dailyStudyTimeMs,
   });
 
-  Color _getDayColor(int ms) {
-    if (ms <= 0) return AppColors.card;
+  Color _getDayColor(int ms, DeskyThemePalette palette) {
+    if (ms <= 0) return palette.card;
     final hours = ms / 3600000;
-    if (hours < 2) return AppColors.heatmapL1;
-    if (hours < 4) return AppColors.heatmapL2;
-    if (hours < 7) return AppColors.heatmapL3;
-    return AppColors.heatmapL4;
+    if (hours < 2) return palette.heatmapL1;
+    if (hours < 4) return palette.heatmapL2;
+    if (hours < 7) return palette.heatmapL3;
+    return palette.heatmapL4;
   }
 
   String _formatMs(int ms) {
@@ -38,6 +38,7 @@ class StudyCalendar extends ConsumerWidget {
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
     final firstDayWeekday = DateTime(now.year, now.month, 1).weekday; // 1=Mon...7=Sun
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     final dayLabels = [
       t.tr('mon', fallback: 'Seg'),
@@ -116,7 +117,7 @@ class StudyCalendar extends ConsumerWidget {
             final dayNum = index - (firstDayWeekday - 1) + 1;
             final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${dayNum.toString().padLeft(2, '0')}';
             final studyMs = dailyStudyTimeMs[dateStr] ?? 0;
-            final color = _getDayColor(studyMs);
+            final color = _getDayColor(studyMs, palette);
 
             return InkWell(
               onTap: () {
@@ -145,7 +146,7 @@ class StudyCalendar extends ConsumerWidget {
                   color: color,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: dayNum == now.day ? AppColors.primary : Colors.transparent,
+                    color: dayNum == now.day ? palette.primary : Colors.transparent,
                     width: 1.5,
                   ),
                 ),
@@ -157,7 +158,7 @@ class StudyCalendar extends ConsumerWidget {
                     Text(
                       '$dayNum',
                       style: TextStyle(
-                        color: color == AppColors.heatmapL4 ? Colors.black : AppColors.textPrimary,
+                        color: color == palette.heatmapL4 ? Colors.black : palette.textPrimary,
                         fontWeight: dayNum == now.day ? FontWeight.bold : FontWeight.normal,
                         fontSize: 12,
                       ),
@@ -166,7 +167,7 @@ class StudyCalendar extends ConsumerWidget {
                       Text(
                         _formatMs(studyMs),
                         style: TextStyle(
-                          color: color == AppColors.heatmapL4 ? Colors.black87 : AppColors.textSecondary,
+                          color: color == palette.heatmapL4 ? Colors.black87 : palette.textSecondary,
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
                         ),

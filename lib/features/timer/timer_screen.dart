@@ -33,9 +33,10 @@ class TimerScreen extends ConsumerWidget {
     final timerState = ref.watch(timerNotifierProvider);
     final notifier = ref.read(timerNotifierProvider.notifier);
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     final currentSubjectColor =
-        timerState.currentSubject?.color ?? AppColors.primary;
+        timerState.currentSubject?.color ?? palette.primary;
 
     final isPomodoro = timerState.mode == TimerMode.pomodoro;
     final displayMs = isPomodoro ? timerState.pomodoroRemainingMs : timerState.sessionElapsedMs;
@@ -53,14 +54,14 @@ class TimerScreen extends ConsumerWidget {
     };
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: palette.background,
       body: SafeArea(
         child: Column(
           children: [
             // Top Header - Study Time & Rest Time & Mode Switcher
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              color: AppColors.surface,
+              color: palette.surface,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -81,7 +82,7 @@ class TimerScreen extends ConsumerWidget {
                                 fontFamilyFallback: AppTextStyles.fontFallbacks,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                                color: palette.textPrimary,
                               ),
                             ),
                           ],
@@ -94,9 +95,9 @@ class TimerScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: AppColors.card,
+                        color: palette.card,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: palette.border),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -126,21 +127,21 @@ class TimerScreen extends ConsumerWidget {
                         // Focus Mode Distraction-Free Toggle
                         IconButton(
                           tooltip: t.tr('focus', fallback: 'Modo Foco Sem Distrações'),
-                          icon: const Icon(Icons.fullscreen_rounded, color: AppColors.textSecondary),
+                          icon: Icon(Icons.fullscreen_rounded, color: palette.textSecondary),
                           onPressed: () => ref.read(focusModeProvider.notifier).toggleStrictFocus(),
                         ),
 
                         // Mini-Player Floating Window Toggle
                         IconButton(
                           tooltip: t.tr('mini_player', fallback: 'Mini-Player Flutuante'),
-                          icon: const Icon(Icons.picture_in_picture_alt_rounded, color: AppColors.textSecondary),
+                          icon: Icon(Icons.picture_in_picture_alt_rounded, color: palette.textSecondary),
                           onPressed: () => ref.read(focusModeProvider.notifier).toggleMiniPlayer(),
                         ),
 
                         // Manual Study Log Button
                         IconButton(
                           tooltip: t.tr('alert_planner_add_study_log', fallback: 'Registro Manual de Estudo'),
-                          icon: const Icon(Icons.edit_calendar_rounded, color: AppColors.primaryLight),
+                          icon: Icon(Icons.edit_calendar_rounded, color: palette.primaryLight),
                           onPressed: () => ManualStudyLogDialog.show(context),
                         ),
                         const SizedBox(width: 8),
@@ -206,7 +207,7 @@ class TimerScreen extends ConsumerWidget {
                 margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.card,
+                  color: palette.card,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: phaseColor.withValues(alpha: 0.4)),
                 ),
@@ -476,13 +477,13 @@ class TimerScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
+          color: isSelected ? context.palette.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textMuted,
+            color: isSelected ? Colors.white : context.palette.textMuted,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 13,
           ),

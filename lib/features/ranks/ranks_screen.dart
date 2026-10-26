@@ -242,16 +242,17 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     }).toList();
 
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: palette.background,
       appBar: AppBar(
         title: Text(t.tr('ranks', fallback: 'Rankings & Estatísticas'), style: AppTextStyles.titleLarge),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
+          indicatorColor: palette.primary,
           labelColor: Colors.white,
-          unselectedLabelColor: AppColors.textSecondary,
+          unselectedLabelColor: palette.textSecondary,
           tabs: [
             Tab(text: t.tr('ranks', fallback: 'Rankings Globais')),
             Tab(text: t.tr('stats', fallback: 'Estatísticas & Mapa 24h')),

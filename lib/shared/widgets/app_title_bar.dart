@@ -98,13 +98,14 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     return Container(
       height: 32,
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
+      decoration: BoxDecoration(
+        color: palette.surface,
         border: Border(
-          bottom: BorderSide(color: AppColors.border, width: 1),
+          bottom: BorderSide(color: palette.border, width: 1),
         ),
       ),
       child: Row(

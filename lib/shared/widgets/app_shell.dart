@@ -20,9 +20,10 @@ class AppShell extends ConsumerWidget {
     final focusState = ref.watch(focusModeProvider);
     final isFocusActive = focusState.isStrictFocus || focusState.isMiniPlayer;
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: palette.background,
       body: Stack(
         children: [
           Row(
@@ -31,7 +32,7 @@ class AppShell extends ConsumerWidget {
                 SidebarNav(currentRoute: currentRoute),
                 Container(
                   width: 1,
-                  color: AppColors.border,
+                  color: palette.border,
                 ),
               ],
               Expanded(
@@ -53,18 +54,18 @@ class AppShell extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.surface.withValues(alpha: 0.85),
+                      color: palette.surface.withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: palette.border),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.close_fullscreen_rounded, size: 16, color: AppColors.textSecondary),
+                        Icon(Icons.close_fullscreen_rounded, size: 16, color: palette.textSecondary),
                         const SizedBox(width: 8),
                         Text(
                           t.tr('exit_focus', fallback: 'Sair do Foco'),
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: palette.textPrimary, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),

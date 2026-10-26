@@ -223,22 +223,22 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
   Widget _buildGroupCard(GroupModel group, AppTranslation t, {bool isMyGroup = false}) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      color: AppColors.card,
+      color: context.palette.card,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.palette.border),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: (group.isCamStudy ? AppColors.accent : AppColors.primary).withValues(alpha: 0.15),
+            color: (group.isCamStudy ? context.palette.accent : context.palette.primary).withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(
             group.isCamStudy ? Icons.videocam_rounded : Icons.group_work_rounded,
-            color: group.isCamStudy ? AppColors.accent : AppColors.primary,
+            color: group.isCamStudy ? context.palette.accent : context.palette.primary,
           ),
         ),
         title: Row(
@@ -340,9 +340,10 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
   Widget build(BuildContext context) {
     final myGroups = ref.watch(authStateProvider).user?.userGroups ?? [];
     final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: palette.background,
       appBar: AppBar(
         title: Text(t.tr('groups', fallback: 'Grupos de Estudo'), style: AppTextStyles.titleLarge),
         actions: [
@@ -364,9 +365,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
+          indicatorColor: palette.primary,
           labelColor: Colors.white,
-          unselectedLabelColor: AppColors.textSecondary,
+          unselectedLabelColor: palette.textSecondary,
           tabs: [
             Tab(text: t.tr('my_groups', fallback: 'Meus Grupos')),
             Tab(text: t.tr('explore', fallback: 'Explorar Grupos')),

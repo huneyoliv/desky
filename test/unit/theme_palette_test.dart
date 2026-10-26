@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:desky/core/theme/app_colors.dart';
 import 'package:desky/core/theme/app_theme.dart';
 import 'package:desky/core/theme/theme_palette.dart';
 import 'package:desky/data/repositories/settings_repository.dart';
@@ -119,6 +120,29 @@ void main() {
 
       // Check that preference is persisted in SharedPreferences
       expect(prefs.getString(SettingsRepository.keyThemePreset), equals('midnight_navy'));
+    });
+
+    testWidgets('BuildContext extension and AppColors dynamic accessors match active palette', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.buildTheme(DeskyThemePalette.forestEmerald),
+          home: Builder(
+            builder: (context) {
+              expect(context.appBackground, equals(DeskyThemePalette.forestEmerald.background));
+              expect(context.appSurface, equals(DeskyThemePalette.forestEmerald.surface));
+              expect(context.appCard, equals(DeskyThemePalette.forestEmerald.card));
+              expect(context.appBorder, equals(DeskyThemePalette.forestEmerald.border));
+              expect(context.appPrimary, equals(DeskyThemePalette.forestEmerald.primary));
+              expect(context.appHeatmapL1, equals(DeskyThemePalette.forestEmerald.heatmapL1));
+              expect(context.appHeatmapL4, equals(DeskyThemePalette.forestEmerald.heatmapL4));
+              expect(AppColors.bg(context), equals(DeskyThemePalette.forestEmerald.background));
+              expect(AppColors.pri(context), equals(DeskyThemePalette.forestEmerald.primary));
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
     });
   });
 }
