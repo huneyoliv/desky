@@ -711,7 +711,7 @@ class AppTranslation {
     },
     'group_rank_total_time': {
       'pt': 'Tempo Total',
-      'en': 'Total Time',
+      'en': 'Total time',
       'es': 'Tiempo total',
       'ko': '총 공부 시간',
       'ja': '総勉強時間',
