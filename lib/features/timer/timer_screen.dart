@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/theme_palette.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/localization/app_translation.dart';
 import 'timer_notifier.dart';
@@ -77,7 +78,7 @@ class TimerScreen extends ConsumerWidget {
                             const SizedBox(height: 2),
                             Text(
                               _formatTotalTime(timerState.todayTotalMs),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: AppTextStyles.fontDisplay,
                                 fontFamilyFallback: AppTextStyles.fontFallbacks,
                                 fontSize: 20,
@@ -103,6 +104,7 @@ class TimerScreen extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _buildModeTab(
+                            context: context,
                             label: t.tr('bottom_home', fallback: 'Cronômetro'),
                             isSelected: !isPomodoro,
                             onTap: timerState.isRunning
@@ -110,6 +112,7 @@ class TimerScreen extends ConsumerWidget {
                                 : () => notifier.setTimerMode(TimerMode.stopwatch),
                           ),
                           _buildModeTab(
+                            context: context,
                             label: t.tr('timer_options_pomodoro', fallback: 'Pomodoro'),
                             isSelected: isPomodoro,
                             onTap: timerState.isRunning
@@ -467,23 +470,25 @@ class TimerScreen extends ConsumerWidget {
   }
 
   Widget _buildModeTab({
+    required BuildContext context,
     required String label,
     required bool isSelected,
     required VoidCallback? onTap,
   }) {
+    final palette = context.palette;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? context.palette.primary : Colors.transparent,
+          color: isSelected ? palette.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : context.palette.textMuted,
+            color: isSelected ? Colors.white : palette.textMuted,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 13,
           ),
