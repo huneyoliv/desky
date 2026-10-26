@@ -672,7 +672,7 @@ class AppTranslation {
     },
     'resting_inactive': {
       'pt': 'Descansando / Inativos',
-      'en': 'Resting / Idle',
+      'en': 'Resting / Inactive',
       'es': 'Descansando / Inactivos',
       'ko': '휴식 / 비활성',
       'ja': '休憩中 / 非アクティブ',

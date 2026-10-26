@@ -1,4 +1,4 @@
-﻿{
+{
     "notifications_center":  "Notification Center",
     "no_recent_notifications":  "No recent notifications.",
     "reset":  "Reset",
@@ -3324,7 +3324,7 @@
     "general_settings":  "General Settings",
     "or":  "or",
     "focus_rate":  "Focus Rate",
-    "resting_inactive":  "Resting / Idle",
+    "resting_inactive":  "Resting / Inactive",
     "amoled_lilac":  "AMOLED Lilac",
     "total_members":  "Total Members",
     "version":  "API Client Version",

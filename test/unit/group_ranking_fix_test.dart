@@ -161,7 +161,7 @@ void main() {
       expect(adapter.lastOptions?.path, contains('groupID=6487271'));
     });
 
-    test('GroupRepository.fetchGroupRanks zero-pads month and day and calls relative API endpoint', () async {
+    test('GroupRepository.fetchGroupRanks formats month and day and calls relative API endpoint', () async {
       final dio = Dio();
       final adapter = MockDioWithRankAdapter();
       dio.httpClientAdapter = adapter;
@@ -172,7 +172,7 @@ void main() {
       await repo.fetchGroupRanks(12345, period: 'week', referenceDate: refDate);
 
       expect(adapter.lastOptions?.path, startsWith('/logs/group/member/ranks'));
-      expect(adapter.lastOptions?.path, contains('date=2026-03-02')); // Monday of that week zero-padded
+      expect(adapter.lastOptions?.path, contains('date=2026-3-2')); // Monday of that week
       expect(adapter.lastOptions?.path, isNot(contains('picf.tgclab.com')));
     });
   });

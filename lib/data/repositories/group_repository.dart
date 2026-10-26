@@ -70,8 +70,7 @@ class GroupRepository {
       } else {
         refDate = StudyDateHelper.getStudyDate(now);
       }
-      final dateStr =
-          '${refDate.year}-${refDate.month.toString().padLeft(2, '0')}-${refDate.day.toString().padLeft(2, '0')}';
+      final dateStr = '${refDate.year}-${refDate.month}-${refDate.day}';
 
       dynamic data;
       // 1. Try authenticated API first
