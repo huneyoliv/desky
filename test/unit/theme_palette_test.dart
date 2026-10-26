@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desky/core/theme/app_colors.dart';
 import 'package:desky/core/theme/app_theme.dart';
-import 'package:desky/core/theme/theme_palette.dart';
 import 'package:desky/data/repositories/settings_repository.dart';
 import 'package:desky/features/settings/theme_notifier.dart';
 import 'package:desky/features/settings/settings_notifier.dart';
