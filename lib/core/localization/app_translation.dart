@@ -6622,7 +6622,7 @@ class AppTranslationNotifier extends StateNotifier<AppTranslation> {
   Future<void> loadLanguage(String code) async {
     final requestId = ++_currentRequestId;
     final translation = await AppTranslation.load(code);
-    if (requestId == _currentRequestId) {
+    if (requestId == _currentRequestId && mounted) {
       state = translation;
     }
   }

@@ -22,9 +22,6 @@ enum PomodoroPhase {
   longBreak,
 }
 
-final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {
-  return SubjectRepository();
-});
 
 final timerRepositoryProvider = Provider<TimerRepository>((ref) {
   return TimerRepository();
@@ -147,6 +144,9 @@ class TimerNotifier extends StateNotifier<TimerState> {
   Timer? _ticker;
   Timer? _dayResetTimer;
   int _dayResetHour;
+  int _accumulatedSessionMs = 0;
+  int _accumulatedRestMs = 0;
+  int _segmentStartRemainingMs = 0;
 
   TimerNotifier({
     required TimerRepository timerRepository,
@@ -168,6 +168,23 @@ class TimerNotifier extends StateNotifier<TimerState> {
     _dayResetTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       _checkStudyDateReset();
     });
+  }
+
+  void updateStudiconId(int newStudiconId) {
+    if (state.studiconId != newStudiconId) {
+      state = state.copyWith(studiconId: newStudiconId);
+    }
+  }
+
+  void handleLogout() {
+    _ticker?.cancel();
+    _accumulatedSessionMs = 0;
+    _accumulatedRestMs = 0;
+    _segmentStartRemainingMs = 0;
+    state = TimerState(
+      studiconId: -1,
+      lastStudyDate: StudyDateHelper.getStudyDateString(null, _dayResetHour),
+    );
   }
 
   void setDayResetHour(int hour) {
@@ -203,11 +220,15 @@ class TimerNotifier extends StateNotifier<TimerState> {
               : subjects.first)
           : null;
 
+      final effectiveTodayTotal = state.isRunning
+          ? (state.todayTotalMs > result.todayTotalMs ? state.todayTotalMs : result.todayTotalMs)
+          : result.todayTotalMs;
+
       state = state.copyWith(
         subjects: subjects,
-        currentSubject: current,
-        todayTotalMs: result.todayTotalMs,
-        todayRestMs: result.todayRestMs,
+        currentSubject: (state.isRunning && state.currentSubject != null) ? state.currentSubject : current,
+        todayTotalMs: effectiveTodayTotal,
+        todayRestMs: (state.isRunning && state.isPaused) ? state.todayRestMs : result.todayRestMs,
         lastStudyDate: StudyDateHelper.getStudyDateString(null, _dayResetHour),
       );
     } catch (_) {
@@ -313,6 +334,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
       } catch (_) {}
     }
 
+    _accumulatedSessionMs = state.sessionElapsedMs;
+    _accumulatedRestMs = 0;
+    _segmentStartRemainingMs = state.pomodoroRemainingMs;
+
     state = state.copyWith(
       isRunning: true,
       isPaused: false,
@@ -329,49 +354,85 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   void _handleTick() {
     _checkStudyDateReset();
+    final now = DateTime.now();
 
     if (state.isPaused) {
-      final newRestMs = state.sessionRestMs + 1000;
-      final newTodayRestMs = state.todayRestMs + 1000;
-      state = state.copyWith(
-        sessionRestMs: newRestMs,
-        todayRestMs: newTodayRestMs,
-      );
+      if (state.restStartAt != null) {
+        final elapsedRest = now.difference(state.restStartAt!).inMilliseconds;
+        final newRestMs = _accumulatedRestMs + elapsedRest;
+        final delta = newRestMs - state.sessionRestMs;
+        state = state.copyWith(
+          sessionRestMs: newRestMs,
+          todayRestMs: state.todayRestMs + (delta > 0 ? delta : 0),
+        );
+      } else {
+        final newRestMs = state.sessionRestMs + 1000;
+        final newTodayRestMs = state.todayRestMs + 1000;
+        state = state.copyWith(
+          sessionRestMs: newRestMs,
+          todayRestMs: newTodayRestMs,
+        );
+      }
       return;
     }
 
     if (state.mode == TimerMode.stopwatch) {
-      final newSessionMs = state.sessionElapsedMs + 1000;
-      final newTodayMs = state.todayTotalMs + 1000;
-      state = state.copyWith(
-        sessionElapsedMs: newSessionMs,
-        todayTotalMs: newTodayMs,
-      );
-    } else {
-      if (state.pomodoroPhase == PomodoroPhase.focus) {
+      if (state.sessionStartAt != null) {
+        final elapsedInSegment = now.difference(state.sessionStartAt!).inMilliseconds;
+        final newSessionMs = _accumulatedSessionMs + elapsedInSegment;
+        final delta = newSessionMs - state.sessionElapsedMs;
+        state = state.copyWith(
+          sessionElapsedMs: newSessionMs,
+          todayTotalMs: state.todayTotalMs + (delta > 0 ? delta : 0),
+        );
+      } else {
         final newSessionMs = state.sessionElapsedMs + 1000;
         final newTodayMs = state.todayTotalMs + 1000;
-        final newRemaining = state.pomodoroRemainingMs - 1000;
+        state = state.copyWith(
+          sessionElapsedMs: newSessionMs,
+          todayTotalMs: newTodayMs,
+        );
+      }
+    } else {
+      if (state.pomodoroPhase == PomodoroPhase.focus) {
+        int delta = 1000;
+        int newSessionMs = state.sessionElapsedMs + 1000;
+        int newRemaining = state.pomodoroRemainingMs - 1000;
+
+        if (state.sessionStartAt != null) {
+          final elapsedInSegment = now.difference(state.sessionStartAt!).inMilliseconds;
+          newSessionMs = _accumulatedSessionMs + elapsedInSegment;
+          delta = newSessionMs - state.sessionElapsedMs;
+          newRemaining = _segmentStartRemainingMs - elapsedInSegment;
+        }
 
         if (newRemaining <= 0) {
           _advancePomodoroPhase();
         } else {
           state = state.copyWith(
             sessionElapsedMs: newSessionMs,
-            todayTotalMs: newTodayMs,
+            todayTotalMs: state.todayTotalMs + (delta > 0 ? delta : 0),
             pomodoroRemainingMs: newRemaining,
           );
         }
       } else {
-        final newRestMs = state.sessionRestMs + 1000;
-        final newTodayRestMs = state.todayRestMs + 1000;
-        final newRemaining = state.pomodoroRemainingMs - 1000;
+        int delta = 1000;
+        int newRestMs = state.sessionRestMs + 1000;
+        int newRemaining = state.pomodoroRemainingMs - 1000;
+
+        if (state.restStartAt != null) {
+          final elapsedRest = now.difference(state.restStartAt!).inMilliseconds;
+          newRestMs = _accumulatedRestMs + elapsedRest;
+          delta = newRestMs - state.sessionRestMs;
+          newRemaining = _segmentStartRemainingMs - elapsedRest;
+        }
+
         if (newRemaining <= 0) {
           _advancePomodoroPhase();
         } else {
           state = state.copyWith(
             sessionRestMs: newRestMs,
-            todayRestMs: newTodayRestMs,
+            todayRestMs: state.todayRestMs + (delta > 0 ? delta : 0),
             pomodoroRemainingMs: newRemaining,
           );
         }
@@ -385,10 +446,20 @@ class TimerNotifier extends StateNotifier<TimerState> {
     if (state.pomodoroPhase == PomodoroPhase.focus) {
       await _syncCompletedFocusSession();
 
-      if (state.currentPomodoroCycle >= state.totalPomodoroCycles) {
+      final isLongBreak = state.currentPomodoroCycle >= state.totalPomodoroCycles;
+      final breakMinutes = isLongBreak
+          ? state.pomodoroLongBreakMinutes
+          : state.pomodoroShortBreakMinutes;
+      final targetBreakRemaining = breakMinutes * 60 * 1000;
+
+      _accumulatedSessionMs = 0;
+      _accumulatedRestMs = 0;
+      _segmentStartRemainingMs = targetBreakRemaining;
+
+      if (isLongBreak) {
         state = state.copyWith(
           pomodoroPhase: PomodoroPhase.longBreak,
-          pomodoroRemainingMs: state.pomodoroLongBreakMinutes * 60 * 1000,
+          pomodoroRemainingMs: targetBreakRemaining,
           currentPomodoroCycle: 1,
           isRunning: state.autoStartBreaks,
           isPaused: !state.autoStartBreaks,
@@ -401,7 +472,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       } else {
         state = state.copyWith(
           pomodoroPhase: PomodoroPhase.shortBreak,
-          pomodoroRemainingMs: state.pomodoroShortBreakMinutes * 60 * 1000,
+          pomodoroRemainingMs: targetBreakRemaining,
           currentPomodoroCycle: state.currentPomodoroCycle + 1,
           isRunning: state.autoStartBreaks,
           isPaused: !state.autoStartBreaks,
@@ -435,9 +506,14 @@ class TimerNotifier extends StateNotifier<TimerState> {
         } catch (_) {}
       }
 
+      final focusTargetRemaining = state.pomodoroFocusMinutes * 60 * 1000;
+      _accumulatedSessionMs = 0;
+      _accumulatedRestMs = 0;
+      _segmentStartRemainingMs = focusTargetRemaining;
+
       state = state.copyWith(
         pomodoroPhase: PomodoroPhase.focus,
-        pomodoroRemainingMs: state.pomodoroFocusMinutes * 60 * 1000,
+        pomodoroRemainingMs: focusTargetRemaining,
         isRunning: state.autoStartFocus,
         isPaused: !state.autoStartFocus,
         sessionElapsedMs: 0,
@@ -521,6 +597,9 @@ class TimerNotifier extends StateNotifier<TimerState> {
     final now = DateTime.now();
     await _syncCompletedFocusSession();
 
+    _accumulatedRestMs = 0;
+    _accumulatedSessionMs = state.sessionElapsedMs;
+
     state = state.copyWith(
       isRunning: false,
       isPaused: true,
@@ -554,6 +633,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
         (state.sessionElapsedMs - state.lastSyncedSessionElapsedMs) > 0) {
       await _syncCompletedFocusSession();
     }
+
+    _accumulatedSessionMs = 0;
+    _accumulatedRestMs = 0;
+    _segmentStartRemainingMs = 0;
 
     int initialRemaining = state.pomodoroFocusMinutes * 60 * 1000;
     state = state.copyWith(
@@ -706,21 +789,37 @@ final timerNotifierProvider =
   final timerRepo = ref.watch(timerRepositoryProvider);
   final subjectRepo = ref.watch(subjectRepositoryProvider);
   final offlineSyncRepo = ref.watch(offlineSyncRepositoryProvider);
-  final user = ref.watch(authStateProvider).user;
-  final dayResetHour = ref.watch(settingsNotifierProvider.select((s) => s.dayResetHour));
+  final initialUser = ref.read(authStateProvider).user;
+  final dayResetHour = ref.read(settingsNotifierProvider).dayResetHour;
+  final initialTranslation = ref.read(appTranslationProvider);
 
   final notifier = TimerNotifier(
     timerRepository: timerRepo,
     subjectRepository: subjectRepo,
     offlineSyncRepository: offlineSyncRepo,
-    userStudiconId: user?.studiconId ?? -1,
+    userStudiconId: initialUser?.studiconId ?? -1,
     dayResetHour: dayResetHour,
-    initialSubjectTitle: ref.watch(appTranslationProvider).tr('initial_subject', fallback: 'Matéria Inicial'),
+    initialSubjectTitle: initialTranslation.tr('initial_subject', fallback: 'Matéria Inicial'),
   );
 
-  ref.listen(settingsNotifierProvider.select((s) => s.dayResetHour), (prev, next) {
+  // Dynamically update day reset hour without disposing TimerNotifier
+  ref.listen<int>(settingsNotifierProvider.select((s) => s.dayResetHour), (prev, next) {
     if (next != prev) {
       notifier.setDayResetHour(next);
+    }
+  });
+
+  // Dynamically update studicon when user equips/changes avatar without resetting running timer
+  ref.listen<int?>(authStateProvider.select((s) => s.user?.studiconId), (prev, next) {
+    if (next != null && next != prev) {
+      notifier.updateStudiconId(next);
+    }
+  });
+
+  // Cleanly handle user logout
+  ref.listen<bool>(authStateProvider.select((s) => s.isAuthenticated), (prev, next) {
+    if (prev == true && next == false) {
+      notifier.handleLogout();
     }
   });
 
