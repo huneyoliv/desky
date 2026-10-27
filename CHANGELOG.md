@@ -73,6 +73,16 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.1.4] - 2026-10-27
+
+### Fixed
+- **Timer State & Visual Persistence Across Tab Switching**: Resolved bug where navigating from the Timer tab (`/home`) to other tabs (such as 'Groups' or 'Timetable' / 'Planner') visually reset the timer display to `00:00:00` and reverted the control button to "INICIAR" while leaving the study session running on the backend (Fixes Issue #3):
+  - **Decoupled Riverpod Dependencies**: Removed `ref.watch(authStateProvider).user` from `timerNotifierProvider` which previously triggered provider invalidation and cancellation of the study ticker whenever `refreshUserGroups()` was called in `GroupsScreen`. Replaced with `ref.read` and dynamic listeners (`ref.listen`) for studicon avatar updates and logout lifecycle handling without disposing active sessions.
+  - **Wall-Clock Elapsed Time Calculation**: Replaced naive incremental tick arithmetic with wall-clock time difference (`DateTime.now().difference(sessionStartAt)`), eliminating timer drift and ensuring millisecond-accurate elapsed time even when navigation or window backgrounding delays ticker execution.
+  - **Subject Data Fetching Safeguards**: Prevented background `loadSubjects()` queries from overriding in-progress session time and active subjects while the timer is running.
+  - **Deduplicated Subject Repository Providers**: Consolidated `subjectRepositoryProvider` declarations in `timetable_screen.dart` and `timer_notifier.dart` into a single canonical definition in `subject_repository.dart`.
+  - **Automated Test Coverage**: Added comprehensive unit and widget tests in `test/unit/timer_tab_switch_persistence_test.dart` verifying state persistence across authentication state changes, wall-clock time accuracy, settings updates, and screen tab switching.
+
 ## [1.1.3] - 2026-10-27
 
 ### Fixed

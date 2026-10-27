@@ -12,9 +12,6 @@ final timetableRepositoryProvider = Provider<TimetableRepository>((ref) {
   return TimetableRepository();
 });
 
-final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {
-  return SubjectRepository();
-});
 
 class TimetableScreen extends ConsumerStatefulWidget {
   const TimetableScreen({super.key});
