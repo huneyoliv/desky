@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: write
-
 jobs:
   validate:
     name: Flutter Analyze & Test
@@ -19,7 +16,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
-          fetch-depth: 0
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -35,19 +31,8 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Run Flutter analyze & publish log
-        run: |
-          flutter analyze > analyze_ci_output.txt 2>&1 || true
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B ci-analyze-log
-          git add analyze_ci_output.txt
-          git commit -m "chore(ci): log flutter analyze output" || true
-          git push -f origin ci-analyze-log || true
-          cat analyze_ci_output.txt
-          if grep -q "error •" analyze_ci_output.txt; then
-            exit 1
-          fi
+      - name: Run Flutter analyze
+        run: flutter analyze
 
       - name: Run test suite
         run: flutter test

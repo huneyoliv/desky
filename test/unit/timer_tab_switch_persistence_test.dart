@@ -69,7 +69,6 @@ void main() {
       // 1. Initial auth state with user
       final authNotifier = container.read(authStateProvider.notifier);
       authNotifier.state = const AuthState(
-        isAuthenticated: true,
         user: UserModel(
           id: 10,
           studiconId: 300,
@@ -184,7 +183,6 @@ void main() {
 
       final authNotifier = container.read(authStateProvider.notifier);
       authNotifier.state = const AuthState(
-        isAuthenticated: true,
         user: UserModel(
           id: 1,
           studiconId: 10,
@@ -201,7 +199,7 @@ void main() {
       expect(container.read(timerNotifierProvider).isRunning, isTrue);
 
       // Simulate logout
-      authNotifier.state = const AuthState(isAuthenticated: false);
+      authNotifier.state = const AuthState();
 
       final stateAfterLogout = container.read(timerNotifierProvider);
       expect(stateAfterLogout.isRunning, isFalse);
@@ -250,7 +248,6 @@ void main() {
                         onPressed: () {
                           // Simulate switching tab and group refresh
                           container.read(authStateProvider.notifier).state = const AuthState(
-                            isAuthenticated: true,
                             user: UserModel(
                               id: 1,
                               studiconId: 5,
