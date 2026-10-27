@@ -55,6 +55,7 @@ void main() {
       for (final preset in DeskyThemePalette.presets) {
         await tester.pumpWidget(
           MaterialApp(
+            key: ValueKey(preset.id),
             theme: AppTheme.buildTheme(preset),
             home: Builder(
               builder: (context) {

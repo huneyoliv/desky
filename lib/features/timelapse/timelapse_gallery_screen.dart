@@ -140,7 +140,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetricCard(context, {
+  Widget _buildMetricCard(BuildContext context, {
     required String title,
     required String value,
     required IconData icon,

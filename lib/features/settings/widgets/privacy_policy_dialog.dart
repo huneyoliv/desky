@@ -93,7 +93,7 @@ class PrivacyPolicyDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionTitle(context, String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
@@ -103,7 +103,7 @@ class PrivacyPolicyDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildParagraph(context, String text) {
+  Widget _buildParagraph(BuildContext context, String text) {
     return Text(
       text,
       style: TextStyle(color: context.appTextSecondary, fontSize: 13, height: 1.5),

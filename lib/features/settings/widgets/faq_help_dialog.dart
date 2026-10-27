@@ -96,7 +96,7 @@ class FaqHelpDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildFaqTile(context, {required IconData icon, required String question, required String answer}) {
+  Widget _buildFaqTile(BuildContext context, {required IconData icon, required String question, required String answer}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
