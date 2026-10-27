@@ -173,7 +173,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: context.appTextPrimary,
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
@@ -333,7 +333,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                         ),
                         child: Text(
                           '${t.tr("my_position", fallback: "Minha Posição")}: #$_myRank',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: context.appPrimary,
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
@@ -349,7 +349,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                     : _ranks.isEmpty
                         ? Center(
                             child: Text(t.tr('no_ranks', fallback: 'Nenhum ranking disponível no momento.'),
-                                style: const TextStyle(color: context.appTextSecondary)),
+                                style: TextStyle(color: context.appTextSecondary)),
                           )
                         : ListView(
                             padding: const EdgeInsets.all(32),
@@ -401,7 +401,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                           width: 32,
                                           child: Text(
                                             '#${rank.rank}',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               color: context.appTextMuted,
                                               fontWeight: FontWeight.w700,
                                             ),
@@ -418,18 +418,18 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                        rank.userName,
                                        maxLines: 1,
                                        overflow: TextOverflow.ellipsis,
-                                       style: const TextStyle(
+                                       style: TextStyle(
                                          color: context.appTextPrimary,
                                          fontWeight: FontWeight.w600,
                                        ),
                                      ),
                                     subtitle: Text(rank.categoryName,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             color: context.appTextSecondary,
                                             fontSize: 12)),
                                     trailing: Text(
                                       _formatMs(rank.studyMs),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: context.appPrimary,
                                         fontWeight: FontWeight.w800,
                                       ),
@@ -495,7 +495,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                                   if (value.toInt() >= 0 && value.toInt() < days.length) {
                                                     return Text(
                                                       days[value.toInt()],
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                           color: context.appTextSecondary,
                                                           fontSize: 12),
                                                     );
@@ -554,7 +554,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                           ? Center(
                                               child: Text(
                                                 t.tr('no_data', fallback: 'Nenhum dado registrado esta semana.'),
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                     color: context.appTextSecondary),
                                               ),
                                             )

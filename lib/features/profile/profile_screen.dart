@@ -65,7 +65,7 @@ class ProfileScreen extends ConsumerWidget {
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: t.tr('nickname', fallback: 'Digite seu novo apelido'),
-            hintStyle: const TextStyle(color: context.appTextMuted),
+            hintStyle: TextStyle(color: context.appTextMuted),
             filled: true,
             fillColor: context.appSurface,
             border: OutlineInputBorder(
@@ -77,7 +77,7 @@ class ProfileScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -121,7 +121,7 @@ class ProfileScreen extends ConsumerWidget {
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: t.tr('status_msg_hint', fallback: 'Digite sua mensagem de status...'),
-            hintStyle: const TextStyle(color: context.appTextMuted),
+            hintStyle: TextStyle(color: context.appTextMuted),
             filled: true,
             fillColor: context.appSurface,
             border: OutlineInputBorder(
@@ -133,7 +133,7 @@ class ProfileScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -209,7 +209,7 @@ class ProfileScreen extends ConsumerWidget {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.edit, size: 18, color: context.appPrimary),
+                              icon: Icon(Icons.edit, size: 18, color: context.appPrimary),
                               tooltip: t.tr('edit', fallback: 'Editar Apelido'),
                               onPressed: () => _showEditNicknameDialog(
                                 context,
@@ -227,7 +227,7 @@ class ProfileScreen extends ConsumerWidget {
                                 user?.statusMessage.isNotEmpty == true
                                     ? '"${user!.statusMessage}"'
                                     : t.tr('no_status_msg', fallback: 'Sem mensagem de status'),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: context.appTextSecondary,
                                   fontSize: 13,
                                   fontStyle: FontStyle.italic,
@@ -235,7 +235,7 @@ class ProfileScreen extends ConsumerWidget {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.mode_comment_outlined,
+                              icon: Icon(Icons.mode_comment_outlined,
                                   size: 16, color: context.appTextMuted),
                               tooltip: t.tr('edit', fallback: 'Editar Mensagem de Status'),
                               onPressed: () => _showEditStatusMsgDialog(
@@ -249,7 +249,7 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Text(
                           user?.email ?? 'contato@tgclab.com',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: context.appTextMuted,
                             fontSize: 13,
                           ),
@@ -265,7 +265,7 @@ class ProfileScreen extends ConsumerWidget {
                               ),
                               child: Text(
                                 'ID: ${user?.id ?? 0}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: context.appPrimary,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -307,7 +307,7 @@ class ProfileScreen extends ConsumerWidget {
                                               ? Center(
                                                   child: Text(
                                                     t.tr('loading_categories', fallback: 'Carregando categorias da região...'),
-                                                    style: const TextStyle(color: context.appTextMuted),
+                                                    style: TextStyle(color: context.appTextMuted),
                                                   ),
                                                 )
                                               : ListView.builder(
@@ -325,7 +325,7 @@ class ProfileScreen extends ConsumerWidget {
                                                             padding: const EdgeInsets.only(top: 12, bottom: 4, left: 8),
                                                             child: Text(
                                                               cat.section,
-                                                              style: const TextStyle(
+                                                              style: TextStyle(
                                                                 color: context.appPrimary,
                                                                 fontSize: 12,
                                                                 fontWeight: FontWeight.bold,
@@ -344,7 +344,7 @@ class ProfileScreen extends ConsumerWidget {
                                                               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                                             ),
                                                           ),
-                                                          trailing: isSelected ? const Icon(Icons.check, color: context.appPrimary, size: 18) : null,
+                                                          trailing: isSelected ? Icon(Icons.check, color: context.appPrimary, size: 18) : null,
                                                           onTap: () async {
                                                             Navigator.of(context).pop();
                                                             final ok = await ref
@@ -373,7 +373,7 @@ class ProfileScreen extends ConsumerWidget {
                                         actions: [
                                           TextButton(
                                             onPressed: () => Navigator.of(context).pop(),
-                                            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+                                            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
                                           ),
                                         ],
                                       );
@@ -414,7 +414,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(t.tr('today_total_study_time', fallback: 'Estudados Hoje'),
-                            style: const TextStyle(color: context.appTextMuted, fontSize: 12)),
+                            style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                       ],
                     ),
                   ),
@@ -439,7 +439,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(t.tr('subjects', fallback: 'Matérias'),
-                            style: const TextStyle(color: context.appTextMuted, fontSize: 12)),
+                            style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                       ],
                     ),
                   ),
@@ -464,7 +464,7 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(t.tr('my_groups', fallback: 'Meus Grupos'),
-                            style: const TextStyle(color: context.appTextMuted, fontSize: 12)),
+                            style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                       ],
                     ),
                   ),
@@ -505,33 +505,33 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.public, color: context.appPrimary),
+                      leading: Icon(Icons.public, color: context.appPrimary),
                       title: Text(t.tr('region', fallback: 'Região / País'), style: const TextStyle(color: Colors.white)),
                       subtitle: Text(
                         '${country.formattedName} (${country.code})',
-                        style: const TextStyle(color: context.appTextSecondary),
+                        style: TextStyle(color: context.appTextSecondary),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                      trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                       onTap: () => SelectCountryDialog.show(context),
                     ),
                     Divider(color: context.appBorder, height: 1),
                     ListTile(
-                      leading: const Icon(Icons.language, color: context.appPrimary),
+                      leading: Icon(Icons.language, color: context.appPrimary),
                       title: Text(t.tr('language', fallback: 'Idioma do Aplicativo'), style: const TextStyle(color: Colors.white)),
                       subtitle: Text(
                         langLabel,
-                        style: const TextStyle(color: context.appTextSecondary),
+                        style: TextStyle(color: context.appTextSecondary),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                      trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                       onTap: () => SelectLanguageDialog.show(context),
                     ),
                     Divider(color: context.appBorder, height: 1),
                     ListTile(
-                      leading: const Icon(Icons.access_time, color: context.appPrimary),
+                      leading: Icon(Icons.access_time, color: context.appPrimary),
                       title: Text(t.tr('timezone', fallback: 'Fuso Horário da Região'), style: const TextStyle(color: Colors.white)),
                       subtitle: Text(
                         '${country.timezone} (${country.gmtDisplay})',
-                        style: const TextStyle(color: context.appTextSecondary),
+                        style: TextStyle(color: context.appTextSecondary),
                       ),
                     ),
                     Divider(color: context.appBorder, height: 1),
@@ -539,14 +539,14 @@ class ProfileScreen extends ConsumerWidget {
                       leading: Icon(_getPlatformIcon(), color: context.appPrimary),
                       title: Text(t.tr('platform', fallback: 'Plataforma'), style: const TextStyle(color: Colors.white)),
                       subtitle: Text(_getPlatformDisplay(),
-                          style: const TextStyle(color: context.appTextSecondary)),
+                          style: TextStyle(color: context.appTextSecondary)),
                     ),
                     Divider(color: context.appBorder, height: 1),
                     ListTile(
-                      leading: const Icon(Icons.info_outline, color: context.appPrimary),
+                      leading: Icon(Icons.info_outline, color: context.appPrimary),
                       title: Text(t.tr('version', fallback: 'Versão do Cliente API'), style: const TextStyle(color: Colors.white)),
                       subtitle: Text('v${AppConstants.appVersion} (API v8.1.0)',
-                          style: const TextStyle(color: context.appTextSecondary)),
+                          style: TextStyle(color: context.appTextSecondary)),
                     ),
                   ],
                 ),
@@ -574,26 +574,26 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.palette_outlined, color: context.appPrimary),
+                    leading: Icon(Icons.palette_outlined, color: context.appPrimary),
                     title: Text(t.tr('theme_appearance', fallback: 'Aparência & Tema'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr(activeTheme.nameKey, fallback: activeTheme.id),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => ThemeSelectionDialog.show(context),
                   ),
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
-                    leading: const Icon(Icons.tune_rounded, color: context.appPrimary),
+                    leading: Icon(Icons.tune_rounded, color: context.appPrimary),
                     title: Text(t.tr('study_preferences', fallback: 'Ajustes de Estudo e Alertas'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('study_pref_subtitle', fallback: 'Horário de reset do dia, exibição de descanso e notificações'),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => StudyPreferencesDialog.show(context),
                   ),
                 ],
@@ -621,14 +621,14 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.lock_reset_rounded, color: context.appPrimary),
+                    leading: Icon(Icons.lock_reset_rounded, color: context.appPrimary),
                     title: Text(t.tr('drawer_settings_reset_password_title', fallback: 'Alterar Senha'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('change_password_subtitle', fallback: 'Atualizar sua credencial de acesso'),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => ChangePasswordDialog.show(context),
                   ),
                   Divider(color: context.appBorder, height: 1),
@@ -638,9 +638,9 @@ class ProfileScreen extends ConsumerWidget {
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('blocked_users_subtitle', fallback: 'Gerenciar lista de usuários bloqueados'),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => BlockedUsersDialog.show(context),
                   ),
                 ],
@@ -668,50 +668,50 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.privacy_tip_outlined, color: context.appPrimary),
+                    leading: Icon(Icons.privacy_tip_outlined, color: context.appPrimary),
                     title: Text(t.tr('drawer_settings_pallo_privacy_title', fallback: 'Política de Privacidade'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('privacy_subtitle', fallback: 'Como protegemos seus dados e logs de estudo'),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => PrivacyPolicyDialog.show(context),
                   ),
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
-                    leading: const Icon(Icons.description_outlined, color: context.appPrimary),
+                    leading: Icon(Icons.description_outlined, color: context.appPrimary),
                     title: Text(t.tr('drawer_settings_pallo_terms_title', fallback: 'Termos de Uso'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('terms_subtitle', fallback: 'Condições de serviço e regras da comunidade'),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => TermsOfServiceDialog.show(context),
                   ),
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
-                    leading: const Icon(Icons.help_outline_rounded, color: context.appPrimary),
+                    leading: Icon(Icons.help_outline_rounded, color: context.appPrimary),
                     title: Text('${t.tr('drawer_helps_title', fallback: 'Ajuda')} & FAQ',
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('faq_subtitle', fallback: 'Dúvidas frequentes e canais de atendimento'),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => FaqHelpDialog.show(context),
                   ),
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
-                    leading: const Icon(Icons.code_rounded, color: context.appPrimary),
+                    leading: Icon(Icons.code_rounded, color: context.appPrimary),
                     title: Text(t.tr('open_source_licenses', fallback: 'Licenças Open Source'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('licenses_subtitle', fallback: 'Softwares e bibliotecas de código aberto'),
-                      style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                     ),
-                    trailing: const Icon(Icons.chevron_right, color: context.appTextMuted),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => OpenSourceLicensesDialog.show(context),
                   ),
                 ],
@@ -733,7 +733,7 @@ class ProfileScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.info_outline_rounded, size: 18, color: context.appPrimary),
+                      Icon(Icons.info_outline_rounded, size: 18, color: context.appPrimary),
                       const SizedBox(width: 8),
                       Text(
                         'Desky v${AppConstants.appVersion} (${AppConstants.buildNumber})',
@@ -791,7 +791,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 subtitle: Text(
                   t.tr('delete_account_desc', fallback: 'Apagar permanentemente seus dados, histórico e desvincular grupos'),
-                  style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                  style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                 ),
                 trailing: const Icon(Icons.chevron_right, color: AppColors.error),
                 onTap: () => DeleteAccountDialog.show(context),

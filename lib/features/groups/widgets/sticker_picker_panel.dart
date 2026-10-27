@@ -53,20 +53,20 @@ class _StickerPickerPanelState extends ConsumerState<StickerPickerPanel> {
 
     return Container(
       height: 280,
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
+      decoration: BoxDecoration(
+        color: context.appSurface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        border: Border(top: BorderSide(color: AppColors.border)),
+        border: Border(top: BorderSide(color: context.appBorder)),
       ),
       child: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? Center(child: CircularProgressIndicator(color: context.appPrimary))
           : Column(
               children: [
                 // Header Bar: Sets selector
                 Container(
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  color: AppColors.card,
+                  color: context.appCard,
                   child: Row(
                     children: [
                       Text(
@@ -91,8 +91,8 @@ class _StickerPickerPanelState extends ConsumerState<StickerPickerPanel> {
                               child: ChoiceChip(
                                 label: Text(set.name),
                                 selected: isSelected,
-                                selectedColor: AppColors.primary,
-                                backgroundColor: AppColors.surface,
+                                selectedColor: context.appPrimary,
+                                backgroundColor: context.appSurface,
                                 labelStyle: TextStyle(
                                   color: isSelected ? Colors.white : AppColors.textSecondary,
                                   fontSize: 12,
@@ -115,7 +115,7 @@ class _StickerPickerPanelState extends ConsumerState<StickerPickerPanel> {
                       ? Center(
                           child: Text(
                             t.tr('no_stickers_available', fallback: 'Nenhuma figurinha disponível.'),
-                            style: const TextStyle(color: AppColors.textMuted),
+                            style: TextStyle(color: context.appTextMuted),
                           ),
                         )
                       : GridView.builder(
@@ -135,15 +135,15 @@ class _StickerPickerPanelState extends ConsumerState<StickerPickerPanel> {
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
-                                  color: AppColors.card,
+                                  color: context.appCard,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Image.network(
                                   sticker.url,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
+                                  errorBuilder: (_, __, ___) => Icon(
                                     Icons.extension_rounded,
-                                    color: AppColors.primary,
+                                    color: context.appPrimary,
                                     size: 32,
                                   ),
                                 ),

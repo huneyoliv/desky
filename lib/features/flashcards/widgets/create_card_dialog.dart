@@ -40,7 +40,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
     final t = ref.watch(appTranslationProvider);
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(t.tr('new_flashcard', fallback: 'Novo Flashcard'),
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
@@ -58,9 +58,9 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: t.tr('card_front', fallback: 'Frente (Pergunta ou Termo)'),
-                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  labelStyle: TextStyle(color: context.appTextSecondary),
                   hintText: t.tr('card_front_hint', fallback: 'Ex: Qual a fórmula da energia cinética?'),
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
+                  hintStyle: TextStyle(color: context.appTextMuted),
                 ),
               ),
               const SizedBox(height: 16),
@@ -71,9 +71,9 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: t.tr('card_back', fallback: 'Verso (Resposta ou Definição)'),
-                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  labelStyle: TextStyle(color: context.appTextSecondary),
                   hintText: t.tr('card_back_hint', fallback: 'Ex: Ec = (m * v²) / 2'),
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
+                  hintStyle: TextStyle(color: context.appTextMuted),
                 ),
               ),
               const SizedBox(height: 16),
@@ -82,9 +82,9 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: t.tr('hint_optional', fallback: 'Dica (opcional)'),
-                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  labelStyle: TextStyle(color: context.appTextSecondary),
                   hintText: t.tr('hint_example', fallback: 'Ex: Depende da massa e velocidade'),
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
+                  hintStyle: TextStyle(color: context.appTextMuted),
                 ),
               ),
             ],
@@ -94,7 +94,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+          child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
         ),
         ElevatedButton(
           onPressed: () {
@@ -105,7 +105,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
               Navigator.of(context).pop();
             }
           },
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+          style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
           child: Text(t.tr('add', fallback: 'Adicionar'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],

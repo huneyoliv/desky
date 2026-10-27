@@ -67,17 +67,17 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(challenge.description, style: const TextStyle(color: context.appTextSecondary)),
+            Text(challenge.description, style: TextStyle(color: context.appTextSecondary)),
             const SizedBox(height: 12),
-            Text('${t.tr("bet", fallback: "Entrada")}: ${challenge.flameCost} ${t.tr("points", fallback: "pts")}', style: const TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 15)),
+            Text('${t.tr("bet", fallback: "Entrada")}: ${challenge.flameCost} ${t.tr("points", fallback: "pts")}', style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 15)),
             const SizedBox(height: 8),
-            Text(challenge.rules, style: const TextStyle(color: context.appTextMuted, fontSize: 12)),
+            Text(challenge.rules, style: TextStyle(color: context.appTextMuted, fontSize: 12)),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -124,13 +124,13 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.emoji_events_outlined, size: 64, color: context.appTextMuted),
+            Icon(Icons.emoji_events_outlined, size: 64, color: context.appTextMuted),
             const SizedBox(height: 16),
             Text(
               isMyList
                   ? t.tr('no_my_challenges', fallback: 'Você ainda não entrou em nenhum desafio.')
                   : t.tr('no_challenges', fallback: 'Nenhum desafio disponível no momento.'),
-              style: const TextStyle(color: context.appTextSecondary, fontSize: 14),
+              style: TextStyle(color: context.appTextSecondary, fontSize: 14),
             ),
           ],
         ),
@@ -176,7 +176,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                       ),
                       child: Text(
                         '⭐ ${challenge.flameCost} ${t.tr("points", fallback: "pts")}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: context.appPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -188,7 +188,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                       child: Text(
                         '${t.tr("goal", fallback: "Meta")}: ${(challenge.successThreshold * 100).toInt()}%',
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: context.appTextMuted, fontSize: 12),
+                        style: TextStyle(color: context.appTextMuted, fontSize: 12),
                       ),
                     ),
                   ],
@@ -209,7 +209,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                   challenge.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
+                  style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                 ),
                 const SizedBox(height: 14),
 
@@ -217,8 +217,8 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(t.tr('checkin', fallback: 'Check-in'), style: const TextStyle(color: context.appTextMuted, fontSize: 11)),
-                      Text('${(progress * 100).toInt()}%', style: const TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 11)),
+                      Text(t.tr('checkin', fallback: 'Check-in'), style: TextStyle(color: context.appTextMuted, fontSize: 11)),
+                      Text('${(progress * 100).toInt()}%', style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 11)),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -237,18 +237,18 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                 const Spacer(),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, size: 14, color: context.appTextMuted),
+                    Icon(Icons.calendar_today, size: 14, color: context.appTextMuted),
                     const SizedBox(width: 6),
                     Text(
                       '${df.format(challenge.startDate)} - ${df.format(challenge.endDate)}',
-                      style: const TextStyle(color: context.appTextMuted, fontSize: 11),
+                      style: TextStyle(color: context.appTextMuted, fontSize: 11),
                     ),
                     const Spacer(),
-                    const Icon(Icons.people_outline, size: 14, color: context.appTextMuted),
+                    Icon(Icons.people_outline, size: 14, color: context.appTextMuted),
                     const SizedBox(width: 4),
                     Text(
                       '${challenge.participantCount}',
-                      style: const TextStyle(color: context.appTextMuted, fontSize: 11),
+                      style: TextStyle(color: context.appTextMuted, fontSize: 11),
                     ),
                   ],
                 ),
@@ -301,7 +301,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
+          ? Center(child: CircularProgressIndicator(color: context.appPrimary))
           : TabBarView(
               controller: _tabController,
               children: [

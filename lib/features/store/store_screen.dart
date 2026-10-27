@@ -91,12 +91,12 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
+          ? Center(child: CircularProgressIndicator(color: context.appPrimary))
           : _myStudicons.isEmpty
               ? Center(
                   child: Text(
                     t.tr('no_avatars', fallback: 'Nenhum avatar encontrado.'),
-                    style: const TextStyle(color: context.appTextMuted),
+                    style: TextStyle(color: context.appTextMuted),
                   ),
                 )
               : GridView.builder(

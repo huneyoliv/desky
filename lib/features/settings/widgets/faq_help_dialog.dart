@@ -19,7 +19,7 @@ class FaqHelpDialog extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
 
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
       child: Container(
@@ -31,7 +31,7 @@ class FaqHelpDialog extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.help_outline_rounded, color: AppColors.primary, size: 26),
+                Icon(Icons.help_outline_rounded, color: context.appPrimary, size: 26),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -40,12 +40,12 @@ class FaqHelpDialog extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(color: AppColors.border, height: 24),
+            Divider(color: context.appBorder, height: 24),
             Expanded(
               child: ListView(
                 children: [
@@ -83,7 +83,7 @@ class FaqHelpDialog extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.appPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
@@ -100,14 +100,14 @@ class FaqHelpDialog extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: AppColors.surface,
+        color: context.appSurface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: context.appBorder),
         ),
         clipBehavior: Clip.antiAlias,
         child: ExpansionTile(
-          leading: Icon(icon, color: AppColors.primary, size: 22),
+          leading: Icon(icon, color: context.appPrimary, size: 22),
           title: Text(
             question,
             style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
@@ -118,7 +118,7 @@ class FaqHelpDialog extends ConsumerWidget {
           children: [
             Text(
               answer,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+              style: TextStyle(color: context.appTextSecondary, fontSize: 13, height: 1.5),
             ),
           ],
         ),

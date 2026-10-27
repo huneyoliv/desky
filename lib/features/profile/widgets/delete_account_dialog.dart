@@ -67,7 +67,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
     final requiredPhrase = t.tr('delete_confirm_phrase', fallback: 'delete');
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
@@ -92,7 +92,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
             children: [
               Text(
                 t.tr('delete_account_warning_intro', fallback: 'Esta ação é permanente e irreversível. Ao excluir sua conta:'),
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                style: TextStyle(color: context.appTextSecondary, fontSize: 14),
               ),
               const SizedBox(height: 16),
 
@@ -166,8 +166,8 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
               // Confirmation Phrase Input
               Text(
                 '${t.tr("type_to_confirm", fallback: "Digite exatamente")} "$requiredPhrase" ${t.tr("to_confirm", fallback: "para confirmar:")}',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
+                style: TextStyle(
+                  color: context.appTextSecondary,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -178,16 +178,16 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: requiredPhrase,
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
+                  hintStyle: TextStyle(color: context.appTextMuted),
                   filled: true,
-                  fillColor: AppColors.surface,
+                  fillColor: context.appSurface,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: context.appBorder),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppColors.error),
+                    borderSide: BorderSide(color: AppColors.error),
                   ),
                 ),
                 onChanged: (_) => setState(() {}),
@@ -201,7 +201,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
           child: Text(
             t.tr('cancel', fallback: 'Cancelar'),
-            style: const TextStyle(color: AppColors.textMuted),
+            style: TextStyle(color: context.appTextMuted),
           ),
         ),
         ElevatedButton(
@@ -238,7 +238,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            style: TextStyle(color: context.appTextSecondary, fontSize: 13),
           ),
         ),
       ],

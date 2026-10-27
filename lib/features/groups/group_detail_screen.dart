@@ -108,12 +108,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         title: Text(t.tr('leave_group', fallback: 'Sair do Grupo'), style: const TextStyle(color: Colors.white)),
         content: Text(
           t.tr('leave_group_confirm', fallback: 'Tem certeza que deseja sair deste grupo?'),
-          style: const TextStyle(color: context.appTextSecondary),
+          style: TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -352,7 +352,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           children: [
             Text(
               t.tr('attach_image_desc', fallback: 'Insira a URL da imagem ou captura de estudo:'),
-              style: const TextStyle(color: context.appTextSecondary, fontSize: 13),
+              style: TextStyle(color: context.appTextSecondary, fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -360,7 +360,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: t.tr('image_url_hint', fallback: 'https://exemplo.com/estudo.jpg'),
-                hintStyle: const TextStyle(color: context.appTextMuted),
+                hintStyle: TextStyle(color: context.appTextMuted),
                 filled: true,
                 fillColor: context.appSurface,
               ),
@@ -370,7 +370,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
@@ -438,7 +438,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
             Text(widget.group.name, style: AppTextStyles.titleLarge),
             Text(
               '${studyingMembers.length} ${t.tr("studying_now", fallback: "studying now")} • ${t.tr("today_total", fallback: "Total Hoje")}: ${_formatMs(todayTotalMs)} • ${t.tr("goal", fallback: "Goal")}: ${widget.group.dailyGoalHours}h/${t.tr("day", fallback: "day")}',
-              style: const TextStyle(fontSize: 12, color: context.appTextSecondary),
+              style: TextStyle(fontSize: 12, color: context.appTextSecondary),
             ),
           ],
         ),
@@ -473,7 +473,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
             ),
           if (isLeader)
             IconButton(
-              icon: const Icon(Icons.admin_panel_settings, color: context.appPrimary),
+              icon: Icon(Icons.admin_panel_settings, color: context.appPrimary),
               tooltip: t.tr('leader_menu', fallback: 'Menu do Líder'),
               onPressed: () {
                 Navigator.of(context).push(
@@ -494,8 +494,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
             )
           else
             TextButton.icon(
-              icon: const Icon(Icons.group_add, color: context.appPrimary),
-              label: Text(t.tr('join', fallback: 'Entrar'), style: const TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold)),
+              icon: Icon(Icons.group_add, color: context.appPrimary),
+              label: Text(t.tr('join', fallback: 'Entrar'), style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold)),
               onPressed: _joinGroup,
             ),
           const SizedBox(width: 8),
@@ -644,7 +644,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.attach_file_rounded, color: context.appTextSecondary),
+                      icon: Icon(Icons.attach_file_rounded, color: context.appTextSecondary),
                       tooltip: t.tr('attach_image', fallback: 'Anexar Imagem'),
                       onPressed: _attachMedia,
                     ),
@@ -665,7 +665,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           hintText: t.tr('type_message', fallback: 'Digite sua mensagem...'),
-                          hintStyle: const TextStyle(color: context.appTextMuted),
+                          hintStyle: TextStyle(color: context.appTextMuted),
                           filled: true,
                           fillColor: palette.card,
                           border: OutlineInputBorder(
@@ -678,7 +678,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: const Icon(Icons.send_rounded,
+                      icon: Icon(Icons.send_rounded,
                           color: context.appPrimary),
                       onPressed: _sendMessage,
                     ),
@@ -748,12 +748,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                             : _selectedGroupRankPeriod == 'week'
                                 ? t.tr('weekly_total', fallback: 'Total Semanal')
                                 : t.tr('monthly_total', fallback: 'Total Mensal'),
-                        style: const TextStyle(color: context.appTextMuted, fontSize: 12),
+                        style: TextStyle(color: context.appTextMuted, fontSize: 12),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         _formatMs(periodTotalMs),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: context.appPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
@@ -764,12 +764,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                 ),
                 Expanded(
                   child: _isLoadingRanks
-                      ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
+                      ? Center(child: CircularProgressIndicator(color: context.appPrimary))
                       : displayList.isEmpty
                           ? Center(
                               child: Text(
                                 t.tr('no_records', fallback: 'Nenhum registro encontrado para este período.'),
-                                style: const TextStyle(color: context.appTextMuted),
+                                style: TextStyle(color: context.appTextMuted),
                               ),
                             )
                           : ListView.builder(
@@ -868,7 +868,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       return Center(
         child: Text(
           t.tr('no_group_members', fallback: 'Nenhum membro no grupo ainda.'),
-          style: const TextStyle(color: context.appTextMuted),
+          style: TextStyle(color: context.appTextMuted),
         ),
       );
     }
@@ -927,7 +927,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                   Container(
                     width: 10,
                     height: 10,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: context.appTextMuted,
                       shape: BoxShape.circle,
                     ),
@@ -935,7 +935,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                   const SizedBox(width: 8),
                   Text(
                     '${t.tr("resting_inactive", fallback: "Descansando / Inativos")} (${restingMembers.length})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: context.appTextSecondary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -1067,7 +1067,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                 ),
                 child: Text(
                   '🔔 ${t.tr("shake", fallback: "Shake")}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: context.appPrimary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,

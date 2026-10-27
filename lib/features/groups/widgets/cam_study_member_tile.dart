@@ -33,7 +33,7 @@ class CamStudyMemberTile extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.appCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: member.isStudying
@@ -51,7 +51,7 @@ class CamStudyMemberTile extends ConsumerWidget {
               camUrl,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Container(
-                color: AppColors.surface,
+                color: context.appSurface,
                 child: Center(
                   child: StudiconAvatar(
                     studiconId: member.studiconId,
@@ -140,8 +140,8 @@ class CamStudyMemberTile extends ConsumerWidget {
                         ),
                         Text(
                           _formatStudyTime(member.studyMs),
-                          style: const TextStyle(
-                            color: AppColors.primary,
+                          style: TextStyle(
+                            color: context.appPrimary,
                             fontWeight: FontWeight.w700,
                             fontSize: 11,
                           ),
@@ -151,8 +151,8 @@ class CamStudyMemberTile extends ConsumerWidget {
                   ),
                   if (onShake != null && !member.isStudying)
                     IconButton(
-                      icon: const Icon(Icons.notifications_active,
-                          color: AppColors.primary, size: 18),
+                      icon: Icon(Icons.notifications_active,
+                          color: context.appPrimary, size: 18),
                       onPressed: onShake,
                       tooltip: t.tr('shake', fallback: 'Chacoalhar'),
                     ),

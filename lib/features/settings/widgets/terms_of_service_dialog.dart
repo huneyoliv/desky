@@ -19,7 +19,7 @@ class TermsOfServiceDialog extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
 
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
       child: Container(
@@ -31,7 +31,7 @@ class TermsOfServiceDialog extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.description_outlined, color: AppColors.primary, size: 26),
+                Icon(Icons.description_outlined, color: context.appPrimary, size: 26),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -40,12 +40,12 @@ class TermsOfServiceDialog extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(color: AppColors.border, height: 24),
+            Divider(color: context.appBorder, height: 24),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -69,19 +69,19 @@ class TermsOfServiceDialog extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: context.appSurface,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: context.appBorder),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.gavel_rounded, size: 18, color: AppColors.primary),
+                          Icon(Icons.gavel_rounded, size: 18, color: context.appPrimary),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               t.tr('legal_disclaimer', fallback: 'O Desky é um cliente de terceiros independente e de código aberto, não sendo afiliado, endossado, patrocinado ou associado à Pallo Inc. ou ao Yeolpumta (YPT). Todas as marcas registradas pertencem aos seus respectivos proprietários.'),
-                              style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.9), fontSize: 11, height: 1.4),
+                              style: TextStyle(color: context.appTextMuted.withValues(alpha: 0.9), fontSize: 11, height: 1.4),
                             ),
                           ),
                         ],
@@ -90,7 +90,7 @@ class TermsOfServiceDialog extends ConsumerWidget {
                     const SizedBox(height: 16),
                     Text(
                       t.tr('terms_last_update', fallback: 'Última atualização: 2026 • TGCLab / Pallo Inc.'),
-                      style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.8), fontSize: 12),
+                      style: TextStyle(color: context.appTextMuted.withValues(alpha: 0.8), fontSize: 12),
                     ),
                   ],
                 ),
@@ -102,7 +102,7 @@ class TermsOfServiceDialog extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.appPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
@@ -128,7 +128,7 @@ class TermsOfServiceDialog extends ConsumerWidget {
   Widget _buildParagraph(String text) {
     return Text(
       text,
-      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+      style: TextStyle(color: context.appTextSecondary, fontSize: 13, height: 1.5),
     );
   }
 }

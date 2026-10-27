@@ -69,7 +69,7 @@ class StudyCalendar extends ConsumerWidget {
           children: [
             Text(
               '${t.tr("presence_calendar", fallback: "Calendário de Presença")} — $monthHeader',
-              style: const TextStyle(
+              style: TextStyle(
                 color: context.appTextPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
@@ -86,7 +86,7 @@ class StudyCalendar extends ConsumerWidget {
               child: Center(
                 child: Text(
                   day,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: context.appTextSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -125,17 +125,17 @@ class StudyCalendar extends ConsumerWidget {
                   context: context,
                   builder: (context) => AlertDialog(
                     backgroundColor: context.appCard,
-                    title: Text('${t.tr("studies_on", fallback: "Estudos em")} $dateStr', style: const TextStyle(color: context.appTextPrimary)),
+                    title: Text('${t.tr("studies_on", fallback: "Estudos em")} $dateStr', style: TextStyle(color: context.appTextPrimary)),
                     content: Text(
                       studyMs > 0
                           ? '${t.tr("total_time_studied", fallback: "Tempo total estudado")}: ${_formatMs(studyMs)}'
                           : t.tr('no_study_on_day', fallback: 'Nenhum estudo registrado neste dia.'),
-                      style: const TextStyle(color: context.appTextSecondary),
+                      style: TextStyle(color: context.appTextSecondary),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(t.tr('ok', fallback: 'OK'), style: const TextStyle(color: context.appPrimary)),
+                        child: Text(t.tr('ok', fallback: 'OK'), style: TextStyle(color: context.appPrimary)),
                       ),
                     ],
                   ),

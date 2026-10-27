@@ -119,11 +119,11 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
     final subjects = timerState.subjects;
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
-          const Icon(Icons.edit_calendar_rounded, color: AppColors.primary),
+          Icon(Icons.edit_calendar_rounded, color: context.appPrimary),
           const SizedBox(width: 10),
           Text(
             t.tr('manual_study_record', fallback: 'Registro Manual de Estudo'),
@@ -155,18 +155,18 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
               ],
 
               // Subject Dropdown
-              Text(t.tr('subjects', fallback: 'Matéria:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              Text(t.tr('subjects', fallback: 'Matéria:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               DropdownButtonFormField<SubjectModel>(
                 value: _selectedSubject,
-                dropdownColor: AppColors.surface,
+                dropdownColor: context.appSurface,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: AppColors.surface,
+                  fillColor: context.appSurface,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.border),
+                    borderSide: BorderSide(color: context.appBorder),
                   ),
                 ),
                 items: subjects.map((s) {
@@ -190,7 +190,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
               const SizedBox(height: 16),
 
               // Date Selector
-              Text(t.tr('date', fallback: 'Data do Estudo:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              Text(t.tr('date', fallback: 'Data do Estudo:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               InkWell(
                 onTap: () async {
@@ -208,9 +208,9 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: context.appSurface,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: context.appBorder),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,7 +219,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                         '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
                         style: const TextStyle(color: Colors.white, fontSize: 14),
                       ),
-                      const Icon(Icons.calendar_today, color: AppColors.primary, size: 18),
+                      Icon(Icons.calendar_today, color: context.appPrimary, size: 18),
                     ],
                   ),
                 ),
@@ -233,7 +233,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.tr('start_time', fallback: 'Início:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                        Text(t.tr('start_time', fallback: 'Início:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
                         const SizedBox(height: 6),
                         InkWell(
                           onTap: () async {
@@ -249,9 +249,9 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: context.appSurface,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AppColors.border),
+                              border: Border.all(color: context.appBorder),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -260,7 +260,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                                   '${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}',
                                   style: const TextStyle(color: Colors.white, fontSize: 14),
                                 ),
-                                const Icon(Icons.access_time, color: AppColors.primary, size: 18),
+                                Icon(Icons.access_time, color: context.appPrimary, size: 18),
                               ],
                             ),
                           ),
@@ -273,7 +273,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.tr('end_time', fallback: 'Término:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                        Text(t.tr('end_time', fallback: 'Término:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
                         const SizedBox(height: 6),
                         InkWell(
                           onTap: () async {
@@ -289,9 +289,9 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: context.appSurface,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AppColors.border),
+                              border: Border.all(color: context.appBorder),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -300,7 +300,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                                   '${_stopTime.hour.toString().padLeft(2, '0')}:${_stopTime.minute.toString().padLeft(2, '0')}',
                                   style: const TextStyle(color: Colors.white, fontSize: 14),
                                 ),
-                                const Icon(Icons.access_time, color: AppColors.primary, size: 18),
+                                Icon(Icons.access_time, color: context.appPrimary, size: 18),
                               ],
                             ),
                           ),
@@ -338,11 +338,11 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
       actions: [
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-          child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+          child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _handleSave,
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+          style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
           child: _isLoading
               ? const SizedBox(
                   width: 20,

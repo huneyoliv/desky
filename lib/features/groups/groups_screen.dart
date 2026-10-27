@@ -152,7 +152,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             children: [
               Text(
                 t.tr('enter_group_password', fallback: 'Este grupo requer senha para entrada:'),
-                style: const TextStyle(color: context.appTextSecondary),
+                style: TextStyle(color: context.appTextSecondary),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -161,7 +161,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: t.tr('password', fallback: 'Senha do Grupo'),
-                  hintStyle: const TextStyle(color: context.appTextMuted),
+                  hintStyle: TextStyle(color: context.appTextMuted),
                   filled: true,
                   fillColor: context.appSurface,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -172,7 +172,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
@@ -269,7 +269,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                 ),
                 child: Text(
                   t.tr('live_study', fallback: 'LIVE STUDY').toUpperCase(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: context.appAccent,
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
@@ -286,7 +286,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             children: [
               Text(
                 '${group.category} • ${group.membersCount}/${group.maxCapacity} ${t.tr("members", fallback: "membros")} • ${t.tr("goal", fallback: "Meta")}: ${group.dailyGoalHours}h/${t.tr("today", fallback: "dia")}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: context.appTextSecondary,
                   fontSize: 13,
                 ),
@@ -295,7 +295,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                 const SizedBox(height: 4),
                 Text(
                   group.notice!.trim(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: context.appTextMuted,
                     fontSize: 12,
                   ),
@@ -385,13 +385,13 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.group_off_rounded,
+                        Icon(Icons.group_off_rounded,
                             size: 48, color: context.appTextMuted),
                         const SizedBox(height: 12),
                         Text(
                           t.tr('no_groups', fallback: 'Você não participa de nenhum grupo de estudos no momento.'),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: context.appTextSecondary),
+                          style: TextStyle(color: context.appTextSecondary),
                         ),
                       ],
                     ),
@@ -433,17 +433,17 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: t.tr('search', fallback: 'Buscar grupos por nome ou palavra-chave...'),
-                            hintStyle: const TextStyle(color: context.appTextMuted),
+                            hintStyle: TextStyle(color: context.appTextMuted),
                             filled: true,
                             fillColor: context.appCard,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: const Icon(Icons.search, color: context.appTextSecondary),
+                            prefixIcon: Icon(Icons.search, color: context.appTextSecondary),
                             suffixIcon: _searchController.text.isNotEmpty
                                 ? IconButton(
-                                    icon: const Icon(Icons.clear, color: context.appTextMuted),
+                                    icon: Icon(Icons.clear, color: context.appTextMuted),
                                     onPressed: () {
                                       _searchController.clear();
                                       _performSearch();
@@ -522,7 +522,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                 ? Center(
                                     child: Text(
                                       t.tr('no_results', fallback: 'Nenhum grupo encontrado para sua busca.'),
-                                      style: const TextStyle(color: context.appTextSecondary),
+                                      style: TextStyle(color: context.appTextSecondary),
                                     ),
                                   )
                                 : ListView.builder(
@@ -536,7 +536,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                 ? Center(
                                     child: Text(
                                       t.tr('no_groups_found', fallback: 'Nenhum grupo disponível para explorar no momento.'),
-                                      style: const TextStyle(color: context.appTextSecondary),
+                                      style: TextStyle(color: context.appTextSecondary),
                                     ),
                                   )
                                 : ListView.builder(

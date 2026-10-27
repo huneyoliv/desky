@@ -28,7 +28,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
       return Scaffold(
         backgroundColor: context.appBackground,
         appBar: AppBar(title: Text(deck.title), backgroundColor: context.appSurface),
-        body: const Center(child: CircularProgressIndicator(color: context.appPrimary)),
+        body: Center(child: CircularProgressIndicator(color: context.appPrimary)),
       );
     }
 
@@ -44,7 +44,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.style_outlined, size: 64, color: context.appTextMuted),
+              Icon(Icons.style_outlined, size: 64, color: context.appTextMuted),
               const SizedBox(height: 16),
               Text(t.tr('deck_empty_cards', fallback: 'Este baralho ainda não tem cartões.'),
                   style: const TextStyle(color: Colors.white, fontSize: 16)),
@@ -78,7 +78,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
               const SizedBox(height: 10),
               Text(
                 '${t.tr("reviewed_all", fallback: "Você revisou todos os")} ${state.currentCards.length} ${t.tr("cards_in_deck", fallback: "cartões deste baralho.")}',
-                style: const TextStyle(color: context.appTextSecondary, fontSize: 15),
+                style: TextStyle(color: context.appTextSecondary, fontSize: 15),
               ),
               const SizedBox(height: 30),
               Row(
@@ -121,7 +121,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
               padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '$current / $total',
-                style: const TextStyle(color: context.appTextSecondary, fontWeight: FontWeight.bold),
+                style: TextStyle(color: context.appTextSecondary, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -212,7 +212,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
                                 const SizedBox(width: 6),
                                 Text(
                                   '${t.tr("hint", fallback: "Dica")}: ${card.hint!}',
-                                  style: const TextStyle(color: context.appTextSecondary, fontSize: 13),
+                                  style: TextStyle(color: context.appTextSecondary, fontSize: 13),
                                 ),
                               ],
                             ),
@@ -222,11 +222,11 @@ class FlashcardStudyScreen extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.touch_app_outlined, size: 16, color: context.appTextMuted),
+                            Icon(Icons.touch_app_outlined, size: 16, color: context.appTextMuted),
                             const SizedBox(width: 6),
                             Text(
                               t.tr('tap_to_flip', fallback: 'Toque para virar'),
-                              style: const TextStyle(color: context.appTextMuted, fontSize: 12),
+                              style: TextStyle(color: context.appTextMuted, fontSize: 12),
                             ),
                           ],
                         ),

@@ -37,7 +37,7 @@ class SubjectSelector extends ConsumerWidget {
         builder: (context, setState) {
           final isEditing = editSubject != null;
           return AlertDialog(
-            backgroundColor: AppColors.card,
+            backgroundColor: context.appCard,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text(
               isEditing ? t.tr('edit_subject', fallback: 'Editar Matéria') : t.tr('new_subject', fallback: 'Nova Matéria'),
@@ -54,19 +54,19 @@ class SubjectSelector extends ConsumerWidget {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: t.tr('subject_title', fallback: 'Nome da matéria (ex: Matemática)'),
-                      hintStyle: const TextStyle(color: AppColors.textMuted),
+                      hintStyle: TextStyle(color: context.appTextMuted),
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: context.appSurface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.border),
+                        borderSide: BorderSide(color: context.appBorder),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     t.tr('color', fallback: 'Cor'),
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: context.appTextSecondary, fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 10),
                   Container(
@@ -111,7 +111,7 @@ class SubjectSelector extends ConsumerWidget {
             ),       actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+                child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -131,7 +131,7 @@ class SubjectSelector extends ConsumerWidget {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.appPrimary,
                 ),
                 child: Text(
                   isEditing ? t.tr('save', fallback: 'Salvar') : t.tr('create', fallback: 'Criar'),
@@ -149,7 +149,7 @@ class SubjectSelector extends ConsumerWidget {
     final t = ref.read(appTranslationProvider);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -195,16 +195,16 @@ class SubjectSelector extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         title: Text('${t.tr("delete", fallback: "Excluir")} "${subject.title}"?', style: const TextStyle(color: Colors.white)),
         content: Text(
           t.tr('delete_confirm_desc', fallback: 'Tem certeza que deseja excluir esta matéria do servidor?'),
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -224,7 +224,7 @@ class SubjectSelector extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         title: Text(t.tr('manage_subjects', fallback: 'Gerenciar Matérias'), style: const TextStyle(color: Colors.white)),
         content: SizedBox(
           width: 450,
@@ -236,7 +236,7 @@ class SubjectSelector extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   child: Text(
                     t.tr('no_active_subjects', fallback: 'Nenhuma matéria cadastrada'),
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style: TextStyle(color: context.appTextMuted),
                   ),
                 )
               else
@@ -244,7 +244,7 @@ class SubjectSelector extends ConsumerWidget {
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: subjects.length,
-                    separatorBuilder: (_, __) => const Divider(color: AppColors.border),
+                    separatorBuilder: (_, __) => Divider(color: context.appBorder),
                     itemBuilder: (context, index) {
                       final s = subjects[index];
                       return ListTile(
@@ -350,9 +350,9 @@ class SubjectSelector extends ConsumerWidget {
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.appSurface,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.appBorder),
               ),
               child: const Icon(Icons.add, color: Colors.white, size: 20),
             ),
@@ -365,11 +365,11 @@ class SubjectSelector extends ConsumerWidget {
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.appSurface,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.appBorder),
               ),
-              child: const Icon(Icons.tune_outlined, color: AppColors.primary, size: 20),
+              child: Icon(Icons.tune_outlined, color: context.appPrimary, size: 20),
             ),
           ),
         ],

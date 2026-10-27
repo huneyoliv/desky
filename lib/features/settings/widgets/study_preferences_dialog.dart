@@ -23,7 +23,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
     final notifier = ref.read(settingsNotifierProvider.notifier);
 
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 520,
@@ -35,7 +35,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.tune_rounded, color: AppColors.primary, size: 24),
+                Icon(Icons.tune_rounded, color: context.appPrimary, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -44,12 +44,12 @@ class StudyPreferencesDialog extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(color: AppColors.border, height: 24),
+            Divider(color: context.appBorder, height: 24),
 
             Flexible(
               child: SingleChildScrollView(
@@ -59,19 +59,19 @@ class StudyPreferencesDialog extends ConsumerWidget {
                     // Theme & Appearance
                     ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.palette_outlined, color: AppColors.primary, size: 22),
+                      leading: Icon(Icons.palette_outlined, color: context.appPrimary, size: 22),
                       title: Text(
                         t.tr('theme_appearance', fallback: 'Aparência & Tema'),
                         style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('theme_appearance_desc', fallback: 'Personalize a paleta visual e cores do aplicativo'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                      trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                       onTap: () => ThemeSelectionDialog.show(context),
                     ),
-                    const Divider(color: AppColors.border, height: 16),
+                    Divider(color: context.appBorder, height: 16),
 
                     // Day Start Reset Time
                     ListTile(
@@ -83,11 +83,11 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       ),
                       subtitle: Text(
                         t.tr('day_start_hour_desc', fallback: 'Horário de virada do dia nos gráficos e diário'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                       ),
                       trailing: DropdownButton<int>(
                         value: settings.dayResetHour,
-                        dropdownColor: AppColors.surface,
+                        dropdownColor: context.appSurface,
                         style: const TextStyle(color: Colors.white, fontSize: 14),
                         underline: const SizedBox(),
                         items: List.generate(7, (i) => i).map((h) {
@@ -104,70 +104,70 @@ class StudyPreferencesDialog extends ConsumerWidget {
                         },
                       ),
                     ),
-                    const Divider(color: AppColors.border, height: 16),
+                    Divider(color: context.appBorder, height: 16),
 
                     // Show Rest Time Toggle
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      activeColor: AppColors.primary,
+                      activeColor: context.appPrimary,
                       title: Text(
                         t.tr('drawer_settings_menu_show_rest', fallback: 'Exibir Tempo de Descanso'),
                         style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('show_rest_desc', fallback: 'Exibir pausas e intervalos no registro diário'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                       ),
                       value: settings.showRestTime,
                       onChanged: (val) => notifier.toggleShowRestTime(val),
                     ),
-                    const Divider(color: AppColors.border, height: 16),
+                    Divider(color: context.appBorder, height: 16),
 
                     // Nudge / Wake Notifications Toggle
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      activeColor: AppColors.primary,
+                      activeColor: context.appPrimary,
                       title: Text(
                         t.tr('drawer_settings_menu_wake_notification', fallback: 'Notificações de Cutucada (Nudge)'),
                         style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('wake_notif_desc', fallback: 'Receber alertas quando membros do grupo te cutucarem'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                       ),
                       value: settings.wakeNotifications,
                       onChanged: (val) => notifier.toggleWakeNotifications(val),
                     ),
-                    const Divider(color: AppColors.border, height: 16),
+                    Divider(color: context.appBorder, height: 16),
 
                     // Sound Effects Toggle
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      activeColor: AppColors.primary,
+                      activeColor: context.appPrimary,
                       title: Text(
                         t.tr('sound_effects', fallback: 'Efeitos Sonoros do Cronômetro'),
                         style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('sound_effects_desc', fallback: 'Sons de início, pausa e conclusão de ciclos Pomodoro'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                       ),
                       value: settings.soundEffects,
                       onChanged: (val) => notifier.toggleSoundEffects(val),
                     ),
-                    const Divider(color: AppColors.border, height: 16),
+                    Divider(color: context.appBorder, height: 16),
 
                     // Discord Rich Presence Toggle
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      activeColor: AppColors.primary,
+                      activeColor: context.appPrimary,
                       title: Text(
                         t.tr('discord_rpc_title', fallback: 'Discord Rich Presence'),
                         style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('discord_rpc_desc', fallback: 'Exibir matéria e tempo de estudo em tempo real no status do Discord'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                       ),
                       value: settings.discordRpcEnabled,
                       onChanged: (val) => notifier.toggleDiscordRpc(val),
@@ -183,7 +183,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.appPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),

@@ -35,7 +35,7 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
     final notifier = ref.read(settingsNotifierProvider.notifier);
 
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 480,
@@ -56,12 +56,12 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(color: AppColors.border, height: 24),
+            Divider(color: context.appBorder, height: 24),
 
             Row(
               children: [
@@ -71,12 +71,12 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                     decoration: InputDecoration(
                       hintText: t.tr('block_user_hint', fallback: 'Bloquear apelido de usuário...'),
-                      hintStyle: const TextStyle(color: AppColors.textMuted),
+                      hintStyle: TextStyle(color: context.appTextMuted),
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: context.appSurface,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.appBorder)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.appBorder)),
                     ),
                   ),
                 ),
@@ -106,11 +106,11 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
                 child: Center(
                   child: Column(
                     children: [
-                      const Icon(Icons.sentiment_satisfied_rounded, size: 40, color: AppColors.textMuted),
+                      Icon(Icons.sentiment_satisfied_rounded, size: 40, color: context.appTextMuted),
                       const SizedBox(height: 12),
                       Text(
                         t.tr('drawer_settings_block_user_empty_msg', fallback: 'Você não tem nenhum usuário bloqueado.'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -122,20 +122,20 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: settings.blockedUsers.length,
-                  separatorBuilder: (_, __) => const Divider(color: AppColors.border, height: 1),
+                  separatorBuilder: (_, __) => Divider(color: context.appBorder, height: 1),
                   itemBuilder: (context, index) {
                     final user = settings.blockedUsers[index];
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: const CircleAvatar(
+                      leading: CircleAvatar(
                         radius: 16,
-                        backgroundColor: AppColors.surface,
+                        backgroundColor: context.appSurface,
                         child: Icon(Icons.person_off_rounded, size: 18, color: AppColors.error),
                       ),
                       title: Text(user, style: const TextStyle(color: Colors.white, fontSize: 14)),
                       trailing: TextButton(
                         onPressed: () => notifier.unblockUser(user),
-                        child: Text(t.tr('unblock', fallback: 'Desbloquear'), style: const TextStyle(color: AppColors.primary)),
+                        child: Text(t.tr('unblock', fallback: 'Desbloquear'), style: TextStyle(color: context.appPrimary)),
                       ),
                     );
                   },
@@ -147,7 +147,7 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(t.tr('close_btn', fallback: 'Fechar'), style: const TextStyle(color: AppColors.textMuted)),
+                child: Text(t.tr('close_btn', fallback: 'Fechar'), style: TextStyle(color: context.appTextMuted)),
               ),
             ),
           ],

@@ -129,7 +129,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: AppColors.card,
+          backgroundColor: context.appCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(t.tr('new_subject', fallback: 'Nova Matéria'), style: const TextStyle(color: Colors.white)),
           content: SizedBox(
@@ -143,19 +143,19 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: t.tr('subject_title', fallback: 'Nome da Matéria'),
-                    labelStyle: const TextStyle(color: AppColors.textSecondary),
+                    labelStyle: TextStyle(color: context.appTextSecondary),
                     filled: true,
-                    fillColor: AppColors.surface,
+                    fillColor: context.appSurface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: BorderSide(color: context.appBorder),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   t.tr('color', fallback: 'Cor'),
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: context.appTextSecondary, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 10),
                 _buildColorGrid(_selectedColorInt, (c) => setDialogState(() => _selectedColorInt = c)),
@@ -165,7 +165,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -176,7 +176,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: context.appPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               child: Text(t.tr('save', fallback: 'Criar'), style: const TextStyle(color: Colors.white)),
@@ -196,7 +196,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: AppColors.card,
+          backgroundColor: context.appCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text('${t.tr("edit", fallback: "Editar")}: ${subject.title}', style: const TextStyle(color: Colors.white)),
           content: SizedBox(
@@ -210,19 +210,19 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: t.tr('subject_title', fallback: 'Nome da Matéria'),
-                    labelStyle: const TextStyle(color: AppColors.textSecondary),
+                    labelStyle: TextStyle(color: context.appTextSecondary),
                     filled: true,
-                    fillColor: AppColors.surface,
+                    fillColor: context.appSurface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: BorderSide(color: context.appBorder),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   t.tr('color', fallback: 'Cor'),
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: context.appTextSecondary, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 10),
                 _buildColorGrid(editColorInt, (c) => setDialogState(() => editColorInt = c)),
@@ -232,7 +232,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -247,7 +247,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: context.appPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
@@ -290,10 +290,10 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
     final filteredSubjects = _localSubjects.where((s) => s.isArchived == _showArchived).toList();
 
     return Dialog(
-      backgroundColor: AppColors.card.withValues(alpha: 0.85),
+      backgroundColor: context.appCard.withValues(alpha: 0.85),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.appBorder),
       ),
       child: Container(
         width: 520,
@@ -304,12 +304,12 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
           children: [
             Row(
               children: [
-                const Icon(Icons.bookmark_outline_rounded, color: AppColors.primary, size: 24),
+                Icon(Icons.bookmark_outline_rounded, color: context.appPrimary, size: 24),
                 const SizedBox(width: 10),
                 Text(t.tr('manage_subjects', fallback: 'Gerenciar Matérias'), style: AppTextStyles.titleMedium),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -320,8 +320,8 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 ChoiceChip(
                   label: Text(t.tr('active', fallback: 'Ativas')),
                   selected: !_showArchived,
-                  selectedColor: AppColors.primary,
-                  backgroundColor: AppColors.surface,
+                  selectedColor: context.appPrimary,
+                  backgroundColor: context.appSurface,
                   labelStyle: TextStyle(color: !_showArchived ? Colors.white : AppColors.textMuted),
                   onSelected: (_) => setState(() => _showArchived = false),
                 ),
@@ -329,8 +329,8 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 ChoiceChip(
                   label: Text(t.tr('archived', fallback: 'Arquivadas')),
                   selected: _showArchived,
-                  selectedColor: AppColors.primary,
-                  backgroundColor: AppColors.surface,
+                  selectedColor: context.appPrimary,
+                  backgroundColor: context.appSurface,
                   labelStyle: TextStyle(color: _showArchived ? Colors.white : AppColors.textMuted),
                   onSelected: (_) => setState(() => _showArchived = true),
                 ),
@@ -347,7 +347,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                           _showArchived
                               ? t.tr('no_archived_subjects', fallback: 'Nenhuma matéria arquivada.')
                               : t.tr('no_active_subjects', fallback: 'Nenhuma matéria ativa.'),
-                          style: const TextStyle(color: AppColors.textMuted),
+                          style: TextStyle(color: context.appTextMuted),
                         ),
                       ),
                     )
@@ -407,7 +407,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                                       ),
                                       Text(
                                         _formatMs(subject.studyMs),
-                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                                        style: TextStyle(color: context.appTextMuted, fontSize: 11),
                                       ),
                                     ],
                                   ),
@@ -422,7 +422,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                                 icon: Icon(
                                   _showArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
                                   size: 18,
-                                  color: AppColors.primary,
+                                  color: context.appPrimary,
                                 ),
                                 tooltip: _showArchived
                                     ? t.tr('unarchive', fallback: 'Desarquivar')
@@ -447,11 +447,11 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 onPressed: _showAddSubjectDialog,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: const BorderSide(color: AppColors.primary),
+                  side: BorderSide(color: context.appPrimary),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                icon: const Icon(Icons.add, color: AppColors.primary),
-                label: Text(t.tr('new_subject', fallback: 'Nova Matéria'), style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                icon: Icon(Icons.add, color: context.appPrimary),
+                label: Text(t.tr('new_subject', fallback: 'Nova Matéria'), style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold)),
               ),
             ),
           ],

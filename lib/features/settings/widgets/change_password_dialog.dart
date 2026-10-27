@@ -101,7 +101,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     final t = ref.watch(appTranslationProvider);
 
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 460,
@@ -112,7 +112,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
           children: [
             Row(
               children: [
-                const Icon(Icons.lock_reset_rounded, color: AppColors.primary, size: 24),
+                Icon(Icons.lock_reset_rounded, color: context.appPrimary, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -121,12 +121,12 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(color: AppColors.border, height: 24),
+            Divider(color: context.appBorder, height: 24),
 
             if (_errorMessage != null) ...[
               Container(
@@ -178,13 +178,13 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
               children: [
                 TextButton(
                   onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-                  child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+                  child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleSubmit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: context.appPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
@@ -212,15 +212,15 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
       style: const TextStyle(color: Colors.white, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+        labelStyle: TextStyle(color: context.appTextMuted, fontSize: 13),
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: context.appSurface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.appBorder)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.appBorder)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.appPrimary)),
         suffixIcon: IconButton(
-          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: AppColors.textMuted, size: 18),
+          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: context.appTextMuted, size: 18),
           onPressed: onToggleVisibility,
         ),
       ),

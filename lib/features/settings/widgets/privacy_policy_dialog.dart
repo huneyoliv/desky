@@ -19,7 +19,7 @@ class PrivacyPolicyDialog extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
 
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
       child: Container(
@@ -31,7 +31,7 @@ class PrivacyPolicyDialog extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.privacy_tip_outlined, color: AppColors.primary, size: 26),
+                Icon(Icons.privacy_tip_outlined, color: context.appPrimary, size: 26),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -40,12 +40,12 @@ class PrivacyPolicyDialog extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(color: AppColors.border, height: 24),
+            Divider(color: context.appBorder, height: 24),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -68,7 +68,7 @@ class PrivacyPolicyDialog extends ConsumerWidget {
                     const SizedBox(height: 20),
                     Text(
                       t.tr('privacy_footer_contact', fallback: 'Pallo Inc. / TGCLab • Contato: contact@yeolpumta.com'),
-                      style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.8), fontSize: 12),
+                      style: TextStyle(color: context.appTextMuted.withValues(alpha: 0.8), fontSize: 12),
                     ),
                   ],
                 ),
@@ -80,7 +80,7 @@ class PrivacyPolicyDialog extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.appPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
@@ -106,7 +106,7 @@ class PrivacyPolicyDialog extends ConsumerWidget {
   Widget _buildParagraph(String text) {
     return Text(
       text,
-      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+      style: TextStyle(color: context.appTextSecondary, fontSize: 13, height: 1.5),
     );
   }
 }

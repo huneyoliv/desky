@@ -122,7 +122,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
         elevation: 1,
         title: Row(
           children: [
-            const Icon(Icons.menu_book_rounded, color: context.appPrimary, size: 24),
+            Icon(Icons.menu_book_rounded, color: context.appPrimary, size: 24),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -144,7 +144,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
               onPressed: _toggleBookmark,
             ),
             IconButton(
-              icon: const Icon(Icons.style_rounded, color: context.appPrimary),
+              icon: Icon(Icons.style_rounded, color: context.appPrimary),
               tooltip: t.tr('smartbook_create_flashcard', fallback: 'Criar Flashcard desta Página'),
               onPressed: _createFlashcardFromPage,
             ),
@@ -163,7 +163,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
             ),
           ],
           IconButton(
-            icon: const Icon(Icons.file_open_rounded, color: context.appPrimary),
+            icon: Icon(Icons.file_open_rounded, color: context.appPrimary),
             tooltip: t.tr('smartbook_open_pdf', fallback: 'Abrir PDF Local'),
             onPressed: _pickPdfFile,
           ),
@@ -183,7 +183,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
                           style: const TextStyle(color: Colors.white, fontSize: 14),
                           decoration: InputDecoration(
                             hintText: t.tr('smartbook_search_hint', fallback: 'Digite o termo de busca...'),
-                            hintStyle: const TextStyle(color: context.appTextMuted),
+                            hintStyle: TextStyle(color: context.appTextMuted),
                             border: InputBorder.none,
                           ),
                           onSubmitted: (query) {
@@ -231,7 +231,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: context.appBorder),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.picture_as_pdf_rounded,
               size: 80,
               color: context.appPrimary,
@@ -247,7 +247,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
               t.tr('pdf_reader_empty_desc', fallback: 'Abra arquivos PDF do seu computador para estudar com zoom, páginas, marcadores e gerar flashcards.'),
-              style: const TextStyle(color: context.appTextSecondary, fontSize: 14),
+              style: TextStyle(color: context.appTextSecondary, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ),

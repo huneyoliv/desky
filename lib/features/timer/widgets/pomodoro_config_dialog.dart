@@ -70,11 +70,11 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
     final t = ref.watch(appTranslationProvider);
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
-          const Icon(Icons.timer_outlined, color: AppColors.primary),
+          Icon(Icons.timer_outlined, color: context.appPrimary),
           const SizedBox(width: 10),
           Text(
             t.tr('pomodoro_settings', fallback: 'Configurações do Pomodoro'),
@@ -96,7 +96,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 onDecrement: _focusMinutes > 5 ? () => setState(() => _focusMinutes -= 5) : null,
                 onIncrement: _focusMinutes < 120 ? () => setState(() => _focusMinutes += 5) : null,
               ),
-              const Divider(color: AppColors.border),
+              Divider(color: context.appBorder),
               _buildStepper(
                 label: t.tr('short_break', fallback: 'Pausa Curta'),
                 value: '$_shortBreakMinutes min',
@@ -105,7 +105,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 onDecrement: _shortBreakMinutes > 1 ? () => setState(() => _shortBreakMinutes -= 1) : null,
                 onIncrement: _shortBreakMinutes < 30 ? () => setState(() => _shortBreakMinutes += 1) : null,
               ),
-              const Divider(color: AppColors.border),
+              Divider(color: context.appBorder),
               _buildStepper(
                 label: t.tr('long_break', fallback: 'Pausa Longa'),
                 value: '$_longBreakMinutes min',
@@ -114,7 +114,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 onDecrement: _longBreakMinutes > 5 ? () => setState(() => _longBreakMinutes -= 5) : null,
                 onIncrement: _longBreakMinutes < 60 ? () => setState(() => _longBreakMinutes += 5) : null,
               ),
-              const Divider(color: AppColors.border),
+              Divider(color: context.appBorder),
               _buildStepper(
                 label: t.tr('cycles_to_long_break', fallback: 'Ciclos até Pausa Longa'),
                 value: '$_totalCycles ${t.tr("cycles", fallback: "ciclos")}',
@@ -128,14 +128,14 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 contentPadding: EdgeInsets.zero,
                 title: Text(t.tr('auto_start_breaks', fallback: 'Iniciar pausas automaticamente'), style: const TextStyle(color: Colors.white, fontSize: 14)),
                 value: _autoStartBreaks,
-                activeColor: AppColors.primary,
+                activeColor: context.appPrimary,
                 onChanged: (val) => setState(() => _autoStartBreaks = val),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(t.tr('auto_start_focus', fallback: 'Iniciar foco automaticamente'), style: const TextStyle(color: Colors.white, fontSize: 14)),
                 value: _autoStartFocus,
-                activeColor: AppColors.primary,
+                activeColor: context.appPrimary,
                 onChanged: (val) => setState(() => _autoStartFocus = val),
               ),
             ],
@@ -145,7 +145,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+          child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
         ),
         ElevatedButton(
           onPressed: () {
@@ -159,7 +159,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
             );
             Navigator.of(context).pop();
           },
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+          style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
           child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],
@@ -189,7 +189,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline, color: AppColors.textSecondary, size: 22),
+                icon: Icon(Icons.remove_circle_outline, color: context.appTextSecondary, size: 22),
                 onPressed: onDecrement,
               ),
               SizedBox(
@@ -201,7 +201,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.add_circle_outline, color: AppColors.primary, size: 22),
+                icon: Icon(Icons.add_circle_outline, color: context.appPrimary, size: 22),
                 onPressed: onIncrement,
               ),
             ],

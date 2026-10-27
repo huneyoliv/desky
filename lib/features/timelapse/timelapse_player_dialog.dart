@@ -94,7 +94,7 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
     final subjectColor = ColorUtils.fromArgbInt(session.subjectColorInt);
 
     return Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.appSurface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: 720,
@@ -131,12 +131,12 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceLight,
+                          color: context.appSurfaceLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           '${t.tr("study", fallback: "Estudo")}: ${_formatDuration(session.durationSeconds)}',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                         ),
                       ),
                     ],
@@ -153,7 +153,7 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.appBorder),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: _buildFrameView(t),
@@ -190,21 +190,21 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
                         const SizedBox(width: 8),
                         Text(
                           '${t.tr('frame', fallback: 'Frame')} ${_currentFrameIndex + 1} / ${session.frameCount}',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 13),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        Text(t.tr('speed', fallback: 'Velocidade: '), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                        Text(t.tr('speed', fallback: 'Velocidade: '), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
                         for (final sp in [1.0, 5.0, 10.0, 30.0, 60.0])
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 2),
                             child: ChoiceChip(
                               label: Text('${sp.toInt()}x', style: TextStyle(color: _playbackSpeed == sp ? Colors.white : AppColors.textSecondary, fontSize: 11)),
                               selected: _playbackSpeed == sp,
-                              selectedColor: AppColors.primary,
-                              backgroundColor: AppColors.surfaceLight,
+                              selectedColor: context.appPrimary,
+                              backgroundColor: context.appSurfaceLight,
                               showCheckmark: false,
                               padding: const EdgeInsets.symmetric(horizontal: 4),
                               onSelected: (_) => _changeSpeed(sp),
@@ -228,9 +228,9 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.videocam_off_rounded, size: 48, color: AppColors.textMuted),
+            Icon(Icons.videocam_off_rounded, size: 48, color: context.appTextMuted),
             const SizedBox(height: 8),
-            Text(t.tr('no_frames_recorded', fallback: 'Nenhum frame gravado nesta sessão.'), style: const TextStyle(color: AppColors.textSecondary)),
+            Text(t.tr('no_frames_recorded', fallback: 'Nenhum frame gravado nesta sessão.'), style: TextStyle(color: context.appTextSecondary)),
           ],
         ),
       );
@@ -251,7 +251,7 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.slow_motion_video_rounded, size: 64, color: AppColors.primary),
+          Icon(Icons.slow_motion_video_rounded, size: 64, color: context.appPrimary),
           const SizedBox(height: 12),
           Text(
             '${t.tr('timelapse', fallback: 'Timelapse')} • ${t.tr('frame', fallback: 'Frame')} ${_currentFrameIndex + 1} / ${widget.session.frameCount}',
@@ -260,7 +260,7 @@ class _TimelapsePlayerDialogState extends ConsumerState<TimelapsePlayerDialog> {
           const SizedBox(height: 4),
           Text(
             widget.session.subjectName,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            style: TextStyle(color: context.appTextSecondary, fontSize: 13),
           ),
         ],
       ),

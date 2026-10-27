@@ -158,7 +158,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
         title: Text(t.tr('remove_member', fallback: 'Remover Membro'), style: const TextStyle(color: Colors.white)),
         content: Text(
           '${t.tr("remove_member_confirm", fallback: "Remover")} ${member.name} ${t.tr("from_group_q", fallback: "do grupo?")}',
-          style: const TextStyle(color: context.appTextSecondary),
+          style: TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
@@ -194,7 +194,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
         title: Text(t.tr('ban_member', fallback: 'Banir Membro'), style: const TextStyle(color: Colors.white)),
         content: Text(
           '${t.tr("ban_member_confirm", fallback: "Banir")} ${member.name} ${t.tr("ban_member_blacklist_desc", fallback: "do grupo? O usuário entrará na lista negra.")}',
-          style: const TextStyle(color: context.appTextSecondary),
+          style: TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
@@ -390,7 +390,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                   child: Text(t.tr('save_changes', fallback: 'Salvar Alterações'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
 
-                const Divider(height: 48, color: context.appBorder),
+                Divider(height: 48, color: context.appBorder),
 
                 // Danger Zone
                 ElevatedButton.icon(
@@ -447,7 +447,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
           _isLoadingRequests
               ? const Center(child: CircularProgressIndicator())
               : _joinRequests.isEmpty
-                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhuma solicitação de entrada pendente.'), style: const TextStyle(color: context.appTextSecondary)))
+                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhuma solicitação de entrada pendente.'), style: TextStyle(color: context.appTextSecondary)))
                   : ListView.builder(
                       padding: const EdgeInsets.all(24),
                       itemCount: _joinRequests.length,
@@ -494,7 +494,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
           _isLoadingBanned
               ? const Center(child: CircularProgressIndicator())
               : _bannedList.isEmpty
-                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhum usuário na lista negra.'), style: const TextStyle(color: context.appTextSecondary)))
+                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhum usuário na lista negra.'), style: TextStyle(color: context.appTextSecondary)))
                   : ListView.builder(
                       padding: const EdgeInsets.all(24),
                       itemCount: _bannedList.length,

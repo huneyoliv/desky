@@ -90,7 +90,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.tr('subject', fallback: 'Matéria:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
+              Text(t.tr('subject', fallback: 'Matéria:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               DropdownButtonFormField<SubjectModel>(
                 value: selectedSubject,
@@ -122,7 +122,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              Text(t.tr('day_of_week', fallback: 'Dia da Semana:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
+              Text(t.tr('day_of_week', fallback: 'Dia da Semana:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               DropdownButtonFormField<int>(
                 value: selectedDay,
@@ -150,7 +150,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.tr('start_time', fallback: 'Início:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
+                        Text(t.tr('start_time', fallback: 'Início:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<int>(
                           value: startHour,
@@ -181,7 +181,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.tr('end_time', fallback: 'Fim:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
+                        Text(t.tr('end_time', fallback: 'Fim:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<int>(
                           value: endHour,
@@ -209,7 +209,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -257,12 +257,12 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
         title: Text(t.tr('delete_timetable', fallback: 'Excluir Horário'), style: const TextStyle(color: Colors.white)),
         content: Text(
           '${t.tr("delete", fallback: "Excluir")} "${block.subjectTitle}"?',
-          style: const TextStyle(color: context.appTextSecondary),
+          style: TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -287,7 +287,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
     final t = ref.watch(appTranslationProvider);
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: context.appPrimary));
+      return Center(child: CircularProgressIndicator(color: context.appPrimary));
     }
 
     return Scaffold(
@@ -371,7 +371,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                             child: Center(
                               child: Text(
                                 '${hour.toString().padLeft(2, '0')}:00',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: context.appTextMuted,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
@@ -390,7 +390,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                             children: List.generate(24, (index) {
                               return Container(
                                 height: 50,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                     top: BorderSide(color: context.appBorder, width: 0.5),
                                   ),
@@ -406,7 +406,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
 
                               return Expanded(
                                 child: Container(
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     border: Border(
                                       left: BorderSide(color: context.appBorder, width: 0.5),
                                     ),

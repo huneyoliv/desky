@@ -48,7 +48,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
         ],
       ),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
+          ? Center(child: CircularProgressIndicator(color: context.appPrimary))
           : state.sessions.isEmpty
               ? _buildEmptyState(context, t)
               : _buildGalleryContent(context, state.sessions, notifier, totalSeconds, t),
@@ -67,7 +67,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: context.appBorder),
             ),
-            child: const Icon(Icons.slow_motion_video_rounded, size: 72, color: context.appTextMuted),
+            child: Icon(Icons.slow_motion_video_rounded, size: 72, color: context.appTextMuted),
           ),
           const SizedBox(height: 20),
           Text(
@@ -77,7 +77,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             t.tr('timelapse_empty_desc', fallback: 'Inicie o cronômetro com a câmera/timelapse ativado para gravar seu progresso acelerado.'),
-            style: const TextStyle(color: context.appTextSecondary, fontSize: 14),
+            style: TextStyle(color: context.appTextSecondary, fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -168,7 +168,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: context.appTextSecondary, fontSize: 12)),
+                Text(title, style: TextStyle(color: context.appTextSecondary, fontSize: 12)),
                 const SizedBox(height: 2),
                 Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               ],
@@ -255,12 +255,12 @@ class TimelapseGalleryScreen extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(dateStr, style: const TextStyle(color: context.appTextMuted, fontSize: 11)),
+                        Text(dateStr, style: TextStyle(color: context.appTextMuted, fontSize: 11)),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, color: context.appTextMuted, size: 20),
+                    icon: Icon(Icons.delete_outline_rounded, color: context.appTextMuted, size: 20),
                     onPressed: () => notifier.deleteSession(session.id),
                     tooltip: t.tr('delete_timelapse', fallback: 'Excluir Timelapse'),
                   ),

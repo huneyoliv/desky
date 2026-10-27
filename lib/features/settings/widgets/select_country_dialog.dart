@@ -87,10 +87,10 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: context.appBorder),
         ),
         title: Row(
           children: [
@@ -116,18 +116,18 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.appSurface,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.appBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('• ${t.tr("timezone", fallback: "Fuso Horário")}: ${country.timezone} (${country.gmtDisplay})',
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12)),
                   const SizedBox(height: 4),
                   Text('• ${t.tr("day_reset_time", fallback: "Reinício do dia de estudo")}: ${country.startTime ?? "5:00 AM"}',
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12)),
                   const SizedBox(height: 4),
                   Text('• ${t.tr("sync_region_desc", fallback: "As matérias e rankings serão sincronizados com esta região.")}',
                       style: const TextStyle(color: AppColors.primaryLight, fontSize: 12)),
@@ -139,7 +139,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -150,12 +150,12 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('${t.tr("region", fallback: "Região")} ${country.formattedName} ${t.tr("success", fallback: "alterada com sucesso!")} 🌍'),
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: context.appPrimary,
                   ),
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
             child: Text(t.tr('confirm', fallback: 'Confirmar'), style: const TextStyle(color: Colors.white)),
           ),
         ],
@@ -185,10 +185,10 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
     }).toList();
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.appBorder),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,9 +200,9 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: context.appSurface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.appBorder),
             ),
             child: Text(
               '${allCountries.length} ${t.tr("countries", fallback: "Países")}',
@@ -221,7 +221,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.appSurface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.primary.withValues(alpha: 0.5)),
               ),
@@ -256,12 +256,12 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                         const SizedBox(height: 2),
                         Text(
                           '${selectedCountry.timezone} (${selectedCountry.gmtDisplay}) • ${t.tr('reset', fallback: 'Reset')}: ${selectedCountry.startTime ?? "5 AM"}',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 11),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 22),
+                  Icon(Icons.check_circle_rounded, color: context.appPrimary, size: 22),
                 ],
               ),
             ),
@@ -273,11 +273,11 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: t.tr('search_country_hint', fallback: 'Pesquisar país, código (BR, US) ou fuso horário...'),
-                hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
-                prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                hintStyle: TextStyle(color: context.appTextMuted, fontSize: 13),
+                prefixIcon: Icon(Icons.search, color: context.appTextMuted),
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: AppColors.textMuted, size: 18),
+                        icon: Icon(Icons.clear, color: context.appTextMuted, size: 18),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _query = '');
@@ -285,15 +285,15 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                       )
                     : null,
                 filled: true,
-                fillColor: AppColors.surface,
+                fillColor: context.appSurface,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.appBorder),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.appBorder),
                 ),
               ),
             ),
@@ -313,8 +313,8 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                   return ChoiceChip(
                     label: Text(_formatContinentLabel(continent, t)),
                     selected: isSelected,
-                    selectedColor: AppColors.primary,
-                    backgroundColor: AppColors.surface,
+                    selectedColor: context.appPrimary,
+                    backgroundColor: context.appSurface,
                     labelStyle: TextStyle(
                       color: isSelected ? Colors.white : AppColors.textSecondary,
                       fontSize: 12,
@@ -334,17 +334,17 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
             // Country List
             Expanded(
               child: settingsState.isLoadingCountries
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  ? Center(child: CircularProgressIndicator(color: context.appPrimary))
                   : filtered.isEmpty
                       ? Center(
                           child: Text(
                             t.tr('no_countries_found', fallback: 'Nenhum país encontrado para esta busca'),
-                            style: const TextStyle(color: AppColors.textMuted),
+                            style: TextStyle(color: context.appTextMuted),
                           ),
                         )
                       : ListView.separated(
                           itemCount: filtered.length,
-                          separatorBuilder: (_, __) => const Divider(color: AppColors.border, height: 1),
+                          separatorBuilder: (_, __) => Divider(color: context.appBorder, height: 1),
                           itemBuilder: (context, index) {
                             final CountryModel country = filtered[index];
                             final isSelected = country.id == selectedCountry.id;
@@ -371,13 +371,13 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: AppColors.surface,
+                                        color: context.appSurface,
                                         borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(color: AppColors.border),
+                                        border: Border.all(color: context.appBorder),
                                       ),
                                       child: Text(
                                         country.gmtDisplay,
-                                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                                        style: TextStyle(color: context.appTextSecondary, fontSize: 11),
                                       ),
                                     ),
                                 ],
@@ -386,12 +386,12 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Text(
                                   '${country.timezone} • ${t.tr('reset', fallback: 'Reset')}: ${country.startTime ?? "5 AM"}',
-                                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                                  style: TextStyle(color: context.appTextMuted, fontSize: 11),
                                 ),
                               ),
                               trailing: isSelected
-                                  ? const Icon(Icons.radio_button_checked, color: AppColors.primary, size: 20)
-                                  : const Icon(Icons.radio_button_off, color: AppColors.border, size: 20),
+                                  ? Icon(Icons.radio_button_checked, color: context.appPrimary, size: 20)
+                                  : Icon(Icons.radio_button_off, color: context.appBorder, size: 20),
                               onTap: () => _confirmCountrySelection(context, country),
                             );
                           },
@@ -403,7 +403,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(t.tr('close', fallback: 'Fechar'), style: const TextStyle(color: AppColors.textMuted)),
+          child: Text(t.tr('close', fallback: 'Fechar'), style: TextStyle(color: context.appTextMuted)),
         ),
       ],
     );

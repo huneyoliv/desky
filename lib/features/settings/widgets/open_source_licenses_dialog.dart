@@ -31,7 +31,7 @@ class OpenSourceLicensesDialog extends ConsumerWidget {
     ];
 
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
       child: Container(
@@ -43,7 +43,7 @@ class OpenSourceLicensesDialog extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.code_rounded, color: AppColors.primary, size: 26),
+                Icon(Icons.code_rounded, color: context.appPrimary, size: 26),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -52,30 +52,30 @@ class OpenSourceLicensesDialog extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  icon: Icon(Icons.close, color: context.appTextMuted),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const Divider(color: AppColors.border, height: 24),
+            Divider(color: context.appBorder, height: 24),
             Expanded(
               child: ListView.separated(
                 itemCount: packages.length,
-                separatorBuilder: (_, __) => const Divider(color: AppColors.border, height: 1),
+                separatorBuilder: (_, __) => Divider(color: context.appBorder, height: 1),
                 itemBuilder: (context, index) {
                   final pkg = packages[index];
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     title: Text(pkg['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                    subtitle: Text('${pkg['desc']} • ${pkg['license']}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    subtitle: Text('${pkg['desc']} • ${pkg['license']}', style: TextStyle(color: context.appTextSecondary, fontSize: 12)),
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: context.appSurface,
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: context.appBorder),
                       ),
-                      child: Text(pkg['license']!, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                      child: Text(pkg['license']!, style: TextStyle(color: context.appTextMuted, fontSize: 11)),
                     ),
                   );
                 },
@@ -87,7 +87,7 @@ class OpenSourceLicensesDialog extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.appPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),

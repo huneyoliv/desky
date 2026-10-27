@@ -46,10 +46,10 @@ class UpdateDialog extends ConsumerWidget {
     final df = DateFormat('dd/MM/yyyy');
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.appBorder),
       ),
       titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -89,22 +89,22 @@ class UpdateDialog extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
+                          color: context.appSurface,
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: context.appBorder),
                         ),
                         child: Text(
                           'v${updateState.currentVersion}',
-                          style: const TextStyle(
-                            color: AppColors.textMuted,
+                          style: TextStyle(
+                            color: context.appTextMuted,
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(horizontal: 6),
-                        child: Icon(Icons.arrow_forward_rounded, size: 12, color: AppColors.textMuted),
+                        child: Icon(Icons.arrow_forward_rounded, size: 12, color: context.appTextMuted),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -129,7 +129,7 @@ class UpdateDialog extends ConsumerWidget {
             ],
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
+            icon: Icon(Icons.close_rounded, color: context.appTextMuted, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -143,7 +143,7 @@ class UpdateDialog extends ConsumerWidget {
             if (release.publishedAt != null) ...[
               Text(
                 '${t.tr('released_on', fallback: 'Lançado em')}: ${df.format(release.publishedAt!)}',
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                style: TextStyle(color: context.appTextSecondary, fontSize: 12),
               ),
               const SizedBox(height: 12),
             ],
@@ -162,9 +162,9 @@ class UpdateDialog extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.appSurface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.appBorder),
               ),
               child: SingleChildScrollView(
                 child: MarkdownBody(
@@ -178,8 +178,8 @@ class UpdateDialog extends ConsumerWidget {
                     }
                   },
                   styleSheet: MarkdownStyleSheet(
-                    p: const TextStyle(
-                      color: AppColors.textSecondary,
+                    p: TextStyle(
+                      color: context.appTextSecondary,
                       fontSize: 13,
                       height: 1.45,
                     ),
@@ -195,8 +195,8 @@ class UpdateDialog extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                       height: 1.4,
                     ),
-                    h3: const TextStyle(
-                      color: AppColors.primary,
+                    h3: TextStyle(
+                      color: context.appPrimary,
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       height: 1.4,
@@ -205,39 +205,39 @@ class UpdateDialog extends ConsumerWidget {
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
-                    em: const TextStyle(
-                      color: AppColors.textSecondary,
+                    em: TextStyle(
+                      color: context.appTextSecondary,
                       fontStyle: FontStyle.italic,
                     ),
-                    listBullet: const TextStyle(
-                      color: AppColors.primary,
+                    listBullet: TextStyle(
+                      color: context.appPrimary,
                       fontSize: 13,
                     ),
                     code: TextStyle(
                       color: AppColors.warning,
-                      backgroundColor: AppColors.card,
+                      backgroundColor: context.appCard,
                       fontSize: 12,
                       fontFamily: 'monospace',
                     ),
                     codeblockDecoration: BoxDecoration(
-                      color: AppColors.card,
+                      color: context.appCard,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: context.appBorder),
                     ),
                     blockquoteDecoration: BoxDecoration(
-                      color: AppColors.card.withValues(alpha: 0.5),
+                      color: context.appCard.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(4),
-                      border: const Border(
-                        left: BorderSide(color: AppColors.primary, width: 4),
+                      border: Border(
+                        left: BorderSide(color: context.appPrimary, width: 4),
                       ),
                     ),
                     horizontalRuleDecoration: BoxDecoration(
                       border: Border(
-                        top: BorderSide(color: AppColors.border, width: 1),
+                        top: BorderSide(color: context.appBorder, width: 1),
                       ),
                     ),
-                    a: const TextStyle(
-                      color: AppColors.primary,
+                    a: TextStyle(
+                      color: context.appPrimary,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -256,7 +256,7 @@ class UpdateDialog extends ConsumerWidget {
           label: Text(t.tr('view_on_github', fallback: 'Ver no GitHub')),
           style: OutlinedButton.styleFrom(
             foregroundColor: Colors.white70,
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: context.appBorder),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           ),
@@ -276,7 +276,7 @@ class UpdateDialog extends ConsumerWidget {
                 : t.tr('download_update', fallback: 'Baixar Atualização'),
           ),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: context.appPrimary,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),

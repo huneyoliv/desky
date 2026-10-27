@@ -45,10 +45,10 @@ class SelectLanguageDialog extends ConsumerWidget {
     final currentLang = settingsState.selectedLanguage;
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.appBorder),
       ),
       title: Text(
         t.tr('select_language', fallback: 'Selecionar Idioma'),
@@ -59,7 +59,7 @@ class SelectLanguageDialog extends ConsumerWidget {
         child: ListView.separated(
           shrinkWrap: true,
           itemCount: supportedLanguages.length,
-          separatorBuilder: (_, __) => const Divider(color: AppColors.border, height: 1),
+          separatorBuilder: (_, __) => Divider(color: context.appBorder, height: 1),
           itemBuilder: (context, index) {
             final lang = supportedLanguages[index];
             final isSelected = lang.code == currentLang;
@@ -75,10 +75,10 @@ class SelectLanguageDialog extends ConsumerWidget {
               ),
               subtitle: Text(
                 lang.nativeName,
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                style: TextStyle(color: context.appTextMuted, fontSize: 12),
               ),
               trailing: isSelected
-                  ? const Icon(Icons.check_circle, color: AppColors.primary, size: 20)
+                  ? Icon(Icons.check_circle, color: context.appPrimary, size: 20)
                   : null,
               onTap: () async {
                 final nav = Navigator.of(context);
@@ -93,7 +93,7 @@ class SelectLanguageDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(t.tr('close', fallback: 'Fechar'), style: const TextStyle(color: AppColors.textMuted)),
+          child: Text(t.tr('close', fallback: 'Fechar'), style: TextStyle(color: context.appTextMuted)),
         ),
       ],
     );

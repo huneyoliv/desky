@@ -91,7 +91,7 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(t.tr('group_avatar_updated', fallback: 'Avatar do grupo atualizado com sucesso! 🎉')),
-            backgroundColor: AppColors.primary,
+            backgroundColor: context.appPrimary,
           ),
         );
         Navigator.of(context).pop(_selectedStudiconId);
@@ -111,7 +111,7 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
     final t = ref.watch(appTranslationProvider);
 
     return Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.appSurface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         width: 560,
@@ -135,13 +135,13 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                       const SizedBox(height: 4),
                       Text(
                         '${widget.groupName} • ${t.tr("select_group_avatar_desc", fallback: "Escolha um avatar para exibir neste grupo:")}',
-                        style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 13, color: context.appTextSecondary),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                  icon: Icon(Icons.close, color: context.appTextSecondary),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -149,12 +149,12 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
             const SizedBox(height: 20),
             Expanded(
               child: _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  ? Center(child: CircularProgressIndicator(color: context.appPrimary))
                   : _availableStudicons.isEmpty
                       ? Center(
                           child: Text(
                             t.tr('no_avatars', fallback: 'Nenhum avatar disponível.'),
-                            style: const TextStyle(color: AppColors.textMuted),
+                            style: TextStyle(color: context.appTextMuted),
                           ),
                         )
                       : GridView.builder(
@@ -214,7 +214,7 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: AppColors.primary,
+                                          color: context.appPrimary,
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
@@ -243,14 +243,14 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                   onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
                   child: Text(
                     t.tr('cancel', fallback: 'Cancelar'),
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style: TextStyle(color: context.appTextMuted),
                   ),
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _isSaving ? null : _saveGroupStudicon,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: context.appPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
