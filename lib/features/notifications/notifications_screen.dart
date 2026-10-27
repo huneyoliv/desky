@@ -22,7 +22,7 @@ class NotificationsScreen extends ConsumerWidget {
           _buildHeader(context, tr, state, notifier),
           Expanded(
             child: state.isLoading && state.notifications.isEmpty
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(context.appPrimary),
                     ),
@@ -148,7 +148,7 @@ class NotificationsScreen extends ConsumerWidget {
               shape: BoxShape.circle,
               border: Border.all(color: context.appBorder.withValues(alpha: 0.6)),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.notifications_off_outlined,
               size: 48,
               color: context.appTextMuted,
@@ -157,7 +157,7 @@ class NotificationsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             tr.tr('no_notifications_title', fallback: 'Nenhuma notificação'),
-            style: const TextStyle(
+            style: TextStyle(
               color: context.appTextPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -166,7 +166,7 @@ class NotificationsScreen extends ConsumerWidget {
           const SizedBox(height: 6),
           Text(
             tr.tr('no_notifications_subtitle', fallback: 'Você está em dia com todas as atualizações.'),
-            style: const TextStyle(
+            style: TextStyle(
               color: context.appTextSecondary,
               fontSize: 13,
             ),
@@ -259,7 +259,7 @@ class NotificationsScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 10, top: 4),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           color: context.appTextMuted,
           fontSize: 11,
           fontWeight: FontWeight.bold,
@@ -330,7 +330,7 @@ class NotificationsScreen extends ConsumerWidget {
                             width: 8,
                             height: 8,
                             margin: const EdgeInsets.only(left: 6),
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: context.appPrimary,
                               shape: BoxShape.circle,
                             ),
@@ -340,7 +340,7 @@ class NotificationsScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       notification.message,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: context.appTextSecondary,
                         fontSize: 13,
                         height: 1.35,
@@ -349,7 +349,7 @@ class NotificationsScreen extends ConsumerWidget {
                     const SizedBox(height: 6),
                     Text(
                       _formatDate(notification.createdAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: context.appTextMuted,
                         fontSize: 11,
                       ),

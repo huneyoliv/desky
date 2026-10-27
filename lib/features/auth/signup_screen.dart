@@ -303,7 +303,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       widget.oauthInfo != null
                           ? t.tr('complete_profile', fallback: 'Complete seu Perfil')
                           : t.tr('sign_up_title', fallback: 'Crie sua Conta'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: AppTextStyles.fontDisplay,
                         fontFamilyFallback: AppTextStyles.fontFallbacks,
                         fontSize: 34,
@@ -359,7 +359,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               widget.oauthInfo != null
                                   ? t.tr('complete_profile', fallback: 'Complete seu Perfil')
                                   : '${t.tr("step", fallback: "Passo")} $_currentStep ${t.tr("of", fallback: "de")} 3',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: context.appPrimary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,

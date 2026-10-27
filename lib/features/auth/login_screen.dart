@@ -72,7 +72,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                 color: context.appPrimary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person_add_alt_1_outlined,
                 color: context.appPrimary,
                 size: 24,
@@ -394,7 +394,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'Desky',
                           style: TextStyle(
                             fontFamily: AppTextStyles.fontDisplay,
