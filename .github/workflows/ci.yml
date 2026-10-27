@@ -40,14 +40,13 @@ jobs:
 
       - name: Run test suite & publish log
         run: |
-          flutter test > test_output.txt 2>&1 || true
+          set -e
+          EXIT_CODE=0
+          flutter test 2>&1 | tee test_output.txt || EXIT_CODE=$?
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -B ci-test-log
           git add test_output.txt
           git commit -m "chore(ci): log flutter test output" || true
           git push -f origin ci-test-log || true
-          cat test_output.txt
-          if grep -q "Some tests failed" test_output.txt; then
-            exit 1
-          fi
+          exit $EXIT_CODE

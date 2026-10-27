@@ -35,9 +35,9 @@ class MockTimerRepository extends TimerRepository {
 class MockSubjectRepository extends SubjectRepository {
   @override
   Future<SubjectFetchResult> fetchSubjectsData({
-    String? language,
-    String? timezone,
-    int? version,
+    String language = 'pt',
+    String timezone = 'UTC',
+    int version = 1,
   }) async {
     return const SubjectFetchResult(
       subjects: [
@@ -53,6 +53,12 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
+  Override mockTranslationOverride() {
+    return appTranslationProvider.overrideWith(
+      (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'pt'),
+    );
+  }
+
   group('Timer Tab-Switch State Persistence Tests (Issue #3)', () {
     test('TimerNotifier does not dispose or reset when authStateProvider updates (e.g. group refresh)', () async {
       final timerRepo = MockTimerRepository();
@@ -62,9 +68,9 @@ void main() {
         overrides: [
           timerRepositoryProvider.overrideWithValue(timerRepo),
           subjectRepositoryProvider.overrideWithValue(subjectRepo),
+          mockTranslationOverride(),
         ],
       );
-      addTearDown(container.dispose);
 
       // 1. Initial auth state with user
       final authNotifier = container.read(authStateProvider.notifier);
@@ -111,6 +117,9 @@ void main() {
       expect(afterGroupRefreshState.isRunning, isTrue,
           reason: 'Timer must continue running even when authState updates from group refresh');
       expect(afterGroupRefreshState.currentSubject?.id, equals(1));
+
+      await timerNotifier.stopStudy();
+      container.dispose();
     });
 
     test('Wall-clock elapsed time computes exact delta even if ticks are throttled', () async {
@@ -121,9 +130,9 @@ void main() {
         overrides: [
           timerRepositoryProvider.overrideWithValue(timerRepo),
           subjectRepositoryProvider.overrideWithValue(subjectRepo),
+          mockTranslationOverride(),
         ],
       );
-      addTearDown(container.dispose);
 
       final timerNotifier = container.read(timerNotifierProvider.notifier);
       await timerNotifier.loadSubjects();
@@ -135,12 +144,15 @@ void main() {
       final pastTime = DateTime.now().subtract(const Duration(seconds: 15));
       timerNotifier.state = timerNotifier.state.copyWith(sessionStartAt: pastTime);
 
-      // Wait a moment for periodic tick or invoke directly by starting another second
+      // Wait a moment for periodic tick
       await Future<void>.delayed(const Duration(milliseconds: 1100));
 
       final state = container.read(timerNotifierProvider);
       expect(state.sessionElapsedMs, greaterThanOrEqualTo(15000),
           reason: 'Wall-clock elapsed calculation must reflect true difference without losing seconds');
+
+      await timerNotifier.stopStudy();
+      container.dispose();
     });
 
     test('Changing dayResetHour updates notifier via listener without resetting running session', () async {
@@ -151,9 +163,9 @@ void main() {
         overrides: [
           timerRepositoryProvider.overrideWithValue(timerRepo),
           subjectRepositoryProvider.overrideWithValue(subjectRepo),
+          mockTranslationOverride(),
         ],
       );
-      addTearDown(container.dispose);
 
       final timerNotifier = container.read(timerNotifierProvider.notifier);
       await timerNotifier.loadSubjects();
@@ -167,6 +179,9 @@ void main() {
       // Verify timer is still running
       final state = container.read(timerNotifierProvider);
       expect(state.isRunning, isTrue);
+
+      await timerNotifier.stopStudy();
+      container.dispose();
     });
 
     test('User logout properly triggers handleLogout on timer', () async {
@@ -177,9 +192,9 @@ void main() {
         overrides: [
           timerRepositoryProvider.overrideWithValue(timerRepo),
           subjectRepositoryProvider.overrideWithValue(subjectRepo),
+          mockTranslationOverride(),
         ],
       );
-      addTearDown(container.dispose);
 
       final authNotifier = container.read(authStateProvider.notifier);
       authNotifier.state = const AuthState(
@@ -204,6 +219,8 @@ void main() {
       final stateAfterLogout = container.read(timerNotifierProvider);
       expect(stateAfterLogout.isRunning, isFalse);
       expect(stateAfterLogout.sessionElapsedMs, equals(0));
+
+      container.dispose();
     });
 
     testWidgets('Widget navigation between TimerScreen and another screen preserves running state', (tester) async {
@@ -214,12 +231,9 @@ void main() {
         overrides: [
           timerRepositoryProvider.overrideWithValue(timerRepo),
           subjectRepositoryProvider.overrideWithValue(subjectRepo),
-          appTranslationProvider.overrideWith(
-            (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'pt'),
-          ),
+          mockTranslationOverride(),
         ],
       );
-      addTearDown(container.dispose);
 
       // Start study in container
       final notifier = container.read(timerNotifierProvider.notifier);
@@ -292,6 +306,11 @@ void main() {
       expect(find.text('PARAR'), findsOneWidget);
       expect(find.text('INICIAR'), findsNothing);
       expect(container.read(timerNotifierProvider).isRunning, isTrue);
+
+      // Stop study, unmount widgets, and dispose container cleanly so no periodic timers remain pending
+      await notifier.stopStudy();
+      await tester.pumpWidget(const SizedBox());
+      container.dispose();
     });
   });
 }
