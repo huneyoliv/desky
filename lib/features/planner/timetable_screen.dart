@@ -84,21 +84,21 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: AppColors.card,
+          backgroundColor: context.appCard,
           title: Text(t.tr('add_timetable', fallback: 'Adicionar Horário de Aula'), style: const TextStyle(color: Colors.white)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.tr('subject', fallback: 'Matéria:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              Text(t.tr('subject', fallback: 'Matéria:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               DropdownButtonFormField<SubjectModel>(
                 value: selectedSubject,
-                dropdownColor: AppColors.surface,
+                dropdownColor: context.appSurface,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: AppColors.surface,
+                  fillColor: context.appSurface,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 items: _subjects.map((s) {
@@ -122,15 +122,15 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              Text(t.tr('day_of_week', fallback: 'Dia da Semana:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              Text(t.tr('day_of_week', fallback: 'Dia da Semana:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               DropdownButtonFormField<int>(
                 value: selectedDay,
-                dropdownColor: AppColors.surface,
+                dropdownColor: context.appSurface,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: AppColors.surface,
+                  fillColor: context.appSurface,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 items: _getDays(t).map((d) {
@@ -150,15 +150,15 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.tr('start_time', fallback: 'Início:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                        Text(t.tr('start_time', fallback: 'Início:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<int>(
                           value: startHour,
-                          dropdownColor: AppColors.surface,
+                          dropdownColor: context.appSurface,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: AppColors.surface,
+                            fillColor: context.appSurface,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                           items: List.generate(24, (i) => i).map((h) {
@@ -181,15 +181,15 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.tr('end_time', fallback: 'Fim:'), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                        Text(t.tr('end_time', fallback: 'Fim:'), style: const TextStyle(color: context.appTextSecondary, fontSize: 13)),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<int>(
                           value: endHour,
-                          dropdownColor: AppColors.surface,
+                          dropdownColor: context.appSurface,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: AppColors.surface,
+                            fillColor: context.appSurface,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                           items: List.generate(24, (i) => i + 1).where((h) => h > startHour).map((h) {
@@ -209,7 +209,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -239,7 +239,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                   setState(() => _blocks = [..._blocks, fallbackBlock]);
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
               child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
             ),
           ],
@@ -253,16 +253,16 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         title: Text(t.tr('delete_timetable', fallback: 'Excluir Horário'), style: const TextStyle(color: Colors.white)),
         content: Text(
           '${t.tr("delete", fallback: "Excluir")} "${block.subjectTitle}"?',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: const TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -287,16 +287,16 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
     final t = ref.watch(appTranslationProvider);
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const Center(child: CircularProgressIndicator(color: context.appPrimary));
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appBackground,
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            color: AppColors.surface,
+            color: context.appSurface,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -325,7 +325,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                 ElevatedButton.icon(
                   icon: const Icon(Icons.add, color: Colors.white, size: 18),
                   label: Text(t.tr('add_timetable', fallback: 'Novo Horário'), style: const TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                  style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                   onPressed: () => _showAddBlockDialog(),
                 ),
               ],
@@ -335,7 +335,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
           // Days Header
           Container(
             height: 40,
-            color: AppColors.card,
+            color: context.appCard,
             child: Row(
               children: [
                 const SizedBox(width: 60),
@@ -372,7 +372,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                               child: Text(
                                 '${hour.toString().padLeft(2, '0')}:00',
                                 style: const TextStyle(
-                                  color: AppColors.textMuted,
+                                  color: context.appTextMuted,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -392,7 +392,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                                 height: 50,
                                 decoration: const BoxDecoration(
                                   border: Border(
-                                    top: BorderSide(color: AppColors.border, width: 0.5),
+                                    top: BorderSide(color: context.appBorder, width: 0.5),
                                   ),
                                 ),
                               );
@@ -408,7 +408,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     border: Border(
-                                      left: BorderSide(color: AppColors.border, width: 0.5),
+                                      left: BorderSide(color: context.appBorder, width: 0.5),
                                     ),
                                   ),
                                   child: Stack(
