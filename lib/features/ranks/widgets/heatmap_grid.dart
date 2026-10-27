@@ -44,7 +44,7 @@ class HeatmapGrid extends ConsumerWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('${t.tr("less", fallback: "Menos")} ', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                Text('${t.tr("less", fallback: "Menos")} ', style: const TextStyle(color: context.appTextMuted, fontSize: 11)),
                 Container(width: 10, height: 10, color: palette.surface),
                 const SizedBox(width: 4),
                 Container(width: 10, height: 10, color: palette.heatmapL1),
@@ -55,7 +55,7 @@ class HeatmapGrid extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Container(width: 10, height: 10, color: palette.heatmapL4),
                 const SizedBox(width: 4),
-                Text(' ${t.tr("more", fallback: "Mais")}', style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                Text(' ${t.tr("more", fallback: "Mais")}', style: const TextStyle(color: context.appTextMuted, fontSize: 11)),
               ],
             ),
           ],
@@ -76,7 +76,7 @@ class HeatmapGrid extends ConsumerWidget {
                     child: Text(
                       '${h.toString().padLeft(2, '0')}h',
                       style: const TextStyle(
-                        color: AppColors.textMuted,
+                        color: context.appTextMuted,
                         fontSize: 9,
                       ),
                     ),

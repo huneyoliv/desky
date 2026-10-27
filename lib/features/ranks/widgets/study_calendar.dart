@@ -70,7 +70,7 @@ class StudyCalendar extends ConsumerWidget {
             Text(
               '${t.tr("presence_calendar", fallback: "Calendário de Presença")} — $monthHeader',
               style: const TextStyle(
-                color: AppColors.textPrimary,
+                color: context.appTextPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
@@ -87,7 +87,7 @@ class StudyCalendar extends ConsumerWidget {
                 child: Text(
                   day,
                   style: const TextStyle(
-                    color: AppColors.textSecondary,
+                    color: context.appTextSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -124,18 +124,18 @@ class StudyCalendar extends ConsumerWidget {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    backgroundColor: AppColors.card,
-                    title: Text('${t.tr("studies_on", fallback: "Estudos em")} $dateStr', style: const TextStyle(color: AppColors.textPrimary)),
+                    backgroundColor: context.appCard,
+                    title: Text('${t.tr("studies_on", fallback: "Estudos em")} $dateStr', style: const TextStyle(color: context.appTextPrimary)),
                     content: Text(
                       studyMs > 0
                           ? '${t.tr("total_time_studied", fallback: "Tempo total estudado")}: ${_formatMs(studyMs)}'
                           : t.tr('no_study_on_day', fallback: 'Nenhum estudo registrado neste dia.'),
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: const TextStyle(color: context.appTextSecondary),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(t.tr('ok', fallback: 'OK'), style: const TextStyle(color: AppColors.primary)),
+                        child: Text(t.tr('ok', fallback: 'OK'), style: const TextStyle(color: context.appPrimary)),
                       ),
                     ],
                   ),

@@ -174,7 +174,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: AppColors.textPrimary,
+                color: context.appTextPrimary,
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
               ),
@@ -214,11 +214,11 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
         4.0, (max, h) => h > max ? h : max);
 
     final colors = [
-      AppColors.primary,
+      context.appPrimary,
       AppColors.flame,
       AppColors.success,
       AppColors.warning,
-      AppColors.accent,
+      context.appAccent,
     ];
 
     double totalSubjectHours = _subjectDistribution.values.fold(0.0, (a, b) => a + b);
@@ -269,14 +269,14 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
               // Period Selector Bar & Scope Toggle
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                color: AppColors.surface,
+                color: context.appSurface,
                 child: Row(
                   children: [
                     ChoiceChip(
                       label: Text(t.tr('today', fallback: 'Hoje')),
                       selected: _selectedPeriod == 'day',
-                      selectedColor: AppColors.primary,
-                      backgroundColor: AppColors.card,
+                      selectedColor: context.appPrimary,
+                      backgroundColor: context.appCard,
                       labelStyle: TextStyle(
                           color: _selectedPeriod == 'day' ? Colors.white : AppColors.textMuted),
                       onSelected: (_) {
@@ -288,8 +288,8 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                     ChoiceChip(
                       label: Text(t.tr('this_week', fallback: 'Esta Semana')),
                       selected: _selectedPeriod == 'week',
-                      selectedColor: AppColors.primary,
-                      backgroundColor: AppColors.card,
+                      selectedColor: context.appPrimary,
+                      backgroundColor: context.appCard,
                       labelStyle: TextStyle(
                           color: _selectedPeriod == 'week' ? Colors.white : AppColors.textMuted),
                       onSelected: (_) {
@@ -301,8 +301,8 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                     ChoiceChip(
                       label: Text(t.tr('this_month', fallback: 'Este Mês')),
                       selected: _selectedPeriod == 'month',
-                      selectedColor: AppColors.primary,
-                      backgroundColor: AppColors.card,
+                      selectedColor: context.appPrimary,
+                      backgroundColor: context.appCard,
                       labelStyle: TextStyle(
                           color: _selectedPeriod == 'month'
                               ? Colors.white
@@ -327,14 +327,14 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.15),
+                          color: context.appPrimary.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.primary),
+                          border: Border.all(color: context.appPrimary),
                         ),
                         child: Text(
                           '${t.tr("my_position", fallback: "Minha Posição")}: #$_myRank',
                           style: const TextStyle(
-                            color: AppColors.primary,
+                            color: context.appPrimary,
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -349,7 +349,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                     : _ranks.isEmpty
                         ? Center(
                             child: Text(t.tr('no_ranks', fallback: 'Nenhum ranking disponível no momento.'),
-                                style: const TextStyle(color: AppColors.textSecondary)),
+                                style: const TextStyle(color: context.appTextSecondary)),
                           )
                         : ListView(
                             padding: const EdgeInsets.all(32),
@@ -392,7 +392,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                               ..._ranks.skip(3).map((rank) {
                                 return Card(
                                   margin: const EdgeInsets.only(bottom: 8),
-                                  color: AppColors.card,
+                                  color: context.appCard,
                                   child: ListTile(
                                     leading: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -402,7 +402,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                           child: Text(
                                             '#${rank.rank}',
                                             style: const TextStyle(
-                                              color: AppColors.textMuted,
+                                              color: context.appTextMuted,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
@@ -419,18 +419,18 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                        maxLines: 1,
                                        overflow: TextOverflow.ellipsis,
                                        style: const TextStyle(
-                                         color: AppColors.textPrimary,
+                                         color: context.appTextPrimary,
                                          fontWeight: FontWeight.w600,
                                        ),
                                      ),
                                     subtitle: Text(rank.categoryName,
                                         style: const TextStyle(
-                                            color: AppColors.textSecondary,
+                                            color: context.appTextSecondary,
                                             fontSize: 12)),
                                     trailing: Text(
                                       _formatMs(rank.studyMs),
                                       style: const TextStyle(
-                                        color: AppColors.primary,
+                                        color: context.appPrimary,
                                         fontWeight: FontWeight.w800,
                                       ),
                                     ),
@@ -459,9 +459,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                               child: Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: AppColors.card,
+                                  color: context.appCard,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.border),
+                                  border: Border.all(color: context.appBorder),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -496,7 +496,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                                     return Text(
                                                       days[value.toInt()],
                                                       style: const TextStyle(
-                                                          color: AppColors.textSecondary,
+                                                          color: context.appTextSecondary,
                                                           fontSize: 12),
                                                     );
                                                   }
@@ -518,7 +518,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                               barRods: [
                                                 BarChartRodData(
                                                   toY: _weeklyHours[index],
-                                                  color: AppColors.primary,
+                                                  color: context.appPrimary,
                                                 )
                                               ],
                                             );
@@ -537,9 +537,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                               child: Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: AppColors.card,
+                                  color: context.appCard,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.border),
+                                  border: Border.all(color: context.appBorder),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,7 +555,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                               child: Text(
                                                 t.tr('no_data', fallback: 'Nenhum dado registrado esta semana.'),
                                                 style: const TextStyle(
-                                                    color: AppColors.textSecondary),
+                                                    color: context.appTextSecondary),
                                               ),
                                             )
                                           : PieChart(
@@ -579,9 +579,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppColors.card,
+                          color: context.appCard,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: context.appBorder),
                         ),
                         child: HeatmapGrid(
                           hourlyLogs: {
@@ -599,9 +599,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.appSurface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.appBorder),
               ),
               child: StudyCalendar(
                 dailyStudyTimeMs: _monthlyStudyMs,
@@ -635,9 +635,9 @@ class _ScopeToggle extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.appCard,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -673,7 +673,7 @@ class _ScopeToggle extends ConsumerWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
+          color: isSelected ? context.appPrimary : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
