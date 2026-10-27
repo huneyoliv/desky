@@ -49,27 +49,27 @@ class FaqHelpDialog extends ConsumerWidget {
             Expanded(
               child: ListView(
                 children: [
-                  _buildFaqTile(
+                  _buildFaqTile(context, 
                     icon: Icons.timer,
                     question: t.tr('faq_q1_title', fallback: 'Como funciona o Cronômetro e o modo Pomodoro?'),
                     answer: t.tr('faq_q1_desc', fallback: 'Selecione uma matéria na lista e clique em "Iniciar". No modo Contagem Livre (Stopwatch), o tempo corre continuamente. No modo Pomodoro, você estuda em blocos com intervalos programados (ex.: 25 min de foco, 5 min de descanso).'),
                   ),
-                  _buildFaqTile(
+                  _buildFaqTile(context, 
                     icon: Icons.groups_rounded,
                     question: t.tr('faq_q2_title', fallback: 'Como funcionam os Grupos de Estudo e o Live Study?'),
                     answer: t.tr('faq_q2_desc', fallback: 'Você pode entrar em até 10 grupos de estudo simultâneos. No Live Study, fotos da sua webcam são capturadas periodicamente para compartilhar seu foco com o grupo.'),
                   ),
-                  _buildFaqTile(
+                  _buildFaqTile(context, 
                     icon: Icons.fullscreen_rounded,
                     question: t.tr('faq_q3_title', fallback: 'Como usar a Tela Cheia, Mini Player e o Leitor de PDF?'),
                     answer: t.tr('faq_q3_desc', fallback: 'Na tela do cronômetro, use os botões no topo para alternar para modo Tela Cheia (Focus) ou Mini-Player compacto flutuante. Acesse a aba Flashcards para abrir o leitor de apostilas e PDFs.'),
                   ),
-                  _buildFaqTile(
+                  _buildFaqTile(context, 
                     icon: Icons.sync,
                     question: t.tr('faq_q4_title', fallback: 'O que acontece quando estou sem internet (Offline)?'),
                     answer: t.tr('faq_q4_desc', fallback: 'O Desky continua gravando seu tempo normalmente em modo offline. Assim que a conexão for restabelecida, a fila de sincronização enviará suas sessões pendentes aos servidores automaticamente.'),
                   ),
-                  _buildFaqTile(
+                  _buildFaqTile(context, 
                     icon: Icons.support_agent,
                     question: t.tr('faq_q5_title', fallback: 'Precisa de suporte ou encontrou algum problema?'),
                     answer: t.tr('faq_q5_desc', fallback: 'Nossa equipe de suporte está à disposição. Entre em contato diretamente pelo e-mail oficial: contact@yeolpumta.com informando seu Nickname e ID de usuário.'),
@@ -96,7 +96,7 @@ class FaqHelpDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildFaqTile({required IconData icon, required String question, required String answer}) {
+  Widget _buildFaqTile(context, {required IconData icon, required String question, required String answer}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
@@ -110,10 +110,10 @@ class FaqHelpDialog extends ConsumerWidget {
           leading: Icon(icon, color: context.appPrimary, size: 22),
           title: Text(
             question,
-            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+            style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
           ),
-          iconColor: AppColors.primary,
-          collapsedIconColor: AppColors.textMuted,
+          iconColor: context.appPrimary,
+          collapsedIconColor: context.appTextMuted,
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           children: [
             Text(

@@ -642,14 +642,14 @@ class _ScopeToggle extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildOption(
+          _buildOption(context,
             isSelected: scope == _RankScope.category,
             icon: Icons.school_rounded,
             label: catLabel,
             onTap: () => onChanged(_RankScope.category),
           ),
           const SizedBox(width: 2),
-          _buildOption(
+          _buildOption(context,
             isSelected: scope == _RankScope.region,
             icon: Icons.public_rounded,
             label: t.tr('region_scope', fallback: 'Região'),
@@ -660,7 +660,7 @@ class _ScopeToggle extends ConsumerWidget {
     );
   }
 
-  Widget _buildOption({
+  Widget _buildOption(BuildContext context, {
     required bool isSelected,
     required IconData icon,
     required String label,

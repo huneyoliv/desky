@@ -51,20 +51,20 @@ class PrivacyPolicyDialog extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionTitle(t.tr('privacy_sec1_title', fallback: '1. Informações que Coletamos')),
-                    _buildParagraph(t.tr('privacy_sec1_body', fallback: 'O YPT coleta informações fornecidas diretamente por você ao criar uma conta, tais como endereço de e-mail, nome de usuário (nickname), fuso horário e região. Durante a utilização do aplicativo, registramos métricas de estudo, incluindo matérias cadastradas, tempos de início e término de sessões no cronômetro e histórico de metas.')),
+                    _buildSectionTitle(context, t.tr('privacy_sec1_title', fallback: '1. Informações que Coletamos')),
+                    _buildParagraph(context, t.tr('privacy_sec1_body', fallback: 'O YPT coleta informações fornecidas diretamente por você ao criar uma conta, tais como endereço de e-mail, nome de usuário (nickname), fuso horário e região. Durante a utilização do aplicativo, registramos métricas de estudo, incluindo matérias cadastradas, tempos de início e término de sessões no cronômetro e histórico de metas.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('privacy_sec2_title', fallback: '2. Live Study e Mídia')),
-                    _buildParagraph(t.tr('privacy_sec2_body', fallback: 'Ao participar de grupos de estudo com recurso de Live Study ativado, capturas periódicas de imagem podem ser processadas para verificação de presença em tempo real. As fotos de estudo temporárias não arquivadas são eliminadas automaticamente de nossos servidores após 7 dias corridos.')),
+                    _buildSectionTitle(context, t.tr('privacy_sec2_title', fallback: '2. Live Study e Mídia')),
+                    _buildParagraph(context, t.tr('privacy_sec2_body', fallback: 'Ao participar de grupos de estudo com recurso de Live Study ativado, capturas periódicas de imagem podem ser processadas para verificação de presença em tempo real. As fotos de estudo temporárias não arquivadas são eliminadas automaticamente de nossos servidores após 7 dias corridos.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('privacy_sec3_title', fallback: '3. Segurança e Privacidade no Desktop')),
-                    _buildParagraph(t.tr('privacy_sec3_body', fallback: 'O Desky armazena credenciais e preferências de estudo de forma segura localmente utilizando encriptação nativa. Nenhuma informação sobre outros softwares ou arquivos do seu computador é acessada ou compartilhada.')),
+                    _buildSectionTitle(context, t.tr('privacy_sec3_title', fallback: '3. Segurança e Privacidade no Desktop')),
+                    _buildParagraph(context, t.tr('privacy_sec3_body', fallback: 'O Desky armazena credenciais e preferências de estudo de forma segura localmente utilizando encriptação nativa. Nenhuma informação sobre outros softwares ou arquivos do seu computador é acessada ou compartilhada.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('privacy_sec4_title', fallback: '4. Compartilhamento e Armazenamento de Dados')),
-                    _buildParagraph(t.tr('privacy_sec4_body', fallback: 'Não comercializamos, alugamos ou compartilhamos seus dados pessoais com terceiros para fins de marketing. O tráfego de dados é protegido por criptografia TLS/HTTPS e chaves de autenticação JWT seguras.')),
+                    _buildSectionTitle(context, t.tr('privacy_sec4_title', fallback: '4. Compartilhamento e Armazenamento de Dados')),
+                    _buildParagraph(context, t.tr('privacy_sec4_body', fallback: 'Não comercializamos, alugamos ou compartilhamos seus dados pessoais com terceiros para fins de marketing. O tráfego de dados é protegido por criptografia TLS/HTTPS e chaves de autenticação JWT seguras.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('privacy_sec5_title', fallback: '5. Seus Direitos e Exclusão de Conta')),
-                    _buildParagraph(t.tr('privacy_sec5_body', fallback: 'Em conformidade com a LGPD e GDPR, você pode solicitar a qualquer momento a visualização, retificação ou exclusão permanente de todos os seus dados e histórico através da opção "Excluir Minha Conta" nas configurações.')),
+                    _buildSectionTitle(context, t.tr('privacy_sec5_title', fallback: '5. Seus Direitos e Exclusão de Conta')),
+                    _buildParagraph(context, t.tr('privacy_sec5_body', fallback: 'Em conformidade com a LGPD e GDPR, você pode solicitar a qualquer momento a visualização, retificação ou exclusão permanente de todos os seus dados e histórico através da opção "Excluir Minha Conta" nas configurações.')),
                     const SizedBox(height: 20),
                     Text(
                       t.tr('privacy_footer_contact', fallback: 'Pallo Inc. / TGCLab • Contato: contact@yeolpumta.com'),
@@ -93,17 +93,17 @@ class PrivacyPolicyDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         title,
-        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Widget _buildParagraph(String text) {
+  Widget _buildParagraph(context, String text) {
     return Text(
       text,
       style: TextStyle(color: context.appTextSecondary, fontSize: 13, height: 1.5),

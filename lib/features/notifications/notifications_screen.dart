@@ -237,24 +237,24 @@ class NotificationsScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       children: [
         if (todayItems.isNotEmpty) ...[
-          _buildSectionHeader(tr.tr('today', fallback: 'Hoje')),
-          ...todayItems.map((n) => _buildNotificationCard(n, notifier, tr)),
+          _buildSectionHeader(context, tr.tr('today', fallback: 'Hoje')),
+          ...todayItems.map((n) => _buildNotificationCard(context, n, notifier, tr)),
           const SizedBox(height: 16),
         ],
         if (thisWeekItems.isNotEmpty) ...[
-          _buildSectionHeader(tr.tr('this_week', fallback: 'Esta semana')),
-          ...thisWeekItems.map((n) => _buildNotificationCard(n, notifier, tr)),
+          _buildSectionHeader(context, tr.tr('this_week', fallback: 'Esta semana')),
+          ...thisWeekItems.map((n) => _buildNotificationCard(context, n, notifier, tr)),
           const SizedBox(height: 16),
         ],
         if (earlierItems.isNotEmpty) ...[
-          _buildSectionHeader(tr.tr('earlier', fallback: 'Anteriores')),
-          ...earlierItems.map((n) => _buildNotificationCard(n, notifier, tr)),
+          _buildSectionHeader(context, tr.tr('earlier', fallback: 'Anteriores')),
+          ...earlierItems.map((n) => _buildNotificationCard(context, n, notifier, tr)),
         ],
       ],
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10, top: 4),
       child: Text(
@@ -270,6 +270,7 @@ class NotificationsScreen extends ConsumerWidget {
   }
 
   Widget _buildNotificationCard(
+    BuildContext context,
     NotificationModel notification,
     NotificationsNotifier notifier,
     AppTranslation tr,

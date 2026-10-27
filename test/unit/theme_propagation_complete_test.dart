@@ -82,7 +82,7 @@ void main() {
       final subject = SubjectModel(
         id: 1,
         title: 'Matemática',
-        colorHex: '#3B82F6',
+        colorInt: 0xFF3B82F6,
         studyMs: 3600000,
       );
 

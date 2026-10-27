@@ -51,20 +51,20 @@ class TermsOfServiceDialog extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionTitle(t.tr('terms_sec1_title', fallback: '1. Aceitação dos Termos')),
-                    _buildParagraph(t.tr('terms_sec1_body', fallback: 'Ao criar uma conta ou utilizar a plataforma YPT através do Desky, você concorda expressamente com os presentes Termos de Uso e com nossa Política de Privacidade. Caso discorde de qualquer disposição, não utilize o serviço.')),
+                    _buildSectionTitle(context, t.tr('terms_sec1_title', fallback: '1. Aceitação dos Termos')),
+                    _buildParagraph(context, t.tr('terms_sec1_body', fallback: 'Ao criar uma conta ou utilizar a plataforma YPT através do Desky, você concorda expressamente com os presentes Termos de Uso e com nossa Política de Privacidade. Caso discorde de qualquer disposição, não utilize o serviço.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('terms_sec2_title', fallback: '2. Regras da Comunidade e Grupos')),
-                    _buildParagraph(t.tr('terms_sec2_body', fallback: 'É estritamente proibido publicar ou transmitir em mensagens de grupo, fotos de perfil ou transmissões de Live Study: conteúdo pornográfico, discurso de ódio, assédio, ameaças, publicidade não autorizada ou qualquer conteúdo ilícito. A violação resultará em banimento imediato sem aviso prévio.')),
+                    _buildSectionTitle(context, t.tr('terms_sec2_title', fallback: '2. Regras da Comunidade e Grupos')),
+                    _buildParagraph(context, t.tr('terms_sec2_body', fallback: 'É estritamente proibido publicar ou transmitir em mensagens de grupo, fotos de perfil ou transmissões de Live Study: conteúdo pornográfico, discurso de ódio, assédio, ameaças, publicidade não autorizada ou qualquer conteúdo ilícito. A violação resultará em banimento imediato sem aviso prévio.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('terms_sec3_title', fallback: '3. Integridade do Registro de Estudo')),
-                    _buildParagraph(t.tr('terms_sec3_body', fallback: 'O usuário compromete-se a registrar honestamente suas horas de estudo. O uso de scripts automatizados, bots ou qualquer artifício com o intuito de manipular rankings globais ou de grupos é proibido e passível de desclassificação e encerramento de conta.')),
+                    _buildSectionTitle(context, t.tr('terms_sec3_title', fallback: '3. Integridade do Registro de Estudo')),
+                    _buildParagraph(context, t.tr('terms_sec3_body', fallback: 'O usuário compromete-se a registrar honestamente suas horas de estudo. O uso de scripts automatizados, bots ou qualquer artifício com o intuito de manipular rankings globais ou de grupos é proibido e passível de desclassificação e encerramento de conta.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('terms_sec4_title', fallback: '4. Propriedade Intelectual e Avatares')),
-                    _buildParagraph(t.tr('terms_sec4_body', fallback: 'Todos os direitos sobre avatares, marcas, interfaces e ilustrações são de titularidade de seus respectivos detentores. O Desky é um cliente de desktop independente de código aberto e não possui vínculo corporativo oficial com a Pallo Inc.')),
+                    _buildSectionTitle(context, t.tr('terms_sec4_title', fallback: '4. Propriedade Intelectual e Avatares')),
+                    _buildParagraph(context, t.tr('terms_sec4_body', fallback: 'Todos os direitos sobre avatares, marcas, interfaces e ilustrações são de titularidade de seus respectivos detentores. O Desky é um cliente de desktop independente de código aberto e não possui vínculo corporativo oficial com a Pallo Inc.')),
                     const SizedBox(height: 16),
-                    _buildSectionTitle(t.tr('terms_sec5_title', fallback: '5. Modificações e Encerramento')),
-                    _buildParagraph(t.tr('terms_sec5_body', fallback: 'A Pallo Inc. reserva-se o direito de atualizar estes termos periodicamente. O uso contínuo dos serviços após alterações constitui aceitação tácita dos novos termos.')),
+                    _buildSectionTitle(context, t.tr('terms_sec5_title', fallback: '5. Modificações e Encerramento')),
+                    _buildParagraph(context, t.tr('terms_sec5_body', fallback: 'A Pallo Inc. reserva-se o direito de atualizar estes termos periodicamente. O uso contínuo dos serviços após alterações constitui aceitação tácita dos novos termos.')),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -115,17 +115,17 @@ class TermsOfServiceDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         title,
-        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Widget _buildParagraph(String text) {
+  Widget _buildParagraph(context, String text) {
     return Text(
       text,
       style: TextStyle(color: context.appTextSecondary, fontSize: 13, height: 1.5),

@@ -72,7 +72,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
           const SizedBox(height: 20),
           Text(
             t.tr('no_timelapse', fallback: 'Nenhum timelapse gravado ainda'),
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
@@ -99,14 +99,14 @@ class TimelapseGalleryScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              _buildMetricCard(
+              _buildMetricCard(context, 
                 title: t.tr('total_videos', fallback: 'Total de Vídeos'),
                 value: '${sessions.length}',
                 icon: Icons.video_library_rounded,
                 color: context.appPrimary,
               ),
               const SizedBox(width: 16),
-              _buildMetricCard(
+              _buildMetricCard(context, 
                 title: t.tr('recorded_time', fallback: 'Tempo Gravado'),
                 value: _formatDuration(totalSeconds),
                 icon: Icons.access_time_filled_rounded,
@@ -117,7 +117,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Text(
             t.tr('study_sessions', fallback: 'Sessões de Estudo'),
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -140,7 +140,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetricCard({
+  Widget _buildMetricCard(context, {
     required String title,
     required String value,
     required IconData icon,
@@ -170,7 +170,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
               children: [
                 Text(title, style: TextStyle(color: context.appTextSecondary, fontSize: 12)),
                 const SizedBox(height: 2),
-                Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(value, style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
           ],
