@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {
-  return SubjectRepository();
-});
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/subject_model.dart';
+
+final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {
+  return SubjectRepository();
+});
 
 class SubjectFetchResult {
   final List<SubjectModel> subjects;
