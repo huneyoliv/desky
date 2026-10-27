@@ -69,10 +69,10 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
     final t = ref.watch(appTranslationProvider);
 
     return AlertDialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.appBorder),
       ),
       titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -82,11 +82,11 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
         children: [
           Row(
             children: [
-              const Icon(Icons.notifications_active_rounded, color: AppColors.primaryLight, size: 22),
+              Icon(Icons.notifications_active_rounded, color: context.appPrimary, size: 22),
               const SizedBox(width: 10),
               Text(
                 t.tr('notifications', fallback: 'Notificações'),
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -99,7 +99,7 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                   onPressed: _clearAll,
                 ),
               IconButton(
-                icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 20),
+                icon: Icon(Icons.close_rounded, color: context.appTextMuted, size: 20),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -110,17 +110,17 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
         width: 480,
         height: 480,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+            ? Center(child: CircularProgressIndicator(color: context.appPrimary))
             : _notifications.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.notifications_off_outlined, size: 48, color: AppColors.textMuted),
+                        Icon(Icons.notifications_off_outlined, size: 48, color: context.appTextMuted),
                         const SizedBox(height: 12),
                         Text(
                           t.tr('no_notifications', fallback: 'Nenhuma notificação no momento'),
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 14),
                         ),
                       ],
                     ),
@@ -133,9 +133,9 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                       return Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
+                          color: context.appSurface,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                          border: Border.all(color: context.appBorder.withValues(alpha: 0.5)),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +144,7 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                               radius: 18,
                               backgroundColor: notice.type == 'shake'
                                   ? AppColors.warning.withValues(alpha: 0.2)
-                                  : AppColors.primary.withValues(alpha: 0.2),
+                                  : context.appPrimary.withValues(alpha: 0.2),
                               child: Icon(
                                 notice.type == 'shake'
                                     ? Icons.vibration
@@ -155,7 +155,7 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                                     ? AppColors.warning
                                     : notice.type == 'warning'
                                         ? AppColors.error
-                                        : AppColors.primary,
+                                        : context.appPrimary,
                                 size: 18,
                               ),
                             ),
@@ -166,8 +166,8 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                                 children: [
                                   Text(
                                     notice.title,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: context.appTextPrimary,
                                       fontWeight: FontWeight.w700,
                                       fontSize: 14,
                                     ),
@@ -175,8 +175,8 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                                   const SizedBox(height: 4),
                                   Text(
                                     notice.message,
-                                    style: const TextStyle(
-                                      color: AppColors.textSecondary,
+                                    style: TextStyle(
+                                      color: context.appTextSecondary,
                                       fontSize: 13,
                                       height: 1.3,
                                     ),
@@ -184,13 +184,13 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                                   const SizedBox(height: 6),
                                   Text(
                                     df.format(notice.createdAt),
-                                    style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                                    style: TextStyle(color: context.appTextMuted, fontSize: 11),
                                   ),
                                 ],
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline, color: AppColors.textMuted, size: 18),
+                              icon: Icon(Icons.delete_outline, color: context.appTextMuted, size: 18),
                               tooltip: t.tr('delete', fallback: 'Excluir'),
                               onPressed: () => _deleteNotification(notice),
                             ),

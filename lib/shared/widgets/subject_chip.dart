@@ -45,10 +45,10 @@ class SubjectChip extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? chipColor.withValues(alpha: 0.25) : AppColors.surface,
+            color: isSelected ? chipColor.withValues(alpha: 0.25) : context.appSurface,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected ? chipColor : AppColors.border,
+              color: isSelected ? chipColor : context.appBorder,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -67,7 +67,7 @@ class SubjectChip extends StatelessWidget {
               Text(
                 subject.title,
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: context.appTextPrimary,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   fontSize: 14,
                 ),
@@ -76,7 +76,7 @@ class SubjectChip extends StatelessWidget {
               Text(
                 _formatMs(subject.studyMs),
                 style: TextStyle(
-                  color: isSelected ? AppColors.textSecondary : AppColors.textMuted,
+                  color: isSelected ? context.appTextSecondary : context.appTextMuted,
                   fontSize: 12,
                 ),
               ),

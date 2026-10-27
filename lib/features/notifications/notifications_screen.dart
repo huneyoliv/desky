@@ -16,7 +16,7 @@ class NotificationsScreen extends ConsumerWidget {
     final notifier = ref.read(notificationsNotifierProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appBackground,
       body: Column(
         children: [
           _buildHeader(context, tr, state, notifier),
@@ -24,7 +24,7 @@ class NotificationsScreen extends ConsumerWidget {
             child: state.isLoading && state.notifications.isEmpty
                 ? const Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(context.appPrimary),
                     ),
                   )
                 : state.errorMessage != null && state.notifications.isEmpty
@@ -50,9 +50,9 @@ class NotificationsScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appSurface,
         border: Border(
-          bottom: BorderSide(color: AppColors.border.withValues(alpha: 0.5)),
+          bottom: BorderSide(color: context.appBorder.withValues(alpha: 0.5)),
         ),
       ),
       child: Row(
@@ -60,12 +60,12 @@ class NotificationsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.15),
+              color: context.appPrimary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.notifications_rounded,
-              color: AppColors.primary,
+              color: context.appPrimary,
               size: 20,
             ),
           ),
@@ -77,8 +77,8 @@ class NotificationsScreen extends ConsumerWidget {
               children: [
                 Text(
                   tr.tr('notifications', fallback: 'Notificações'),
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: context.appTextPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -88,8 +88,8 @@ class NotificationsScreen extends ConsumerWidget {
                 if (state.unreadCount > 0)
                   Text(
                     '${state.unreadCount} ${tr.tr('unread', fallback: 'não lidas')}',
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: context.appPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
@@ -101,14 +101,14 @@ class NotificationsScreen extends ConsumerWidget {
           if (hasUnread)
             TextButton.icon(
               onPressed: () => notifier.markAllAsRead(),
-              icon: const Icon(Icons.done_all_rounded, size: 16, color: AppColors.primary),
+              icon: Icon(Icons.done_all_rounded, size: 16, color: context.appPrimary),
               label: Text(
                 tr.tr('mark_all_read', fallback: 'Lidas'),
-                style: const TextStyle(color: AppColors.primary, fontSize: 12),
+                style: TextStyle(color: context.appPrimary, fontSize: 12),
               ),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: context.appPrimary.withValues(alpha: 0.1),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
@@ -117,7 +117,7 @@ class NotificationsScreen extends ConsumerWidget {
             IconButton(
               tooltip: tr.tr('clear_read', fallback: 'Limpar lidas'),
               onPressed: () => notifier.deleteAllRead(),
-              icon: const Icon(Icons.delete_sweep_outlined, size: 18, color: AppColors.textMuted),
+              icon: Icon(Icons.delete_sweep_outlined, size: 18, color: context.appTextMuted),
               hoverColor: AppColors.error.withValues(alpha: 0.1),
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               padding: const EdgeInsets.all(6),
@@ -127,7 +127,7 @@ class NotificationsScreen extends ConsumerWidget {
           IconButton(
             tooltip: tr.tr('refresh', fallback: 'Atualizar'),
             onPressed: () => notifier.loadNotifications(),
-            icon: const Icon(Icons.refresh_rounded, size: 18, color: AppColors.textSecondary),
+            icon: Icon(Icons.refresh_rounded, size: 18, color: context.appTextSecondary),
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             padding: const EdgeInsets.all(6),
           ),
@@ -144,21 +144,21 @@ class NotificationsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: context.appSurface,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
+              border: Border.all(color: context.appBorder.withValues(alpha: 0.6)),
             ),
             child: const Icon(
               Icons.notifications_off_outlined,
               size: 48,
-              color: AppColors.textMuted,
+              color: context.appTextMuted,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             tr.tr('no_notifications_title', fallback: 'Nenhuma notificação'),
             style: const TextStyle(
-              color: AppColors.textPrimary,
+              color: context.appTextPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -167,7 +167,7 @@ class NotificationsScreen extends ConsumerWidget {
           Text(
             tr.tr('no_notifications_subtitle', fallback: 'Você está em dia com todas as atualizações.'),
             style: const TextStyle(
-              color: AppColors.textSecondary,
+              color: context.appTextSecondary,
               fontSize: 13,
             ),
           ),
@@ -190,7 +190,7 @@ class NotificationsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
             error,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            style: TextStyle(color: context.appTextSecondary, fontSize: 14),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -199,7 +199,7 @@ class NotificationsScreen extends ConsumerWidget {
             icon: const Icon(Icons.refresh_rounded, size: 16),
             label: Text(tr.tr('retry', fallback: 'Tentar novamente')),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: context.appPrimary,
               foregroundColor: Colors.white,
             ),
           ),
@@ -260,7 +260,7 @@ class NotificationsScreen extends ConsumerWidget {
       child: Text(
         title.toUpperCase(),
         style: const TextStyle(
-          color: AppColors.textMuted,
+          color: context.appTextMuted,
           fontSize: 11,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.1,
@@ -280,12 +280,12 @@ class NotificationsScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: notification.isRead ? AppColors.surface : AppColors.card,
+        color: notification.isRead ? context.appSurface : context.appCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: notification.isRead
-              ? AppColors.border.withValues(alpha: 0.4)
-              : AppColors.primary.withValues(alpha: 0.35),
+              ? context.appBorder.withValues(alpha: 0.4)
+              : context.appPrimary.withValues(alpha: 0.35),
         ),
       ),
       child: InkWell(
@@ -319,7 +319,7 @@ class NotificationsScreen extends ConsumerWidget {
                           child: Text(
                             notification.title,
                             style: TextStyle(
-                              color: AppColors.textPrimary,
+                              color: context.appTextPrimary,
                               fontSize: 14,
                               fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.bold,
                             ),
@@ -331,7 +331,7 @@ class NotificationsScreen extends ConsumerWidget {
                             height: 8,
                             margin: const EdgeInsets.only(left: 6),
                             decoration: const BoxDecoration(
-                              color: AppColors.primary,
+                              color: context.appPrimary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -341,7 +341,7 @@ class NotificationsScreen extends ConsumerWidget {
                     Text(
                       notification.message,
                       style: const TextStyle(
-                        color: AppColors.textSecondary,
+                        color: context.appTextSecondary,
                         fontSize: 13,
                         height: 1.35,
                       ),
@@ -350,7 +350,7 @@ class NotificationsScreen extends ConsumerWidget {
                     Text(
                       _formatDate(notification.createdAt),
                       style: const TextStyle(
-                        color: AppColors.textMuted,
+                        color: context.appTextMuted,
                         fontSize: 11,
                       ),
                     ),
@@ -358,7 +358,7 @@ class NotificationsScreen extends ConsumerWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, size: 18, color: AppColors.textMuted),
+                icon: Icon(Icons.delete_outline_rounded, size: 18, color: context.appTextMuted),
                 onPressed: () => notifier.deleteNotification(notification.id),
                 tooltip: tr.tr('delete', fallback: 'Excluir'),
               ),

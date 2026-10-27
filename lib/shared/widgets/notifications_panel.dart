@@ -47,12 +47,12 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
     final t = ref.watch(appTranslationProvider);
 
     return Material(
-      color: AppColors.card,
+      color: context.appCard,
       elevation: 8,
       shadowColor: Colors.black.withValues(alpha: 0.7),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.appBorder),
       ),
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
@@ -62,17 +62,17 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.border)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: context.appBorder)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.notifications_active_outlined, color: AppColors.primary, size: 20),
+                Icon(Icons.notifications_active_outlined, color: context.appPrimary, size: 20),
                 const SizedBox(width: 8),
                 Text(t.tr('notifications_center', fallback: 'Central de Notificações'), style: AppTextStyles.titleMedium),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.refresh, size: 18, color: AppColors.textMuted),
+                  icon: Icon(Icons.refresh, size: 18, color: context.appTextMuted),
                   onPressed: _loadNotifications,
                 ),
               ],
@@ -80,27 +80,27 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
           ),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                ? Center(child: CircularProgressIndicator(color: context.appPrimary))
                 : _notifications.isEmpty
                     ? Center(
                         child: Text(
                           t.tr('no_recent_notifications', fallback: 'Nenhuma notificação recente.'),
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 13),
                         ),
                       )
                     : ListView.separated(
                         itemCount: _notifications.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.border),
+                        separatorBuilder: (_, __) => Divider(height: 1, color: context.appBorder),
                         itemBuilder: (context, index) {
                           final notice = _notifications[index];
                           final df = DateFormat('dd/MM HH:mm');
 
                           return ListTile(
                             dense: true,
-                            tileColor: notice.isRead ? Colors.transparent : AppColors.primary.withValues(alpha: 0.05),
+                            tileColor: notice.isRead ? Colors.transparent : context.appPrimary.withValues(alpha: 0.05),
                             leading: CircleAvatar(
                               radius: 16,
-                              backgroundColor: AppColors.surface,
+                              backgroundColor: context.appSurface,
                               child: Icon(
                                 notice.type == 'shake'
                                     ? Icons.vibration
@@ -108,20 +108,20 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
                                         ? Icons.warning_amber_rounded
                                         : Icons.notifications_none,
                                 size: 16,
-                                color: notice.type == 'warning' ? AppColors.error : AppColors.primary,
+                                color: notice.type == 'warning' ? AppColors.error : context.appPrimary,
                               ),
                             ),
                             title: Text(
                               notice.title,
                               style: TextStyle(
-                                color: AppColors.textPrimary,
+                                color: context.appTextPrimary,
                                 fontWeight: notice.isRead ? FontWeight.normal : FontWeight.bold,
                                 fontSize: 13,
                               ),
                             ),
                             subtitle: Text(
                               '${notice.message}\n${df.format(notice.createdAt)}',
-                              style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                              style: TextStyle(color: context.appTextMuted, fontSize: 11),
                             ),
                             onTap: () => _markRead(notice),
                           );

@@ -100,11 +100,11 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
               height: widget.size,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.surface,
+                color: context.appSurface,
                 border: Border.all(
                   color: _unreadCount > 0
-                      ? AppColors.primary.withValues(alpha: 0.6)
-                      : AppColors.border,
+                      ? context.appPrimary.withValues(alpha: 0.6)
+                      : context.appBorder,
                   width: 1.2,
                 ),
               ),
@@ -119,7 +119,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
                   },
                   child: Icon(
                     Icons.notifications_outlined,
-                    color: _unreadCount > 0 ? AppColors.primaryLight : Colors.white70,
+                    color: _unreadCount > 0 ? context.appPrimary : context.appTextSecondary,
                     size: 19,
                   ),
                 ),
@@ -137,7 +137,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
               decoration: BoxDecoration(
                 color: AppColors.error,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.background, width: 1.5),
+                border: Border.all(color: context.appBackground, width: 1.5),
               ),
             ),
           ),
