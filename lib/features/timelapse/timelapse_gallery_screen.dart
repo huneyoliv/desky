@@ -31,9 +31,9 @@ class TimelapseGalleryScreen extends ConsumerWidget {
     final totalSeconds = state.sessions.fold<int>(0, (sum, s) => sum + s.durationSeconds);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appBackground,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.appSurface,
         elevation: 0,
         title: Text(
           t.tr('timelapse_gallery', fallback: 'Galeria de Timelapse'),
@@ -48,7 +48,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
         ],
       ),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
           : state.sessions.isEmpty
               ? _buildEmptyState(context, t)
               : _buildGalleryContent(context, state.sessions, notifier, totalSeconds, t),
@@ -63,11 +63,11 @@ class TimelapseGalleryScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: context.appSurface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.appBorder),
             ),
-            child: const Icon(Icons.slow_motion_video_rounded, size: 72, color: AppColors.textMuted),
+            child: const Icon(Icons.slow_motion_video_rounded, size: 72, color: context.appTextMuted),
           ),
           const SizedBox(height: 20),
           Text(
@@ -77,7 +77,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             t.tr('timelapse_empty_desc', fallback: 'Inicie o cronômetro com a câmera/timelapse ativado para gravar seu progresso acelerado.'),
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            style: const TextStyle(color: context.appTextSecondary, fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -103,7 +103,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
                 title: t.tr('total_videos', fallback: 'Total de Vídeos'),
                 value: '${sessions.length}',
                 icon: Icons.video_library_rounded,
-                color: AppColors.primary,
+                color: context.appPrimary,
               ),
               const SizedBox(width: 16),
               _buildMetricCard(
@@ -150,9 +150,9 @@ class TimelapseGalleryScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.appSurface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.appBorder),
         ),
         child: Row(
           children: [
@@ -168,7 +168,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                Text(title, style: const TextStyle(color: context.appTextSecondary, fontSize: 12)),
                 const SizedBox(height: 2),
                 Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               ],
@@ -193,9 +193,9 @@ class TimelapseGalleryScreen extends ConsumerWidget {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.appSurface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.appBorder),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -203,7 +203,7 @@ class TimelapseGalleryScreen extends ConsumerWidget {
           children: [
             Expanded(
               child: Container(
-                color: AppColors.card,
+                color: context.appCard,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -255,12 +255,12 @@ class TimelapseGalleryScreen extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(dateStr, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                        Text(dateStr, style: const TextStyle(color: context.appTextMuted, fontSize: 11)),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: 20),
+                    icon: const Icon(Icons.delete_outline_rounded, color: context.appTextMuted, size: 20),
                     onPressed: () => notifier.deleteSession(session.id),
                     tooltip: t.tr('delete_timelapse', fallback: 'Excluir Timelapse'),
                   ),

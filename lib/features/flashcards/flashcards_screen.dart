@@ -19,11 +19,11 @@ class FlashcardsScreen extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appBackground,
       appBar: AppBar(
         title: Text(t.tr('flashcards', fallback: 'Flashcards'),
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.appSurface,
         elevation: 0,
         actions: [
           IconButton(
@@ -34,7 +34,7 @@ class FlashcardsScreen extends ConsumerWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.add_rounded, color: AppColors.primary, size: 28),
+            icon: const Icon(Icons.add_rounded, color: context.appPrimary, size: 28),
             tooltip: t.tr('new_deck', fallback: 'Novo Baralho'),
             onPressed: () {
               CreateDeckDialog.show(
@@ -49,7 +49,7 @@ class FlashcardsScreen extends ConsumerWidget {
         ],
       ),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
           : state.decks.isEmpty
               ? _buildEmptyState(context, ref, notifier, t)
               : _buildDeckGrid(context, ref, state.decks, t),
@@ -61,7 +61,7 @@ class FlashcardsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.style_outlined, size: 80, color: AppColors.textMuted),
+          const Icon(Icons.style_outlined, size: 80, color: context.appTextMuted),
           const SizedBox(height: 16),
           Text(
             t.tr('no_flashcards', fallback: 'Nenhum baralho criado ainda'),
@@ -70,7 +70,7 @@ class FlashcardsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             t.tr('flashcard_desc', fallback: 'Crie baralhos e adicione cartões para acelerar seus estudos.'),
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            style: const TextStyle(color: context.appTextSecondary, fontSize: 14),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
@@ -86,7 +86,7 @@ class FlashcardsScreen extends ConsumerWidget {
             label: Text(t.tr('new_deck', fallback: 'Criar Baralho'),
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: context.appPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -135,9 +135,9 @@ class FlashcardsScreen extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.appCard,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appBorder),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -164,8 +164,8 @@ class FlashcardsScreen extends ConsumerWidget {
                 ),
               ),
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: AppColors.textSecondary, size: 20),
-                color: AppColors.surface,
+                icon: const Icon(Icons.more_vert, color: context.appTextSecondary, size: 20),
+                color: context.appSurface,
                 onSelected: (val) {
                   if (val == 'add') {
                     notifier.selectDeck(deck);
@@ -184,7 +184,7 @@ class FlashcardsScreen extends ConsumerWidget {
                     value: 'add',
                     child: Row(
                       children: [
-                        const Icon(Icons.add_circle_outline, color: AppColors.primary, size: 18),
+                        const Icon(Icons.add_circle_outline, color: context.appPrimary, size: 18),
                         const SizedBox(width: 8),
                         Text(t.tr('add_card', fallback: 'Adicionar Cartão'), style: const TextStyle(color: Colors.white)),
                       ],
@@ -208,7 +208,7 @@ class FlashcardsScreen extends ConsumerWidget {
             const SizedBox(height: 6),
             Text(
               deck.description!,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -219,7 +219,7 @@ class FlashcardsScreen extends ConsumerWidget {
             children: [
               Text(
                 '${deck.cardCount} ${t.tr("cards", fallback: "cartões")}',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+                style: const TextStyle(color: context.appTextMuted, fontSize: 13),
               ),
               ElevatedButton.icon(
                 onPressed: () async {

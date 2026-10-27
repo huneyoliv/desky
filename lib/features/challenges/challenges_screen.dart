@@ -61,27 +61,27 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         title: Text('${t.tr("join", fallback: "Participar")}: ${challenge.name}', style: const TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(challenge.description, style: const TextStyle(color: AppColors.textSecondary)),
+            Text(challenge.description, style: const TextStyle(color: context.appTextSecondary)),
             const SizedBox(height: 12),
-            Text('${t.tr("bet", fallback: "Entrada")}: ${challenge.flameCost} ${t.tr("points", fallback: "pts")}', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15)),
+            Text('${t.tr("bet", fallback: "Entrada")}: ${challenge.flameCost} ${t.tr("points", fallback: "pts")}', style: const TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 15)),
             const SizedBox(height: 8),
-            Text(challenge.rules, style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+            Text(challenge.rules, style: const TextStyle(color: context.appTextMuted, fontSize: 12)),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
             child: Text(t.tr('confirm', fallback: 'Confirmar'), style: const TextStyle(color: Colors.white)),
           ),
         ],
@@ -124,13 +124,13 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.emoji_events_outlined, size: 64, color: AppColors.textMuted),
+            const Icon(Icons.emoji_events_outlined, size: 64, color: context.appTextMuted),
             const SizedBox(height: 16),
             Text(
               isMyList
                   ? t.tr('no_my_challenges', fallback: 'Você ainda não entrou em nenhum desafio.')
                   : t.tr('no_challenges', fallback: 'Nenhum desafio disponível no momento.'),
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              style: const TextStyle(color: context.appTextSecondary, fontSize: 14),
             ),
           ],
         ),
@@ -152,11 +152,11 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
         final progress = (challenge.checkInCount / 7.0).clamp(0.0, 1.0);
 
         return Card(
-          color: AppColors.card,
+          color: context.appCard,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(
-              color: challenge.isJoined ? AppColors.primary : AppColors.border,
+              color: challenge.isJoined ? context.appPrimary : context.appBorder,
               width: challenge.isJoined ? 2 : 1,
             ),
           ),
@@ -171,13 +171,13 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
+                        color: context.appPrimary.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         '⭐ ${challenge.flameCost} ${t.tr("points", fallback: "pts")}',
                         style: const TextStyle(
-                          color: AppColors.primary,
+                          color: context.appPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -188,7 +188,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                       child: Text(
                         '${t.tr("goal", fallback: "Meta")}: ${(challenge.successThreshold * 100).toInt()}%',
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                        style: const TextStyle(color: context.appTextMuted, fontSize: 12),
                       ),
                     ),
                   ],
@@ -209,7 +209,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                   challenge.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  style: const TextStyle(color: context.appTextSecondary, fontSize: 12),
                 ),
                 const SizedBox(height: 14),
 
@@ -217,8 +217,8 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(t.tr('checkin', fallback: 'Check-in'), style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
-                      Text('${(progress * 100).toInt()}%', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 11)),
+                      Text(t.tr('checkin', fallback: 'Check-in'), style: const TextStyle(color: context.appTextMuted, fontSize: 11)),
+                      Text('${(progress * 100).toInt()}%', style: const TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 11)),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -226,8 +226,8 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
-                      backgroundColor: AppColors.surface,
-                      color: AppColors.primary,
+                      backgroundColor: context.appSurface,
+                      color: context.appPrimary,
                       minHeight: 6,
                     ),
                   ),
@@ -237,18 +237,18 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                 const Spacer(),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, size: 14, color: AppColors.textMuted),
+                    const Icon(Icons.calendar_today, size: 14, color: context.appTextMuted),
                     const SizedBox(width: 6),
                     Text(
                       '${df.format(challenge.startDate)} - ${df.format(challenge.endDate)}',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                      style: const TextStyle(color: context.appTextMuted, fontSize: 11),
                     ),
                     const Spacer(),
-                    const Icon(Icons.people_outline, size: 14, color: AppColors.textMuted),
+                    const Icon(Icons.people_outline, size: 14, color: context.appTextMuted),
                     const SizedBox(width: 4),
                     Text(
                       '${challenge.participantCount}',
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                      style: const TextStyle(color: context.appTextMuted, fontSize: 11),
                     ),
                   ],
                 ),
@@ -267,7 +267,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                       : ElevatedButton(
                           onPressed: () => _joinChallenge(challenge),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
+                            backgroundColor: context.appPrimary,
                           ),
                           child: Text(t.tr('join_challenge', fallback: 'Participar do Desafio'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
@@ -285,14 +285,15 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
     final t = ref.watch(appTranslationProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appBackground,
       appBar: AppBar(
+        backgroundColor: context.appSurface,
         title: Text(t.tr('challenges', fallback: 'Desafios & Metas'), style: AppTextStyles.titleLarge),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
+          indicatorColor: context.appPrimary,
           labelColor: Colors.white,
-          unselectedLabelColor: AppColors.textSecondary,
+          unselectedLabelColor: context.appTextSecondary,
           tabs: [
             Tab(text: t.tr('available_challenges', fallback: 'Desafios Disponíveis')),
             Tab(text: t.tr('my_challenges', fallback: 'Meus Desafios')),
@@ -300,7 +301,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
           : TabBarView(
               controller: _tabController,
               children: [

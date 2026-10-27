@@ -66,7 +66,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${t.tr("avatar", fallback: "Avatar")} "$itemName" ${t.tr("equipped_success", fallback: "equipado com sucesso!")} 🎉'),
-          backgroundColor: AppColors.primary,
+          backgroundColor: context.appPrimary,
         ),
       );
     }
@@ -77,8 +77,9 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
     final t = ref.watch(appTranslationProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appBackground,
       appBar: AppBar(
+        backgroundColor: context.appSurface,
         title: Text(t.tr('my_avatars', fallback: 'Meus Avatares'), style: AppTextStyles.titleLarge),
         actions: [
           IconButton(
@@ -90,12 +91,12 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Center(child: CircularProgressIndicator(color: context.appPrimary))
           : _myStudicons.isEmpty
               ? Center(
                   child: Text(
                     t.tr('no_avatars', fallback: 'Nenhum avatar encontrado.'),
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style: const TextStyle(color: context.appTextMuted),
                   ),
                 )
               : GridView.builder(
@@ -114,10 +115,10 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.card,
+                        color: context.appCard,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: item.isEquipped ? AppColors.primary : AppColors.border,
+                          color: item.isEquipped ? context.appPrimary : context.appBorder,
                           width: item.isEquipped ? 2 : 1,
                         ),
                       ),
@@ -162,7 +163,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed: () => _equipItem(item),
-                                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                                style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                                 child: Text(
                                   t.tr('equip', fallback: 'Equipar'),
                                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
