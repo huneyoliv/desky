@@ -1,3 +1,4 @@
+// ignore_for_file: invalid_use_of_protected_member
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,14 +68,15 @@ void main() {
 
       // 1. Initial auth state with user
       final authNotifier = container.read(authStateProvider.notifier);
-      authNotifier.state = AuthState(
+      authNotifier.state = const AuthState(
         isAuthenticated: true,
         user: UserModel(
           id: 10,
           studiconId: 300,
           name: 'Estudante Teste',
           email: 'test@desky.app',
-          userGroups: const [],
+          jwtToken: 'fake_jwt_token',
+          userGroups: [],
         ),
       );
 
@@ -90,13 +92,16 @@ void main() {
       // 3. Simulate navigating to /groups where refreshUserGroups() updates user with groups
       authNotifier.state = authNotifier.state.copyWith(
         user: authNotifier.state.user!.copyWith(
-          userGroups: [
+          userGroups: const [
             GroupModel(
               id: 99,
               name: 'Grupo de Estudos',
               category: 'Geral',
-              memberCount: 5,
-              maxMembers: 50,
+              dailyGoalHours: 8,
+              membersCount: 5,
+              maxCapacity: 50,
+              isPrivate: false,
+              leaderName: 'Líder Teste',
             ),
           ],
         ),
@@ -178,9 +183,15 @@ void main() {
       addTearDown(container.dispose);
 
       final authNotifier = container.read(authStateProvider.notifier);
-      authNotifier.state = AuthState(
+      authNotifier.state = const AuthState(
         isAuthenticated: true,
-        user: UserModel(id: 1, studiconId: 10, name: 'User', email: 'u@test.com'),
+        user: UserModel(
+          id: 1,
+          studiconId: 10,
+          name: 'User',
+          email: 'u@test.com',
+          jwtToken: 'fake_jwt_token',
+        ),
       );
 
       final timerNotifier = container.read(timerNotifierProvider.notifier);
@@ -238,8 +249,16 @@ void main() {
                       TextButton(
                         onPressed: () {
                           // Simulate switching tab and group refresh
-                          container.read(authStateProvider.notifier).state =
-                              AuthState(isAuthenticated: true, user: UserModel(id: 1, studiconId: 5, name: 'T'));
+                          container.read(authStateProvider.notifier).state = const AuthState(
+                            isAuthenticated: true,
+                            user: UserModel(
+                              id: 1,
+                              studiconId: 5,
+                              name: 'T',
+                              email: 't@test.com',
+                              jwtToken: 'fake_jwt_token',
+                            ),
+                          );
                           setState(() => currentTab = 1);
                         },
                         child: const Text('Groups Tab'),

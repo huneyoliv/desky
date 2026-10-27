@@ -32,7 +32,16 @@ jobs:
         run: flutter pub get
 
       - name: Run Flutter analyze
-        run: flutter analyze
+        run: |
+          if ! flutter analyze > analyze.log 2>&1; then
+            echo "### Flutter Analyze Output" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat analyze.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat analyze.log
+            exit 1
+          fi
+          cat analyze.log
 
       - name: Run test suite
         run: flutter test
