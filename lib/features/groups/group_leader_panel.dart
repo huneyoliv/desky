@@ -110,7 +110,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t.tr('settings_updated_success', fallback: 'Configurações atualizadas com sucesso!')),
-          backgroundColor: AppColors.primary,
+          backgroundColor: context.appPrimary,
         ),
       );
     }
@@ -129,7 +129,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                 ? t.tr('group_promoted_success', fallback: 'Grupo promovido ao topo da busca! 🚀')
                 : t.tr('group_promoted_wait', fallback: 'Promoção disponível apenas após 1 hora da última promoção.'),
           ),
-          backgroundColor: success ? AppColors.primary : AppColors.error,
+          backgroundColor: success ? context.appPrimary : AppColors.error,
         ),
       );
     }
@@ -143,7 +143,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${t.tr("warning_issued_to", fallback: "Cartão de advertência emitido para")} ${member.name}.'),
-          backgroundColor: AppColors.primary,
+          backgroundColor: context.appPrimary,
         ),
       );
     }
@@ -154,11 +154,11 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         title: Text(t.tr('remove_member', fallback: 'Remover Membro'), style: const TextStyle(color: Colors.white)),
         content: Text(
           '${t.tr("remove_member_confirm", fallback: "Remover")} ${member.name} ${t.tr("from_group_q", fallback: "do grupo?")}',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: const TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
@@ -190,11 +190,11 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         title: Text(t.tr('ban_member', fallback: 'Banir Membro'), style: const TextStyle(color: Colors.white)),
         content: Text(
           '${t.tr("ban_member_confirm", fallback: "Banir")} ${member.name} ${t.tr("ban_member_blacklist_desc", fallback: "do grupo? O usuário entrará na lista negra.")}',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: const TextStyle(color: context.appTextSecondary),
         ),
         actions: [
           TextButton(
@@ -227,7 +227,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         title: Text(t.tr('disband_group', fallback: 'Dissolver Grupo'), style: const TextStyle(color: Colors.white)),
         content: Text(
           '${t.tr("disband_group_confirm_prefix", fallback: "Tem certeza que deseja dissolver o grupo")} "${widget.group.name}"? ${t.tr("action_irreversible", fallback: "Esta ação é irreversível.")}',
@@ -264,12 +264,12 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
     final t = ref.watch(appTranslationProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appBackground,
       appBar: AppBar(
         title: Text('${t.tr("leader_menu", fallback: "Menu do Líder")} — ${widget.group.name}', style: AppTextStyles.titleLarge),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
+          indicatorColor: context.appPrimary,
           labelColor: Colors.white,
           unselectedLabelColor: AppColors.textSecondary,
           tabs: [
@@ -296,7 +296,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                     ElevatedButton.icon(
                       icon: const Icon(Icons.rocket_launch, color: Colors.white, size: 18),
                       label: Text(t.tr('promote_group', fallback: 'Promover Grupo'), style: const TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                      style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                       onPressed: _promoteGroup,
                     ),
                   ],
@@ -310,7 +310,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                   decoration: InputDecoration(
                     labelText: t.tr('group_name', fallback: 'Nome do Grupo'),
                     filled: true,
-                    fillColor: AppColors.card,
+                    fillColor: context.appCard,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -324,7 +324,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                     labelText: t.tr('group_notice', fallback: 'Aviso do Grupo (Notice Board)'),
                     hintText: t.tr('group_notice_hint', fallback: 'Escreva regras e avisos do grupo...'),
                     filled: true,
-                    fillColor: AppColors.card,
+                    fillColor: context.appCard,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -335,9 +335,9 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                     Expanded(
                       child: DropdownButtonFormField<int>(
                         value: _capacity,
-                        dropdownColor: AppColors.surface,
+                        dropdownColor: context.appSurface,
                         style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(labelText: t.tr('member_capacity', fallback: 'Capacidade de Membros'), filled: true, fillColor: AppColors.card),
+                        decoration: InputDecoration(labelText: t.tr('member_capacity', fallback: 'Capacidade de Membros'), filled: true, fillColor: context.appCard),
                         items: [5, 10, 20, 30, 50].map((c) => DropdownMenuItem(value: c, child: Text('$c ${t.tr("members", fallback: "membros")}'))).toList(),
                         onChanged: (val) { if (val != null) setState(() => _capacity = val); },
                       ),
@@ -346,9 +346,9 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                     Expanded(
                       child: DropdownButtonFormField<int>(
                         value: _goalHours,
-                        dropdownColor: AppColors.surface,
+                        dropdownColor: context.appSurface,
                         style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(labelText: t.tr('daily_goal_hours', fallback: 'Meta Diária (Horas)'), filled: true, fillColor: AppColors.card),
+                        decoration: InputDecoration(labelText: t.tr('daily_goal_hours', fallback: 'Meta Diária (Horas)'), filled: true, fillColor: context.appCard),
                         items: [2, 4, 6, 8, 10, 12].map((g) => DropdownMenuItem(value: g, child: Text('$g h/${t.tr("today", fallback: "dia")}'))).toList(),
                         onChanged: (val) { if (val != null) setState(() => _goalHours = val); },
                       ),
@@ -365,7 +365,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                   decoration: InputDecoration(
                     labelText: t.tr('group_password_hint', fallback: 'Senha de Acesso (opcional - deixe em branco para público)'),
                     filled: true,
-                    fillColor: AppColors.card,
+                    fillColor: context.appCard,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -376,7 +376,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                 SwitchListTile(
                   title: Text(t.tr('enable_group_chat', fallback: 'Habilitar Chat do Grupo'), style: const TextStyle(color: Colors.white)),
                   value: _chatEnabled,
-                  activeColor: AppColors.primary,
+                  activeColor: context.appPrimary,
                   onChanged: (val) => setState(() => _chatEnabled = val),
                 ),
                 const SizedBox(height: 24),
@@ -384,13 +384,13 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                 ElevatedButton(
                   onPressed: _updateSettings,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: context.appPrimary,
                     minimumSize: const Size.fromHeight(48),
                   ),
                   child: Text(t.tr('save_changes', fallback: 'Salvar Alterações'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
 
-                const Divider(height: 48, color: AppColors.border),
+                const Divider(height: 48, color: context.appBorder),
 
                 // Danger Zone
                 ElevatedButton.icon(
@@ -413,7 +413,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
             itemBuilder: (context, index) {
               final member = widget.members[index];
               return Card(
-                color: AppColors.card,
+                color: context.appCard,
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   title: Text(member.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -447,7 +447,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
           _isLoadingRequests
               ? const Center(child: CircularProgressIndicator())
               : _joinRequests.isEmpty
-                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhuma solicitação de entrada pendente.'), style: const TextStyle(color: AppColors.textSecondary)))
+                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhuma solicitação de entrada pendente.'), style: const TextStyle(color: context.appTextSecondary)))
                   : ListView.builder(
                       padding: const EdgeInsets.all(24),
                       itemCount: _joinRequests.length,
@@ -457,7 +457,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                         final name = req['name']?.toString() ?? 'Usuário';
 
                         return Card(
-                          color: AppColors.card,
+                          color: context.appCard,
                           margin: const EdgeInsets.only(bottom: 12),
                           child: ListTile(
                             title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -494,7 +494,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
           _isLoadingBanned
               ? const Center(child: CircularProgressIndicator())
               : _bannedList.isEmpty
-                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhum usuário na lista negra.'), style: const TextStyle(color: AppColors.textSecondary)))
+                  ? Center(child: Text(t.tr('no_results', fallback: 'Nenhum usuário na lista negra.'), style: const TextStyle(color: context.appTextSecondary)))
                   : ListView.builder(
                       padding: const EdgeInsets.all(24),
                       itemCount: _bannedList.length,
@@ -504,7 +504,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                         final name = banned['name']?.toString() ?? 'Usuário Banido';
 
                         return Card(
-                          color: AppColors.card,
+                          color: context.appCard,
                           margin: const EdgeInsets.only(bottom: 12),
                           child: ListTile(
                             title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -514,7 +514,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                                 await repo.unbanMember(widget.group.id, uId);
                                 _loadAdminData();
                               },
-                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                              style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                               child: Text(t.tr('unban', fallback: 'Desbanir'), style: const TextStyle(color: Colors.white)),
                             ),
                           ),

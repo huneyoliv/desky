@@ -144,7 +144,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          backgroundColor: AppColors.card,
+          backgroundColor: context.appCard,
           title: Text(t.tr('join_private_group', fallback: 'Grupo Privado'), style: const TextStyle(color: Colors.white)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -152,7 +152,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             children: [
               Text(
                 t.tr('enter_group_password', fallback: 'Este grupo requer senha para entrada:'),
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: const TextStyle(color: context.appTextSecondary),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -161,9 +161,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: t.tr('password', fallback: 'Senha do Grupo'),
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
+                  hintStyle: const TextStyle(color: context.appTextMuted),
                   filled: true,
-                  fillColor: AppColors.surface,
+                  fillColor: context.appSurface,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
@@ -172,11 +172,11 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+              child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
               child: Text(t.tr('join', fallback: 'Entrar'), style: const TextStyle(color: Colors.white)),
             ),
           ],
@@ -264,13 +264,13 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.2),
+                  color: context.appAccent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   t.tr('live_study', fallback: 'LIVE STUDY').toUpperCase(),
                   style: const TextStyle(
-                    color: AppColors.accent,
+                    color: context.appAccent,
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
                   ),
@@ -287,7 +287,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
               Text(
                 '${group.category} • ${group.membersCount}/${group.maxCapacity} ${t.tr("members", fallback: "membros")} • ${t.tr("goal", fallback: "Meta")}: ${group.dailyGoalHours}h/${t.tr("today", fallback: "dia")}',
                 style: const TextStyle(
-                  color: AppColors.textSecondary,
+                  color: context.appTextSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -296,7 +296,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                 Text(
                   group.notice!.trim(),
                   style: const TextStyle(
-                    color: AppColors.textMuted,
+                    color: context.appTextMuted,
                     fontSize: 12,
                   ),
                   maxLines: 1,
@@ -322,8 +322,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: isMyGroup ? AppColors.surface : AppColors.primary,
-            side: isMyGroup ? const BorderSide(color: AppColors.border) : null,
+            backgroundColor: isMyGroup ? context.appSurface : context.appPrimary,
+            side: isMyGroup ? BorderSide(color: context.appBorder) : null,
           ),
           child: Text(
             isMyGroup
@@ -386,12 +386,12 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.group_off_rounded,
-                            size: 48, color: AppColors.textMuted),
+                            size: 48, color: context.appTextMuted),
                         const SizedBox(height: 12),
                         Text(
                           t.tr('no_groups', fallback: 'Você não participa de nenhum grupo de estudos no momento.'),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: AppColors.textSecondary),
+                          style: const TextStyle(color: context.appTextSecondary),
                         ),
                       ],
                     ),
@@ -433,17 +433,17 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: t.tr('search', fallback: 'Buscar grupos por nome ou palavra-chave...'),
-                            hintStyle: const TextStyle(color: AppColors.textMuted),
+                            hintStyle: const TextStyle(color: context.appTextMuted),
                             filled: true,
-                            fillColor: AppColors.card,
+                            fillColor: context.appCard,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
+                            prefixIcon: const Icon(Icons.search, color: context.appTextSecondary),
                             suffixIcon: _searchController.text.isNotEmpty
                                 ? IconButton(
-                                    icon: const Icon(Icons.clear, color: AppColors.textMuted),
+                                    icon: const Icon(Icons.clear, color: context.appTextMuted),
                                     onPressed: () {
                                       _searchController.clear();
                                       _performSearch();
@@ -458,7 +458,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                       ElevatedButton.icon(
                         onPressed: _performSearch,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: context.appPrimary,
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
@@ -486,8 +486,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                               child: ChoiceChip(
                                 label: Text(cat['name'] as String),
                                 selected: isSelected,
-                                selectedColor: AppColors.primary,
-                                backgroundColor: AppColors.card,
+                                selectedColor: context.appPrimary,
+                                backgroundColor: context.appCard,
                                 labelStyle: TextStyle(
                                   color: isSelected ? Colors.white : AppColors.textSecondary,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -522,7 +522,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                 ? Center(
                                     child: Text(
                                       t.tr('no_results', fallback: 'Nenhum grupo encontrado para sua busca.'),
-                                      style: const TextStyle(color: AppColors.textSecondary),
+                                      style: const TextStyle(color: context.appTextSecondary),
                                     ),
                                   )
                                 : ListView.builder(
@@ -536,7 +536,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                 ? Center(
                                     child: Text(
                                       t.tr('no_groups_found', fallback: 'Nenhum grupo disponível para explorar no momento.'),
-                                      style: const TextStyle(color: AppColors.textSecondary),
+                                      style: const TextStyle(color: context.appTextSecondary),
                                     ),
                                   )
                                 : ListView.builder(
