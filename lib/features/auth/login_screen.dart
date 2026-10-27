@@ -59,22 +59,22 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
       context: context,
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.appCard,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: context.appBorder),
         ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
+                color: context.appPrimary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.person_add_alt_1_outlined,
-                color: AppColors.primary,
+                color: context.appPrimary,
                 size: 24,
               ),
             ),
@@ -82,8 +82,8 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
             Expanded(
               child: Text(
                 t.tr('account_not_found', fallback: 'Conta não encontrada'),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: context.appTextPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -93,8 +93,8 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         content: Text(
           desc,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
+          style: TextStyle(
+            color: context.appTextSecondary,
             fontSize: 14,
             height: 1.4,
           ),
@@ -105,8 +105,8 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               t.tr('cancel', fallback: 'Cancelar'),
-              style: const TextStyle(
-                color: AppColors.textMuted,
+              style: TextStyle(
+                color: context.appTextMuted,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -126,7 +126,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: context.appPrimary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -158,14 +158,14 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            backgroundColor: AppColors.card,
+            backgroundColor: context.appCard,
             title: Text(
               step == 1
                   ? t.tr('forgot_password', fallback: 'Esqueci minha Senha')
                   : step == 2
                       ? t.tr('enter_verification_code', fallback: 'Digite o Código')
                       : t.tr('new_password', fallback: 'Nova Senha'),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appTextPrimary),
             ),
             content: SingleChildScrollView(
               child: Column(
@@ -190,27 +190,27 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                   if (step == 1) ...[
                     Text(
                       t.tr('forgot_password_desc', fallback: 'Insira seu e-mail para receber um código de 6 dígitos de redefinição de senha:'),
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 14),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: emailController,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: context.appTextPrimary),
                       decoration: InputDecoration(
                         hintText: t.tr('email', fallback: 'Seu e-mail cadastrado'),
-                        hintStyle: const TextStyle(color: AppColors.textMuted),
+                        hintStyle: TextStyle(color: context.appTextMuted),
                         filled: true,
-                        fillColor: AppColors.surface,
+                        fillColor: context.appSurface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: context.appBorder),
                         ),
                       ),
                     ),
                   ] else if (step == 2) ...[
                     Text(
                       '${t.tr('verification_code_sent', fallback: 'Enviamos um código de verificação para')} ${emailController.text}:',
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 14),
                     ),
                     const SizedBox(height: 12),
                     TextField(
@@ -222,33 +222,33 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                       textAlign: TextAlign.center,
                       decoration: InputDecoration(
                         hintText: '123456',
-                        hintStyle: const TextStyle(color: AppColors.textMuted),
+                        hintStyle: TextStyle(color: context.appTextMuted),
                         filled: true,
-                        fillColor: AppColors.surface,
+                        fillColor: context.appSurface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: context.appBorder),
                         ),
                       ),
                     ),
                   ] else ...[
                     Text(
                       t.tr('new_password_prompt', fallback: 'Crie uma nova senha segura para sua conta:'),
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 14),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: newPasswordController,
                       obscureText: true,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: context.appTextPrimary),
                       decoration: InputDecoration(
                         hintText: t.tr('new_password', fallback: 'Nova senha'),
-                        hintStyle: const TextStyle(color: AppColors.textMuted),
+                        hintStyle: TextStyle(color: context.appTextMuted),
                         filled: true,
-                        fillColor: AppColors.surface,
+                        fillColor: context.appSurface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: context.appBorder),
                         ),
                       ),
                     ),
@@ -259,7 +259,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
             actions: [
               TextButton(
                 onPressed: isLoading ? null : () => Navigator.of(context).pop(),
-                child: Text(t.tr('cancel', fallback: 'Cancelar'), style: const TextStyle(color: AppColors.textMuted)),
+                child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
               ),
               ElevatedButton(
                 onPressed: isLoading
@@ -331,7 +331,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                             : step == 2
                                 ? t.tr('verify_code', fallback: 'Verificar')
                                 : t.tr('reset_password', fallback: 'Redefinir Senha'),
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: context.appTextPrimary),
                       ),
               ),
             ],
@@ -366,12 +366,12 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
           Expanded(
             flex: 5,
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     Colors.black,
-                    AppColors.surface,
-                    AppColors.surfaceLight,
+                    context.appSurface,
+                    context.appSurfaceLight,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -401,7 +401,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                             fontFamilyFallback: AppTextStyles.fontFallbacks,
                             fontSize: 36,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                            color: context.appTextPrimary,
                             letterSpacing: 1.2,
                           ),
                         ),
@@ -422,7 +422,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
           Expanded(
             flex: 6,
             child: Container(
-              color: AppColors.background,
+              color: context.appBackground,
               padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 32),
               child: Stack(
                 children: [
@@ -437,25 +437,25 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: AppColors.card,
+                            color: context.appCard,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.border),
+                            border: Border.all(color: context.appBorder),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.language_rounded, size: 16, color: AppColors.primary),
+                              Icon(Icons.language_rounded, size: 16, color: context.appPrimary),
                               const SizedBox(width: 8),
                               Text(
                                 langLabel,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: context.appTextPrimary,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               const SizedBox(width: 4),
-                              const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textMuted),
+                              Icon(Icons.keyboard_arrow_down, size: 16, color: context.appTextMuted),
                             ],
                           ),
                         ),
@@ -517,25 +517,25 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                               TextFormField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(color: context.appTextPrimary),
                                 decoration: InputDecoration(
                                   labelText: t.tr('email', fallback: 'E-mail'),
-                                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                                  labelStyle: TextStyle(color: context.appTextSecondary),
                                   filled: true,
-                                  fillColor: AppColors.surface,
-                                  prefixIcon: const Icon(Icons.email_outlined,
-                                      color: AppColors.textSecondary),
+                                  fillColor: context.appSurface,
+                                  prefixIcon: Icon(Icons.email_outlined,
+                                      color: context.appTextSecondary),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(color: AppColors.border),
+                                    borderSide: BorderSide(color: context.appBorder),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(color: AppColors.border),
+                                    borderSide: BorderSide(color: context.appBorder),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(color: AppColors.primary),
+                                    borderSide: BorderSide(color: context.appPrimary),
                                   ),
                                 ),
                                 validator: (value) {
@@ -551,20 +551,20 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                               TextFormField(
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(color: context.appTextPrimary),
                                 decoration: InputDecoration(
                                   labelText: t.tr('password', fallback: 'Senha'),
-                                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                                  labelStyle: TextStyle(color: context.appTextSecondary),
                                   filled: true,
-                                  fillColor: AppColors.surface,
-                                  prefixIcon: const Icon(Icons.lock_outline,
-                                      color: AppColors.textSecondary),
+                                  fillColor: context.appSurface,
+                                  prefixIcon: Icon(Icons.lock_outline,
+                                      color: context.appTextSecondary),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword
                                           ? Icons.visibility_off_outlined
                                           : Icons.visibility_outlined,
-                                      color: AppColors.textSecondary,
+                                      color: context.appTextSecondary,
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -574,15 +574,15 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(color: AppColors.border),
+                                    borderSide: BorderSide(color: context.appBorder),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(color: AppColors.border),
+                                    borderSide: BorderSide(color: context.appBorder),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(color: AppColors.primary),
+                                    borderSide: BorderSide(color: context.appPrimary),
                                   ),
                                 ),
                                 validator: (value) {
@@ -601,8 +601,8 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                   onPressed: () => _showForgotPasswordDialog(context),
                                   child: Text(
                                     t.tr('forgot_password', fallback: 'Esqueci minha senha'),
-                                    style: const TextStyle(
-                                      color: AppColors.primary,
+                                    style: TextStyle(
+                                      color: context.appPrimary,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -615,7 +615,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                 child: ElevatedButton(
                                   onPressed: authState.isLoading ? null : _submitLogin,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
+                                    backgroundColor: context.appPrimary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -644,20 +644,20 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                               // Or continue with Divider
                               Row(
                                 children: [
-                                  const Expanded(child: Divider(color: AppColors.border)),
+                                  Expanded(child: Divider(color: context.appBorder)),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 14),
                                     child: Text(
                                       t.tr('or', fallback: 'ou').toUpperCase(),
-                                      style: const TextStyle(
-                                        color: AppColors.textMuted,
+                                      style: TextStyle(
+                                        color: context.appTextMuted,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                         letterSpacing: 1.2,
                                       ),
                                     ),
                                   ),
-                                  const Expanded(child: Divider(color: AppColors.border)),
+                                  Expanded(child: Divider(color: context.appBorder)),
                                 ],
                               ),
                               const SizedBox(height: 16),
@@ -673,7 +673,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      side: const BorderSide(color: AppColors.border),
+                                      side: BorderSide(color: context.appBorder),
                                     ),
                                     padding: const EdgeInsets.symmetric(horizontal: 16),
                                   ),
@@ -708,7 +708,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                 children: [
                                   Text(
                                     t.tr('dont_have_account', fallback: 'Não tem uma conta? '),
-                                    style: const TextStyle(color: AppColors.textSecondary),
+                                    style: TextStyle(color: context.appTextSecondary),
                                   ),
                                   TextButton(
                                     onPressed: () {
@@ -720,8 +720,8 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                     },
                                     child: Text(
                                       t.tr('sign_up', fallback: 'Cadastre-se'),
-                                      style: const TextStyle(
-                                        color: AppColors.primary,
+                                      style: TextStyle(
+                                        color: context.appPrimary,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
