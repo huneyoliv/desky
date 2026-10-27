@@ -73,6 +73,20 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.1.3] - 2026-10-27
+
+### Fixed
+- **Complete End-to-End Theme Propagation Across All Screens**: Systematically eliminated all remaining hardcoded static color tokens (#121624, #0A0D14, #A78BFA) across the entire application, propagating dynamic theme tokens (context.appBackground, context.appSurface, context.appCard, context.appBorder, context.appPrimary, context.appTextPrimary, context.appTextSecondary, context.appTextMuted) to ensure 100% visual consistency with user-selected themes (AMOLED Lilac, Midnight Navy, Cyberpunk Neon, Forest Emerald, Sunset Amber) (Fixes Issue #2):
+  - **Ranks & Analytics**: Updated Ranks period selector pills, member cards background, weekly study bar charts (BarChartGroupData rods using context.appPrimary), and subject distribution pie chart to dynamically reflect selected theme colors.
+  - **Flashcards & Study**: Replaced dark containers, purple action buttons (+ Add flashcards, + Deck), and modal inputs with dynamic theme tokens.
+  - **Store & Avatars**: Replaced static black backgrounds and purple equipped avatar indicator borders with context.appPrimary and context.appCard.
+  - **Timelapse Gallery & Player**: Migrated gallery grid cards, header, and timelapse video player dialog to dynamic surface colors and adaptive text tokens.
+  - **Challenges & Missions**: Updated mission tab indicators, challenge cards, goal badges, and join dialogs to dynamic primary and card colors.
+  - **Profile & Settings**: Propagated dynamic theme tokens to Profile stats summary cards ("Total time today", "Subjects", "My groups") and settings navigation tiles.
+  - **Planner & Timetable**: Harmonized timetable grid, D-Day counter badge, selected date highlight, to-do list items, progress card, and add buttons with active theme palette.
+  - **Groups & Exploration**: Updated group search inputs, category selection pills, group detail leader panels, and "Join group" action buttons to dynamic theme colors.
+  - **Shared UI & Authentication**: Updated sidebar notification bell, notification panel dialog, notification center screen, subject chips, login screen, and registration flow to seamlessly inherit dynamic theme colors.
+
 ## [1.1.2] - 2026-10-25
 
 ### Fixed
