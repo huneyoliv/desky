@@ -130,6 +130,9 @@ flutter:
           weight: 600
         - asset: assets/fonts/SF-Pro-Display-Bold.otf
           weight: 700
+    - family: AppleEmoji
+      fonts:
+        - asset: assets/fonts/AppleEmoji.ttf
     - family: NotoColorEmoji
       fonts:
         - asset: assets/fonts/NotoColorEmoji.ttf

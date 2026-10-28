@@ -13,6 +13,9 @@ void main() {
     final sfDisplay = await rootBundle.load('assets/fonts/SF-Pro-Display-Bold.otf');
     expect(sfDisplay.lengthInBytes, greaterThan(0));
 
+    final appleEmoji = await rootBundle.load('assets/fonts/AppleEmoji.ttf');
+    expect(appleEmoji.lengthInBytes, greaterThan(1000));
+
     final emoji = await rootBundle.load('assets/fonts/NotoColorEmoji.ttf');
     expect(emoji.lengthInBytes, greaterThan(1000));
 
