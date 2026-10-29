@@ -2,8 +2,8 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Desky';
-  static const String appVersion = '1.1.4';
-  static const int buildNumber = 15;
+  static const String appVersion = '1.1.5';
+  static const int buildNumber = 16;
   static const String githubRepo = 'huneyoliv/desky';
 
   /// When compiled with `--dart-define=ENABLE_IN_APP_UPDATER=false` (e.g. for Microsoft Store / MSIX),
@@ -13,9 +13,7 @@ class AppConstants {
     defaultValue: true,
   );
 
-  /// Public PNG icon URL for Discord RPC small image and external services.
-  static const String deskyIconUrl =
-      'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png';
+  static const String releaseBaseUrl =
+      'https://github.com/huneyoliv/desky/releases/download';
+  static const String apiBaseUrl = 'https://api.github.com/repos/huneyoliv/desky';
 }
-
-

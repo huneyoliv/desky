@@ -4,7 +4,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/localization/app_translation.dart';
 import '../settings_notifier.dart';
-import 'theme_selection_dialog.dart';
 
 class StudyPreferencesDialog extends ConsumerWidget {
   const StudyPreferencesDialog({super.key});
@@ -56,23 +55,6 @@ class StudyPreferencesDialog extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Theme & Appearance
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(Icons.palette_outlined, color: context.appPrimary, size: 22),
-                      title: Text(
-                        t.tr('theme_appearance', fallback: 'Aparência & Tema'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
-                      ),
-                      subtitle: Text(
-                        t.tr('theme_appearance_desc', fallback: 'Personalize a paleta visual e cores do aplicativo'),
-                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
-                      ),
-                      trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
-                      onTap: () => ThemeSelectionDialog.show(context),
-                    ),
-                    Divider(color: context.appBorder, height: 16),
-
                     // Day Start Reset Time
                     ListTile(
                       contentPadding: EdgeInsets.zero,

@@ -3388,5 +3388,7 @@
     "leave_group_confirm":  "Are you sure you want to leave this group?",
     "photo":  "Photo",
     "left_group_success":  "You have left the group.",
-    "member_removed_msg":  "has been removed from the group."
+    "member_removed_msg":  "has been removed from the group.",
+    "theme_sakura_pastel":  "Sakura Pastel",
+    "theme_nordic_frost":  "Nordic Frost"
 }

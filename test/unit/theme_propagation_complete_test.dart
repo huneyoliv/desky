@@ -18,7 +18,8 @@ class _FakeNotificationRepository implements NotificationRepository {
 
 void main() {
   group('Theme Propagation Completeness Tests', () {
-    test('all 5 presets have valid, non-transparent core colors', () {
+    test('all 7 presets have valid, non-transparent core colors', () {
+      expect(DeskyThemePalette.presets.length, equals(7));
       for (final preset in DeskyThemePalette.presets) {
         expect(preset.primary.alpha, greaterThan(0));
         expect(preset.background.alpha, greaterThan(0));
@@ -41,14 +42,20 @@ void main() {
       final amber = DeskyThemePalette.sunsetAmber;
       final navy = DeskyThemePalette.midnightNavy;
       final neon = DeskyThemePalette.cyberpunk;
+      final sakura = DeskyThemePalette.sakuraPastel;
+      final frost = DeskyThemePalette.nordicFrost;
 
       expect(emerald.primary, isNot(equals(lilac.primary)));
       expect(amber.primary, isNot(equals(lilac.primary)));
       expect(navy.primary, isNot(equals(lilac.primary)));
       expect(neon.primary, isNot(equals(lilac.primary)));
+      expect(sakura.primary, isNot(equals(lilac.primary)));
+      expect(frost.primary, isNot(equals(lilac.primary)));
 
       expect(navy.background, isNot(equals(lilac.background)));
       expect(neon.card, isNot(equals(lilac.card)));
+      expect(sakura.background, isNot(equals(lilac.background)));
+      expect(frost.border, isNot(equals(lilac.border)));
     });
 
     testWidgets('DeskyThemeContext extensions return active palette across all presets', (tester) async {

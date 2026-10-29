@@ -73,6 +73,17 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.1.5] - 2026-10-29
+
+### Added
+- **New Theme Presets (Sakura Pastel & Nordic Frost)**: Added two fresh hand-crafted palettes expanding Desky's customization options in response to community feedback on Issue #2:
+  - **Sakura Pastel**: Soft rose pinks, lavender accents, and elegant dark cherry slate tones.
+  - **Nordic Frost**: Clean Arctic ice mint, frosty cyan, and slate deep ocean tones.
+  - Updated theme selection dialog and all localized dictionary keys across 11 supported languages.
+
+### Fixed
+- **Settings Theme Selector De-duplication**: Removed redundant "Aparência & Tema" entry from inside the `StudyPreferencesDialog` modal, ensuring the main Settings/Profile list tile serves as the single, clean source of truth for appearance customization (Fixes Issue #2).
+
 ## [1.1.4] - 2026-10-27
 
 ### Fixed
