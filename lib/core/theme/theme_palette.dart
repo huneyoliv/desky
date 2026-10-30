@@ -162,12 +162,62 @@ class DeskyThemePalette {
     heatmapL4: Color(0xFFF59E0B),
   );
 
+  // 6. Sakura Pastel
+  static const DeskyThemePalette sakuraPastel = DeskyThemePalette(
+    id: 'sakura_pastel',
+    nameKey: 'theme_sakura_pastel',
+    background: Color(0xFF160E18),
+    surface: Color(0xFF221626),
+    surfaceLight: Color(0xFF2F1F35),
+    card: Color(0xFF271A2C),
+    border: Color(0xFF4C2A57),
+    primary: Color(0xFFF472B6),
+    primaryDark: Color(0xFFDB2777),
+    primaryLight: Color(0xFFFBCFE8),
+    accent: Color(0xFFC084FC),
+    accentDark: Color(0xFF9333EA),
+    outline: Color(0xFF831843),
+    textPrimary: Color(0xFFFDF2F8),
+    textSecondary: Color(0xFFF9A8D4),
+    textMuted: Color(0xFF9D4C73),
+    heatmapL1: Color(0xFF33162C),
+    heatmapL2: Color(0xFF701A75),
+    heatmapL3: Color(0xFFBE185D),
+    heatmapL4: Color(0xFFF472B6),
+  );
+
+  // 7. Nordic Frost
+  static const DeskyThemePalette nordicFrost = DeskyThemePalette(
+    id: 'nordic_frost',
+    nameKey: 'theme_nordic_frost',
+    background: Color(0xFF0B131B),
+    surface: Color(0xFF13202E),
+    surfaceLight: Color(0xFF1D2F44),
+    card: Color(0xFF172636),
+    border: Color(0xFF27425F),
+    primary: Color(0xFF2DD4BF),
+    primaryDark: Color(0xFF0F766E),
+    primaryLight: Color(0xFFCCFBF1),
+    accent: Color(0xFF38BDF8),
+    accentDark: Color(0xFF0284C7),
+    outline: Color(0xFF134E4A),
+    textPrimary: Color(0xFFF0FDFA),
+    textSecondary: Color(0xFF99F6E4),
+    textMuted: Color(0xFF5E8E9E),
+    heatmapL1: Color(0xFF0E2730),
+    heatmapL2: Color(0xFF115E59),
+    heatmapL3: Color(0xFF0D9488),
+    heatmapL4: Color(0xFF2DD4BF),
+  );
+
   static const List<DeskyThemePalette> presets = [
     amoledLilac,
     midnightNavy,
     cyberpunk,
     forestEmerald,
     sunsetAmber,
+    sakuraPastel,
+    nordicFrost,
   ];
 
   static DeskyThemePalette fromId(String? id) {

@@ -11,17 +11,19 @@ import 'package:desky/features/settings/widgets/theme_selection_dialog.dart';
 
 void main() {
   group('DeskyThemePalette Model & Presets Tests', () {
-    test('all 5 curated presets are defined with unique ids', () {
-      expect(DeskyThemePalette.presets.length, equals(5));
+    test('all 7 curated presets are defined with unique ids', () {
+      expect(DeskyThemePalette.presets.length, equals(7));
 
       final ids = DeskyThemePalette.presets.map((p) => p.id).toSet();
-      expect(ids.length, equals(5));
+      expect(ids.length, equals(7));
       expect(ids, containsAll([
         'amoled_lilac',
         'midnight_navy',
         'cyberpunk',
         'forest_emerald',
         'sunset_amber',
+        'sakura_pastel',
+        'nordic_frost',
       ]));
     });
 
@@ -30,6 +32,8 @@ void main() {
       expect(DeskyThemePalette.fromId('cyberpunk').id, equals('cyberpunk'));
       expect(DeskyThemePalette.fromId('forest_emerald').id, equals('forest_emerald'));
       expect(DeskyThemePalette.fromId('sunset_amber').id, equals('sunset_amber'));
+      expect(DeskyThemePalette.fromId('sakura_pastel').id, equals('sakura_pastel'));
+      expect(DeskyThemePalette.fromId('nordic_frost').id, equals('nordic_frost'));
       expect(DeskyThemePalette.fromId('amoled_lilac').id, equals('amoled_lilac'));
       expect(DeskyThemePalette.fromId('unknown_id').id, equals('amoled_lilac'));
       expect(DeskyThemePalette.fromId(null).id, equals('amoled_lilac'));
@@ -87,6 +91,13 @@ void main() {
 
   group('ThemeSelectionDialog Widget Tests', () {
     testWidgets('renders theme dialog and allows selecting another theme', (tester) async {
+      tester.view.physicalSize = const Size(1280, 1000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
 
@@ -105,13 +116,15 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify all 5 theme options are rendered
+      // Verify all 7 theme options are rendered
       expect(find.byType(ThemeSelectionDialog), findsOneWidget);
       expect(find.text('AMOLED Lilás (Padrão)'), findsOneWidget);
       expect(find.text('Azul Meia-Noite'), findsOneWidget);
       expect(find.text('Cyberpunk Neon'), findsOneWidget);
       expect(find.text('Verde Esmeralda'), findsOneWidget);
       expect(find.text('Âmbar Dourado'), findsOneWidget);
+      expect(find.text('Sakura Pastel'), findsOneWidget);
+      expect(find.text('Geada Nórdica'), findsOneWidget);
 
       // Tap on Midnight Navy theme
       await tester.tap(find.text('Azul Meia-Noite'));

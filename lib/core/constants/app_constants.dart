@@ -2,8 +2,8 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Desky';
-  static const String appVersion = '1.1.4';
-  static const int buildNumber = 15;
+  static const String appVersion = '1.1.5';
+  static const int buildNumber = 16;
   static const String githubRepo = 'huneyoliv/desky';
 
   /// When compiled with `--dart-define=ENABLE_IN_APP_UPDATER=false` (e.g. for Microsoft Store / MSIX),
@@ -17,5 +17,3 @@ class AppConstants {
   static const String deskyIconUrl =
       'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png';
 }
-
-
