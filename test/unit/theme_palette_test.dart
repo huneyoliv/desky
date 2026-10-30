@@ -91,6 +91,13 @@ void main() {
 
   group('ThemeSelectionDialog Widget Tests', () {
     testWidgets('renders theme dialog and allows selecting another theme', (tester) async {
+      tester.view.physicalSize = const Size(1280, 1000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
 
