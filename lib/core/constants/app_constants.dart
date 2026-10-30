@@ -13,7 +13,7 @@ class AppConstants {
     defaultValue: true,
   );
 
-  static const String releaseBaseUrl =
-      'https://github.com/huneyoliv/desky/releases/download';
-  static const String apiBaseUrl = 'https://api.github.com/repos/huneyoliv/desky';
+  /// Public PNG icon URL for Discord RPC small image and external services.
+  static const String deskyIconUrl =
+      'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png';
 }
