@@ -1,0 +1,622 @@
+Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 85.0.0 (111.0.0 available)
+  analyzer 7.6.0 (14.7.0 available)
+  analyzer_plugin 0.13.4 (0.14.20 available)
+  archive 4.0.9 (4.5.2 available)
+  audio_session 0.1.25 (0.2.4 available)
+  build 2.5.4 (5.0.0 available)
+  build_config 1.1.2 (1.4.0 available)
+  build_daemon 4.1.5 (4.1.7 available)
+  build_resolvers 2.5.4 (3.0.4 available)
+  build_runner 2.5.4 (2.17.1 available)
+  build_runner_core 9.1.2 (9.3.2 available)
+  built_collection 5.1.1 (6.0.0 available)
+  built_value 8.12.7 (8.13.0 available)
+  cached_network_image 3.4.1 (4.0.6 available)
+  cached_network_image_platform_interface 4.1.1 (5.0.3 available)
+  cached_network_image_web 1.3.1 (2.0.4 available)
+  cli_util 0.4.2 (0.6.0 available)
+  clock 1.1.2 (1.1.3 available)
+  code_assets 1.2.1 (2.1.0 available)
+  code_builder 4.11.1 (4.13.0 available)
+  cross_file 0.3.5+4 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  custom_lint_core 0.7.5 (0.8.2 available)
+  custom_lint_visitor 1.0.0+7.7.0 (1.0.0+9.0.0 available)
+  dart_style 3.1.1 (3.1.14 available)
+  dbus 0.7.13 (0.8.0 available)
+  device_info_plus 12.4.0 (13.3.0 available)
+  device_info_plus_platform_interface 7.0.3 (8.1.0 available)
+  dio 5.11.0 (5.11.1 available)
+  dio_web_adapter 2.2.1 (2.2.2 available)
+  equatable 2.1.0 (3.0.0 available)
+  file_picker 11.0.3 (13.3.0 available)
+  fl_chart 0.68.0 (1.3.0 available)
+  flutter_cache_manager 3.4.2 (3.4.6 available)
+  flutter_dotenv 5.2.1 (6.0.1 available)
+  flutter_hooks 0.20.5 (0.21.3+1 available)
+  flutter_lints 5.0.0 (6.0.0 available)
+  flutter_markdown 0.7.7+1 (discontinued replaced by flutter_markdown_plus)
+  flutter_riverpod 2.6.1 (3.4.3 available)
+  flutter_secure_storage 9.2.4 (11.2.0 available)
+  flutter_secure_storage_linux 1.2.3 (3.0.3 available)
+  flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+  flutter_secure_storage_platform_interface 1.1.2 (2.1.1 available)
+  flutter_secure_storage_web 1.2.1 (2.1.1 available)
+  flutter_secure_storage_windows 3.1.2 (4.2.2 available)
+  flutter_svg 2.3.0 (2.3.2 available)
+  freezed 2.5.8 (4.0.3 available)
+  freezed_annotation 2.4.4 (3.1.0 available)
+  frontend_server_client 4.0.0 (4.2.0 available)
+  get_it 9.2.1 (9.3.0 available)
+  glob 2.1.3 (2.2.0 available)
+  go_router 14.8.1 (18.1.2 available)
+  google_sign_in 6.3.0 (7.2.0 available)
+  google_sign_in_android 6.2.1 (7.2.18 available)
+  google_sign_in_ios 5.9.0 (6.3.8 available)
+  google_sign_in_platform_interface 2.5.0 (3.1.0 available)
+  google_sign_in_web 0.12.4+4 (1.1.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  hooks_riverpod 2.6.1 (3.4.3 available)
+  http_multi_server 3.2.2 (3.2.3 available)
+  image 4.9.1 (4.12.0 available)
+  io 1.0.5 (1.1.0 available)
+  jni 1.0.3 (1.1.1 available)
+  jni_flutter 1.0.2 (1.0.4+1 available)
+  js 0.6.7 (0.7.2 available)
+  json_annotation 4.9.0 (4.12.0 available)
+  json_serializable 6.9.5 (6.15.2 available)
+  just_audio 0.9.46 (0.10.6 available)
+  lints 5.1.1 (6.1.0 available)
+  lottie 3.3.3 (3.8.0 available)
+  lucide_icons_flutter 3.1.15 (4.0.1 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  mime 2.0.0 (2.1.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  octo_image 2.1.0 (2.1.3 available)
+  package_config 2.2.0 (3.0.0 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  pool 1.5.2 (1.5.3 available)
+  posix 6.5.2 (6.5.4 available)
+  pub_semver 2.2.0 (2.2.1 available)
+  pubspec_parse 1.5.0 (1.7.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  riverpod 2.6.1 (3.4.3 available)
+  riverpod_analyzer_utils 0.5.9 (0.5.10 available)
+  riverpod_annotation 2.6.1 (4.0.7 available)
+  riverpod_generator 2.6.4 (4.0.9 available)
+  screen_retriever 0.1.9 (0.3.0 available)
+  shared_preferences 2.5.5 (2.5.6 available)
+  shared_preferences_android 2.4.23 (2.5.4 available)
+  shared_preferences_foundation 2.5.6 (2.6.1 available)
+  shelf 1.4.2 (1.4.3 available)
+  sign_in_with_apple 6.1.4 (8.2.0 available)
+  sign_in_with_apple_platform_interface 1.1.0 (2.0.0 available)
+  sign_in_with_apple_web 2.1.1 (3.0.0 available)
+  source_gen 2.0.0 (4.3.1 available)
+  source_helper 1.3.7 (1.4.0 available)
+  sqflite 2.4.2+1 (2.4.5 available)
+  sqflite_android 2.4.2+3 (2.4.5 available)
+  sqflite_common 2.5.8 (2.5.14 available)
+  sqflite_darwin 2.4.2 (2.4.4+1 available)
+  sqflite_platform_interface 2.4.0 (2.4.3 available)
+  stack_trace 1.12.1 (1.12.2 available)
+  stream_transform 2.1.1 (2.1.2 available)
+  syncfusion_flutter_core 33.2.15 (35.1.42 available)
+  syncfusion_flutter_pdf 33.2.15 (35.1.42 available)
+  syncfusion_flutter_pdfviewer 33.2.13 (35.1.42 available)
+  syncfusion_flutter_signaturepad 33.2.15 (35.1.42 available)
+  syncfusion_pdfviewer_linux 33.2.15 (35.1.42 available)
+  syncfusion_pdfviewer_macos 33.2.15 (35.1.42 available)
+  syncfusion_pdfviewer_platform_interface 33.2.15 (35.1.42 available)
+  syncfusion_pdfviewer_web 33.2.15 (35.1.42 available)
+  syncfusion_pdfviewer_windows 33.2.15 (35.1.42 available)
+  synchronized 3.4.0+1 (3.5.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  url_launcher 6.3.2 (6.3.3 available)
+  url_launcher_android 6.3.30 (6.3.33 available)
+  url_launcher_ios 6.4.1 (6.4.2 available)
+  url_launcher_linux 3.2.2 (3.2.3 available)
+  url_launcher_macos 3.2.5 (3.2.6 available)
+  url_launcher_windows 3.1.5 (3.1.6 available)
+  vector_graphics 1.2.3 (1.2.5 available)
+  vector_graphics_compiler 1.3.0 (1.3.4 available)
+  vector_math 2.4.2 (2.4.4 available)
+  vm_service 15.2.0 (15.4.0 available)
+  web 1.1.1 (1.1.2 available)
+  win32 5.15.0 (6.4.0 available)
+  win32_registry 2.1.0 (3.0.3 available)
+  window_manager 0.3.9 (0.5.2 available)
+  xml 7.0.1 (7.1.0 available)
+  yaml 3.1.3 (3.1.4 available)
+Got dependencies!
+1 package is discontinued.
+131 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+::group::✅ Passing tests
+✅ /home/runner/work/desky/desky/test/unit/timer_day_reset_test.dart: TimerNotifier Day Reset Tests initializes with todayTotalMs and todayRestMs from server and observes dayResetHour
+✅ /home/runner/work/desky/desky/test/unit/timer_day_reset_test.dart: TimerNotifier Day Reset Tests setDayResetHour updates reset hour and triggers date rollover if date changed
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: DeskyThemePalette Model & Presets Tests all 7 curated presets are defined with unique ids
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: DeskyThemePalette Model & Presets Tests fromId returns correct preset or defaults to amoled_lilac
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: DeskyThemePalette Model & Presets Tests buildTheme configures ThemeData and ThemeExtension accurately
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: ThemeNotifier & Persistence Tests ThemeNotifier initializes with default theme when no preference stored
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: ThemeNotifier & Persistence Tests ThemeNotifier initializes with stored preference
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: ThemeNotifier & Persistence Tests setTheme updates state and persists theme id
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: ThemeNotifier & Persistence Tests setThemeById updates state and persists theme id
+✅ /home/runner/work/desky/desky/test/unit/update_service_test.dart: UpdateService Tests fetchLatestRelease parses valid release JSON
+✅ /home/runner/work/desky/desky/test/unit/update_service_test.dart: UpdateService Tests fetchLatestRelease handles 404 gracefully
+✅ /home/runner/work/desky/desky/test/unit/update_service_test.dart: UpdateService Tests fetchLatestRelease handles connection failure gracefully without throwing
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: ThemeSelectionDialog Widget Tests renders theme dialog and allows selecting another theme
+✅ /home/runner/work/desky/desky/test/unit/theme_palette_test.dart: ThemeSelectionDialog Widget Tests BuildContext extension and AppColors dynamic accessors match active palette
+✅ /home/runner/work/desky/desky/test/unit/chat_reactions_media_test.dart: Chat Reactions and Media Tests ChatMessageModel.fromJson parses img, th, and reactions correctly
+✅ /home/runner/work/desky/desky/test/unit/chat_reactions_media_test.dart: Chat Reactions and Media Tests ChatMessageModel copyWith updates reactions properly
+✅ /home/runner/work/desky/desky/test/unit/chat_reactions_media_test.dart: Chat Reactions and Media Tests GroupRepository sendReaction posts correct payload to API
+✅ /home/runner/work/desky/desky/test/unit/offline_sync_test.dart: Offline Sync Queue Tests OfflineSessionModel serialization and deserialization
+✅ /home/runner/work/desky/desky/test/unit/offline_sync_test.dart: Offline Sync Queue Tests OfflineSyncRepository enqueues, reads, and clears sessions
+✅ /home/runner/work/desky/desky/test/unit/offline_sync_test.dart: Offline Sync Queue Tests syncAllPending successfully drains queue when server responds OK
+✅ /home/runner/work/desky/desky/test/unit/offline_sync_test.dart: Offline Sync Queue Tests syncAllPending retains failed sessions with incremented retry count
+✅ /home/runner/work/desky/desky/test/unit/offline_sync_test.dart: Offline Sync Queue Tests TimerNotifier enqueues offline session when stopStudy encounters error
+✅ /home/runner/work/desky/desky/test/unit/offline_sync_test.dart: Offline Sync Queue Tests OfflineSyncNotifier syncNow updates pending state properly
+✅ /home/runner/work/desky/desky/test/unit/group_repository_test.dart: GroupRepository Tests fetchMembers parses members list
+✅ /home/runner/work/desky/desky/test/unit/group_repository_test.dart: GroupRepository Tests shakeMember sends POST and returns true on success
+✅ /home/runner/work/desky/desky/test/unit/group_repository_test.dart: GroupRepository Tests fetchChatMessages parses messages list
+✅ /home/runner/work/desky/desky/test/unit/group_repository_test.dart: GroupRepository Tests sendMessage posts message and returns ChatMessageModel
+✅ /home/runner/work/desky/desky/test/unit/group_repository_test.dart: GroupRepository Tests joinGroup sends join request
+✅ /home/runner/work/desky/desky/test/unit/group_repository_test.dart: GroupRepository Tests leaveGroup sends leave request
+✅ /home/runner/work/desky/desky/test/unit/delete_account_test.dart: Account Deletion Tests deleteAccount calls /user/unregister and clears stored JWT token
+✅ /home/runner/work/desky/desky/test/unit/delete_account_test.dart: Account Deletion Tests AuthNotifier.deleteAccount resets state to unauthenticated
+✅ /home/runner/work/desky/desky/test/unit/theme_propagation_complete_test.dart: Theme Propagation Completeness Tests all 7 presets have valid, non-transparent core colors
+✅ /home/runner/work/desky/desky/test/unit/theme_propagation_complete_test.dart: Theme Propagation Completeness Tests each preset provides distinct primary and background colors
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService language resolution resolves Portuguese language from Accept-Language header
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService language resolution resolves English language from Accept-Language header
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService language resolution resolves Spanish language from Accept-Language header
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService language resolution resolves Korean, Japanese and Chinese
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService language resolution falls back to en for null, empty or unsupported language
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService buildResponseHtml renders Portuguese success HTML with Desky brand and AMOLED colors
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService buildResponseHtml renders English success HTML when acceptLanguage is en-US
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService buildResponseHtml renders Spanish success HTML when acceptLanguage is es-ES
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService buildResponseHtml renders Korean success HTML when acceptLanguage is ko-KR
+✅ /home/runner/work/desky/desky/test/unit/oauth_desktop_service_test.dart: OAuthDesktopService buildResponseHtml renders error HTML with error styling and custom error message
+✅ /home/runner/work/desky/desky/test/unit/theme_propagation_complete_test.dart: Theme Propagation Completeness Tests DeskyThemeContext extensions return active palette across all presets
+✅ /home/runner/work/desky/desky/test/unit/theme_propagation_complete_test.dart: Theme Propagation Completeness Tests SubjectChip adapts to dynamic theme surface and text tokens
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks with type=day uses today date without zero-padding
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks with type=week uses Monday of current week without zero-padding
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks with type=month uses first day of month without zero-padding
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks URL does NOT contain zero-padded date
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks URL includes groupID=0 and isCam=false
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks returns parsed RankEntryModel list
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks returns empty list when s=false
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks returns empty list on null response
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchGlobalRanks falls back to ranks key if ms is absent
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchMyCategoryRank returns user current rank integer
+✅ /home/runner/work/desky/desky/test/unit/rank_repository_test.dart: RankRepository Tests fetchUserStats sends POST to /logs/range/days and returns logs
+✅ /home/runner/work/desky/desky/test/unit/theme_propagation_complete_test.dart: Theme Propagation Completeness Tests NotificationBell renders with dynamic context colors without error
+✅ /home/runner/work/desky/desky/test/unit/challenge_repository_test.dart: ChallengeRepository Tests fetchAvailableChallenges parses API response list
+✅ /home/runner/work/desky/desky/test/unit/challenge_repository_test.dart: ChallengeRepository Tests fetchMyChallenges parses user enrolled challenges
+✅ /home/runner/work/desky/desky/test/unit/challenge_repository_test.dart: ChallengeRepository Tests joinChallenge sends POST to /mission/challenge/join and returns true
+✅ /home/runner/work/desky/desky/test/unit/challenge_repository_test.dart: ChallengeRepository Tests cancelParticipation sends POST to /mission/challenge/cancel and returns true
+✅ /home/runner/work/desky/desky/test/unit/new_translations_validation_test.dart: New Translations & All 28 Locales Validation Tests All 28 translation json files contain newly added keys
+✅ /home/runner/work/desky/desky/test/unit/new_translations_validation_test.dart: New Translations & All 28 Locales Validation Tests AppTranslation fallback translations resolve for new keys across core languages
+✅ /home/runner/work/desky/desky/test/unit/new_translations_validation_test.dart: New Translations & All 28 Locales Validation Tests AppTranslation fallback translations resolve for room and group keys across core languages
+✅ /home/runner/work/desky/desky/test/unit/new_translations_validation_test.dart: New Translations & All 28 Locales Validation Tests AppTranslation tr replaces placeholder arguments for formatted messages
+✅ /home/runner/work/desky/desky/test/unit/group_rank_date_test.dart: GroupRepository fetchGroupRanks Date and Sorting Tests fetchGroupRanks with period=day generates date without zero-padding
+✅ /home/runner/work/desky/desky/test/unit/group_rank_date_test.dart: GroupRepository fetchGroupRanks Date and Sorting Tests fetchGroupRanks with period=week generates Monday date without zero-padding
+✅ /home/runner/work/desky/desky/test/unit/group_rank_date_test.dart: GroupRepository fetchGroupRanks Date and Sorting Tests fetchGroupRanks with period=month generates 1st of month without zero-padding
+✅ /home/runner/work/desky/desky/test/unit/group_rank_date_test.dart: GroupRepository fetchGroupRanks Date and Sorting Tests fetchGroupRanks always returns members sorted by studyMs descending
+✅ /home/runner/work/desky/desky/test/unit/settings_notifier_test.dart: SettingsNotifier Tests selectCountry saves country and updates state
+✅ /home/runner/work/desky/desky/test/unit/settings_notifier_test.dart: SettingsNotifier Tests selectLanguage saves language and updates state
+✅ /home/runner/work/desky/desky/test/unit/settings_notifier_test.dart: SettingsNotifier Tests setDayResetHour, toggle preferences and block users
+✅ /home/runner/work/desky/desky/test/unit/group_ranking_fix_test.dart: Group Ranking Fix Tests GroupMemberModel.fromJson parses HAR rank item format correctly
+✅ /home/runner/work/desky/desky/test/unit/group_ranking_fix_test.dart: Group Ranking Fix Tests GroupMemberModel.fromJson parses st in seconds correctly to studyMs
+✅ /home/runner/work/desky/desky/test/unit/group_ranking_fix_test.dart: Group Ranking Fix Tests GroupMemberModel.fromJson parses st: 0 correctly without error
+✅ /home/runner/work/desky/desky/test/unit/group_ranking_fix_test.dart: Group Ranking Fix Tests GroupMemberModel.fromJson parses pv and tm/totalMs correctly
+✅ /home/runner/work/desky/desky/test/unit/group_ranking_fix_test.dart: Group Ranking Fix Tests RankEntryModel.fromJson parses pv studicon correctly
+✅ /home/runner/work/desky/desky/test/unit/group_ranking_fix_test.dart: Group Ranking Fix Tests GroupRepository.fetchGroupRanks includes isCam=false and sorts descending by studyMs
+✅ /home/runner/work/desky/desky/test/unit/group_ranking_fix_test.dart: Group Ranking Fix Tests GroupRepository.fetchGroupRanks formats month and day and calls relative API endpoint
+✅ /home/runner/work/desky/desky/test/unit/language_fix_test.dart: Language and Translation Fix Tests AppTranslation normalizeCode formats language codes correctly
+✅ /home/runner/work/desky/desky/test/unit/language_fix_test.dart: Language and Translation Fix Tests AppTranslation tr replaces placeholder arguments
+✅ /home/runner/work/desky/desky/test/unit/language_fix_test.dart: Language and Translation Fix Tests SettingsRepository fetchCategoriesByCountry sends both lang and language query params
+✅ /home/runner/work/desky/desky/test/unit/language_fix_test.dart: Language and Translation Fix Tests SettingsRepository saveLanguage and getSavedLanguage persist code
+✅ /home/runner/work/desky/desky/test/unit/challenge_model_test.dart: ChallengeModel Tests fromJson parses full challenge JSON accurately
+✅ /home/runner/work/desky/desky/test/unit/challenge_model_test.dart: ChallengeModel Tests fromJson handles empty/null json with safe fallback defaults
+✅ /home/runner/work/desky/desky/test/unit/notification_bell_test.dart: Notification Bell and Model Tests NotificationModel.fromJson extracts full message text and title accurately
+✅ /home/runner/work/desky/desky/test/unit/notification_bell_test.dart: Notification Bell and Model Tests NotificationRepository fetchUnreadCount returns correct unread count
+✅ /home/runner/work/desky/desky/test/unit/notification_bell_test.dart: Notification Bell and Model Tests NotificationRepository deleteNotification sends delete request with id and persists locally
+✅ /home/runner/work/desky/desky/test/unit/notification_bell_test.dart: Notification Bell and Model Tests NotificationRepository fetchNotifications filters out deleted IDs
+✅ /home/runner/work/desky/desky/test/unit/notification_bell_test.dart: Notification Bell and Model Tests NotificationRepository deleteAllRead saves read IDs to persistent storage
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests signInWithGoogle authenticates user and updates state
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests signInWithGoogle handles cancellation without setting error
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests signInWithGoogle sets errorMessage on failure
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests cancelOAuth cancels active oauth services and resets loading
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests updateStudicon updates authenticated user studiconId
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests signInWithGoogle calls onSignUpRequired on SocialSignUpRequiredException
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests signInWithGoogle checks account existence and calls onSignUpRequired when account does not exist
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests signUpWithGoogle registers new user and updates auth state
+✅ /home/runner/work/desky/desky/test/unit/auth_notifier_social_test.dart: AuthNotifier Social Login Tests signUpWithGoogle handles failure and sets error message
+✅ /home/runner/work/desky/desky/test/unit/flashcard_models_test.dart: Flashcard Models Tests FlashcardDeckModel parses JSON accurately
+✅ /home/runner/work/desky/desky/test/unit/flashcard_models_test.dart: Flashcard Models Tests FlashcardModel parses front, back, hint and reviews accurately
+✅ /home/runner/work/desky/desky/test/unit/timer_tab_switch_persistence_test.dart: Timer Tab-Switch State Persistence Tests (Issue #3) TimerNotifier does not dispose or reset when authStateProvider updates (e.g. group refresh)
+✅ /home/runner/work/desky/desky/test/unit/manual_study_log_test.dart: Manual Study Log Tests logManualStudy sends correct JSON payload to /logs/v2/study/manual
+✅ /home/runner/work/desky/desky/test/unit/manual_study_log_test.dart: Manual Study Log Tests logManualStudy throws ApiException if stopAt is before or equal to startAt
+✅ /home/runner/work/desky/desky/test/unit/manual_study_log_test.dart: Manual Study Log Tests TimerNotifier.logManualStudy updates state todayTotalMs and subject studyMs
+✅ /home/runner/work/desky/desky/test/unit/package_helper_test.dart: PackageHelper & Store Update Suppression Tests PackageHelper respects isStoreOrMsixOverride
+✅ /home/runner/work/desky/desky/test/unit/package_helper_test.dart: PackageHelper & Store Update Suppression Tests UpdateNotifier suppresses update checks in Store / MSIX environment
+✅ /home/runner/work/desky/desky/test/unit/package_helper_test.dart: PackageHelper & Store Update Suppression Tests UpdateNotifier allows update checks in non-store environment
+✅ /home/runner/work/desky/desky/test/unit/package_helper_test.dart: PackageHelper & Store Update Suppression Tests PackageHelper returns boolean when running on host
+✅ /home/runner/work/desky/desky/test/unit/timer_tab_switch_persistence_test.dart: Timer Tab-Switch State Persistence Tests (Issue #3) Wall-clock elapsed time computes exact delta even if ticks are throttled
+✅ /home/runner/work/desky/desky/test/unit/timer_tab_switch_persistence_test.dart: Timer Tab-Switch State Persistence Tests (Issue #3) Changing dayResetHour updates notifier via listener without resetting running session
+✅ /home/runner/work/desky/desky/test/unit/timer_tab_switch_persistence_test.dart: Timer Tab-Switch State Persistence Tests (Issue #3) User logout properly triggers handleLogout on timer
+✅ /home/runner/work/desky/desky/test/unit/rank_entry_model_test.dart: RankEntryModel Tests fromJson parses rank entry accurately from API json format
+✅ /home/runner/work/desky/desky/test/unit/rank_entry_model_test.dart: RankEntryModel Tests fromJson handles fallback fields gracefully
+✅ /home/runner/work/desky/desky/test/unit/timer_tab_switch_persistence_test.dart: Timer Tab-Switch State Persistence Tests (Issue #3) Widget navigation between TimerScreen and another screen preserves running state
+✅ /home/runner/work/desky/desky/test/unit/flashcard_repository_test.dart: FlashcardRepository Tests fetchDecks parses list of decks from API
+✅ /home/runner/work/desky/desky/test/unit/flashcard_repository_test.dart: FlashcardRepository Tests createDeck sends POST to /card/book/create and returns FlashcardDeckModel
+✅ /home/runner/work/desky/desky/test/unit/flashcard_repository_test.dart: FlashcardRepository Tests deleteDeck sends POST to /card/book/delete and returns true
+✅ /home/runner/work/desky/desky/test/unit/flashcard_repository_test.dart: FlashcardRepository Tests fetchCards parses cards list from /card/list
+✅ /home/runner/work/desky/desky/test/unit/flashcard_repository_test.dart: FlashcardRepository Tests createCard sends POST to /card/create and returns FlashcardModel
+✅ /home/runner/work/desky/desky/test/unit/flashcard_repository_test.dart: FlashcardRepository Tests deleteCard sends POST to /card/delete and returns true
+✅ /home/runner/work/desky/desky/test/unit/flashcard_repository_test.dart: FlashcardRepository Tests submitReview sends POST to /card/review and returns true
+✅ /home/runner/work/desky/desky/test/unit/group_models_test.dart: Group Models Tests GroupModel parses API json accurately
+✅ /home/runner/work/desky/desky/test/unit/group_models_test.dart: Group Models Tests GroupMemberModel parses status and avatar accurate values
+✅ /home/runner/work/desky/desky/test/unit/group_models_test.dart: Group Models Tests ChatMessageModel parses message and reaction maps
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_test.dart: Focus Mode Desktop Tests FocusModeNotifier initial state has all modes disabled
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_test.dart: Focus Mode Desktop Tests toggleStrictFocus toggles strict focus mode state
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_test.dart: Focus Mode Desktop Tests toggleMiniPlayer enables mini player and strict focus
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_test.dart: Focus Mode Desktop Tests exitFocusModes restores default desktop state
+✅ /home/runner/work/desky/desky/test/unit/fonts_verification_test.dart: Font asset files can be loaded from bundle
+✅ /home/runner/work/desky/desky/test/unit/fonts_verification_test.dart: AppTheme darkTheme configures fontFamily and textTheme properly
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_notifier_test.dart: FocusModeNotifier Tests initial state has all focus modes disabled
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_notifier_test.dart: FocusModeNotifier Tests toggleStrictFocus toggles isStrictFocus
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_notifier_test.dart: FocusModeNotifier Tests toggleMiniPlayer activates mini player and strict focus
+✅ /home/runner/work/desky/desky/test/unit/focus_mode_notifier_test.dart: FocusModeNotifier Tests exitFocusModes resets all focus states to false
+✅ /home/runner/work/desky/desky/test/unit/group_member_sort_test.dart: GroupMemberModel & Partitioning Tests GroupMemberModel.fromJson parses fields correctly
+✅ /home/runner/work/desky/desky/test/unit/group_member_sort_test.dart: GroupMemberModel & Partitioning Tests avatarUrl resolves correct pose for studying, paused and idle states
+✅ /home/runner/work/desky/desky/test/unit/group_member_sort_test.dart: GroupMemberModel & Partitioning Tests Partitioning separates studying members from resting members correctly
+✅ /home/runner/work/desky/desky/test/unit/group_member_sort_test.dart: GroupMemberModel & Partitioning Tests Sorting handles studyMs ties alphabetically
+✅ /home/runner/work/desky/desky/test/unit/group_room_translations_test.dart: Group Room and Theme Translation Fallbacks Tests resolves room tabs and header in English and Portuguese
+✅ /home/runner/work/desky/desky/test/unit/group_room_translations_test.dart: Group Room and Theme Translation Fallbacks Tests resting does not resolve to Break (study_rest_label decoupled)
+✅ /home/runner/work/desky/desky/test/unit/group_room_translations_test.dart: Group Room and Theme Translation Fallbacks Tests goal does not resolve to Total time
+✅ /home/runner/work/desky/desky/test/unit/group_room_translations_test.dart: Group Room and Theme Translation Fallbacks Tests resolves chat action keys in English and Portuguese
+✅ /home/runner/work/desky/desky/test/unit/group_room_translations_test.dart: Group Room and Theme Translation Fallbacks Tests resolves theme keys across languages
+✅ /home/runner/work/desky/desky/test/unit/oauth_services_test.dart: GoogleOAuthService configuration & instantiation instantiates with custom or env client id and secret
+✅ /home/runner/work/desky/desky/test/unit/oauth_services_test.dart: GoogleOAuthService configuration & instantiation defaults to environment or fallback client id from EnvConfig
+✅ /home/runner/work/desky/desky/test/unit/study_date_helper_test.dart: StudyDateHelper Tests before 05:00 AM returns previous calendar day as study day
+✅ /home/runner/work/desky/desky/test/unit/study_date_helper_test.dart: StudyDateHelper Tests at 05:00 AM returns current calendar day as study day
+✅ /home/runner/work/desky/desky/test/unit/study_date_helper_test.dart: StudyDateHelper Tests after 05:00 AM returns current calendar day as study day
+✅ /home/runner/work/desky/desky/test/unit/study_date_helper_test.dart: StudyDateHelper Tests getStudyDateString returns yyyy-MM-dd formatted string
+✅ /home/runner/work/desky/desky/test/unit/study_date_helper_test.dart: StudyDateHelper Tests isSameStudyDay matches timestamps within same 05:00 boundary
+✅ /home/runner/work/desky/desky/test/unit/study_date_helper_test.dart: StudyDateHelper Tests getNextResetTime calculates upcoming 05:00 AM accurately
+✅ /home/runner/work/desky/desky/test/unit/study_date_helper_test.dart: StudyDateHelper Tests custom resetHour calculates study date and next reset time accordingly
+✅ /home/runner/work/desky/desky/test/unit/update_notifier_test.dart: UpdateNotifier Tests initializes and triggers update check
+✅ /home/runner/work/desky/desky/test/unit/update_notifier_test.dart: UpdateNotifier Tests detects when app is up to date
+✅ /home/runner/work/desky/desky/test/unit/update_notifier_test.dart: UpdateNotifier Tests default constructor uses AppConstants.appVersion and marks as up to date
+✅ /home/runner/work/desky/desky/test/unit/update_notifier_test.dart: UpdateNotifier Tests handles errors during update check
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests createSubject sends POST to subject create endpoint and returns SubjectModel
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests fetchSubjects parses splash response with subjects and study times
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests fetchSubjects handles null dl gracefully setting 0ms for all subjects
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests updateSubject sends POST and returns true
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests deleteSubject sends POST and returns true
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests archiveSubject sends POST and returns true
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests reorderSubjects sends orders list to backend
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests cacheSubjects and getCachedSubjects persist and retrieve subjects
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests saveSubjectsFromRawData extracts subjects from login response and caches them
+✅ /home/runner/work/desky/desky/test/unit/subject_repository_test.dart: SubjectRepository Tests fetchSubjectsData falls back to cached subjects when API returns empty list
+✅ /home/runner/work/desky/desky/test/unit/groups_sync_and_translations_test.dart: Groups Sync & Serialization Tests GroupModel parses YPT API keys correctly without mc conflict
+✅ /home/runner/work/desky/desky/test/unit/groups_sync_and_translations_test.dart: Groups Sync & Serialization Tests UserModel serializes and deserializes userGroups correctly for caching
+✅ /home/runner/work/desky/desky/test/unit/groups_sync_and_translations_test.dart: AppTranslation Fallbacks & 5 Items Validation Item 1: profile translation returns only Perfil/Profile and never Perfil do grupo
+✅ /home/runner/work/desky/desky/test/unit/groups_sync_and_translations_test.dart: AppTranslation Fallbacks & 5 Items Validation Item 2: Planner, Timetable and Days of Week translate across locales
+✅ /home/runner/work/desky/desky/test/unit/groups_sync_and_translations_test.dart: AppTranslation Fallbacks & 5 Items Validation Item 3: Groups, Explore and Members translate across locales
+✅ /home/runner/work/desky/desky/test/unit/groups_sync_and_translations_test.dart: AppTranslation Fallbacks & 5 Items Validation Item 4: Timer, Today Total and Pomodoro phases translate across locales
+✅ /home/runner/work/desky/desky/test/unit/app_title_bar_test.dart: AppTitleBar Tests AppTitleBar renders title and 3 control buttons
+✅ /home/runner/work/desky/desky/test/unit/app_title_bar_test.dart: AppTitleBar Tests AppTitleBar handles maximize and unmaximize events gracefully
+✅ /home/runner/work/desky/desky/test/unit/store_my_studicons_test.dart: Store and Meus Avatares Tests CdnResolver.studiconUrl resolves -1 as default orange doll
+::endgroup::
+::group::✅ /home/runner/work/desky/desky/test/unit/store_my_studicons_test.dart: Store and Meus Avatares Tests StoreRepository.fetchMyStudicons includes default orange avatar -1
+[API] *** Request ***
+[API] uri: https://pi.tgclab.com/studicon/my/list?lang=pt
+[API] method: GET
+[API] responseType: ResponseType.json
+[API] followRedirects: true
+[API] persistentConnection: true
+[API] connectTimeout: 0:00:15.000000
+[API] sendTimeout: null
+[API] receiveTimeout: 0:00:15.000000
+[API] transformTimeout: null
+[API] receiveDataWhenStatusError: true
+[API] extra: {}
+[API] data:
+[API] null
+[API] 
+[API] *** Response ***
+[API] uri: https://pi.tgclab.com/studicon/my/list?lang=pt
+[API] Response Text:
+[API] 
+[API] 
+[API] *** Request ***
+[API] uri: https://picf.tgclab.com/studicon/list/famous?p=1&lang=pt
+[API] method: GET
+[API] responseType: ResponseType.json
+[API] followRedirects: true
+[API] persistentConnection: true
+[API] connectTimeout: 0:00:15.000000
+[API] sendTimeout: null
+[API] receiveTimeout: 0:00:15.000000
+[API] transformTimeout: null
+[API] receiveDataWhenStatusError: true
+[API] extra: {}
+[API] data:
+[API] null
+[API] 
+[API] *** Response ***
+[API] uri: https://picf.tgclab.com/studicon/list/famous?p=1&lang=pt
+[API] Response Text:
+[API] 
+[API] 
+[API] *** Request ***
+[API] uri: https://picf.tgclab.com/studicon/list/new?p=1&lang=pt
+[API] method: GET
+[API] responseType: ResponseType.json
+[API] followRedirects: true
+[API] persistentConnection: true
+[API] connectTimeout: 0:00:15.000000
+[API] sendTimeout: null
+[API] receiveTimeout: 0:00:15.000000
+[API] transformTimeout: null
+[API] receiveDataWhenStatusError: true
+[API] extra: {}
+[API] data:
+[API] null
+[API] 
+[API] *** Response ***
+[API] uri: https://picf.tgclab.com/studicon/list/new?p=1&lang=pt
+[API] Response Text:
+[API] 
+[API] 
+::endgroup::
+::group::✅ Passing tests
+✅ /home/runner/work/desky/desky/test/unit/store_my_studicons_test.dart: Store and Meus Avatares Tests UserModel.fromJson ignores pv and defaults to -1 when sd/ssd/csd are -1
+✅ /home/runner/work/desky/desky/test/unit/store_my_studicons_test.dart: Store and Meus Avatares Tests UserModel.fromJson parses custom equipped studicon from sd/ssd/csd
+✅ /home/runner/work/desky/desky/test/unit/store_my_studicons_test.dart: Store and Meus Avatares Tests UserModel.fromJson parses csd correctly when ssd is -1 (real YPT paid avatar payload)
+✅ /home/runner/work/desky/desky/test/unit/pomodoro_timer_test.dart: Pomodoro Timer Mode Tests setTimerMode switches to Pomodoro and sets initial remaining time
+✅ /home/runner/work/desky/desky/test/unit/pomodoro_timer_test.dart: Pomodoro Timer Mode Tests configurePomodoro updates parameters and initial remaining time
+✅ /home/runner/work/desky/desky/test/unit/pomodoro_timer_test.dart: Pomodoro Timer Mode Tests skipPomodoroPhase advances from Focus to Short Break and increments cycle
+✅ /home/runner/work/desky/desky/test/unit/pomodoro_timer_test.dart: Pomodoro Timer Mode Tests Advancing at totalCycles transitions to Long Break and resets cycle
+✅ /home/runner/work/desky/desky/test/unit/pomodoro_timer_test.dart: Pomodoro Timer Mode Tests stopStudy resets Pomodoro timer to initial focus state
+✅ /home/runner/work/desky/desky/test/unit/dday_calculation_test.dart: D-Day Model & Calculation Tests future date generates D-X label correctly
+✅ /home/runner/work/desky/desky/test/unit/dday_calculation_test.dart: D-Day Model & Calculation Tests today target date generates D-DAY label
+✅ /home/runner/work/desky/desky/test/unit/dday_calculation_test.dart: D-Day Model & Calculation Tests past target date generates D+X label
+✅ /home/runner/work/desky/desky/test/unit/dday_calculation_test.dart: D-Day Model & Calculation Tests fromJson and toJson work symmetrically
+✅ /home/runner/work/desky/desky/test/unit/dday_calculation_test.dart: PlannerRepository D-Day CRUD Tests createDDay sends POST to /planner/dday and parses result
+✅ /home/runner/work/desky/desky/test/unit/dday_calculation_test.dart: PlannerRepository D-Day CRUD Tests deleteDDay sends DELETE to /planner/dday/:id
+✅ /home/runner/work/desky/desky/test/unit/group_admin_repository_test.dart: GroupAdminRepository Tests updateGroupName sends POST to /group/setting/name
+✅ /home/runner/work/desky/desky/test/unit/group_admin_repository_test.dart: GroupAdminRepository Tests updateGroupGoal sends POST to /group/setting/goal-time
+✅ /home/runner/work/desky/desky/test/unit/group_admin_repository_test.dart: GroupAdminRepository Tests updateGroupCapacity sends POST to /group/setting/max-member
+✅ /home/runner/work/desky/desky/test/unit/group_admin_repository_test.dart: GroupAdminRepository Tests updateGroupPassword sends POST to /group/setting/password
+✅ /home/runner/work/desky/desky/test/unit/group_admin_repository_test.dart: GroupAdminRepository Tests promoteGroup sends POST to /group/setting/promote
+✅ /home/runner/work/desky/desky/test/unit/oauth_pkce_test.dart: OAuthPkce Tests generateVerifier returns url-safe string with requested length
+✅ /home/runner/work/desky/desky/test/unit/oauth_pkce_test.dart: OAuthPkce Tests generateChallenge returns valid base64url sha256 hash without padding
+✅ /home/runner/work/desky/desky/test/unit/oauth_pkce_test.dart: OAuthPkce Tests generateState returns random string with specified length
+✅ /home/runner/work/desky/desky/test/unit/oauth_pkce_test.dart: OAuthPkce Tests decodeJwtPayload decodes valid JWT payload into Map
+✅ /home/runner/work/desky/desky/test/unit/oauth_pkce_test.dart: OAuthPkce Tests decodeJwtPayload throws FormatException on invalid structure
+✅ /home/runner/work/desky/desky/test/unit/oauth_pkce_test.dart: OAuthUserInfo & OAuthException Tests OAuthUserInfo stores and serializes correctly
+✅ /home/runner/work/desky/desky/test/unit/oauth_pkce_test.dart: OAuthUserInfo & OAuthException Tests OAuthException contains error message and cancelled state
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: CountryModel & CategoryModel Tests CountryModel.fromJson parses complete data correctly
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: CountryModel & CategoryModel Tests CountryModel.fromJson applies default values for missing fields
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: CountryModel & CategoryModel Tests CategoryModel.fromJson parses correctly
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: SettingsRepository Tests fetchCountries parses API response successfully
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: SettingsRepository Tests fetchCategoriesByCountry parses API response successfully
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: SettingsRepository Tests fetchCountries returns fallback countries on server error
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: SettingsRepository Tests saveCountry and getSavedCountry persist correctly
+✅ /home/runner/work/desky/desky/test/unit/settings_repository_test.dart: SettingsRepository Tests saveLanguage and getSavedLanguage persist correctly
+✅ /home/runner/work/desky/desky/test/unit/api_hardcoded_values_test.dart: Etapa 0 - Dynamic API Parameters & Hardcoded Values Fix GroupRepository.fetchMembers sends dynamic countryId and version
+✅ /home/runner/work/desky/desky/test/unit/api_hardcoded_values_test.dart: Etapa 0 - Dynamic API Parameters & Hardcoded Values Fix GroupRepository.fetchGroupRanks sends dynamic countryId and categoryId
+✅ /home/runner/work/desky/desky/test/unit/api_hardcoded_values_test.dart: Etapa 0 - Dynamic API Parameters & Hardcoded Values Fix RankRepository.fetchGlobalRanks sends dynamic countryId
+✅ /home/runner/work/desky/desky/test/unit/api_hardcoded_values_test.dart: Etapa 0 - Dynamic API Parameters & Hardcoded Values Fix TimerRepository.logManualStudy sends dynamic language and deviceModel
+✅ /home/runner/work/desky/desky/test/unit/api_hardcoded_values_test.dart: Etapa 0 - Dynamic API Parameters & Hardcoded Values Fix SubjectRepository.fetchSubjectsData sends dynamic language and timezone
+✅ /home/runner/work/desky/desky/test/unit/api_hardcoded_values_test.dart: Etapa 0 - Dynamic API Parameters & Hardcoded Values Fix FlashcardRepository.fetchDecks sends dynamic language
+✅ /home/runner/work/desky/desky/test/unit/api_hardcoded_values_test.dart: Etapa 0 - Dynamic API Parameters & Hardcoded Values Fix AuthRepository.signInWithEmail sends dynamic language
+✅ /home/runner/work/desky/desky/test/unit/studicon_poses_test.dart: Studicon and CdnResolver Tests studiconUrl generates valid CDN URLs for all poses
+✅ /home/runner/work/desky/desky/test/unit/studicon_poses_test.dart: Studicon and CdnResolver Tests resolvePose follows exact 10 time thresholds from official YPT APK
+✅ /home/runner/work/desky/desky/test/unit/studicon_poses_test.dart: Studicon and CdnResolver Tests defaultStudiconAsset maps poses to official native APK assets
+✅ /home/runner/work/desky/desky/test/unit/studicon_poses_test.dart: Studicon and CdnResolver Tests userAvatarUrl handles custom avatar and dynamically selects poses
+✅ /home/runner/work/desky/desky/test/unit/studicon_poses_test.dart: Studicon and CdnResolver Tests camStudyUrl and chatPhotoUrl format paths correctly
+✅ /home/runner/work/desky/desky/test/unit/signup_flow_test.dart: Sign-Up & Email Verification Tests sendSignUpVerificationCode succeeds on valid email
+✅ /home/runner/work/desky/desky/test/unit/signup_flow_test.dart: Sign-Up & Email Verification Tests sendSignUpVerificationCode throws ApiException when email already in use
+✅ /home/runner/work/desky/desky/test/unit/signup_flow_test.dart: Sign-Up & Email Verification Tests verifySignUpCode validates 6-digit code
+✅ /home/runner/work/desky/desky/test/unit/signup_flow_test.dart: Sign-Up & Email Verification Tests signUp registers user and stores JWT token
+✅ /home/runner/work/desky/desky/test/unit/signup_flow_test.dart: Sign-Up & Email Verification Tests AuthNotifier.signUp transitions state to authenticated user
+✅ /home/runner/work/desky/desky/test/unit/discord_rpc_service_test.dart: DiscordRpcService - Formatting and Helpers formatStudyDuration formats milliseconds to hours and minutes correctly
+✅ /home/runner/work/desky/desky/test/unit/discord_rpc_service_test.dart: DiscordRpcService - Payload Construction buildPayload returns correct Studying state in Portuguese
+✅ /home/runner/work/desky/desky/test/unit/discord_rpc_service_test.dart: DiscordRpcService - Payload Construction buildPayload localizes Studying state for other languages
+✅ /home/runner/work/desky/desky/test/unit/discord_rpc_service_test.dart: DiscordRpcService - Payload Construction buildPayload alters large image according to elapsed time poses
+✅ /home/runner/work/desky/desky/test/unit/discord_rpc_service_test.dart: DiscordRpcService - Payload Construction buildPayload returns correct Paused and Idle states
+✅ /home/runner/work/desky/desky/test/unit/discord_rpc_service_test.dart: Settings - Discord RPC Preferences SettingsRepository defaults to true for discordRpcEnabled and persists changes
+✅ /home/runner/work/desky/desky/test/unit/discord_rpc_service_test.dart: Settings - Discord RPC Preferences SettingsNotifier toggles discordRpcEnabled and updates state
+✅ /home/runner/work/desky/desky/test/unit/cdn_studicon_test.dart: CDN Studicon Pose Matrix Tests All poses in StudiconPose generate valid CDN URLs
+✅ /home/runner/work/desky/desky/test/unit/cdn_studicon_test.dart: CDN Studicon Pose Matrix Tests Negative and zero IDs correctly fallback to -1 in CDN
+✅ /home/runner/work/desky/desky/test/unit/cdn_studicon_test.dart: CDN Studicon Pose Matrix Tests userAvatarUrl resolves fire1 when daily goal is reached
+✅ /home/runner/work/desky/desky/test/unit/cdn_studicon_test.dart: StoreRepository Real Sync Tests fetchCatalog merges API responses from famous and new without mock injection
+✅ /home/runner/work/desky/desky/test/unit/cdn_studicon_test.dart: StoreRepository Real Sync Tests equipStudicon calls /user/studicon with correct sd payload
+✅ /home/runner/work/desky/desky/test/unit/subject_model_test.dart: SubjectModel Tests fromJson and toJson parse subject attributes correctly
+✅ /home/runner/work/desky/desky/test/unit/subject_model_test.dart: SubjectModel Tests ColorUtils converts ARGB integer to Color correctly
+✅ /home/runner/work/desky/desky/test/unit/subject_model_test.dart: SubjectModel Tests copyWith updates specific properties without modifying others
+✅ /home/runner/work/desky/desky/test/unit/app_translation_test.dart: AppTranslation Tests tr returns exact match or alias or fallback
+✅ /home/runner/work/desky/desky/test/unit/app_translation_test.dart: AppTranslation Tests supports language codes pt, en, es, ko, zh, ja
+✅ /home/runner/work/desky/desky/test/unit/app_translation_test.dart: AppTranslation Tests resolves ranks and profile UI keys in English and Portuguese
+✅ /home/runner/work/desky/desky/test/unit/app_translation_test.dart: AppTranslation Tests resolves no_status_msg via alias when loaded from translation map
+✅ /home/runner/work/desky/desky/test/unit/timetable_block_test.dart: TimetableBlock Model Tests fromJson and toJson parse attributes accurately
+✅ /home/runner/work/desky/desky/test/unit/timetable_block_test.dart: TimetableRepository Tests fetchTimetable parses API response successfully
+✅ /home/runner/work/desky/desky/test/unit/timetable_block_test.dart: TimetableRepository Tests createBlock sends POST and parses returned TimetableBlock
+✅ /home/runner/work/desky/desky/test/unit/timetable_block_test.dart: TimetableRepository Tests deleteBlock sends DELETE request
+✅ /home/runner/work/desky/desky/test/unit/flashcard_test.dart: Flashcard Feature Tests FlashcardDeckModel and FlashcardModel serialization
+✅ /home/runner/work/desky/desky/test/unit/flashcard_test.dart: Flashcard Feature Tests FlashcardRepository operations (fetch, create, delete, review)
+✅ /home/runner/work/desky/desky/test/unit/flashcard_test.dart: Flashcard Feature Tests FlashcardNotifier manages study flow, flip, and completion
+✅ /home/runner/work/desky/desky/test/unit/update_model_test.dart: UpdateModel Tests AppRelease.fromJson parses fields accurately
+✅ /home/runner/work/desky/desky/test/unit/update_model_test.dart: UpdateModel Tests isNewerThan compares SemVer correctly
+✅ /home/runner/work/desky/desky/test/unit/update_model_test.dart: UpdateModel Tests getAssetForPlatform retrieves appropriate installer per OS
+✅ /home/runner/work/desky/desky/test/core/webcam_service_test.dart: WebcamService Tests startPeriodicCapture sets isCapturing true and triggers upload
+✅ /home/runner/work/desky/desky/test/core/webcam_service_test.dart: WebcamService Tests stopCapture cancels timer and sets isCapturing false
+✅ /home/runner/work/desky/desky/test/core/services/discord_rpc_service_test.dart: EnvConfig Discord Client ID Validation defaultDiscordClientId is empty by default when not configured
+✅ /home/runner/work/desky/desky/test/core/services/discord_rpc_service_test.dart: EnvConfig Discord Client ID Validation discordClientId returns empty when no env or dart-define is provided
+✅ /home/runner/work/desky/desky/test/core/services/discord_rpc_service_test.dart: DiscordRpcService Helper Methods formatStudyDuration formats milliseconds correctly
+✅ /home/runner/work/desky/desky/test/core/services/discord_rpc_service_test.dart: DiscordRpcService Helper Methods buildPayload creates active studying payload with subject and startTime
+✅ /home/runner/work/desky/desky/test/core/services/discord_rpc_service_test.dart: DiscordRpcService Helper Methods buildPayload creates paused payload with state Em pausa and without startTime
+✅ /home/runner/work/desky/desky/test/core/services/discord_rpc_service_test.dart: DiscordRpcService Helper Methods buildPayload returns null when timer is not studying (idle)
+✅ /home/runner/work/desky/desky/test/core/services/discord_rpc_service_test.dart: DiscordRpcService IPC Connection (Live when Discord open) connect and updatePresence executes successfully without premature timeout
+✅ /home/runner/work/desky/desky/test/widget_test.dart: DeskyApp renders LoginScreen correctly
+✅ /home/runner/work/desky/desky/test/core/cdn_resolver_test.dart: CdnResolver Tests studiconUrl generates deterministic URLs for poses
+✅ /home/runner/work/desky/desky/test/core/cdn_resolver_test.dart: CdnResolver Tests studiconUrl fallback for invalid or negative id
+✅ /home/runner/work/desky/desky/test/core/cdn_resolver_test.dart: CdnResolver Tests userAvatarUrl returns custom photo URL if custom avatar is true
+✅ /home/runner/work/desky/desky/test/core/cdn_resolver_test.dart: CdnResolver Tests userAvatarUrl resolves pose based on studying state and duration
+✅ /home/runner/work/desky/desky/test/core/cdn_resolver_test.dart: CdnResolver Tests camStudyUrl generates camera check URL
+✅ /home/runner/work/desky/desky/test/core/cdn_resolver_test.dart: CdnResolver Tests chatPhotoUrl resolves relative chat photo path
+✅ /home/runner/work/desky/desky/test/core/cdn_resolver_test.dart: CdnResolver Tests audioUrl resolves audio CDN path
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Focus Mode keys across languages
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Manual Study Log keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Pomodoro keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Planner & Todo keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Rankings, Heatmap & Calendar keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Flashcards keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Avatars and Live Study keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Login subtitle and Google keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Timelapse keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Profile keys
+✅ /home/runner/work/desky/desky/test/core/app_translation_test.dart: AppTranslation Comprehensive Tests Translates Leitor de PDF, Decks, Challenges, Terms, Privacy and FAQ modules
+✅ /home/runner/work/desky/desky/test/shared/widgets/studicon_avatar_test.dart: StudiconAvatar Widget Tests renders local asset directly when studiconId is <= 0 or -1
+✅ /home/runner/work/desky/desky/test/shared/widgets/studicon_avatar_test.dart: StudiconAvatar Widget Tests renders ic_user_off_s when studiconId is <= 0 and isStudying is false
+✅ /home/runner/work/desky/desky/test/shared/widgets/studicon_avatar_test.dart: StudiconAvatar Widget Tests renders ic_user_sweat_s for sweat poses on default studicon
+✅ /home/runner/work/desky/desky/test/shared/widgets/studicon_avatar_test.dart: StudiconAvatar Widget Tests renders ic_user_fire_s for fire and explosion poses on default studicon
+✅ /home/runner/work/desky/desky/test/shared/widgets/studicon_avatar_test.dart: StudiconAvatar Widget Tests renders ic_user_smoke_s for paused/smoke poses on default studicon
+✅ /home/runner/work/desky/desky/test/data/group_studicon_test.dart: GroupRepository Studicon Tests updateGroupMemberStudicon sends correct payload to /group/join/v2
+✅ /home/runner/work/desky/desky/test/shared/widgets/sidebar_nav_test.dart: SidebarNav does not render Desky branding or static ativas text
+✅ /home/runner/work/desky/desky/test/shared/widgets/sidebar_nav_test.dart: SidebarNav turns active/studying when timer is running
+✅ /home/runner/work/desky/desky/test/data/timetable_model_test.dart: TimetableBlock Tests fromJson parses timetable JSON correctly
+✅ /home/runner/work/desky/desky/test/data/timetable_model_test.dart: TimetableBlock Tests toJson produces correct map
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithEmail authenticates and stores JWT token
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithEmail handles error code 112 (wrong password)
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithEmail handles error code 113 (email not found)
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithEmail handles error code 114 (account suspended)
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests logout deletes stored JWT token
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithSocial sends password:null and returns user on success
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithSocial throws SocialSignUpRequiredException on error c:111 (social id not found)
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signUpWithSocial completes registration and returns user model
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signUpWithSocial assigns and caches nickname when server returns empty name
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithJwt saves token and returns user model on valid splashLogin
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signInWithJwt throws ApiException on empty or invalid token
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests sendSignUpVerificationCode calls /user/v2/send-signup-code and handles success
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests sendSignUpVerificationCode throws ApiException on error code 106 (already registered)
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests verifySignUpCode calls /user/v2/verify-code and verifies valid code
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests verifySignUpCode throws on invalid code
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests signUp calls /user/v2/create-email-account, updates nickname and stores token
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests deleteAccount calls GET /user/unregister and deletes token on success
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests tryRestoreSession preserves locally saved studicon when server returns -1
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests tryRestoreSession updates studicon when server returns positive sd > 0
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests checkUsernameExists returns true when server responds with s: true
+✅ /home/runner/work/desky/desky/test/data/auth_repository_test.dart: AuthRepository Tests checkUsernameExists returns false when server responds with s: false
+✅ /home/runner/work/desky/desky/test/data/subject_repository_test.dart: SubjectRepository createSubject parses response correctly with sb key (matching HAR API)
+✅ /home/runner/work/desky/desky/test/data/subject_repository_test.dart: SubjectRepository updateSubject sends correct payload and returns true on success
+✅ /home/runner/work/desky/desky/test/data/subject_repository_test.dart: SubjectRepository archiveSubject sends correct payload and returns true on success
+✅ /home/runner/work/desky/desky/test/data/subject_repository_test.dart: SubjectRepository deleteSubject sends correct payload and returns true on success
+✅ /home/runner/work/desky/desky/test/data/group_admin_repository_test.dart: GroupAdminRepository Tests disbandGroup succeeds with DELETE request
+✅ /home/runner/work/desky/desky/test/data/group_admin_repository_test.dart: GroupAdminRepository Tests disbandGroup falls back to POST request when DELETE fails
+✅ /home/runner/work/desky/desky/test/data/group_admin_repository_test.dart: GroupAdminRepository Tests disbandGroup returns false when both DELETE and POST fail
+✅ /home/runner/work/desky/desky/test/data/group_admin_repository_test.dart: GroupAdminRepository Tests updateGroupName succeeds on valid response
+✅ /home/runner/work/desky/desky/test/data/group_admin_repository_test.dart: GroupAdminRepository Tests banMember and unbanMember execute correctly
+✅ /home/runner/work/desky/desky/test/data/user_model_test.dart: UserModel Tests parses ownedStudiconIds from int array in scs
+✅ /home/runner/work/desky/desky/test/data/user_model_test.dart: UserModel Tests parses ownedStudiconIds from map list with various keys (id, sc, sd, studiconId)
+✅ /home/runner/work/desky/desky/test/data/user_model_test.dart: UserModel Tests parses ownedStudiconIds from my or ownedStudiconIds fallback
+✅ /home/runner/work/desky/desky/test/data/user_model_test.dart: UserModel Tests copyWith updates ownedStudiconIds correctly
+✅ /home/runner/work/desky/desky/test/data/user_model_test.dart: UserModel Tests toJson and fromJson maintain data integrity
+✅ /home/runner/work/desky/desky/test/features/flashcards/flashcards_screen_test.dart: FlashcardsScreen renders deck list properly
+✅ /home/runner/work/desky/desky/test/features/store/studicon_avatar_widget_test.dart: StudiconAvatar builds correctly with given size and pose
+✅ /home/runner/work/desky/desky/test/features/store/store_repository_test.dart: StudiconItemModel Tests fromJson parses API studicon response correctly
+✅ /home/runner/work/desky/desky/test/features/planner/timetable_repository_test.dart: TimetableRepository Tests fetchTimetable parses blocks list correctly
+✅ /home/runner/work/desky/desky/test/features/planner/timetable_repository_test.dart: TimetableRepository Tests createBlock creates and parses block
+✅ /home/runner/work/desky/desky/test/features/planner/timetable_repository_test.dart: TimetableRepository Tests deleteBlock returns true on success
+✅ /home/runner/work/desky/desky/test/features/planner/planner_screen_test.dart: PlannerScreen renders D-Days and To-Do list items
+✅ /home/runner/work/desky/desky/test/features/planner/planner_repository_test.dart: Planner Models Tests DDayModel calculates daysRemaining and label correctly
+✅ /home/runner/work/desky/desky/test/features/planner/planner_repository_test.dart: Planner Models Tests TodoItemModel parses study-plan HAR JSON response correctly
+✅ /home/runner/work/desky/desky/test/features/planner/planner_repository_test.dart: Planner Models Tests TodoItemModel parses recurrence_rule and isRecurring correctly
+✅ /home/runner/work/desky/desky/test/features/groups/group_repository_test.dart: GroupRepository Tests fetchMembers parses active studying group members correctly
+✅ /home/runner/work/desky/desky/test/features/groups/group_repository_test.dart: GroupRepository Tests shakeMember triggers shake push notification
+✅ /home/runner/work/desky/desky/test/features/planner/timetable_screen_test.dart: TimetableScreen renders day columns and timetable blocks
+✅ /home/runner/work/desky/desky/test/features/groups/chat_media_repository_test.dart: ChatMediaRepository Tests StickerSet.fromJson parses sticker sets correctly
+✅ /home/runner/work/desky/desky/test/features/groups/chat_media_repository_test.dart: ChatMediaRepository Tests fetchStickerSets parses API response correctly
+✅ /home/runner/work/desky/desky/test/features/groups/group_detail_screen_test.dart: GroupDetailScreen renders member list and chat tab
+✅ /home/runner/work/desky/desky/test/features/groups/group_detail_screen_test.dart: GroupMemberModel parses ranking time in seconds and milliseconds correctly
+✅ /home/runner/work/desky/desky/test/features/groups/group_admin_repository_test.dart: GroupAdminRepository Tests updateGroupName returns true on success
+✅ /home/runner/work/desky/desky/test/features/groups/group_admin_repository_test.dart: GroupAdminRepository Tests warnMember returns true on success
+✅ /home/runner/work/desky/desky/test/features/groups/group_admin_repository_test.dart: GroupAdminRepository Tests kickMember returns true on success
+✅ /home/runner/work/desky/desky/test/features/groups/group_admin_repository_test.dart: GroupAdminRepository Tests banMember returns true on success
+✅ /home/runner/work/desky/desky/test/features/groups/group_admin_repository_test.dart: GroupAdminRepository Tests fetchBannedList returns users list
+✅ /home/runner/work/desky/desky/test/features/groups/group_admin_repository_test.dart: GroupAdminRepository Tests approveRequest returns true on success
+✅ /home/runner/work/desky/desky/test/features/groups/group_admin_repository_test.dart: GroupAdminRepository Tests disbandGroup returns true on success
+✅ /home/runner/work/desky/desky/test/features/groups/cam_upload_repository_test.dart: CamUploadRepository Tests uploadCamPhoto returns formatted CDN URL on success
+✅ /home/runner/work/desky/desky/test/features/timelapse/timelapse_test.dart: Timelapse Model & Notifier Tests TimelapseSession toJson and fromJson roundtrip
+✅ /home/runner/work/desky/desky/test/features/groups/groups_screen_test.dart: GroupsScreen renders user groups and explore list
+✅ /home/runner/work/desky/desky/test/features/timelapse/timelapse_test.dart: Timelapse Model & Notifier Tests TimelapseNotifier starts and stops recording properly
+✅ /home/runner/work/desky/desky/test/features/timelapse/timelapse_test.dart: Timelapse UI Tests TimelapseGalleryScreen renders empty state when no recordings exist
+✅ /home/runner/work/desky/desky/test/features/timelapse/timelapse_test.dart: Timelapse UI Tests TimelapsePlayerDialog displays controls and playback speed buttons
+✅ /home/runner/work/desky/desky/test/features/updates/update_widgets_test.dart: Update Widgets Tests UpdateButton renders badge with text and icon when update is available
+✅ /home/runner/work/desky/desky/test/features/updates/update_widgets_test.dart: Update Widgets Tests UpdateDialog renders changelog with Markdown formatting
+✅ /home/runner/work/desky/desky/test/features/updates/update_widgets_test.dart: Update Widgets Tests UpdateDialog renders fallback text when release body is empty
+✅ /home/runner/work/desky/desky/test/features/updates/update_widgets_test.dart: Update Widgets Tests UpdateButton accepts custom height and padding
+✅ /home/runner/work/desky/desky/test/features/auth/login_screen_test.dart: LoginScreen displays Account Not Found confirmation dialog correctly
+✅ /home/runner/work/desky/desky/test/features/notifications/notifications_notifier_test.dart: NotificationsNotifier Tests loadNotifications sets notifications and unreadCount correctly
+✅ /home/runner/work/desky/desky/test/features/notifications/notifications_notifier_test.dart: NotificationsNotifier Tests markAsRead updates isRead and unreadCount
+✅ /home/runner/work/desky/desky/test/features/notifications/notifications_notifier_test.dart: NotificationsNotifier Tests markAllAsRead marks all notifications as read and resets unreadCount to 0
+✅ /home/runner/work/desky/desky/test/features/notifications/notifications_notifier_test.dart: NotificationsNotifier Tests deleteNotification removes notification and recalculates unreadCount
+✅ /home/runner/work/desky/desky/test/features/notifications/notifications_notifier_test.dart: NotificationsNotifier Tests deleteAllRead removes only read notifications
+✅ /home/runner/work/desky/desky/test/features/auth/login_screen_test.dart: Account Not Found dialog can be dismissed with Cancelar
+✅ /home/runner/work/desky/desky/test/features/notifications/notification_repository_test.dart: NotificationRepository Tests NotificationModel.fromJson parses JSON correctly
+✅ /home/runner/work/desky/desky/test/features/notifications/notification_repository_test.dart: NotificationRepository Tests fetchNotifications returns parsed list
+✅ /home/runner/work/desky/desky/test/features/notifications/notification_repository_test.dart: NotificationRepository Tests markAsRead returns true on success
+✅ /home/runner/work/desky/desky/test/features/notifications/notifications_screen_test.dart: NotificationsScreen renders notifications list and cards
+✅ /home/runner/work/desky/desky/test/features/notifications/notifications_screen_test.dart: NotificationsScreen renders empty state when no notifications
+✅ /home/runner/work/desky/desky/test/features/profile/delete_account_dialog_test.dart: DeleteAccountDialog requires typing "delete" to enable confirmation
+✅ /home/runner/work/desky/desky/test/features/profile/profile_screen_test.dart: ProfileScreen renders user profile information and settings options
+✅ /home/runner/work/desky/desky/test/features/store_screen_test.dart: StoreScreen renders default orange studicon asset correctly
+✅ /home/runner/work/desky/desky/test/features/ranks/heatmap_grid_test.dart: Stats Widgets Tests HeatmapGrid renders without crashing
+✅ /home/runner/work/desky/desky/test/features/ranks/rank_repository_test.dart: RankEntryModel Tests fromJson parses rank entry response from HAR schema correctly
+✅ /home/runner/work/desky/desky/test/features/ranks/heatmap_grid_test.dart: Stats Widgets Tests StudyCalendar renders without crashing
+✅ /home/runner/work/desky/desky/test/features/ranks/heatmap_and_calendar_test.dart: HeatmapGrid renders hourly logs cleanly
+✅ /home/runner/work/desky/desky/test/features/ranks/heatmap_and_calendar_test.dart: StudyCalendar renders monthly calendar days and study times
+✅ /home/runner/work/desky/desky/test/features/ranks/ranks_screen_test.dart: RanksScreen renders top podium and ranks list
+✅ /home/runner/work/desky/desky/test/features/ranks/ranks_screen_test.dart: RanksScreen scope toggle switches between category and region
+✅ /home/runner/work/desky/desky/test/features/smartbook/smartbook_test.dart: SmartBook Tests SmartBookScreen renders empty view when no file is loaded
+✅ /home/runner/work/desky/desky/test/features/smartbook/smartbook_test.dart: SmartBook Tests SmartBookWindowService open pushes fullscreen route
+✅ /home/runner/work/desky/desky/test/features/settings/account_and_study_settings_test.dart: ChangePasswordDialog renders input fields and validates length
+✅ /home/runner/work/desky/desky/test/features/settings/account_and_study_settings_test.dart: StudyPreferencesDialog toggles options and selects reset hour
+✅ /home/runner/work/desky/desky/test/features/settings/account_and_study_settings_test.dart: BlockedUsersDialog allows adding and unblocking users
+✅ /home/runner/work/desky/desky/test/features/settings/account_and_study_settings_test.dart: ProfileScreen shows Account Security and Study Preferences
+✅ /home/runner/work/desky/desky/test/features/settings/legal_dialogs_test.dart: PrivacyPolicyDialog renders sections and dismisses on close
+✅ /home/runner/work/desky/desky/test/features/settings/legal_dialogs_test.dart: TermsOfServiceDialog renders terms content cleanly
+✅ /home/runner/work/desky/desky/test/features/settings/legal_dialogs_test.dart: FaqHelpDialog renders FAQ accordion tiles
+✅ /home/runner/work/desky/desky/test/features/settings/legal_dialogs_test.dart: OpenSourceLicensesDialog lists packages and licenses
+✅ /home/runner/work/desky/desky/test/features/challenges/challenge_repository_test.dart: ChallengeRepository Tests ChallengeModel.fromJson parses JSON correctly
+✅ /home/runner/work/desky/desky/test/features/challenges/challenge_repository_test.dart: ChallengeRepository Tests fetchAvailableChallenges parses response list correctly
+✅ /home/runner/work/desky/desky/test/features/settings/legal_dialogs_test.dart: ProfileScreen shows Legal & Support section and has tiles
+✅ /home/runner/work/desky/desky/test/features/challenges/challenge_repository_test.dart: ChallengeRepository Tests joinChallenge returns true on success
+✅ /home/runner/work/desky/desky/test/features/timer/timer_break_and_reset_test.dart: Timer Break Tracking & Rest Isolation Tests pauseStudy syncs active focus session immediately and transitions to isPaused
+✅ /home/runner/work/desky/desky/test/features/timer/timer_break_and_reset_test.dart: Timer Break Tracking & Rest Isolation Tests resuming after pause records accumulated rest time via recordRest
+✅ /home/runner/work/desky/desky/test/features/timer/timer_break_and_reset_test.dart: Timer Break Tracking & Rest Isolation Tests stopStudy while paused records rest and does not inflate subject hours with rest time
+✅ /home/runner/work/desky/desky/test/features/timer/timer_break_and_reset_test.dart: Timer Break Tracking & Rest Isolation Tests stopAt strictly matches startAt + studyMs to eliminate server interval inflation
+✅ /home/runner/work/desky/desky/test/features/challenges/challenges_screen_test.dart: ChallengesScreen renders available challenges and my challenges tab
+✅ /home/runner/work/desky/desky/test/features/timer/subject_management_dialog_test.dart: SubjectManagementDialog lists subjects and selects one
+✅ /home/runner/work/desky/desky/test/features/timer/timer_app_exit_test.dart: TimerNotifier - App Exit Scenarios stopStudy cleanly syncs running focus session and resets state
+✅ /home/runner/work/desky/desky/test/features/timer/timer_app_exit_test.dart: TimerNotifier - App Exit Scenarios stopStudy while paused records rest time and resets state
+✅ /home/runner/work/desky/desky/test/features/timer/timer_screen_test.dart: TimerScreen renders study and rest headers and clean timer display
+✅ /home/runner/work/desky/desky/test/features/timer/timer_screen_test.dart: TimerScreen start button is disabled when no subject is selected
+✅ /home/runner/work/desky/desky/test/features/timer/timer_notifier_test.dart: TimerNotifier Tests loadSubjects populates subjects list and sets first subject
+✅ /home/runner/work/desky/desky/test/features/timer/timer_notifier_test.dart: TimerNotifier Tests selectSubject updates currentSubject when not running
+✅ /home/runner/work/desky/desky/test/features/timer/timer_notifier_test.dart: TimerNotifier Tests startStudy sets isRunning true and ticks timer
+✅ /home/runner/work/desky/desky/test/features/timer/timer_app_exit_test.dart: TimerNotifier - App Exit Scenarios stopStudy does not block indefinitely if network hangs and falls back to offline queue
+✅ /home/runner/work/desky/desky/test/features/timer/focus_mode_widget_test.dart: AppShell shows sidebar when not in focus mode
+✅ /home/runner/work/desky/desky/test/features/timer/focus_mode_widget_test.dart: AppShell hides sidebar and shows exit button in strict focus mode
+::endgroup::
+
+🎉 416 tests passed.
