@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/localization/app_translation.dart';
-import '../../core/utils/study_date_helper.dart';
+import '../../core/utils/study_day_helper.dart';
 import '../../data/models/dday_model.dart';
 import '../../data/models/todo_item_model.dart';
 import '../../data/repositories/planner_repository.dart';
@@ -34,10 +34,20 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
   @override
   void initState() {
     super.initState();
-    final dayResetHour = ref.read(settingsNotifierProvider).dayResetHour;
-    _selectedDate = StudyDateHelper.getStudyDate(null, dayResetHour);
+    _selectedDate = DateTime.parse(
+      StudyDayHelper.todayYmd(gmtOffset: _gmtOffset, resetHour: _resetHour),
+    );
     _loadData();
   }
+
+  /// YPT closes the study day using the selected country's fixed GMT offset and
+  /// start hour, which is also what the mobile app shows in the planner.
+  Duration get _gmtOffset =>
+      ref.read(settingsNotifierProvider).selectedCountry.gmtOffsetDuration ??
+      DateTime.now().timeZoneOffset;
+
+  int get _resetHour =>
+      ref.read(settingsNotifierProvider).selectedCountry.startHour;
 
   @override
   void dispose() {
@@ -49,12 +59,13 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
     final repo = ref.read(plannerRepositoryProvider);
-    final dayResetHour = ref.read(settingsNotifierProvider).dayResetHour;
-    final dateStr = StudyDateHelper.getStudyDateString(_selectedDate, dayResetHour);
+    final gmtOffset = _gmtOffset;
+    final resetHour = _resetHour;
+    final dateStr = StudyDayHelper.formatYmd(_selectedDate);
 
     final results = await Future.wait([
       repo.fetchDDays(),
-      repo.fetchTodos(dateStr),
+      repo.fetchTodos(dateStr, gmtOffset: gmtOffset, resetHour: resetHour),
     ]);
 
     if (mounted) {
@@ -90,7 +101,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     });
 
     final repo = ref.read(plannerRepositoryProvider);
-    await repo.toggleTodo(todo);
+    await repo.toggleTodo(todo, gmtOffset: _gmtOffset, resetHour: _resetHour);
   }
 
   void _showAddTodoDialog() {
@@ -229,6 +240,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 await repo.createTodo(
                   title: text,
                   dateYmd: dateStr,
+                  gmtOffset: _gmtOffset,
+                  resetHour: _resetHour,
                   recurrenceRule: rr,
                 );
 
@@ -349,7 +362,13 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                     _todos = _todos.map((t) => t.id == todo.id ? t.copyWith(title: text) : t).toList();
                   });
                   final repo = ref.read(plannerRepositoryProvider);
-                  await repo.editTodo(todo, text, applyToAll: applyToAllSeries);
+                  await repo.editTodo(
+                    todo,
+                    text,
+                    gmtOffset: _gmtOffset,
+                    resetHour: _resetHour,
+                    applyToAll: applyToAllSeries,
+                  );
                   if (mounted) {
                     _loadData();
                   }

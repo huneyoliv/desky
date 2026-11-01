@@ -18,6 +18,8 @@ class SettingsRepository {
   static const String keyCountryCode = 'selected_country_code';
   static const String keyCountryName = 'selected_country_name';
   static const String keyTimezone = 'selected_timezone';
+  static const String keyGmtOffset = 'selected_gmt_offset';
+  static const String keyStartTime = 'selected_start_time';
   static const String keyLanguage = 'selected_language';
   static const String keyDayResetHour = 'day_reset_hour';
   static const String keyShowRestTime = 'show_rest_time';
@@ -33,6 +35,8 @@ class SettingsRepository {
     code: 'BR',
     timezone: 'America/Sao_Paulo',
     continent: 'South America',
+    gmtOffset: -3,
+    startTime: '5 AM',
   );
 
   static const List<CountryModel> defaultFallbackCountries = [
@@ -179,6 +183,8 @@ class SettingsRepository {
         code: prefs.getString(keyCountryCode) ?? defaultCountry.code,
         timezone: prefs.getString(keyTimezone) ?? defaultCountry.timezone,
         continent: '',
+        gmtOffset: prefs.getDouble(keyGmtOffset) ?? defaultCountry.gmtOffset,
+        startTime: prefs.getString(keyStartTime) ?? defaultCountry.startTime,
       );
     } catch (_) {
       return defaultCountry;
@@ -192,6 +198,12 @@ class SettingsRepository {
       await prefs.setString(keyCountryName, country.name);
       await prefs.setString(keyCountryCode, country.code);
       await prefs.setString(keyTimezone, country.timezone);
+      if (country.gmtOffset != null) {
+        await prefs.setDouble(keyGmtOffset, country.gmtOffset!);
+      }
+      if (country.startTime != null) {
+        await prefs.setString(keyStartTime, country.startTime!);
+      }
     } catch (_) {}
   }
 

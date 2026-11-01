@@ -1,3 +1,5 @@
+import '../../core/utils/study_day_helper.dart';
+
 class RecurrenceRuleModel {
   final int? id;
   final int frequency;
@@ -54,6 +56,12 @@ class TodoItemModel {
   final int? parentId;
   final RecurrenceRuleModel? recurrenceRule;
 
+  /// Raw `sa` timestamp returned by YPT, kept verbatim for updates.
+  final String startAtRaw;
+
+  /// Parsed UTC start instant, when the payload carried an explicit zone.
+  final DateTime? startAt;
+
   const TodoItemModel({
     required this.id,
     this.subjectId,
@@ -64,14 +72,34 @@ class TodoItemModel {
     required this.dateYmd,
     this.parentId,
     this.recurrenceRule,
+    this.startAtRaw = '',
+    this.startAt,
   });
 
   bool get isRecurring => recurrenceRule != null || (parentId != null && parentId! > 0);
 
+  /// Start instant to send back to YPT, preserving the original time of day.
+  String startAtApiIso({
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+  }) {
+    final instant =
+        startAt ?? StudyDayHelper.parseInstant(startAtRaw, gmtOffset: gmtOffset);
+    if (instant != null) return StudyDayHelper.toApiIso(instant);
+    return StudyDayHelper.startAtIso(dateYmd, gmtOffset: gmtOffset, resetHour: resetHour);
+  }
+
   factory TodoItemModel.fromJson(Map<String, dynamic> json) {
     final title = json['t'] as String? ?? json['title'] as String? ?? '';
-    final startAt = json['sa'] as String? ?? json['dateYmd'] as String? ?? '';
-    final dateStr = startAt.length >= 10 ? startAt.substring(0, 10) : startAt;
+    final startAtRaw = json['sa'] as String? ??
+        json['startAt'] as String? ??
+        json['start_at'] as String? ??
+        json['dateYmd'] as String? ??
+        '';
+    final startAt = StudyDayHelper.hasExplicitZone(startAtRaw)
+        ? DateTime.tryParse(startAtRaw)?.toUtc()
+        : null;
+    final dateStr = startAtRaw.length >= 10 ? startAtRaw.substring(0, 10) : startAtRaw;
     final score = json['s'];
     final isDone = (score is bool ? score : (score != null && score != 0)) || (json['isCompleted'] as bool? ?? false);
 
@@ -93,6 +121,8 @@ class TodoItemModel {
       dateYmd: dateStr,
       parentId: parentId,
       recurrenceRule: rr,
+      startAtRaw: startAtRaw,
+      startAt: startAt,
     );
   }
 
@@ -106,6 +136,8 @@ class TodoItemModel {
     String? dateYmd,
     int? parentId,
     RecurrenceRuleModel? recurrenceRule,
+    String? startAtRaw,
+    DateTime? startAt,
   }) {
     return TodoItemModel(
       id: id ?? this.id,
@@ -117,6 +149,8 @@ class TodoItemModel {
       dateYmd: dateYmd ?? this.dateYmd,
       parentId: parentId ?? this.parentId,
       recurrenceRule: recurrenceRule ?? this.recurrenceRule,
+      startAtRaw: startAtRaw ?? this.startAtRaw,
+      startAt: startAt ?? this.startAt,
     );
   }
 }

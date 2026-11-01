@@ -1,4 +1,5 @@
 import '../../core/api/api_client.dart';
+import '../../core/utils/study_day_helper.dart';
 import '../models/dday_model.dart';
 import '../models/todo_item_model.dart';
 
@@ -58,28 +59,65 @@ class PlannerRepository {
     }
   }
 
-  Future<List<TodoItemModel>> fetchTodos(String dateYmd) async {
+  Future<List<TodoItemModel>> fetchTodos(
+    String dateYmd, {
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+  }) async {
     try {
+      final dayStart =
+          StudyDayHelper.startUtc(dateYmd, gmtOffset: gmtOffset, resetHour: resetHour);
+      final dayEnd =
+          StudyDayHelper.endUtc(dateYmd, gmtOffset: gmtOffset, resetHour: resetHour);
+
+      // YPT resolves the day boundary with the timezone stored on the account,
+      // which may differ from the country registry. Querying a half-day margin
+      // keeps the window inclusive; the local filter below discards neighbours.
       final response = await _apiClient.get(
-        '/study/study-plan/get-by-date?start_at=${dateYmd}T00:00:00.000Z&end_at=${dateYmd}T23:59:59.000Z&is_unscheduled=true',
+        '/study/study-plan/get-by-date',
+        queryParameters: {
+          'start_at': StudyDayHelper.toApiIso(dayStart.subtract(const Duration(hours: 12))),
+          'end_at': StudyDayHelper.toApiIso(dayEnd.add(const Duration(hours: 12))),
+          'is_unscheduled': 'true',
+        },
       );
       final data = response.data;
       if (data is Map<String, dynamic>) {
         final rawList = data['r'] ?? data['todos'];
         if (rawList is List) {
-          return rawList
+          final items = rawList
               .whereType<Map<String, dynamic>>()
               .map((item) => TodoItemModel.fromJson(item))
+              .map((item) => _alignToStudyDay(item, gmtOffset, resetHour))
+              .where((item) => item.dateYmd == dateYmd)
               .toList();
+          return items;
         }
       }
     } catch (_) {}
     return [];
   }
 
+  TodoItemModel _alignToStudyDay(
+    TodoItemModel item,
+    Duration gmtOffset,
+    int resetHour,
+  ) {
+    final instant =
+        item.startAt ?? StudyDayHelper.parseInstant(item.startAtRaw, gmtOffset: gmtOffset);
+    if (instant == null) return item;
+    return item.copyWith(
+      startAt: instant,
+      dateYmd:
+          StudyDayHelper.studyDateYmd(instant, gmtOffset: gmtOffset, resetHour: resetHour),
+    );
+  }
+
   Future<TodoItemModel?> createTodo({
     required String title,
     required String dateYmd,
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
     int? subjectId,
     RecurrenceRuleModel? recurrenceRule,
   }) async {
@@ -87,7 +125,7 @@ class PlannerRepository {
       final payload = <String, dynamic>{
         'title': title,
         'subject_id': subjectId,
-        'start_at': '${dateYmd}T00:00:00.000Z',
+        'start_at': StudyDayHelper.startAtIso(dateYmd, gmtOffset: gmtOffset, resetHour: resetHour),
         'all_day': false,
         'order': 0,
         'score': null,
@@ -105,14 +143,22 @@ class PlannerRepository {
       if (data is Map<String, dynamic> && data['s'] == true) {
         final raw = data['r'] ?? data;
         if (raw is Map<String, dynamic>) {
-          return TodoItemModel.fromJson(raw);
+          return _alignToStudyDay(
+            TodoItemModel.fromJson(raw).copyWith(dateYmd: dateYmd),
+            gmtOffset,
+            resetHour,
+          );
         }
       }
     } catch (_) {}
     return null;
   }
 
-  Future<bool> toggleTodo(TodoItemModel todo) async {
+  Future<bool> toggleTodo(
+    TodoItemModel todo, {
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+  }) async {
     try {
       final newScore = todo.isCompleted ? null : 1;
       final response = await _apiClient.put(
@@ -121,7 +167,7 @@ class PlannerRepository {
           'id': todo.id,
           'title': todo.title,
           'subject_id': todo.subjectId,
-          'start_at': '${todo.dateYmd}T00:00:00.000Z',
+          'start_at': todo.startAtApiIso(gmtOffset: gmtOffset, resetHour: resetHour),
           'all_day': false,
           'order': 0,
           'score': newScore,
@@ -137,6 +183,8 @@ class PlannerRepository {
   Future<bool> editTodo(
     TodoItemModel todo,
     String newTitle, {
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
     RecurrenceRuleModel? recurrenceRule,
     bool applyToAll = false,
   }) async {
@@ -145,7 +193,7 @@ class PlannerRepository {
         'id': todo.id,
         'title': newTitle,
         'subject_id': todo.subjectId,
-        'start_at': '${todo.dateYmd}T00:00:00.000Z',
+        'start_at': todo.startAtApiIso(gmtOffset: gmtOffset, resetHour: resetHour),
         'all_day': false,
         'order': 0,
         'score': todo.isCompleted ? 1 : null,

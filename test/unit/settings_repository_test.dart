@@ -1,4 +1,4 @@
-﻿import 'package:desky/core/api/api_client.dart';
+import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/category_model.dart';
 import 'package:desky/data/models/country_model.dart';
 import 'package:desky/data/repositories/settings_repository.dart';
@@ -66,6 +66,27 @@ void main() {
       expect(country.code, 'BR');
       expect(country.timezone, 'America/Sao_Paulo');
       expect(country.continent, '');
+    });
+
+    test('CountryModel derives the study day config from the registry payload', () {
+      final korea = CountryModel.fromJson({
+        'c': 'KR',
+        'tz': 'Asia/Seoul',
+        'g': 9.0,
+        'st': '5 AM KST',
+      });
+      expect(korea.gmtOffsetDuration, const Duration(hours: 9));
+      expect(korea.startHour, 5);
+
+      final brazil = CountryModel.fromJson({'c': 'BR', 'g': -3.0, 'st': '5 AM BRT'});
+      expect(brazil.gmtOffsetDuration, const Duration(hours: -3));
+
+      final india = CountryModel.fromJson({'c': 'IN', 'g': 5.5, 'st': '5 AM IST'});
+      expect(india.gmtOffsetDuration, const Duration(hours: 5, minutes: 30));
+
+      final unknown = CountryModel.fromJson({'c': 'ZZ'});
+      expect(unknown.gmtOffsetDuration, isNull);
+      expect(unknown.startHour, 5);
     });
 
     test('CategoryModel.fromJson parses correctly', () {
@@ -167,6 +188,8 @@ void main() {
         code: 'JP',
         timezone: 'Asia/Tokyo',
         continent: 'Asia',
+        gmtOffset: 9,
+        startTime: '5 AM JST',
       );
 
       await repo.saveCountry(newCountry);
@@ -176,6 +199,9 @@ void main() {
       expect(saved.name, 'JAPAN');
       expect(saved.code, 'JP');
       expect(saved.timezone, 'Asia/Tokyo');
+      expect(saved.gmtOffset, 9);
+      expect(saved.startTime, '5 AM JST');
+      expect(saved.startHour, 5);
     });
 
     test('saveLanguage and getSavedLanguage persist correctly', () async {
