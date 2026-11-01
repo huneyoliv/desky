@@ -156,6 +156,15 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      try {
+        ref.read(timerNotifierProvider.notifier).reconcileWithServer();
+      } catch (_) {}
+    }
+  }
+
+  @override
   Future<AppExitResponse> didRequestAppExit() async {
     await _handleAppExit();
     return AppExitResponse.exit;
