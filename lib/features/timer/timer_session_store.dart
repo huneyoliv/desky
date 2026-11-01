@@ -62,7 +62,11 @@ class TimerSessionStore {
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic>) return null;
       final snapshot = TimerSessionSnapshot.fromJson(decoded);
-      if (snapshot.startAt.isAfter(DateTime.now().toUtc().add(const Duration(minutes: 1)))) {
+      final age = DateTime.now().toUtc().difference(snapshot.startAt);
+      // A crash days ago must not resurrect a stale session and inflate the
+      // reported study time, so snapshots older than a study day are dropped.
+      if (age < const Duration(minutes: -1) || age > const Duration(hours: 24)) {
+        await clear();
         return null;
       }
       return snapshot;
