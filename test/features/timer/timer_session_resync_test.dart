@@ -123,6 +123,15 @@ void main() {
       expect(notifier.state.isRunning, isFalse);
     });
 
+    test('discards a snapshot older than a study day', () async {
+      await seedSession(ago: const Duration(hours: 48));
+
+      final notifier = await buildNotifier();
+
+      expect(notifier.state.isRunning, isFalse);
+      expect(await store.load(), isNull);
+    });
+
     test('adopts a session that is still open on YPT without starting a new one', () async {
       timerRepository.dailyLog = {
         's': true,
