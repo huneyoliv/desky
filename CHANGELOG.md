@@ -73,6 +73,13 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.1.6] - 2026-11-01
+
+### Fixed
+- **Planner To-Do Dates Aligned with the Mobile App**: To-Dos were queried against a UTC calendar day and created at `00:00Z`, so tasks appeared on a different date than in the YPT mobile app; the planner also re-applied the reset hour to the selected date, which always queried the previous day. Queries now use the country study-day window (`[05:00 local, +24h)` against the fixed country GMT offset from the registry), creation writes the study-day start instant, updates keep the original time of day, and the selected calendar date is no longer shifted.
+- **Timer Session Resync with YPT**: The running session lived only in memory, so a crash, update or forced exit left Desky reporting "Inactive" while the phone kept counting. The session is now persisted, restored on launch, reconciled with YPT's daily log on launch, every minute and when the window is resumed, and cleared on stop/logout. Daily logs also receive the selected country timezone and language instead of a hardcoded `America/Sao_Paulo`/`pt`.
+- **Localization Fallback Leaking Portuguese**: Non-Portuguese locales no longer fall back to Portuguese dictionary text (English is the neutral fallback) and a failed translation asset load now falls back to `en.json`; twelve keys used by the UI but missing from every dictionary were added across the seven supported languages.
+
 ## [1.1.5] - 2026-10-29
 
 ### Added
