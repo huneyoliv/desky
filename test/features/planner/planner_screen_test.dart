@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/core/localization/app_translation.dart';
+import 'package:desky/core/utils/study_day_helper.dart';
 import 'package:desky/data/models/dday_model.dart';
 import 'package:desky/data/models/todo_item_model.dart';
 import 'package:desky/data/repositories/planner_repository.dart';
@@ -20,10 +21,20 @@ class FakePlannerRepository extends PlannerRepository {
   Future<List<DDayModel>> fetchDDays() async => mockDDays;
 
   @override
-  Future<List<TodoItemModel>> fetchTodos(String dateYmd) async => mockTodos;
+  Future<List<TodoItemModel>> fetchTodos(
+    String dateYmd, {
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+  }) async =>
+      mockTodos;
 
   @override
-  Future<bool> toggleTodo(TodoItemModel todo) async => true;
+  Future<bool> toggleTodo(
+    TodoItemModel todo, {
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+  }) async =>
+      true;
 }
 
 void main() {
