@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/json_utils.dart';
 import '../../core/utils/study_date_helper.dart';
@@ -10,6 +11,7 @@ import '../auth/auth_notifier.dart';
 import '../settings/settings_notifier.dart';
 import '../../core/localization/app_translation.dart';
 import 'offline_sync_notifier.dart';
+import 'timer_session_store.dart';
 
 enum TimerMode {
   stopwatch,
@@ -25,6 +27,10 @@ enum PomodoroPhase {
 
 final timerRepositoryProvider = Provider<TimerRepository>((ref) {
   return TimerRepository();
+});
+
+final timerSessionStoreProvider = Provider<TimerSessionStore>((ref) {
+  return TimerSessionStore();
 });
 
 class TimerState {
@@ -140,26 +146,41 @@ class TimerNotifier extends StateNotifier<TimerState> {
   final TimerRepository _timerRepository;
   final SubjectRepository _subjectRepository;
   final OfflineSyncRepository? _offlineSyncRepository;
+  final TimerSessionStore _sessionStore;
   final String? _initialSubjectTitle;
   Timer? _ticker;
   Timer? _dayResetTimer;
+  Timer? _reconcileTimer;
   int _dayResetHour;
   int _accumulatedSessionMs = 0;
   int _accumulatedRestMs = 0;
   int _segmentStartRemainingMs = 0;
+  bool _reconciling = false;
+  String _language;
+  String _timezone;
+
+  /// Completes once the persisted session (if any) has been restored and the
+  /// first server reconciliation finished.
+  late final Future<void> ready;
 
   TimerNotifier({
     required TimerRepository timerRepository,
     required SubjectRepository subjectRepository,
     OfflineSyncRepository? offlineSyncRepository,
+    TimerSessionStore? sessionStore,
     int userStudiconId = -1,
     int dayResetHour = 5,
     String? initialSubjectTitle,
+    String language = 'pt',
+    String timezone = 'America/Sao_Paulo',
   })  : _timerRepository = timerRepository,
         _subjectRepository = subjectRepository,
         _offlineSyncRepository = offlineSyncRepository,
+        _sessionStore = sessionStore ?? TimerSessionStore(),
         _dayResetHour = dayResetHour,
         _initialSubjectTitle = initialSubjectTitle,
+        _language = language,
+        _timezone = timezone,
         super(TimerState(
           studiconId: userStudiconId,
           lastStudyDate: StudyDateHelper.getStudyDateString(null, dayResetHour),
@@ -168,6 +189,173 @@ class TimerNotifier extends StateNotifier<TimerState> {
     _dayResetTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       _checkStudyDateReset();
     });
+    ready = _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    final snapshot = await _sessionStore.load();
+    if (!mounted) return;
+    if (snapshot != null) {
+      _restoreFromSnapshot(snapshot);
+    }
+    await reconcileWithServer();
+    if (!mounted) return;
+    if (state.isRunning) _ensureReconcileTimer();
+  }
+
+  void _ensureReconcileTimer() {
+    _reconcileTimer ??= Timer.periodic(const Duration(seconds: 60), (_) {
+      reconcileWithServer();
+    });
+  }
+
+  void _cancelReconcileTimer() {
+    _reconcileTimer?.cancel();
+    _reconcileTimer = null;
+  }
+
+  void _restoreFromSnapshot(TimerSessionSnapshot snapshot) {
+    final startAt = snapshot.startAt.toLocal();
+    final elapsed = DateTime.now().difference(startAt).inMilliseconds;
+    final subject = _findSubject(snapshot.subjectId, snapshot.subjectTitle);
+
+    _accumulatedSessionMs = 0;
+    _accumulatedRestMs = 0;
+    _segmentStartRemainingMs = state.pomodoroRemainingMs;
+
+    state = state.copyWith(
+      isRunning: true,
+      isPaused: false,
+      mode: TimerMode.stopwatch,
+      sessionStartAt: startAt,
+      sessionElapsedMs: elapsed > 0 ? elapsed : 0,
+      todayTotalMs: state.todayTotalMs > elapsed ? state.todayTotalMs : elapsed,
+      currentSubject: subject ?? state.currentSubject,
+    );
+    _startTicker();
+    debugPrint('[timer] restored local session started at ${snapshot.startAt.toIso8601String()}');
+  }
+
+  void _startTicker() {
+    _ticker?.cancel();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      _handleTick();
+    });
+    _ensureReconcileTimer();
+  }
+
+  SubjectModel? _findSubject(int id, String title) {
+    for (final subject in state.subjects) {
+      if (subject.id == id) return subject;
+    }
+    for (final subject in state.subjects) {
+      if (subject.title == title) return subject;
+    }
+    return null;
+  }
+
+  /// Reconciles the local timer with the session YPT has open on the server.
+  ///
+  /// The daily log exposes `dl.is`; when the payload does not carry that flag
+  /// the local state is left untouched instead of guessing.
+  Future<void> reconcileWithServer() async {
+    if (_reconciling) return;
+    _reconciling = true;
+    try {
+      final log = await _timerRepository.fetchDailyLog(DateTime.now());
+      if (!mounted) return;
+      final dl = log?['dl'];
+      if (dl is! Map) return;
+
+      final isStudying = dl['is'];
+      if (isStudying is! bool) return;
+
+      if (isStudying && !state.isRunning) {
+        await _adoptServerSession(Map<String, dynamic>.from(dl));
+      } else if (!isStudying && state.isRunning) {
+        await _stopFromServer();
+      }
+    } catch (_) {
+    } finally {
+      _reconciling = false;
+    }
+  }
+
+  Future<void> _adoptServerSession(Map<String, dynamic> dl) async {
+    final startAt = _parseServerInstant(dl['st']) ?? DateTime.now();
+    final subject = _findSubject(-1, _lastSessionSubject(dl)) ?? state.currentSubject;
+    final elapsed = DateTime.now().difference(startAt).inMilliseconds;
+
+    _accumulatedSessionMs = 0;
+    _accumulatedRestMs = 0;
+    _segmentStartRemainingMs = state.pomodoroRemainingMs;
+
+    state = state.copyWith(
+      isRunning: true,
+      isPaused: false,
+      mode: TimerMode.stopwatch,
+      sessionStartAt: startAt,
+      sessionElapsedMs: elapsed > 0 ? elapsed : 0,
+      todayTotalMs: elapsed > state.todayTotalMs ? elapsed : state.todayTotalMs,
+      currentSubject: subject ?? state.currentSubject,
+    );
+    _startTicker();
+    await _saveSnapshot();
+    debugPrint('[timer] adopted active ypt session started at ${startAt.toIso8601String()}');
+  }
+
+  Future<void> _stopFromServer() async {
+    _ticker?.cancel();
+    _cancelReconcileTimer();
+    _accumulatedSessionMs = 0;
+    _accumulatedRestMs = 0;
+    state = state.copyWith(
+      isRunning: false,
+      isPaused: false,
+      sessionStartAt: null,
+      restStartAt: null,
+      sessionElapsedMs: 0,
+      lastSyncedSessionElapsedMs: 0,
+      sessionRestMs: 0,
+    );
+    await _sessionStore.clear();
+    debugPrint('[timer] ypt reports no active session; local timer cleared');
+  }
+
+  DateTime? _parseServerInstant(dynamic raw) {
+    if (raw is! String || raw.trim().isEmpty) return null;
+    return DateTime.tryParse(raw.trim())?.toLocal();
+  }
+
+  String _lastSessionSubject(Map<String, dynamic> dl) {
+    final sessions = dl['ls'];
+    if (sessions is List && sessions.isNotEmpty) {
+      final last = sessions.last;
+      if (last is Map && last['sb'] is String) return last['sb'] as String;
+    }
+    final single = dl['sb'];
+    return single is String ? single : '';
+  }
+
+  Future<void> _saveSnapshot() async {
+    if (!mounted) return;
+    final subject = state.currentSubject;
+    final startAt = state.sessionStartAt;
+    if (subject == null || startAt == null || !state.isRunning) return;
+    await _sessionStore.save(TimerSessionSnapshot(
+      subjectId: subject.id,
+      subjectTitle: subject.title,
+      startAt: startAt.toUtc(),
+    ));
+  }
+
+  void setLocale({String? language, String? timezone}) {
+    final nextLanguage = language ?? _language;
+    final nextTimezone = timezone ?? _timezone;
+    if (nextLanguage == _language && nextTimezone == _timezone) return;
+    _language = nextLanguage;
+    _timezone = nextTimezone;
+    loadSubjects();
   }
 
   void updateStudiconId(int newStudiconId) {
@@ -178,9 +366,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   void handleLogout() {
     _ticker?.cancel();
+    _cancelReconcileTimer();
     _accumulatedSessionMs = 0;
     _accumulatedRestMs = 0;
     _segmentStartRemainingMs = 0;
+    _sessionStore.clear();
     state = TimerState(
       studiconId: -1,
       lastStudyDate: StudyDateHelper.getStudyDateString(null, _dayResetHour),
@@ -211,7 +401,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   Future<void> loadSubjects() async {
     try {
-      final result = await _subjectRepository.fetchSubjectsData();
+      final result = await _subjectRepository.fetchSubjectsData(
+        language: _language,
+        timezone: _timezone,
+      );
       if (!mounted) return;
       final subjects = result.subjects.isNotEmpty ? result.subjects : state.subjects;
       final current = subjects.isNotEmpty
@@ -347,9 +540,8 @@ class TimerNotifier extends StateNotifier<TimerState> {
     );
 
     _ticker?.cancel();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _handleTick();
-    });
+    _startTicker();
+    await _saveSnapshot();
   }
 
   void _handleTick() {
@@ -527,6 +719,12 @@ class TimerNotifier extends StateNotifier<TimerState> {
         _ticker?.cancel();
       }
     }
+
+    if (state.isRunning) {
+      await _saveSnapshot();
+    } else {
+      await _sessionStore.clear();
+    }
   }
 
   Future<void> _syncCompletedFocusSession() async {
@@ -609,13 +807,16 @@ class TimerNotifier extends StateNotifier<TimerState> {
     );
 
     _ticker?.cancel();
+    _cancelReconcileTimer();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       _handleTick();
     });
+    await _sessionStore.clear();
   }
 
   Future<void> stopStudy() async {
     _ticker?.cancel();
+    _cancelReconcileTimer();
     final now = DateTime.now();
 
     if (state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
@@ -650,6 +851,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       pomodoroPhase: PomodoroPhase.focus,
       pomodoroRemainingMs: initialRemaining,
     );
+    await _sessionStore.clear();
   }
 
   Future<bool> logManualStudy({
@@ -780,6 +982,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   void dispose() {
     _ticker?.cancel();
     _dayResetTimer?.cancel();
+    _reconcileTimer?.cancel();
     super.dispose();
   }
 }
@@ -789,18 +992,35 @@ final timerNotifierProvider =
   final timerRepo = ref.watch(timerRepositoryProvider);
   final subjectRepo = ref.watch(subjectRepositoryProvider);
   final offlineSyncRepo = ref.watch(offlineSyncRepositoryProvider);
+  final sessionStore = ref.watch(timerSessionStoreProvider);
   final initialUser = ref.read(authStateProvider).user;
-  final dayResetHour = ref.read(settingsNotifierProvider).dayResetHour;
+  final settings = ref.read(settingsNotifierProvider);
+  final dayResetHour = settings.dayResetHour;
   final initialTranslation = ref.read(appTranslationProvider);
 
   final notifier = TimerNotifier(
     timerRepository: timerRepo,
     subjectRepository: subjectRepo,
     offlineSyncRepository: offlineSyncRepo,
+    sessionStore: sessionStore,
     userStudiconId: initialUser?.studiconId ?? -1,
     dayResetHour: dayResetHour,
     initialSubjectTitle: initialTranslation.tr('initial_subject', fallback: 'Matéria Inicial'),
+    language: settings.selectedLanguage,
+    timezone: settings.selectedCountry.timezone,
   );
+
+  // Daily logs are resolved with the country timezone, so keep it in sync when
+  // the user changes region without recreating the running timer.
+  ref.listen(settingsNotifierProvider, (prev, next) {
+    if (prev?.selectedLanguage != next.selectedLanguage ||
+        prev?.selectedCountry != next.selectedCountry) {
+      notifier.setLocale(
+        language: next.selectedLanguage,
+        timezone: next.selectedCountry.timezone,
+      );
+    }
+  });
 
   // Dynamically update day reset hour without disposing TimerNotifier
   ref.listen<int>(settingsNotifierProvider.select((s) => s.dayResetHour), (prev, next) {
