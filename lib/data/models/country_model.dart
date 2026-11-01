@@ -34,6 +34,27 @@ class CountryModel {
     }).join(' ');
   }
 
+  /// Fixed GMT offset published by YPT for the country, when known.
+  Duration? get gmtOffsetDuration =>
+      gmtOffset == null ? null : Duration(minutes: (gmtOffset! * 60).round());
+
+  /// Hour at which YPT starts a new study day for the country (5 AM by default).
+  int get startHour {
+    final raw = startTime?.trim() ?? '';
+    final match = RegExp(r'^(\d{1,2})').firstMatch(raw);
+    final parsed = match == null ? null : int.tryParse(match.group(1)!);
+    if (parsed == null) return 5;
+
+    final upper = raw.toUpperCase();
+    var hour = parsed;
+    if (upper.contains('AM') && hour == 12) {
+      hour = 0;
+    } else if (upper.contains('PM') && hour < 12) {
+      hour += 12;
+    }
+    return (hour >= 0 && hour <= 23) ? hour : 5;
+  }
+
   String get gmtDisplay {
     if (gmtOffset == null) return '';
     final g = gmtOffset!;
