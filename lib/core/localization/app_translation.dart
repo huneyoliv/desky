@@ -6547,6 +6547,114 @@ class AppTranslation {
       'it': 'Attivo',
       'ru': 'Активен',
     },
+    'action_irreversible': {
+      'pt': 'Esta ação é irreversível.',
+      'en': 'This action is irreversible.',
+      'es': 'Esta acción es irreversible.',
+      'ko': '이 작업은 되돌릴 수 없습니다.',
+      'ja': 'この操作は元に戻せません。',
+      'zh-cn': '此操作无法撤销。',
+      'zh-tw': '此操作無法復原。',
+    },
+    'ban_member_blacklist_desc': {
+      'pt': 'do grupo? O usuário entrará na lista negra.',
+      'en': 'from the group? The user will be added to the blacklist.',
+      'es': 'del grupo? El usuario entrará en la lista negra.',
+      'ko': '그룹에서? 사용자가 블랙리스트에 추가됩니다.',
+      'ja': 'グループから？ユーザーはブラックリストに追加されます。',
+      'zh-cn': '移出小组？该用户将被加入黑名单。',
+      'zh-tw': '移出群組？該使用者將被加入黑名單。',
+    },
+    'ban_member_confirm': {
+      'pt': 'Banir',
+      'en': 'Ban',
+      'es': 'Banear',
+      'ko': '차단',
+      'ja': '追放',
+      'zh-cn': '封禁',
+      'zh-tw': '封鎖',
+    },
+    'cards_in_deck': {
+      'pt': 'cartões deste baralho.',
+      'en': 'cards in this deck.',
+      'es': 'tarjetas de este mazo.',
+      'ko': '개의 카드를 모두 복습했습니다.',
+      'ja': '枚のカードをすべて復習しました。',
+      'zh-cn': '张卡片。',
+      'zh-tw': '張卡片。',
+    },
+    'from_group_q': {
+      'pt': 'do grupo?',
+      'en': 'from the group?',
+      'es': 'del grupo?',
+      'ko': '그룹에서?',
+      'ja': 'グループから？',
+      'zh-cn': '移出小组？',
+      'zh-tw': '移出群組？',
+    },
+    'inactive': {
+      'pt': 'Inativo',
+      'en': 'Inactive',
+      'es': 'Inactivo',
+      'ko': '비활성',
+      'ja': '非アクティブ',
+      'zh-cn': '未激活',
+      'zh-tw': '未啟用',
+    },
+    'join_private_group': {
+      'pt': 'Grupo Privado',
+      'en': 'Private Group',
+      'es': 'Grupo Privado',
+      'ko': '비공개 그룹',
+      'ja': '非公開グループ',
+      'zh-cn': '私密小组',
+      'zh-tw': '私密群組',
+    },
+    'leave': {
+      'pt': 'Sair',
+      'en': 'Leave',
+      'es': 'Salir',
+      'ko': '나가기',
+      'ja': '退出',
+      'zh-cn': '离开',
+      'zh-tw': '離開',
+    },
+    'nickname': {
+      'pt': 'Apelido',
+      'en': 'Nickname',
+      'es': 'Apodo',
+      'ko': '닉네임',
+      'ja': 'ニックネーム',
+      'zh-cn': '昵称',
+      'zh-tw': '暱稱',
+    },
+    'remove_member_confirm': {
+      'pt': 'Remover',
+      'en': 'Remove',
+      'es': 'Eliminar',
+      'ko': '내보내기',
+      'ja': '削除',
+      'zh-cn': '移除',
+      'zh-tw': '移除',
+    },
+    'shake': {
+      'pt': 'Chacoalhar',
+      'en': 'Shake',
+      'es': 'Sacudir',
+      'ko': '흔들기',
+      'ja': 'シェイク',
+      'zh-cn': '摇一摇',
+      'zh-tw': '搖一搖',
+    },
+    'studied': {
+      'pt': 'estudados',
+      'en': 'studied',
+      'es': 'estudiados',
+      'ko': '공부함',
+      'ja': '学習済み',
+      'zh-cn': '已学习',
+      'zh-tw': '已學習',
+    },
   };
 
   String tr(String key, {List<String>? args, String? fallback}) {
@@ -6568,11 +6676,7 @@ class AppTranslation {
 
     // Check multilingual fallback dict for key
     if (val == null || val.isEmpty) {
-      final fallbackMap = _coreFallbackTranslations[key.toLowerCase()];
-      if (fallbackMap != null) {
-        final langLower = languageCode.toLowerCase();
-        val = fallbackMap[langLower] ?? fallbackMap['en'] ?? fallbackMap['pt'];
-      }
+      val = _fallbackFor(key);
     }
 
     // Check multilingual fallback dict for aliases
@@ -6580,12 +6684,8 @@ class AppTranslation {
       final aliases = _keyAliases[key.toLowerCase()];
       if (aliases != null) {
         for (final alias in aliases) {
-          final fallbackMap = _coreFallbackTranslations[alias.toLowerCase()];
-          if (fallbackMap != null) {
-            final langLower = languageCode.toLowerCase();
-            val = fallbackMap[langLower] ?? fallbackMap['en'] ?? fallbackMap['pt'];
-            if (val != null && val.isNotEmpty) break;
-          }
+          val = _fallbackFor(alias);
+          if (val != null && val.isNotEmpty) break;
         }
       }
     }
@@ -6600,6 +6700,19 @@ class AppTranslation {
       }
     }
     return val!;
+  }
+
+  /// Resolves a fallback entry, never returning Portuguese to a locale that is
+  /// not Portuguese. English is the neutral fallback used by YPT dictionaries.
+  String? _fallbackFor(String key) {
+    final fallbackMap = _coreFallbackTranslations[key.toLowerCase()];
+    if (fallbackMap == null) return null;
+
+    final lang = languageCode.toLowerCase();
+    if (lang == 'pt' || lang.startsWith('pt-')) {
+      return fallbackMap[lang] ?? fallbackMap['pt'] ?? fallbackMap['en'];
+    }
+    return fallbackMap[lang] ?? fallbackMap['en'];
   }
 
   static String normalizeCode(String code) {
@@ -6620,8 +6733,9 @@ class AppTranslation {
         map = decoded.map((k, v) => MapEntry(k, v.toString()));
       }
     } catch (_) {
+      final fallbackCode = norm.toLowerCase().startsWith('pt') ? 'pt' : 'en';
       try {
-        final fallbackJson = await rootBundle.loadString('assets/translations/pt.json');
+        final fallbackJson = await rootBundle.loadString('assets/translations/$fallbackCode.json');
         final dynamic decoded = json.decode(fallbackJson);
         if (decoded is Map<String, dynamic>) {
           map = decoded.map((k, v) => MapEntry(k, v.toString()));
