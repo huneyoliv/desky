@@ -54,7 +54,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     final newMsg = ChatMessageModel(
       id: DateTime.now().millisecondsSinceEpoch,
       senderId: user?.id ?? 1,
-      senderName: user?.name ?? t.tr('you', fallback: 'Você'),
+      senderName: user?.name ?? t.tr('you', fallback: trMsg('common_you', fallback: 'Você')),
       studiconId: user?.studiconId ?? -1,
       message: '',
       stickerUrl: sticker.url,
@@ -250,7 +250,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     final newMsg = ChatMessageModel(
       id: DateTime.now().millisecondsSinceEpoch,
       senderId: user?.id ?? 1,
-      senderName: user?.name ?? t.tr('you', fallback: 'Você'),
+      senderName: user?.name ?? t.tr('you', fallback: trMsg('common_you', fallback: 'Você')),
       studiconId: user?.studiconId ?? -1,
       message: text,
       sentAt: DateTime.now(),
@@ -264,7 +264,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       final repo = ref.read(groupRepositoryProvider);
       await repo.sendMessage(
         groupId: widget.group.id,
-        nickname: user?.name ?? 'Usuário',
+        nickname: user?.name ?? trMsg('common_user', fallback: 'Usuário'),
         userId: user?.id ?? 0,
         message: text,
       );
@@ -386,7 +386,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       final newMsg = ChatMessageModel(
         id: DateTime.now().millisecondsSinceEpoch,
         senderId: user?.id ?? 1,
-        senderName: user?.name ?? t.tr('you', fallback: 'Você'),
+        senderName: user?.name ?? t.tr('you', fallback: trMsg('common_you', fallback: 'Você')),
         studiconId: user?.studiconId ?? -1,
         message: t.tr('photo', fallback: 'Foto'),
         imageUrl: url,
@@ -402,7 +402,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         final repo = ref.read(groupRepositoryProvider);
         await repo.sendMessage(
           groupId: widget.group.id,
-          nickname: user?.name ?? 'Você',
+          nickname: user?.name ?? trMsg('common_you', fallback: 'Você'),
           userId: user?.id ?? 0,
           imageUrl: url,
         );
@@ -533,7 +533,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                     final activeUser = ref.read(authStateProvider).user;
                     final isMe = (activeUser != null && msg.senderId == activeUser.id) ||
                         (activeUser != null && msg.senderName == activeUser.name) ||
-                        (msg.senderName == t.tr('you', fallback: 'Você'));
+                        (msg.senderName == t.tr('you', fallback: trMsg('common_you', fallback: 'Você')));
 
                     return Align(
                       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

@@ -1,3 +1,4 @@
+import '../../core/localization/app_translation.dart';
 class ChallengeModel {
   final int id;
   final String name;
@@ -33,8 +34,8 @@ class ChallengeModel {
     return ChallengeModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
       name: (json['name'] ?? json['n'] ?? 'Desafio de Estudos').toString(),
-      description: (json['description'] ?? json['d'] ?? 'Complete a meta diária').toString(),
-      rules: (json['rules'] ?? json['r'] ?? 'Estudar ao menos 4 horas por dia durante o período.').toString(),
+      description: (json['description'] ?? json['d'] ?? trMsg('challenge_default_title', fallback: 'Complete a meta diária')).toString(),
+      rules: (json['rules'] ?? json['r'] ?? trMsg('challenge_default_desc', fallback: 'Estudar ao menos 4 horas por dia durante o período.')).toString(),
       flameCost: (json['flame_cost'] ?? json['flameCost'] ?? json['fc'] as num?)?.toInt() ?? 50,
       checkInMethod: (json['checkin_method'] ?? json['method'] ?? 'timer').toString(),
       startDate: json['start_at'] != null

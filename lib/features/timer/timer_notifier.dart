@@ -429,7 +429,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       if (state.subjects.isEmpty) {
         final fallbackSubject = SubjectModel(
           id: 1,
-          title: _initialSubjectTitle ?? 'Matéria Inicial',
+          title: _initialSubjectTitle ?? trMsg('initial_subject', fallback: 'Matéria Inicial'),
           colorInt: 4292557552,
         );
         state = state.copyWith(
@@ -1005,7 +1005,7 @@ final timerNotifierProvider =
     sessionStore: sessionStore,
     userStudiconId: initialUser?.studiconId ?? -1,
     dayResetHour: dayResetHour,
-    initialSubjectTitle: initialTranslation.tr('initial_subject', fallback: 'Matéria Inicial'),
+    initialSubjectTitle: initialTranslation.tr('initial_subject', fallback: trMsg('initial_subject', fallback: 'Matéria Inicial')),
     language: settings.selectedLanguage,
     timezone: settings.selectedCountry.timezone,
   );

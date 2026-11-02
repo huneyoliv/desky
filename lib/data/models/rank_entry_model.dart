@@ -1,5 +1,6 @@
 import '../../core/cdn/cdn_resolver.dart';
 import '../../core/utils/json_utils.dart';
+import '../../core/localization/app_translation.dart';
 
 class RankEntryModel {
   final int rank;
@@ -60,7 +61,7 @@ class RankEntryModel {
     return RankEntryModel(
       rank: safeInt(json['rank'], rankIndex),
       userId: safeInt(json['ud'] ?? json['userId']),
-      userName: safeString(json['n'] ?? json['userName'], 'Usuário'),
+      userName: safeString(json['n'] ?? json['userName'], trMsg('common_user', fallback: 'Usuário')),
       studiconId: studiconId,
       studyMs: studyMs,
       categoryName: category,

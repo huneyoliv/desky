@@ -6,6 +6,7 @@ import '../../core/oauth/social_signup_exception.dart';
 import '../../core/oauth/providers/google_oauth_service.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
+import '../../core/localization/app_translation.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository();
@@ -56,24 +57,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout) {
-        return 'Tempo limite de conexão esgotado. Verifique sua internet.';
+        return trMsg('net_timeout', fallback: 'Tempo limite de conexão esgotado. Verifique sua internet.');
       }
       if (e.type == DioExceptionType.connectionError) {
-        return 'Falha de conexão com o servidor da TGC Lab / YPT.';
+        return trMsg('net_server_unreachable', fallback: 'Falha de conexão com o servidor da TGC Lab / YPT.');
       }
       if (e.response?.data is Map) {
         final data = e.response!.data as Map;
         final c = data['c']?.toString();
-        if (c == '103' || c == '116') return 'Não é possível usar este apelido. Insira outro apelido.';
-        if (c == '104') return 'Este apelido já está em uso. Insira outro apelido.';
-        if (c == '106') return 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.';
-        if (c == '107') return 'Não é possível cadastrar este endereço de e-mail.';
-        if (c == '108' || c == 'invalid_auth_code_msg') return 'O código de autenticação não corresponde.';
+        if (c == '103' || c == '116') return trMsg('auth_nickname_invalid', fallback: 'Não é possível usar este apelido. Insira outro apelido.');
+        if (c == '104') return trMsg('auth_nickname_in_use', fallback: 'Este apelido já está em uso. Insira outro apelido.');
+        if (c == '106') return trMsg('auth_email_taken', fallback: 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.');
+        if (c == '107') return trMsg('auth_email_invalid_register', fallback: 'Não é possível cadastrar este endereço de e-mail.');
+        if (c == '108' || c == 'invalid_auth_code_msg') return trMsg('auth_code_mismatch', fallback: 'O código de autenticação não corresponde.');
         if (c == '112') return 'Senha incorreta. Verifique sua senha e tente novamente.';
-        if (c == '113') return 'E-mail não cadastrado no Yeolpumta.';
+        if (c == '113') return trMsg('auth_email_not_registered', fallback: 'E-mail não cadastrado no Yeolpumta.');
         if (c == '114') return 'Conta suspensa ou inativa.';
-        if (c == '115') return 'Esta conta está protegida contra exclusão devido a um problema em andamento.';
-        if (c == '125') return 'E-mail inválido. Tente com outro endereço de e-mail.';
+        if (c == '115') return trMsg('auth_account_protected', fallback: 'Esta conta está protegida contra exclusão devido a um problema em andamento.');
+        if (c == '125') return trMsg('auth_email_invalid', fallback: 'E-mail inválido. Tente com outro endereço de e-mail.');
         if (data['m'] != null) return data['m'].toString();
       }
     }
@@ -297,7 +298,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Falha ao excluir conta. Tente novamente.',
+          errorMessage: trMsg('account_delete_failed_retry', fallback: 'Falha ao excluir conta. Tente novamente.'),
         );
       }
       return success;

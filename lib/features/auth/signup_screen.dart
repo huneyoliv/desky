@@ -253,7 +253,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       setState(() {
         _isLoading = false;
         if (!success) {
-          _errorMessage = ref.read(authStateProvider).errorMessage ?? 'Falha ao realizar cadastro.';
+          _errorMessage = ref.read(authStateProvider).errorMessage ?? trMsg('signup_failed_retry', fallback: 'Falha ao realizar cadastro.');
         }
       });
       if (success) {

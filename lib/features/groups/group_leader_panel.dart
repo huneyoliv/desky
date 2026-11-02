@@ -454,7 +454,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                       itemBuilder: (context, index) {
                         final req = _joinRequests[index];
                         final reqId = req['id'] as int? ?? 0;
-                        final name = req['name']?.toString() ?? 'Usuário';
+                        final name = req['name']?.toString() ?? trMsg('common_user', fallback: 'Usuário');
 
                         return Card(
                           color: context.appCard,
@@ -501,7 +501,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                       itemBuilder: (context, index) {
                         final banned = _bannedList[index];
                         final uId = banned['id'] as int? ?? 0;
-                        final name = banned['name']?.toString() ?? 'Usuário Banido';
+                        final name = banned['name']?.toString() ?? trMsg('group_banned_user', fallback: 'Usuário Banido');
 
                         return Card(
                           color: context.appCard,

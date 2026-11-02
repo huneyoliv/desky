@@ -430,9 +430,9 @@ class NotificationsScreen extends ConsumerWidget {
     final diff = now.difference(dt);
 
     if (diff.inMinutes < 60) {
-      return diff.inMinutes <= 1 ? 'Agora' : '${diff.inMinutes}m atrás';
+      return diff.inMinutes <= 1 ? trMsg('just_now', fallback: 'Agora') : trMsg('minutes_ago', args: [diff.inMinutes.toString()], fallback: '${diff.inMinutes}m atrás');
     } else if (diff.inHours < 24) {
-      return '${diff.inHours}h atrás';
+      return trMsg('hours_ago', args: [diff.inHours.toString()], fallback: '${diff.inHours}h atrás');
     } else {
       return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
     }

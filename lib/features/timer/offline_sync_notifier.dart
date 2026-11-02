@@ -87,8 +87,8 @@ class OfflineSyncNotifier extends StateNotifier<OfflineSyncState> {
           : '${result.totalSynced} sincronizadas, ${result.totalFailed} falharam.';
     } else {
       msg = t != null
-          ? t.tr('no_pending_sessions', fallback: 'Nenhuma sessão pendente.')
-          : 'Nenhuma sessão pendente.';
+          ? t.tr('no_pending_sessions', fallback: trMsg('sync_no_pending', fallback: 'Nenhuma sessão pendente.'))
+          : trMsg('sync_no_pending', fallback: 'Nenhuma sessão pendente.');
     }
 
     state = state.copyWith(

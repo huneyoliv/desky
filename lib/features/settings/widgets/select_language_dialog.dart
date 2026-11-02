@@ -6,12 +6,14 @@ import '../settings_notifier.dart';
 
 class LanguageOption {
   final String code;
+  final String nameKey;
   final String name;
   final String nativeName;
   final String flag;
 
   const LanguageOption({
     required this.code,
+    required this.nameKey,
     required this.name,
     required this.nativeName,
     required this.flag,
@@ -22,13 +24,13 @@ class SelectLanguageDialog extends ConsumerWidget {
   const SelectLanguageDialog({super.key});
 
   static const List<LanguageOption> supportedLanguages = [
-    LanguageOption(code: 'pt', name: 'Português', nativeName: 'Português (Brasil)', flag: '🇧🇷'),
-    LanguageOption(code: 'en', name: 'English', nativeName: 'English (US)', flag: '🇺🇸'),
-    LanguageOption(code: 'es', name: 'Español', nativeName: 'Español', flag: '🇪🇸'),
-    LanguageOption(code: 'ko', name: 'Coreano', nativeName: '한국어', flag: '🇰🇷'),
-    LanguageOption(code: 'ja', name: 'Japonês', nativeName: '日本語', flag: '🇯🇵'),
-    LanguageOption(code: 'zh_hans', name: 'Chinês Simplificado', nativeName: '简体中文', flag: '🇨🇳'),
-    LanguageOption(code: 'zh_hant', name: 'Chinês Tradicional', nativeName: '繁體中文', flag: '🇹🇼'),
+    LanguageOption(code: 'pt', nameKey: 'lang_pt_name', name: 'Português', nativeName: 'Português (Brasil)', flag: '🇧🇷'),
+    LanguageOption(code: 'en', nameKey: 'lang_en_name', name: 'English', nativeName: 'English (US)', flag: '🇺🇸'),
+    LanguageOption(code: 'es', nameKey: 'lang_es_name', name: 'Espanhol', nativeName: 'Español', flag: '🇪🇸'),
+    LanguageOption(code: 'ko', nameKey: 'lang_ko_name', name: 'Coreano', nativeName: '한국어', flag: '🇰🇷'),
+    LanguageOption(code: 'ja', nameKey: 'lang_ja_name', name: 'Japonês', nativeName: '日本語', flag: '🇯🇵'),
+    LanguageOption(code: 'zh_hans', nameKey: 'lang_zh_hans_name', name: 'Chinês Simplificado', nativeName: '简体中文', flag: '🇨🇳'),
+    LanguageOption(code: 'zh_hant', nameKey: 'lang_zh_hant_name', name: 'Chinês Tradicional', nativeName: '繁體中文', flag: '🇹🇼'),
   ];
 
   static Future<void> show(BuildContext context) {
@@ -67,7 +69,7 @@ class SelectLanguageDialog extends ConsumerWidget {
             return ListTile(
               leading: Text(lang.flag, style: const TextStyle(fontSize: 24)),
               title: Text(
-                lang.name,
+                t.tr(lang.nameKey, fallback: lang.name),
                 style: TextStyle(
                   color: isSelected ? AppColors.primaryLight : Colors.white,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

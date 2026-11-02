@@ -1,3 +1,4 @@
+import '../../core/localization/app_translation.dart';
 class NotificationModel {
   final int id;
   final String title;
@@ -52,10 +53,10 @@ class NotificationModel {
       title = rawI1;
       message = rawMsg;
     } else if (rawMsg.isNotEmpty) {
-      title = rawI1.isNotEmpty ? rawI1 : 'Notificação YPT';
+      title = rawI1.isNotEmpty ? rawI1 : trMsg('notification_ypt_title', fallback: 'Notificação YPT');
       message = rawMsg;
     } else {
-      title = rawI1.isNotEmpty ? rawI1 : 'Notificação YPT';
+      title = rawI1.isNotEmpty ? rawI1 : trMsg('notification_ypt_title', fallback: 'Notificação YPT');
       message = rawI2.isNotEmpty ? rawI2 : 'Sem detalhes';
     }
 

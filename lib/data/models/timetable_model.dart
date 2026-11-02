@@ -1,3 +1,4 @@
+import '../../core/localization/app_translation.dart';
 class TimetableBlock {
   final int id;
   final int subjectId;
@@ -21,7 +22,7 @@ class TimetableBlock {
     return TimetableBlock(
       id: (json['id'] as num?)?.toInt() ?? 0,
       subjectId: (json['subject_id'] ?? json['subjectId'] as num?)?.toInt() ?? 0,
-      subjectTitle: (json['subject_title'] ?? json['subjectTitle'] ?? 'Matéria').toString(),
+      subjectTitle: (json['subject_title'] ?? json['subjectTitle'] ?? trMsg('common_subject', fallback: 'Matéria')).toString(),
       colorInt: (json['color'] ?? json['colorInt'] as num?)?.toInt() ?? 4292557552,
       dayOfWeek: (json['day_of_week'] ?? json['dayOfWeek'] as num?)?.toInt() ?? 1,
       startHour: (json['start_hour'] ?? json['startHour'] as num?)?.toInt() ?? 8,

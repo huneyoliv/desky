@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/subject_model.dart';
+import '../../core/localization/app_translation.dart';
 
 final subjectRepositoryProvider = Provider<SubjectRepository>((ref) {
   return SubjectRepository();
@@ -87,7 +88,7 @@ class SubjectRepository {
     final raw = response.data;
     final data = raw is Map ? Map<String, dynamic>.from(raw) : <String, dynamic>{};
     if (data['s'] != true) {
-      throw Exception(data['m'] ?? 'Falha ao criar matéria');
+      throw Exception(data['m'] ?? trMsg('subject_create_failed', fallback: 'Falha ao criar matéria'));
     }
 
     final sb = data['sb'] as Map<String, dynamic>? ?? data['subject'] as Map<String, dynamic>?;
