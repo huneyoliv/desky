@@ -73,6 +73,11 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.1.7] - 2026-11-01
+
+### Fixed
+- **Localized Messages Everywhere**: User-facing messages produced outside the widget tree (authentication errors, OAuth failures, group actions, notification timestamps, store and timer messages) were still hardcoded in Portuguese. They now resolve through a `trMsg` helper backed by the loaded translation, the language selector lists language names in the active language, and relative timestamps follow the locale. The new entries ship in the seven supported languages (PT, EN, ES, KO, JA, zh-CN, zh-TW).
+
 ## [1.1.6] - 2026-11-01
 
 ### Fixed
