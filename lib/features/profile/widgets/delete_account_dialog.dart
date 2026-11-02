@@ -55,7 +55,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
       } else {
         setState(() {
           _errorMessage = ref.read(authStateProvider).errorMessage ??
-              'Falha ao excluir a conta. Verifique sua conexão.';
+              trMsg('account_delete_failed', fallback: 'Falha ao excluir a conta. Verifique sua conexão.');
         });
       }
     }

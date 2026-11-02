@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/offline_session_model.dart';
 import 'timer_repository.dart';
+import '../../core/localization/app_translation.dart';
 
 class SyncResult {
   final int totalSynced;
@@ -101,7 +102,7 @@ class OfflineSyncRepository {
           failed++;
           remainingList.add(session.copyWith(
             retryCount: session.retryCount + 1,
-            lastError: 'Servidor rejeitou sessão',
+            lastError: trMsg('sync_server_rejected', fallback: 'Servidor rejeitou sessão'),
           ));
         }
       } catch (e) {

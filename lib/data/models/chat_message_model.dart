@@ -1,5 +1,6 @@
 import '../../core/cdn/cdn_resolver.dart';
 import '../../core/utils/json_utils.dart';
+import '../../core/localization/app_translation.dart';
 
 class ChatMessageModel {
   final int id;
@@ -104,7 +105,7 @@ class ChatMessageModel {
     return ChatMessageModel(
       id: safeInt(json['idx'] ?? json['id'], DateTime.now().millisecondsSinceEpoch),
       senderId: safeInt(json['uid'] ?? json['ud']),
-      senderName: safeString(json['nn'] ?? json['n'], 'Usuário'),
+      senderName: safeString(json['nn'] ?? json['n'], trMsg('common_user', fallback: 'Usuário')),
       studiconId: safeInt(json['sd'] ?? json['did'] ?? json['st'] ?? json['si'], -1),
       message: safeString(json['msg'] ?? json['m'] ?? json['text']),
       photoUrl: photo,

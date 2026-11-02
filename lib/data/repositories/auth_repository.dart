@@ -10,6 +10,7 @@ import '../../core/utils/json_utils.dart';
 import '../models/user_model.dart';
 import '../models/group_model.dart';
 import 'subject_repository.dart';
+import '../../core/localization/app_translation.dart';
 
 class AuthRepository {
   final ApiClient _apiClient;
@@ -81,11 +82,11 @@ class AuthRepository {
           if (code == '112') {
             msg = 'Senha incorreta. Verifique sua senha e tente novamente.';
           } else if (code == '113') {
-            msg = 'E-mail não cadastrado no Yeolpumta.';
+            msg = trMsg('auth_email_not_registered', fallback: 'E-mail não cadastrado no Yeolpumta.');
           } else if (code == '114') {
             msg = 'Conta suspensa ou inativa.';
           } else {
-            msg = 'Falha na autenticação (código $code)';
+            msg = trMsg('auth_failed_code', args: [code], fallback: 'Falha na autenticação (código $code)');
           }
         }
       }
@@ -94,7 +95,7 @@ class AuthRepository {
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw const ApiException('Token JWT não foi retornado pelo servidor');
+      throw ApiException(trMsg('auth_missing_token', fallback: 'Token JWT não foi retornado pelo servidor'));
     }
 
     await _saveToken(token);
@@ -193,15 +194,15 @@ class AuthRepository {
         }
         final msg = data['m']?.toString() ??
             data['message']?.toString() ??
-            (code != null ? 'Erro de autenticação [$code]' : 'Falha ao autenticar via $provider');
+            (code != null ? trMsg('auth_error_code', args: [code], fallback: 'Erro de autenticação [$code]') : trMsg('auth_failed_via_provider', args: [provider], fallback: 'Falha ao autenticar via $provider'));
         throw ApiException(msg, statusCode: response.statusCode);
       }
-      throw ApiException('Falha ao autenticar via $provider', statusCode: response.statusCode);
+      throw ApiException(trMsg('auth_failed_via_provider', args: [provider], fallback: 'Falha ao autenticar via $provider'), statusCode: response.statusCode);
     }
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw ApiException('Token JWT via $provider não retornado pelo servidor');
+      throw ApiException(trMsg('auth_missing_provider_token', args: [provider], fallback: 'Token JWT via $provider não retornado pelo servidor'));
     }
 
     await _saveToken(token);
@@ -297,23 +298,23 @@ class AuthRepository {
       if (data is Map) {
         final code = data['c']?.toString();
         if (code == '104') {
-          msg = 'Este apelido já está em uso. Insira outro apelido.';
+          msg = trMsg('auth_nickname_in_use', fallback: 'Este apelido já está em uso. Insira outro apelido.');
         } else if (code == '103' || code == '116') {
-          msg = 'Não é possível usar este apelido. Insira outro apelido.';
+          msg = trMsg('auth_nickname_invalid', fallback: 'Não é possível usar este apelido. Insira outro apelido.');
         } else {
           msg = data['m']?.toString() ??
               data['message']?.toString() ??
-              (code != null ? 'Erro de cadastro [$code]' : 'Falha ao cadastrar via $provider');
+              (code != null ? trMsg('auth_signup_error_code', args: [code], fallback: 'Erro de cadastro [$code]') : trMsg('auth_signup_failed_via', args: [provider], fallback: 'Falha ao cadastrar via $provider'));
         }
       } else {
-        msg = 'Falha ao cadastrar via $provider';
+        msg = trMsg('auth_signup_failed_via', args: [provider], fallback: 'Falha ao cadastrar via $provider');
       }
       throw ApiException(msg, statusCode: response.statusCode);
     }
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw ApiException('Token JWT via $provider não retornado pelo servidor');
+      throw ApiException(trMsg('auth_missing_provider_token', args: [provider], fallback: 'Token JWT via $provider não retornado pelo servidor'));
     }
 
     await _saveToken(token);
@@ -334,9 +335,9 @@ class AuthRepository {
         if (nickData is Map && nickData['s'] == false) {
           final nc = nickData['c']?.toString();
           if (nc == '104') {
-            throw const ApiException('Este apelido já está em uso. Insira outro apelido.');
+            throw ApiException(trMsg('auth_nickname_in_use', fallback: 'Este apelido já está em uso. Insira outro apelido.'));
           } else if (nc == '103' || nc == '116') {
-            throw const ApiException('Não é possível usar este apelido. Insira outro apelido.');
+            throw ApiException(trMsg('auth_nickname_invalid', fallback: 'Não é possível usar este apelido. Insira outro apelido.'));
           }
         }
       } catch (e) {
@@ -392,7 +393,7 @@ class AuthRepository {
   Future<UserModel> signInWithJwt(String token, {String language = ApiConstants.defaultLanguage}) async {
     final cleanToken = token.trim().replaceAll('JWT ', '').replaceAll('Bearer ', '');
     if (cleanToken.isEmpty) {
-      throw const ApiException('Token JWT não fornecido.');
+      throw ApiException(trMsg('auth_no_token', fallback: 'Token JWT não fornecido.'));
     }
 
     await _saveToken(cleanToken);
@@ -400,7 +401,7 @@ class AuthRepository {
     final splashData = await splashLogin(language: language);
     if (splashData == null || splashData['s'] != true) {
       await _deleteToken();
-      throw const ApiException('Sessão inválida ou expirada no servidor.');
+      throw ApiException(trMsg('auth_session_expired', fallback: 'Sessão inválida ou expirada no servidor.'));
     }
 
     await SubjectRepository.saveSubjectsFromRawData(splashData);
@@ -511,8 +512,8 @@ class AuthRepository {
     final data = response.data;
     if (data is Map<String, dynamic> && data['s'] == false) {
       final msg = data['c'] == 'invalid_auth_code_msg'
-          ? 'Código de validação inválido'
-          : 'Código incorreto';
+          ? trMsg('auth_invalid_code', fallback: 'Código de validação inválido')
+          : trMsg('auth_wrong_code', fallback: 'Código incorreto');
       throw ApiException(msg);
     }
     return data is Map<String, dynamic> && data['s'] == true;
@@ -533,7 +534,7 @@ class AuthRepository {
     );
     final data = response.data;
     if (data is! Map<String, dynamic> || data['s'] != true) {
-      throw const ApiException('Falha ao redefinir senha');
+      throw ApiException(trMsg('auth_password_reset_failed', fallback: 'Falha ao redefinir senha'));
     }
     final token = (data['jwt'] ?? '').toString();
     if (token.isNotEmpty) {
@@ -582,13 +583,13 @@ class AuthRepository {
     final data = response.data;
     if (data is Map<String, dynamic> && data['s'] == false) {
       final code = data['c']?.toString();
-      String msg = data['m']?.toString() ?? data['message']?.toString() ?? 'Falha ao enviar código';
+      String msg = data['m']?.toString() ?? data['message']?.toString() ?? trMsg('auth_send_code_failed', fallback: 'Falha ao enviar código');
       if (code == '106') {
-        msg = 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.';
+        msg = trMsg('auth_email_taken', fallback: 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.');
       } else if (code == '107') {
-        msg = 'Não é possível cadastrar este endereço de e-mail.';
+        msg = trMsg('auth_email_invalid_register', fallback: 'Não é possível cadastrar este endereço de e-mail.');
       } else if (code == '125') {
-        msg = 'E-mail inválido. Tente com outro endereço de e-mail.';
+        msg = trMsg('auth_email_invalid', fallback: 'E-mail inválido. Tente com outro endereço de e-mail.');
       }
       throw ApiException(msg, statusCode: response.statusCode);
     }
@@ -606,9 +607,9 @@ class AuthRepository {
     final data = response.data;
     if (data is Map<String, dynamic> && data['s'] == false) {
       final c = data['c']?.toString();
-      String msg = 'Código de verificação incorreto';
+      String msg = trMsg('auth_wrong_verification_code', fallback: 'Código de verificação incorreto');
       if (c == 'invalid_auth_code_msg' || c == '108') {
-        msg = 'O código de autenticação não corresponde.';
+        msg = trMsg('auth_code_mismatch', fallback: 'O código de autenticação não corresponde.');
       } else if (data['m'] != null || data['message'] != null) {
         msg = (data['m'] ?? data['message']).toString();
       }
@@ -641,13 +642,13 @@ class AuthRepository {
 
     final data = response.data;
     if (data is! Map<String, dynamic> || data['s'] != true) {
-      String msg = 'Erro ao realizar cadastro';
+      String msg = trMsg('auth_signup_failed', fallback: 'Erro ao realizar cadastro');
       if (data is Map) {
         final c = data['c']?.toString();
         if (c == '106') {
-          msg = 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.';
+          msg = trMsg('auth_email_taken', fallback: 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.');
         } else if (c == '112') {
-          msg = 'As senhas não coincidem. Tente novamente.';
+          msg = trMsg('auth_passwords_mismatch', fallback: 'As senhas não coincidem. Tente novamente.');
         } else if (data['m'] != null || data['message'] != null) {
           msg = (data['m'] ?? data['message']).toString();
         }
@@ -657,7 +658,7 @@ class AuthRepository {
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw const ApiException('Token JWT não foi retornado pelo servidor');
+      throw ApiException(trMsg('auth_missing_token', fallback: 'Token JWT não foi retornado pelo servidor'));
     }
 
     await _saveToken(token);
@@ -679,9 +680,9 @@ class AuthRepository {
         if (nickData is Map && nickData['s'] == false) {
           final nc = nickData['c']?.toString();
           if (nc == '104') {
-            throw const ApiException('Este apelido já está em uso. Insira outro apelido.');
+            throw ApiException(trMsg('auth_nickname_in_use', fallback: 'Este apelido já está em uso. Insira outro apelido.'));
           } else if (nc == '103' || nc == '116') {
-            throw const ApiException('Não é possível usar este apelido. Insira outro apelido.');
+            throw ApiException(trMsg('auth_nickname_invalid', fallback: 'Não é possível usar este apelido. Insira outro apelido.'));
           }
         }
       } catch (e) {
@@ -906,7 +907,7 @@ class AuthRepository {
     if (isSuccess) {
       await _deleteToken();
     } else if (data is Map && data['c'] == '115') {
-      throw const ApiException('Esta conta está protegida contra exclusão devido a um problema em andamento.');
+      throw ApiException(trMsg('auth_account_protected', fallback: 'Esta conta está protegida contra exclusão devido a um problema em andamento.'));
     }
     return isSuccess;
   }

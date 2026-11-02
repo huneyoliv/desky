@@ -1,6 +1,7 @@
 import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/studicon_item_model.dart';
+import '../../core/localization/app_translation.dart';
 
 class StoreRepository {
   final ApiClient _apiClient;
@@ -140,8 +141,8 @@ class StoreRepository {
     myItems.add(
       StudiconItemModel(
         id: -1,
-        name: 'Boneco Padrão (Laranja)',
-        category: 'Padrão',
+        name: trMsg('store_default_studicon', fallback: 'Boneco Padrão (Laranja)'),
+        category: trMsg('common_default', fallback: 'Padrão'),
         priceFlames: 0,
         isOwned: true,
         isEquipped: currentEquippedId <= 0 || currentEquippedId == -1,

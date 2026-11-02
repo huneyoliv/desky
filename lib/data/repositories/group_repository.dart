@@ -4,6 +4,7 @@ import '../../core/utils/study_date_helper.dart';
 import '../models/group_model.dart';
 import '../models/group_member_model.dart';
 import '../models/chat_message_model.dart';
+import '../../core/localization/app_translation.dart';
 
 class GroupRepository {
   final ApiClient _apiClient;
@@ -186,7 +187,7 @@ class GroupRepository {
 
   Future<ChatMessageModel> sendMessage({
     required int groupId,
-    String nickname = 'Usuário',
+    String? nickname,
     int userId = 0,
     String message = '',
     int category = 0,
@@ -219,7 +220,7 @@ class GroupRepository {
 
     final data = response.data;
     if (data is! Map || (data['s'] != true && data['idx'] == null)) {
-      throw Exception(data is Map ? data['m'] : 'Falha ao enviar mensagem');
+      throw Exception(data is Map ? data['m'] : trMsg('group_send_message_failed', fallback: 'Falha ao enviar mensagem'));
     }
 
     return ChatMessageModel.fromJson(Map<String, dynamic>.from(data));
@@ -326,7 +327,7 @@ class GroupRepository {
         'release': true,
         'canCam': true,
         'studiconID': studiconId,
-        'nickname': nickname ?? 'Usuário',
+        'nickname': nickname ?? trMsg('common_user', fallback: 'Usuário'),
         'p': true,
       };
       if (password != null && password.isNotEmpty) {

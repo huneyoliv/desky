@@ -1,4 +1,5 @@
 import '../../core/utils/json_utils.dart';
+import '../../core/localization/app_translation.dart';
 
 class GroupModel {
   final int id;
@@ -30,7 +31,7 @@ class GroupModel {
   factory GroupModel.fromJson(Map<String, dynamic> json) {
     return GroupModel(
       id: safeInt(json['id'] ?? json['groupID'] ?? json['gd'] ?? json['gid']),
-      name: safeString(json['t'] ?? json['n'] ?? json['name'] ?? json['title'], 'Grupo'),
+      name: safeString(json['t'] ?? json['n'] ?? json['name'] ?? json['title'], trMsg('common_group', fallback: 'Grupo')),
       category: safeString(json['c'] ?? json['category'] ?? json['ct'], 'Geral'),
       dailyGoalHours: safeInt(json['gt'] ?? json['g'] ?? json['dailyGoalHours'], 8),
       membersCount: safeInt(json['jc'] ?? json['personnel'] ?? json['membersCount'] ?? json['members_count'], 1),

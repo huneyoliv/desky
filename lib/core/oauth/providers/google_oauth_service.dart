@@ -4,6 +4,7 @@ import '../oauth_desktop_service.dart';
 import '../oauth_exception.dart';
 import '../oauth_pkce.dart';
 import '../oauth_user_info.dart';
+import '../../localization/app_translation.dart';
 
 class GoogleOAuthService {
   final Dio _dio;
@@ -39,7 +40,7 @@ class GoogleOAuthService {
     final activeClientSecret = effectiveClientSecret;
 
     if (activeClientId.isEmpty) {
-      throw const OAuthException('Google Client ID não configurado no arquivo .env.');
+      throw OAuthException(trMsg('oauth_google_missing_client_id', fallback: 'Google Client ID não configurado no arquivo .env.'));
     }
 
     final verifier = OAuthPkce.generateVerifier();
@@ -69,7 +70,7 @@ class GoogleOAuthService {
 
       final code = callbackParams['code'];
       if (code == null || code.isEmpty) {
-        throw const OAuthException('Código de autorização não recebido do Google.');
+        throw OAuthException(trMsg('oauth_google_no_code', fallback: 'Código de autorização não recebido do Google.'));
       }
 
       final redirectUri = 'http://127.0.0.1:$activePort';
@@ -96,8 +97,8 @@ class GoogleOAuthService {
       final tokenData = tokenResponse.data;
       if (tokenData is! Map || tokenData['id_token'] == null) {
         final errorDesc = tokenData is Map
-            ? (tokenData['error_description'] ?? tokenData['error'] ?? 'Falha ao trocar código Google por token')
-            : 'Resposta inválida do servidor Google';
+            ? (tokenData['error_description'] ?? tokenData['error'] ?? trMsg('oauth_google_token_exchange_failed', fallback: 'Falha ao trocar código Google por token'))
+            : trMsg('oauth_google_invalid_response', fallback: 'Resposta inválida do servidor Google');
         throw OAuthException(errorDesc.toString());
       }
 
@@ -107,10 +108,10 @@ class GoogleOAuthService {
       final socialId = payload['sub']?.toString() ?? '';
       final email = payload['email']?.toString() ?? '';
       final name = payload['name']?.toString() ??
-          (email.isNotEmpty ? email.split('@').first : 'Usuário Google');
+          (email.isNotEmpty ? email.split('@').first : trMsg('oauth_google_user', fallback: 'Usuário Google'));
 
       if (socialId.isEmpty) {
-        throw const OAuthException('Identificador de usuário Google não encontrado no token.');
+        throw OAuthException(trMsg('oauth_google_missing_sub', fallback: 'Identificador de usuário Google não encontrado no token.'));
       }
 
       return OAuthUserInfo(

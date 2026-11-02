@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 import 'oauth_exception.dart';
+import '../localization/app_translation.dart';
 
 class OAuthDesktopService {
   HttpServer? _server;
@@ -152,7 +153,7 @@ class OAuthDesktopService {
       },
       onError: (err) {
         if (!completer.isCompleted) {
-          completer.completeError(OAuthException('Erro no servidor local: $err'));
+          completer.completeError(OAuthException(trMsg('oauth_local_server_error', args: [err.toString()], fallback: 'Erro no servidor local: $err')));
         }
       },
       cancelOnError: true,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
+import '../localization/app_translation.dart';
 
 class OAuthPkce {
   static const String _charset =
@@ -27,7 +28,7 @@ class OAuthPkce {
   static Map<String, dynamic> decodeJwtPayload(String jwt) {
     final parts = jwt.split('.');
     if (parts.length != 3) {
-      throw const FormatException('Token JWT inválido: estrutura incorreta');
+      throw FormatException(trMsg('oauth_invalid_jwt_structure', fallback: 'Token JWT inválido: estrutura incorreta'));
     }
     var payload = parts[1];
     switch (payload.length % 4) {
@@ -45,6 +46,6 @@ class OAuthPkce {
     if (json is Map<String, dynamic>) {
       return json;
     }
-    throw const FormatException('Payload JWT não é um objeto JSON válido');
+    throw FormatException(trMsg('oauth_invalid_jwt_payload', fallback: 'Payload JWT não é um objeto JSON válido'));
   }
 }

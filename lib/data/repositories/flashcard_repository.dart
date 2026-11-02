@@ -2,6 +2,7 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/flashcard_model.dart';
+import '../../core/localization/app_translation.dart';
 
 class FlashcardRepository {
   final ApiClient _apiClient;
@@ -57,7 +58,7 @@ class FlashcardRepository {
     if (data is Map<String, dynamic> && data['m'] != null) {
       throw ApiException(data['m'].toString());
     }
-    throw const ApiException('Falha ao criar baralho');
+    throw ApiException(trMsg('flashcard_create_deck_failed', fallback: 'Falha ao criar baralho'));
   }
 
   Future<bool> deleteDeck(int deckId) async {
@@ -122,7 +123,7 @@ class FlashcardRepository {
     if (data is Map<String, dynamic> && data['m'] != null) {
       throw ApiException(data['m'].toString());
     }
-    throw const ApiException('Falha ao criar flashcard');
+    throw ApiException(trMsg('flashcard_create_card_failed', fallback: 'Falha ao criar flashcard'));
   }
 
   Future<bool> deleteCard(int cardId) async {

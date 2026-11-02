@@ -48,4 +48,18 @@ void main() {
       }
     });
   });
+
+  group('trMsg', () {
+    tearDown(() => AppTranslation.current = null);
+
+    test('uses the loaded translation for messages outside the widget tree', () {
+      AppTranslation.current = const AppTranslation(languageCode: 'en');
+      expect(trMsg('common_user', fallback: 'Usuário'), 'User');
+    });
+
+    test('falls back to the provided text when nothing is loaded', () {
+      AppTranslation.current = null;
+      expect(trMsg('common_user', fallback: 'Usuário'), 'Usuário');
+    });
+  });
 }
