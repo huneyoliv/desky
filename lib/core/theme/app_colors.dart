@@ -45,7 +45,7 @@ class AppColors {
   // Text Colors
   static const Color textPrimary = Color(0xFFF5F3FF); // Subtle lilac-white
   static const Color textSecondary = Color(0xFFA89FBD);
-  static const Color textMuted = Color(0xFF685F7D);
+  static const Color textMuted = Color(0xFF837999);
 
   // Status Colors
   static const Color success = Color(0xFF00E5A0);

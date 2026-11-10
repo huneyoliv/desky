@@ -732,7 +732,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                               Text(
                                 t.tr('legal_disclaimer', fallback: 'O Desky é um cliente de terceiros independente e de código aberto, não sendo afiliado, endossado, patrocinado ou associado à Pallo Inc. ou ao Yeolpumta (YPT). Todas as marcas registradas pertencem aos seus respectivos proprietários.'),
                                 style: TextStyle(
-                                  color: AppColors.textMuted.withValues(alpha: 0.8),
+                                  color: context.appTextMuted,
                                   fontSize: 11,
                                   height: 1.3,
                                 ),

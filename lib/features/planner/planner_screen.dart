@@ -166,7 +166,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                       final id = w['id'] as int;
                       final isSelected = selectedDays.contains(id);
                       return FilterChip(
-                        label: Text(w['label'] as String, style: TextStyle(color: isSelected ? Colors.white : AppColors.textMuted, fontSize: 12)),
+                        label: Text(w['label'] as String, style: TextStyle(color: isSelected ? Colors.white : context.appTextMuted, fontSize: 12)),
                         selected: isSelected,
                         selectedColor: context.appPrimary,
                         backgroundColor: context.appSurface,
@@ -783,7 +783,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                                             todo.title,
                                                             style: TextStyle(
                                                               color: todo.isCompleted
-                                                                  ? AppColors.textMuted
+                                                                  ? context.appTextMuted
                                                                   : Colors.white,
                                                               fontSize: 15,
                                                               fontWeight: FontWeight.w600,

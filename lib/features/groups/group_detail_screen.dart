@@ -711,7 +711,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                         selected: _selectedGroupRankPeriod == 'day',
                         selectedColor: palette.primary,
                         backgroundColor: palette.card,
-                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'day' ? Colors.white : AppColors.textMuted),
+                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'day' ? Colors.white : context.appTextMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'day');
                           _loadGroupRanksSilently();
@@ -723,7 +723,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                         selected: _selectedGroupRankPeriod == 'week',
                         selectedColor: palette.primary,
                         backgroundColor: palette.card,
-                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'week' ? Colors.white : AppColors.textMuted),
+                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'week' ? Colors.white : context.appTextMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'week');
                           _loadGroupRanksSilently();
@@ -735,7 +735,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                         selected: _selectedGroupRankPeriod == 'month',
                         selectedColor: palette.primary,
                         backgroundColor: palette.card,
-                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'month' ? Colors.white : AppColors.textMuted),
+                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'month' ? Colors.white : context.appTextMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'month');
                           _loadGroupRanksSilently();
@@ -1051,7 +1051,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                   ? context.appPrimary
                   : member.isPaused
                       ? AppColors.warning
-                      : AppColors.textMuted,
+                      : context.appTextMuted,
             ),
           ),
           if (!isActivelyStudying) ...[

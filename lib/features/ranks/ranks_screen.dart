@@ -278,7 +278,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       selectedColor: context.appPrimary,
                       backgroundColor: context.appCard,
                       labelStyle: TextStyle(
-                          color: _selectedPeriod == 'day' ? Colors.white : AppColors.textMuted),
+                          color: _selectedPeriod == 'day' ? Colors.white : context.appTextMuted),
                       onSelected: (_) {
                         setState(() => _selectedPeriod = 'day');
                         _loadRanks();
@@ -291,7 +291,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       selectedColor: context.appPrimary,
                       backgroundColor: context.appCard,
                       labelStyle: TextStyle(
-                          color: _selectedPeriod == 'week' ? Colors.white : AppColors.textMuted),
+                          color: _selectedPeriod == 'week' ? Colors.white : context.appTextMuted),
                       onSelected: (_) {
                         setState(() => _selectedPeriod = 'week');
                         _loadRanks();
@@ -306,7 +306,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       labelStyle: TextStyle(
                           color: _selectedPeriod == 'month'
                               ? Colors.white
-                              : AppColors.textMuted),
+                              : context.appTextMuted),
                       onSelected: (_) {
                         setState(() => _selectedPeriod = 'month');
                         _loadRanks();

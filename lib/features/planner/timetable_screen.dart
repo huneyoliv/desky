@@ -311,7 +311,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                       const SizedBox(height: 2),
                       Text(
                         t.tr('timetable_desc', fallback: 'Organize seus horários de aulas e sessões de estudo'),
-                        style: AppTextStyles.labelSmall,
+                        style: AppTextStyles.labelSmall.copyWith(color: context.appTextMuted),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
