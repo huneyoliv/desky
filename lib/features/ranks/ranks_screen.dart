@@ -9,6 +9,7 @@ import '../../data/models/rank_entry_model.dart';
 import '../../data/repositories/rank_repository.dart';
 import '../../shared/widgets/studicon_avatar.dart';
 import '../auth/auth_notifier.dart';
+import '../settings/settings_notifier.dart';
 import 'widgets/heatmap_grid.dart';
 import 'widgets/study_calendar.dart';
 
@@ -62,12 +63,20 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     final effectiveCategoryId =
         _rankScope == _RankScope.category ? (user?.categoryId ?? 0) : 0;
 
+    // Rank inside the country the user actually picked: the previous hardcoded
+    // default showed a Brazilian board even for someone in another country.
+    final countryId = ref.read(settingsNotifierProvider).selectedCountry.id;
+
     final results = await Future.wait([
       repo.fetchGlobalRanks(
         period: _selectedPeriod,
         categoryId: effectiveCategoryId,
+        countryId: countryId,
       ),
-      repo.fetchMyCategoryRank(categoryId: effectiveCategoryId),
+      repo.fetchMyCategoryRank(
+        categoryId: effectiveCategoryId,
+        countryId: countryId,
+      ),
     ]);
 
     if (mounted) {
@@ -112,8 +121,6 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
           final dtStr = log['dt'] as String? ?? '';
           final ms = (log['sm'] as int? ?? 0);
           final hours = ms / 3600000.0;
-          final subject = log['sb'] as String? ?? 'Geral';
-
           if (dtStr.isNotEmpty) {
             monthlyMs[dtStr] = (monthlyMs[dtStr] ?? 0) + ms;
             try {
@@ -123,7 +130,23 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
             } catch (_) {}
           }
 
-          subjectMap[subject] = (subjectMap[subject] ?? 0.0) + hours;
+          // 'sb' lives on each session inside 'ls', never on the day object, so
+          // reading it at day level collapsed the whole month into one 'Geral' slice.
+          final sessions = log['ls'];
+          var attributedToSubject = false;
+          if (sessions is List) {
+            for (final session in sessions) {
+              if (session is! Map<String, dynamic>) continue;
+              final subject = (session['sb'] as String? ?? '').trim();
+              if (subject.isEmpty) continue;
+              final sessionHours = (session['sm'] as int? ?? 0) / 3600000.0;
+              subjectMap[subject] = (subjectMap[subject] ?? 0.0) + sessionHours;
+              attributedToSubject = true;
+            }
+          }
+          if (!attributedToSubject && hours > 0) {
+            subjectMap['Geral'] = (subjectMap['Geral'] ?? 0.0) + hours;
+          }
         }
       }
     }
