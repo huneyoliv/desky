@@ -35,7 +35,8 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   List<RankEntryModel> _ranks = [];
   List<double> _weeklyHours = List.filled(7, 0.0);
   Map<String, double> _subjectDistribution = {};
-  Map<String, int> _monthlyStudyMs = {};
+  DateTime _calendarMonth = DateTime.now();
+  Map<String, int> _calendarStudyMs = {};
   bool _isLoadingRanks = true;
   bool _isLoadingStats = true;
 
@@ -45,6 +46,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     _tabController = TabController(length: 3, vsync: this);
     _loadRanks();
     _loadUserStats();
+    _loadCalendarMonth();
   }
 
   @override
@@ -104,7 +106,6 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     final rawLogs = data['ls'];
     final weekly = List.filled(7, 0.0);
     final subjectMap = <String, double>{};
-    final monthlyMs = <String, int>{};
 
     if (rawLogs is List) {
       for (final log in rawLogs) {
@@ -115,7 +116,6 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
           final subject = log['sb'] as String? ?? 'Geral';
 
           if (dtStr.isNotEmpty) {
-            monthlyMs[dtStr] = (monthlyMs[dtStr] ?? 0) + ms;
             try {
               final parsedDate = DateTime.parse(dtStr);
               final dayIndex = (parsedDate.weekday - 1) % 7;
@@ -132,10 +132,23 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
       setState(() {
         _weeklyHours = weekly;
         _subjectDistribution = subjectMap;
-        _monthlyStudyMs = monthlyMs;
         _isLoadingStats = false;
       });
     }
+  }
+
+  Future<void> _loadCalendarMonth() async {
+    final user = ref.read(authStateProvider).user;
+    if (user == null) return;
+    final repo = ref.read(rankRepositoryProvider);
+    final firstDay = DateTime(_calendarMonth.year, _calendarMonth.month, 1);
+    final lastDay = DateTime(_calendarMonth.year, _calendarMonth.month + 1, 0);
+    final byDay = await repo.fetchDailyStudyMs(
+      userId: user.id,
+      startDate: DateFormat('yyyy-MM-dd').format(firstDay),
+      endDate: DateFormat('yyyy-MM-dd').format(lastDay),
+    );
+    if (mounted) setState(() => _calendarStudyMs = byDay);
   }
 
   String _formatMs(int ms) {
@@ -604,7 +617,12 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                 border: Border.all(color: context.appBorder),
               ),
               child: StudyCalendar(
-                dailyStudyTimeMs: _monthlyStudyMs,
+                dailyStudyTimeMs: _calendarStudyMs,
+                month: _calendarMonth,
+                onMonthChanged: (month) {
+                  setState(() => _calendarMonth = month);
+                  _loadCalendarMonth();
+                },
               ),
             ),
           ),

@@ -8,10 +8,14 @@ import '../../settings/settings_notifier.dart';
 
 class StudyCalendar extends ConsumerWidget {
   final Map<String, int> dailyStudyTimeMs; // Key: 'yyyy-MM-dd', Value: ms
+  final DateTime month; // Any date inside the month being displayed.
+  final ValueChanged<DateTime> onMonthChanged;
 
   const StudyCalendar({
     super.key,
     required this.dailyStudyTimeMs,
+    required this.month,
+    required this.onMonthChanged,
   });
 
   Color _getDayColor(int ms, DeskyThemePalette palette) {
@@ -35,8 +39,10 @@ class StudyCalendar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dayResetHour = ref.watch(settingsNotifierProvider.select((s) => s.dayResetHour));
     final now = StudyDateHelper.getStudyDate(null, dayResetHour);
-    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-    final firstDayWeekday = DateTime(now.year, now.month, 1).weekday; // 1=Mon...7=Sun
+    final shown = DateTime(month.year, month.month);
+    final isCurrentMonth = shown.year == now.year && shown.month == now.month;
+    final daysInMonth = DateTime(shown.year, shown.month + 1, 0).day;
+    final firstDayWeekday = DateTime(shown.year, shown.month, 1).weekday; // 1=Mon...7=Sun
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
 
@@ -55,9 +61,9 @@ class StudyCalendar extends ConsumerWidget {
         final locale = t.languageCode == 'zh-cn'
             ? 'zh_CN'
             : (t.languageCode == 'zh-tw' ? 'zh_TW' : t.languageCode);
-        return DateFormat('MMMM yyyy', locale).format(now);
+        return DateFormat('MMMM yyyy', locale).format(shown);
       } catch (_) {
-        return '${now.month}/${now.year}';
+        return '${shown.month}/${shown.year}';
       }
     }();
 
@@ -67,13 +73,26 @@ class StudyCalendar extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${t.tr("presence_calendar", fallback: "Calendário de Presença")} — $monthHeader',
-              style: TextStyle(
-                color: context.appTextPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
+            Expanded(
+              child: Text(
+                '${t.tr("presence_calendar", fallback: "Calendário de Presença")} — $monthHeader',
+                style: TextStyle(
+                  color: context.appTextPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
               ),
+            ),
+            IconButton(
+              onPressed: () => onMonthChanged(DateTime(shown.year, shown.month - 1)),
+              tooltip: t.tr('back', fallback: 'Mês anterior'),
+              icon: Icon(Icons.chevron_left, color: context.appTextPrimary),
+            ),
+            IconButton(
+              // Forward navigation stops at the current month: nobody studies tomorrow.
+              onPressed: isCurrentMonth ? null : () => onMonthChanged(DateTime(shown.year, shown.month + 1)),
+              tooltip: t.tr('next', fallback: 'Próximo mês'),
+              icon: Icon(Icons.chevron_right, color: context.appTextPrimary),
             ),
           ],
         ),
@@ -115,7 +134,7 @@ class StudyCalendar extends ConsumerWidget {
             }
 
             final dayNum = index - (firstDayWeekday - 1) + 1;
-            final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${dayNum.toString().padLeft(2, '0')}';
+            final dateStr = '${shown.year}-${shown.month.toString().padLeft(2, '0')}-${dayNum.toString().padLeft(2, '0')}';
             final studyMs = dailyStudyTimeMs[dateStr] ?? 0;
             final color = _getDayColor(studyMs, palette);
 
@@ -146,7 +165,7 @@ class StudyCalendar extends ConsumerWidget {
                   color: color,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: dayNum == now.day ? palette.primary : Colors.transparent,
+                    color: dayNum == now.day && isCurrentMonth ? palette.primary : Colors.transparent,
                     width: 1.5,
                   ),
                 ),
@@ -159,7 +178,7 @@ class StudyCalendar extends ConsumerWidget {
                       '$dayNum',
                       style: TextStyle(
                         color: color == palette.heatmapL4 ? Colors.black : palette.textPrimary,
-                        fontWeight: dayNum == now.day ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: dayNum == now.day && isCurrentMonth ? FontWeight.bold : FontWeight.normal,
                         fontSize: 12,
                       ),
                     ),
