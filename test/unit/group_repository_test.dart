@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/repositories/group_repository.dart';
@@ -102,8 +102,6 @@ void main() {
 
       final msg = await repository.sendMessage(
         groupId: 100,
-        userId: 55,
-        nickname: 'Pedro',
         message: 'Mensagem de teste',
       );
 

@@ -106,7 +106,8 @@ class ChatMessageModel {
       id: safeInt(json['idx'] ?? json['id'], DateTime.now().millisecondsSinceEpoch),
       senderId: safeInt(json['uid'] ?? json['ud']),
       senderName: safeString(json['nn'] ?? json['n'], trMsg('common_user', fallback: 'Usuário')),
-      studiconId: safeInt(json['sd'] ?? json['did'] ?? json['st'] ?? json['si'], -1),
+      // 'did' is a device id string, never a studicon id.
+      studiconId: safeInt(json['sd'] ?? json['st'] ?? json['si'], -1),
       message: safeString(json['msg'] ?? json['m'] ?? json['text']),
       photoUrl: photo,
       stickerUrl: sticker,
