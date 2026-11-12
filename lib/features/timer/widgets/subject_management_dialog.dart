@@ -400,7 +400,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                                       Text(
                                         subject.title,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: context.appTextPrimary,
                                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                           fontSize: 15,
                                         ),

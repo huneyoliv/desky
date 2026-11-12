@@ -185,7 +185,9 @@ class TimerScreen extends ConsumerWidget {
                                 Text(
                                   timerState.currentSubject?.title ?? t.tr('timer_study_subject', fallback: 'Selecionar Matéria'),
                                   style: TextStyle(
-                                    color: currentSubjectColor,
+                                    // Subject names read like every other label;
+                                    // the dot and border keep the subject colour.
+                                    color: context.appTextPrimary,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 13,
                                   ),

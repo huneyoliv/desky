@@ -255,7 +255,7 @@ class SubjectSelector extends ConsumerWidget {
                         title: Text(
                           s.title,
                           style: TextStyle(
-                            color: s.isArchived ? AppColors.textMuted : Colors.white,
+                            color: s.isArchived ? context.appTextMuted : context.appTextPrimary,
                             decoration: s.isArchived ? TextDecoration.lineThrough : null,
                           ),
                         ),
