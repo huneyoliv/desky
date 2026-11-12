@@ -36,6 +36,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   List<double> _weeklyHours = List.filled(7, 0.0);
   Map<String, double> _subjectDistribution = {};
   Map<String, int> _monthlyStudyMs = {};
+  Map<String, List<int>> _hourlyLogs = {};
   bool _isLoadingRanks = true;
   bool _isLoadingStats = true;
 
@@ -45,6 +46,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     _tabController = TabController(length: 3, vsync: this);
     _loadRanks();
     _loadUserStats();
+    _loadHourlyMap();
   }
 
   @override
@@ -136,6 +138,20 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
         _isLoadingStats = false;
       });
     }
+  }
+
+  /// Real 24h x 30d map: the previous widget was drawn from a hardcoded day.
+  Future<void> _loadHourlyMap() async {
+    final user = ref.read(authStateProvider).user;
+    if (user == null) return;
+    final repo = ref.read(rankRepositoryProvider);
+    final now = DateTime.now();
+    final byDay = await repo.fetchHourlyStudyMinutes(
+      userId: user.id,
+      startDate: DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 29))),
+      endDate: DateFormat('yyyy-MM-dd').format(now),
+    );
+    if (mounted) setState(() => _hourlyLogs = byDay);
   }
 
   String _formatMs(int ms) {
@@ -583,11 +599,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: context.appBorder),
                         ),
-                        child: HeatmapGrid(
-                          hourlyLogs: {
-                            '2026-08-11': List.generate(24, (i) => (i >= 8 && i <= 18) ? (i * 3) % 60 : 0),
-                          },
-                        ),
+                        child: HeatmapGrid(hourlyLogs: _hourlyLogs),
                       ),
                     ],
                   ),
