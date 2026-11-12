@@ -217,27 +217,23 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
 
   Future<void> _shakeUser(GroupMemberModel member) async {
     final t = ref.read(appTranslationProvider);
-    try {
-      final repo = ref.read(groupRepositoryProvider);
-      await repo.shakeMember(groupId: widget.group.id, targetUserId: member.userId);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${t.tr("shake_sent_to", fallback: "Chacoalhada enviada para")} ${member.name}! 🔔'),
-            backgroundColor: context.appPrimary,
-          ),
-        );
-      }
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${t.tr("notification_sent_to", fallback: "Notificação enviada para")} ${member.name}!'),
-            backgroundColor: context.appPrimary,
-          ),
-        );
-      }
-    }
+    final repo = ref.read(groupRepositoryProvider);
+    final sent = await repo.shakeMember(
+      groupId: widget.group.id,
+      targetUserId: member.userId,
+    );
+
+    // The repository answers false instead of throwing, so the old code showed
+    // a success message on both branches and a failed nudge looked delivered.
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(sent
+            ? '${t.tr("shake_sent_to", fallback: "Chacoalhada enviada para")} ${member.name}! 🔔'
+            : t.tr('shake_failed', fallback: 'Não foi possível enviar a cutucada.')),
+        backgroundColor: sent ? context.appPrimary : AppColors.error,
+      ),
+    );
   }
 
   Future<void> _sendMessage() async {
