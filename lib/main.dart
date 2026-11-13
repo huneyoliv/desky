@@ -11,6 +11,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
+import 'core/pdf/macos_document_channel.dart';
+import 'core/pdf/pdf_open_request.dart';
+import 'core/pdf/single_instance_channel.dart';
 import 'core/window/window_state.dart';
 import 'core/window/window_state_store.dart';
 import 'core/services/discord_rpc_coordinator.dart';
@@ -25,8 +28,24 @@ import 'features/settings/theme_notifier.dart';
 import 'features/timer/timer_notifier.dart';
 import 'shared/widgets/app_title_bar.dart';
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Abrir um PDF pela associacao de arquivos: o caminho chega como argumento.
+  final initialPdf = PdfOpenRequest.parse(args);
+
+  // Uma segunda instancia apenas encaminha o arquivo para a que ja esta aberta.
+  // Sem argumento, o comportamento de instancia unica e mantido.
+  SingleInstanceChannel? instanceChannel;
+  if (Platform.isWindows || Platform.isLinux) {
+    instanceChannel = await SingleInstanceChannel.startOrForward(
+      initialPdf.path ?? '',
+    );
+    if (instanceChannel == null) {
+      // O arquivo foi encaminhado para a instancia aberta; nada mais a fazer.
+      exit(0);
+    }
+  }
   await EnvConfig.init();
   await initializeDateFormatting();
 
@@ -89,13 +108,26 @@ void main() async {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
-      child: const DeskyApp(),
+      child: DeskyApp(
+        initialPdf: initialPdf,
+        instanceChannel: instanceChannel,
+      ),
     ),
   );
 }
 
 class DeskyApp extends ConsumerStatefulWidget {
-  const DeskyApp({super.key});
+  const DeskyApp({
+    super.key,
+    this.initialPdf = PdfOpenRequest.none,
+    this.instanceChannel,
+  });
+
+  /// Pedido de abertura vindo da linha de comando.
+  final PdfOpenRequest initialPdf;
+
+  /// Canal de instancia unica, quando este processo e o primario.
+  final SingleInstanceChannel? instanceChannel;
 
   @override
   ConsumerState<DeskyApp> createState() => _DeskyAppState();
@@ -114,6 +146,12 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   Size _lastNormalSize = kDefaultWindowSize;
   bool _lastMaximized = false;
 
+  /// Abertura de PDF pendente: so navegamos depois de autenticado, porque o
+  /// redirect do router manda para /login enquanto a sessao nao estiver pronta.
+  PdfOpenRequest? _pendingPdf;
+  StreamSubscription<String>? _instanceSub;
+  bool _pdfFailureReported = false;
+
   WindowStateStore get _windowStore =>
       _windowStateStore ??= WindowStateStore(
         prefs: ref.read(sharedPreferencesProvider),
@@ -122,6 +160,21 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   @override
   void initState() {
     super.initState();
+    _pendingPdf = widget.initialPdf.shouldOpen || widget.initialPdf.failed
+        ? widget.initialPdf
+        : null;
+    // macOS: o Finder entrega o documento por Apple Event, nao por argumento.
+    MacOsDocumentChannel.listen((path) {
+      final request = PdfOpenRequest.parse([path]);
+      if (request.shouldOpen) _openPdf(request.path!);
+    });
+    _instanceSub = widget.instanceChannel?.incoming.listen((payload) {
+      // Outra instancia mandou um caminho: trata como novo pedido.
+      final request = PdfOpenRequest.parse([payload]);
+      if (request.shouldOpen) {
+        _openPdf(request.path!);
+      }
+    });
     _primeWindowState();
     windowManager.addListener(this);
     WidgetsBinding.instance.addObserver(this);
@@ -135,6 +188,39 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
       ref.read(authStateProvider.notifier).checkAuthStatus();
       ref.read(discordRpcCoordinatorProvider);
     });
+  }
+
+  void _openPdf(String path) {
+    if (!mounted) return;
+    ref.read(routerProvider).go('/smartbook', extra: path);
+  }
+
+  /// Consome o pedido pendente quando a sessao fica autenticada.
+  void _flushPendingPdf() {
+    final request = _pendingPdf;
+    if (request == null) return;
+    if (!ref.read(authStateProvider).isAuthenticated) return;
+    _pendingPdf = null;
+    if (request.shouldOpen) {
+      _openPdf(request.path!);
+      return;
+    }
+    if (request.failed && !_pdfFailureReported) {
+      _pdfFailureReported = true;
+      final t = ref.read(appTranslationProvider);
+      final context = rootNavigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${t.tr('pdf_open_failed', fallback: 'Não foi possível abrir o arquivo')}: '
+              '\${request.fileName ?? ''}',
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   void _setupSignalHandlers() {
@@ -152,6 +238,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
 
   @override
   void dispose() {
+    _instanceSub?.cancel();
     _windowStateDebounce?.cancel();
     _sigtermSub?.cancel();
     _sigintSub?.cancel();
@@ -262,6 +349,12 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
 
   @override
   Widget build(BuildContext context) {
+    // Quando a sessao fica autenticada, abre o PDF que veio por argumento.
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
+      if (next.isAuthenticated && !(previous?.isAuthenticated ?? false)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _flushPendingPdf());
+      }
+    });
     final router = ref.watch(routerProvider);
     final translation = ref.watch(appTranslationProvider);
     final currentPalette = ref.watch(themeNotifierProvider);

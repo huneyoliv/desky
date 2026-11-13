@@ -213,11 +213,13 @@ jobs:
           [Desktop Entry]
           Name=Desky
           Comment=Focus & Study Timer Desktop Client
-          Exec=/usr/bin/desky
+          Exec=/usr/bin/desky %f
           Icon=desky
           Terminal=false
           Type=Application
           Categories=Utility;Education;
+          MimeType=application/pdf;
+          Keywords=study;timer;focus;pdf;
           EOF
 
           cat << EOF > pkg/DEBIAN/control

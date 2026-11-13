@@ -81,7 +81,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/smartbook',
-            builder: (context, state) => const SmartBookScreen(),
+            // O caminho pode vir como `extra` quando o arquivo foi aberto pela
+            // associacao de arquivos; a key forca um estado novo por arquivo.
+            builder: (context, state) {
+              final initialPath = state.extra is String ? state.extra as String : null;
+              return SmartBookScreen(
+                key: ValueKey(initialPath ?? 'pdf-reader'),
+                initialFilePath: initialPath,
+              );
+            },
           ),
           GoRoute(
             path: '/profile',
