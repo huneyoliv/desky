@@ -8,6 +8,7 @@ import '../../data/models/group_model.dart';
 import '../../data/repositories/group_repository.dart';
 import '../auth/auth_notifier.dart';
 import '../settings/settings_notifier.dart';
+import '../settings/widgets/select_country_dialog.dart';
 import 'group_detail_screen.dart';
 
 final groupRepoProvider = Provider<GroupRepository>((ref) {
@@ -74,9 +75,13 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
       final categories = _getCategories(countryCats, t);
       final safeIndex = _selectedCategoryIndex < categories.length ? _selectedCategoryIndex : 0;
       final catId = categories[safeIndex]['id'] as int;
+      // Search inside the country the user picked: the repository default made
+      // every user browse Brazilian groups.
+      final countryId = ref.read(settingsNotifierProvider).selectedCountry.id;
       final results = await repo.fetchExploreGroups(
         categoryId: catId,
         orderType: _selectedOrderType,
+        countryId: countryId,
       );
       if (mounted) {
         setState(() {
@@ -342,6 +347,13 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
 
+    // The explore list depends on the region, so follow any region change
+    // (including the one made from the empty state below).
+    ref.listen(settingsNotifierProvider.select((s) => s.selectedCountry.id),
+        (previous, next) {
+      if (previous != next) _loadExploreGroups();
+    });
+
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
@@ -534,9 +546,34 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                   )
                             : _exploreGroups.isEmpty
                                 ? Center(
-                                    child: Text(
-                                      t.tr('no_groups_found', fallback: 'Nenhum grupo disponível para explorar no momento.'),
-                                      style: TextStyle(color: context.appTextSecondary),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(24),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            t.tr('no_groups_found', fallback: 'Nenhum grupo disponível para explorar no momento.'),
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(color: context.appTextSecondary),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            '${t.tr("region", fallback: "Região")}: '
+                                            '${ref.watch(settingsNotifierProvider).selectedCountry.formattedName}',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(color: context.appTextMuted, fontSize: 12),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          // Explicit action instead of silently
+                                          // widening the search to another country.
+                                          ElevatedButton.icon(
+                                            onPressed: () => SelectCountryDialog.show(context),
+                                            icon: const Icon(Icons.public_rounded, size: 18),
+                                            label: Text(t.tr('view_other_region_groups', fallback: 'Ver grupos de outra região')),
+                                            style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   )
                                 : ListView.builder(
