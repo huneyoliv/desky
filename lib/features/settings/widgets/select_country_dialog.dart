@@ -131,6 +131,11 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                   const SizedBox(height: 4),
                   Text('• ${t.tr("sync_region_desc", fallback: "As matérias e rankings serão sincronizados com esta região.")}',
                       style: const TextStyle(color: AppColors.primaryLight, fontSize: 12)),
+                  const SizedBox(height: 4),
+                  // Deixa explicito que nao existe etapa de senha: a troca e
+                  // aplicada na hora, neste dispositivo, como no app oficial.
+                  Text('• ${t.tr("change_region_no_password", fallback: "A troca é aplicada imediatamente neste dispositivo, sem pedir senha.")}',
+                      style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                 ],
               ),
             ),
