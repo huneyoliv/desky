@@ -98,6 +98,80 @@ class RankRepository {
     return byDay;
   }
 
+  /// Minutes studied per hour, keyed by 'yyyy-MM-dd' with 24 buckets each.
+  ///
+  /// Every session carries `st` (ISO start) and `sm` (duration), so the minutes
+  /// land on the hours that were actually studied instead of one daily block.
+  Future<Map<String, List<int>>> fetchHourlyStudyMinutes({
+    required int userId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final data = await fetchUserStats(
+      userId: userId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+
+    final byDay = <String, List<int>>{};
+    for (final day in _eachDay(startDate, endDate)) {
+      byDay[day] = List.filled(24, 0);
+    }
+
+    final rawLogs = data['ls'];
+    if (rawLogs is List) {
+      for (final log in rawLogs) {
+        if (log is! Map<String, dynamic>) continue;
+        final day = _normalizeDay(log['dt'] as String? ?? '');
+        if (day.isEmpty) continue;
+        final buckets = byDay.putIfAbsent(day, () => List.filled(24, 0));
+
+        final sessions = log['ls'];
+        if (sessions is! List) continue;
+        for (final session in sessions) {
+          if (session is! Map<String, dynamic>) continue;
+          final minutes = ((session['sm'] as int? ?? 0) / 60000).round();
+          if (minutes <= 0) continue;
+          final start = DateTime.tryParse(session['st'] as String? ?? '')?.toLocal();
+          if (start == null) continue;
+
+          var remaining = minutes;
+          var hour = start.hour;
+          // The first hour only takes the part of it that was studied.
+          var capacity = 60 - start.minute;
+          while (remaining > 0 && hour < 24) {
+            final take = remaining < capacity ? remaining : capacity;
+            buckets[hour] += take;
+            remaining -= take;
+            hour++;
+            capacity = 60;
+          }
+        }
+      }
+    }
+
+    return byDay;
+  }
+
+  static String _normalizeDay(String raw) {
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) return raw;
+    return '${parsed.year}-${parsed.month.toString().padLeft(2, '0')}'
+        '-${parsed.day.toString().padLeft(2, '0')}';
+  }
+
+  static Iterable<String> _eachDay(String startDate, String endDate) sync* {
+    final start = DateTime.tryParse(startDate);
+    final end = DateTime.tryParse(endDate);
+    if (start == null || end == null) return;
+    for (var day = DateTime(start.year, start.month, start.day);
+        !day.isAfter(DateTime(end.year, end.month, end.day));
+        day = day.add(const Duration(days: 1))) {
+      yield '${day.year}-${day.month.toString().padLeft(2, '0')}'
+          '-${day.day.toString().padLeft(2, '0')}';
+    }
+  }
+
   Future<Map<String, dynamic>> fetchUserStats({
     required int userId,
     required String startDate,
