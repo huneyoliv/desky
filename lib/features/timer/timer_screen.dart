@@ -73,7 +73,7 @@ class TimerScreen extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(t.tr('today_total_study_time', fallback: 'Tempo de Estudo'), style: AppTextStyles.labelSmall),
+                            Text(t.tr('today_total_study_time', fallback: 'Tempo de Estudo'), style: AppTextStyles.labelSmall.copyWith(color: context.appTextMuted)),
                             const SizedBox(height: 2),
                             Text(
                               _formatTotalTime(timerState.todayTotalMs),
@@ -387,13 +387,13 @@ class TimerScreen extends ConsumerWidget {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: phaseColor,
                               disabledBackgroundColor: AppColors.surfaceLight.withValues(alpha: 0.4),
-                              disabledForegroundColor: AppColors.textMuted,
+                              disabledForegroundColor: AppColors.stopped,
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: Icon(
                               Icons.play_arrow_rounded,
-                              color: timerState.currentSubject == null ? AppColors.textMuted : Colors.white,
+                              color: timerState.currentSubject == null ? AppColors.stopped : Colors.white,
                               size: 28,
                             ),
                             label: Text(
@@ -403,7 +403,7 @@ class TimerScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
-                                color: timerState.currentSubject == null ? AppColors.textMuted : Colors.white,
+                                color: timerState.currentSubject == null ? AppColors.stopped : Colors.white,
                               ),
                             ),
                           ),

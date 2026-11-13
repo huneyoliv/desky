@@ -417,7 +417,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   title: Text(member.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text(member.isStudying ? t.tr('studying', fallback: 'Estudando') : t.tr('inactive', fallback: 'Inativo'), style: TextStyle(color: member.isStudying ? AppColors.success : AppColors.textMuted)),
+                  subtitle: Text(member.isStudying ? t.tr('studying', fallback: 'Estudando') : t.tr('inactive', fallback: 'Inativo'), style: TextStyle(color: member.isStudying ? AppColors.success : context.appTextMuted)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

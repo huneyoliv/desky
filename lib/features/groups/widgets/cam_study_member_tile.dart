@@ -88,7 +88,7 @@ class CamStudyMemberTile extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: member.isStudying
                           ? Colors.white
-                          : AppColors.textMuted,
+                          : context.appTextMuted,
                       shape: BoxShape.circle,
                     ),
                   ),
