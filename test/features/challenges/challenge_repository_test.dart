@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/challenge_model.dart';
@@ -82,6 +82,22 @@ void main() {
 
       expect(list.length, 1);
       expect(list.first.name, 'Desafio Maratona');
+    });
+
+    test('fetchAvailableChallenges le a chave `rs` devolvida pela API', () async {
+      // A API real responde {"s": true, "rs": [...]}; antes o repositorio so
+      // olhava `challenges`/`c` e a aba ficava sempre vazia.
+      mockApiClient.getResponse = {
+        's': true,
+        'rs': [
+          {'id': 7, 'name': 'Desafio YPT', 'flame_cost': 30},
+        ],
+      };
+
+      final list = await repository.fetchAvailableChallenges();
+
+      expect(list.length, 1);
+      expect(list.first.name, 'Desafio YPT');
     });
 
     test('joinChallenge returns true on success', () async {

@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
 import 'core/services/discord_rpc_coordinator.dart';
@@ -37,9 +38,37 @@ void main() async {
 
   // Initialize Desktop Window Manager
   await windowManager.ensureInitialized();
+
+  // A janela nao pode nascer maior que a area util do monitor: em telas 720p o
+  // tamanho padrao (1280x800) ficava mais alto que a tela e, como a barra de
+  // titulo e desenhada pelo proprio app (janela sem moldura), ela abria fora da
+  // tela, exigindo redimensionar para recuperar a janela.
+  const preferredSize = Size(1280, 800);
+  const preferredMinimumSize = Size(1024, 700);
+  var windowSize = preferredSize;
+  var minimumWindowSize = preferredMinimumSize;
+  try {
+    final display = await screenRetriever.getPrimaryDisplay();
+    final visible = display.visibleSize ?? display.size;
+    if (visible.width > 0 && visible.height > 0) {
+      windowSize = Size(
+        preferredSize.width < visible.width ? preferredSize.width : visible.width,
+        preferredSize.height < visible.height ? preferredSize.height : visible.height,
+      );
+      minimumWindowSize = Size(
+        preferredMinimumSize.width < visible.width ? preferredMinimumSize.width : visible.width,
+        preferredMinimumSize.height < windowSize.height
+            ? preferredMinimumSize.height
+            : windowSize.height,
+      );
+    }
+  } catch (_) {
+    // Sem informacao do monitor, mantem o tamanho padrao.
+  }
+
   final windowOptions = WindowOptions(
-    size: const Size(1280, 800),
-    minimumSize: const Size(1024, 700),
+    size: windowSize,
+    minimumSize: minimumWindowSize,
     center: true,
     backgroundColor: Platform.isMacOS ? AppColors.background : Colors.transparent,
     skipTaskbar: false,

@@ -39,6 +39,9 @@ dependencies:
   lucide_icons_flutter: any
   intl: any
   window_manager: ^0.3.9
+  # Necessario para consultar a area util do monitor e nao abrir a janela maior
+  # que a tela (ja vinha como dependencia transitiva do window_manager).
+  screen_retriever: ^0.1.9
 
   crypto: ^3.0.3
   google_sign_in: ^6.2.1

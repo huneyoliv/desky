@@ -12,7 +12,8 @@ class ChallengeRepository {
       final response = await _apiClient.get('/mission/challenges');
       final data = response.data;
       if (data is Map<String, dynamic>) {
-        final list = data['challenges'] ?? data['c'];
+        // A API devolve a lista em `rs`; sem essa chave a aba ficava sempre vazia.
+        final list = data['rs'] ?? data['challenges'] ?? data['c'];
         if (list is List) {
           return list
               .whereType<Map<String, dynamic>>()
@@ -26,10 +27,12 @@ class ChallengeRepository {
 
   Future<List<ChallengeModel>> fetchMyChallenges() async {
     try {
+      // Rota inexistente na API real (404); mantida apenas para o dia em que o
+      // app oficial expuser a lista de desafios do usuario.
       final response = await _apiClient.get('/mission/challenge/my');
       final data = response.data;
       if (data is Map<String, dynamic>) {
-        final list = data['challenges'] ?? data['c'];
+        final list = data['rs'] ?? data['challenges'] ?? data['c'];
         if (list is List) {
           return list
               .whereType<Map<String, dynamic>>()
