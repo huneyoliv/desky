@@ -475,7 +475,10 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
         ),
         body: TabBarView(
           children: [
+            // stretch: sem isso o painel esquerdo (largura fixa) fica centralizado
+            // na vertical e sobra uma faixa vazia acima dos D-Days e abaixo do calendario.
             Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Left Sidebar - Calendar & D-Days
                 Container(
