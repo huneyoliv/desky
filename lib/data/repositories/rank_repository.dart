@@ -73,6 +73,31 @@ class RankRepository {
     return null;
   }
 
+  /// Study milliseconds per day ('yyyy-MM-dd') for any date range.
+  Future<Map<String, int>> fetchDailyStudyMs({
+    required int userId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final data = await fetchUserStats(
+      userId: userId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    final rawLogs = data['ls'];
+    final byDay = <String, int>{};
+    if (rawLogs is List) {
+      for (final log in rawLogs) {
+        if (log is Map<String, dynamic>) {
+          final day = log['dt'] as String? ?? '';
+          if (day.isEmpty) continue;
+          byDay[day] = (byDay[day] ?? 0) + (log['sm'] as int? ?? 0);
+        }
+      }
+    }
+    return byDay;
+  }
+
   Future<Map<String, dynamic>> fetchUserStats({
     required int userId,
     required String startDate,

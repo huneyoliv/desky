@@ -34,7 +34,11 @@ void main() {
           child: MaterialApp(
             home: Scaffold(
               body: SingleChildScrollView(
-                child: StudyCalendar(dailyStudyTimeMs: dailyMs),
+                child: StudyCalendar(
+                  dailyStudyTimeMs: dailyMs,
+                  month: DateTime(2026, 8),
+                  onMonthChanged: (_) {},
+                ),
               ),
             ),
           ),
