@@ -52,7 +52,11 @@ Esta matriz apresenta a especificação atualizada e exaustiva de **TODOS os 15 
 | **Detalhes e Entrada no Grupo** | Consulta de regras, membros e pedido de entrada | `GET /group/search-info/v2` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
 | **Membros Ativos no Grupo** | Status do cronômetro dos membros em tempo real | `GET /logs/group/members/v2` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
 | **Avisos e Alertas (Shake)** | Envio de chamadas e agitação de membros | `POST /group/push/shake` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
-| **Chat de Grupo & Histórico** | Mensagens de texto e filtro incremental | `GET /chat/group/messages` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
+| **Envio de Mensagem no Chat** | Envio de texto no grupo (autor vem do token) | `POST /chat/group/message` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** — corpo `{group_id, message}` |
+| **Configurações do Grupo (edição)** | Edição parcial pelo líder | `POST /group/info/edit` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** — chave `id`; `/group/setting/*` é 404 |
+| **Validação de Nome do Grupo** | Verifica disponibilidade do nome | `POST /group/make/title/validate` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** — corpo `{title}` |
+| **Criação de Grupo** | Criação de grupo de estudos pelo cliente | `POST /group/make/v2` | `pi.tgclab.com` | **Bloqueado** — rota confirmada e `title`/`goalTime` confirmados; o servidor responde erro genérico e não cria (ver investigação do PR 9) |
+| **Chat de Grupo & Histórico** | Mensagens de texto e filtro incremental | `GET /chat/group/messages?group_id=` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** — o parâmetro é `group_id` |
 | **Figurinhas / Stickers do Chat** | Conjuntos de figurinhas personalizadas do YPT | `GET /chat/sticker/sets` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
 | **Upload de Fotos do Chat** | Microserviço serverless para envio de imagens | `POST /file` | `alifn.tgclab.com` | **Validado ao Vivo (200 OK)** |
 | **Desafios e Missões do Grupo** | Missões com metas diárias e taxa de inscrição | `GET /mission/challenges` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |

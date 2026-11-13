@@ -233,3 +233,131 @@ Authorization: JWT <TOKEN_JWT_SESSION>
 
 #### `GET https://pi.tgclab.com/logs/group/members/v2?groupID=6487271`
 - **Função**: Retorna o status de estudo e os identificadores para resolução de avatares CDN de todos os membros do grupo.
+
+---
+
+### Módulo: Configurações do Grupo (Edição Parcial)
+
+#### `POST https://pi.tgclab.com/group/info/edit`
+- **Função**: Atualização **parcial** das configurações do grupo (líder).
+- **Chave do grupo**: `id`. Enviar `groupID` resulta em **HTTP 500**.
+- **Regra**: somente os campos enviados são alterados; os ausentes permanecem intactos.
+- **Campos aceitos** (verificados por escrita *no-op* na API real, comparando o objeto do
+  grupo antes e depois; nenhum campo mudou):
+
+| Chave | Significado | Tipo |
+| :--- | :--- | :--- |
+| `t` | Nome do grupo | String |
+| `cid` | ID da categoria | int |
+| `gt` | Meta diária (horas) | int |
+| `mc` | Capacidade de membros | int |
+| `nt` | Aviso (notice board) | String |
+| `pw` | Senha de acesso | String |
+| `il` | Introdução | String |
+| `ic` | Grupo Cam Study | bool |
+
+- **Request Body**:
+```json
+{ "id": 6487271, "t": "Nome do grupo" }
+```
+- **Response Body (200 OK)**:
+```json
+{ "s": true }
+```
+
+> **Rotas inexistentes (404 na API real)**: `/group/setting/name`,
+> `/group/setting/category`, `/group/setting/max-member`, `/group/setting/goal-time`,
+> `/group/setting/password`, `/group/setting/notice` e `/group/setting/promote`.
+> A promoção de grupo permanece **sem substituto confirmado**.
+
+---
+
+### Módulo: Chat do Grupo
+
+#### `POST https://pi.tgclab.com/chat/group/message`
+- **Função**: Envia uma mensagem de texto. O autor é derivado do token JWT.
+- **Request Body**:
+```json
+{ "group_id": 6487271, "message": "Bom estudo!" }
+```
+- **Response Body (200 OK)**:
+```json
+{
+  "s": true, "idx": 0, "uid": 0, "nn": "Nome", "did": "device-id",
+  "msg": "Bom estudo!", "ts": 0.0, "ua": 0.0, "cat": "study",
+  "idel": false, "ilv": false
+}
+```
+- Chaves como `nickname`, `userID`, `category`, `createdAt` e `updatedAt` **não** são
+  usadas pela API e não devem ser enviadas.
+
+#### `GET https://pi.tgclab.com/chat/group/messages?group_id={id}`
+- **Função**: Lista as mensagens do grupo.
+- **Parâmetro**: `group_id` (snake_case). Com `groupID` ou `id` a API responde
+  `{"s": true, "c": "…"}` **sem o array de mensagens**.
+- **Response Body (200 OK)**: array `m[]` com `idx`, `uid`, `nn`, `did`, `msg`, `ts`,
+  `ua`, `cat`, `idel`, `ilv`.
+- `ts` é o horário de envio (epoch em segundos, com fração). `did` é um identificador de
+  dispositivo (String), **não** um ID de studicon.
+
+---
+
+### Módulo: Estatísticas e Histórico
+
+#### `POST https://pi.tgclab.com/logs/range/days`
+- **Função**: Histórico de estudo por intervalo de datas.
+- **Request Body**:
+```json
+{ "id": 0, "isMember": true, "startDate": "2026-11-01", "endDate": "2026-11-30" }
+```
+- Sem a chave `id` a API responde `{"s": true, "c": "…"}` sem dados.
+- **Estrutura da resposta**: `ls[]` (dias). Cada dia possui `dt` (data) e `ls[]` (sessões).
+  Cada sessão possui `sb` (matéria), `sm` (duração em ms), `st` (início, **ISO 8601 com
+  fuso horário**), `ia` e `ad` (booleanos).
+- **`sb` existe apenas dentro das sessões**, nunca no objeto do dia; ler `sb` no nível do
+  dia faz todo o período virar uma única matéria.
+
+#### `GET https://pi.tgclab.com/logs/day?date=YYYY-MM-DD`
+- **Estrutura observada**: `{ s, dl, ts, cl, ss, sbs }`.
+- `dl` contém `ad, am, as, c, cm, co, dt, id, ls, mm, off, rm, rs, sm, sp, st`.
+- **`dl.is` está ausente** (tanto com o cronômetro parado quanto estudando). O cliente usa
+  esse campo para reconciliar a sessão em andamento, portanto essa reconciliação **nunca
+  age**.
+
+---
+
+### Módulo: Descoberta de Grupos
+
+#### `GET https://pi.tgclab.com/group/list-new-2`
+- **Parâmetros**: `category_id`, `order_type`, `only_available`, `only_open`, `only_cam`,
+  `page`, `country_id`, `p`, `q`.
+- **`country_id` é respeitado**: com `23` (Brasil) a listagem traz grupos brasileiros; com
+  `351` (Portugal) fica vazia e com `1` traz um conjunto diferente. Portanto o país do
+  usuário **deve** ser enviado, sob pena de exibir o quadro brasileiro a todos.
+
+---
+
+### Módulo: Criação de Grupos (contrato NÃO confirmado)
+
+> **Status**: rota confirmada, contrato de payload **não confirmado**. Não implementar por
+> tentativa. Histórico completo em `.desky_apk_work/PR9_group_creation_investigation.md`.
+
+#### `POST https://pi.tgclab.com/group/make/v2`
+- **Formato**: JSON plano (multipart, form-urlencoded e corpo aninhado falham).
+- **Campos comprovadamente lidos pelo servidor**:
+
+| Chave | Tipo | Regra verificada |
+| :--- | :--- | :--- |
+| `title` | String | obrigatório; ausente ou com tipo errado → **HTTP 500**; o app exige de 2 a 19 caracteres |
+| `goalTime` | int | obrigatório; **1 a 20** horas (mensagem do próprio servidor) |
+
+- Com `title` e `goalTime` válidos a API responde `{"s": false, "c": "400"}` e **não cria
+  o grupo** (contagem de grupos da conta inalterada).
+- **Nenhum outro nome de campo é lido**: cerca de 80 chaves candidatas foram testadas
+  (categoria, capacidade, introdução/aviso, senha, Cam Study, privacidade, país, tipo de
+  grupo, versão e plataforma), isoladamente e em combinação, sem alterar a resposta.
+
+#### `POST https://pi.tgclab.com/group/make/title/validate`
+- **Função**: valida se o nome do grupo está disponível.
+- **Request Body**: `{"title": "Nome do grupo"}`
+- **Response Body (200 OK)**: `{"s": true}` quando disponível.
