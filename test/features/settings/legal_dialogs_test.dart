@@ -98,6 +98,10 @@ void main() {
     expect(find.textContaining('Legal'), findsWidgets);
     expect(find.text('Política de Privacidade'), findsOneWidget);
     expect(find.textContaining('Termos de Uso'), findsOneWidget);
-    expect(find.text('Licenças Open Source'), findsOneWidget);
+    // A aba de licencas saiu; no lugar dela ficam o link do repositorio e a versao.
+    expect(find.text('Licenças Open Source'), findsNothing);
+    expect(find.text('Ver no GitHub'), findsOneWidget);
+    expect(find.text('Versão do app'), findsOneWidget);
+    expect(find.textContaining('Build 18'), findsOneWidget);
   });
 }

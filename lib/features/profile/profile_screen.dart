@@ -15,7 +15,6 @@ import '../timer/timer_notifier.dart';
 import '../settings/widgets/privacy_policy_dialog.dart';
 import '../settings/widgets/terms_of_service_dialog.dart';
 import '../settings/widgets/faq_help_dialog.dart';
-import '../settings/widgets/open_source_licenses_dialog.dart';
 import '../settings/widgets/change_password_dialog.dart';
 import '../settings/widgets/study_preferences_dialog.dart';
 import '../settings/widgets/theme_selection_dialog.dart';
@@ -718,18 +717,6 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
-                    leading: Icon(Icons.code_rounded, color: context.appPrimary),
-                    title: Text(t.tr('open_source_licenses', fallback: 'Licenças Open Source'),
-                        style: const TextStyle(color: Colors.white)),
-                    subtitle: Text(
-                      t.tr('licenses_subtitle', fallback: 'Softwares e bibliotecas de código aberto'),
-                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
-                    ),
-                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
-                    onTap: () => OpenSourceLicensesDialog.show(context),
-                  ),
-                  Divider(color: context.appBorder, height: 1),
-                  ListTile(
                     leading: Icon(Icons.open_in_new_rounded, color: context.appPrimary),
                     title: Text(t.tr('view_on_github', fallback: 'Ver no GitHub'),
                         style: const TextStyle(color: Colors.white)),
@@ -739,6 +726,16 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: _openRepository,
+                  ),
+                  Divider(color: context.appBorder, height: 1),
+                  ListTile(
+                    leading: Icon(Icons.info_outline_rounded, color: context.appPrimary),
+                    title: Text(t.tr('drawer_settings_pallo_app_version', fallback: 'Versão do app'),
+                        style: const TextStyle(color: Colors.white)),
+                    subtitle: Text(
+                      'Desky ${AppConstants.appVersion} • Build ${AppConstants.buildNumber}',
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                    ),
                   ),
                 ],
               ),
@@ -757,21 +754,6 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded, size: 18, color: context.appPrimary),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Desky v${AppConstants.appVersion} (${AppConstants.buildNumber})',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
                   Text(
                     t.tr('legal_disclaimer', fallback: 'O Desky é um cliente de terceiros independente e de código aberto, não sendo afiliado, endossado, patrocinado ou associado à Pallo Inc. ou ao Yeolpumta (YPT). Todas as marcas registradas pertencem aos seus respectivos proprietários.'),
                     style: TextStyle(
