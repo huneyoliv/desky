@@ -1,6 +1,13 @@
-import '../../core/api/api_client.dart';
+﻿import '../../core/api/api_client.dart';
 import '../models/challenge_model.dart';
 
+/// Leitura de desafios.
+///
+/// Somente a listagem e comprovada: `GET /mission/challenges`, que devolve a
+/// lista em `rs`. As antigas `fetchMyChallenges` (`/mission/challenge/my`) e
+/// `joinChallenge`/`cancelParticipation` (`/mission/challenge/join` e `/cancel`)
+/// foram removidas porque as tres rotas respondem `404` na API e nao existem no
+/// APK oficial (que tem 20 rotas de missao, nenhuma com join/cancel).
 class ChallengeRepository {
   final ApiClient _apiClient;
 
@@ -23,51 +30,5 @@ class ChallengeRepository {
       }
     } catch (_) {}
     return [];
-  }
-
-  Future<List<ChallengeModel>> fetchMyChallenges() async {
-    try {
-      // Rota inexistente na API real (404); mantida apenas para o dia em que o
-      // app oficial expuser a lista de desafios do usuario.
-      final response = await _apiClient.get('/mission/challenge/my');
-      final data = response.data;
-      if (data is Map<String, dynamic>) {
-        final list = data['rs'] ?? data['challenges'] ?? data['c'];
-        if (list is List) {
-          return list
-              .whereType<Map<String, dynamic>>()
-              .map((item) => ChallengeModel.fromJson(item))
-              .toList();
-        }
-      }
-    } catch (_) {}
-    return [];
-  }
-
-  Future<bool> joinChallenge(int challengeId, int flameBet) async {
-    try {
-      final response = await _apiClient.post(
-        '/mission/challenge/join',
-        data: {
-          'challengeID': challengeId,
-          'flameBet': flameBet,
-        },
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
-  }
-
-  Future<bool> cancelParticipation(int challengeId) async {
-    try {
-      final response = await _apiClient.post(
-        '/mission/challenge/cancel',
-        data: {'challengeID': challengeId},
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
   }
 }

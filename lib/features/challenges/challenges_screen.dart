@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
@@ -11,6 +11,12 @@ final challengeRepositoryProvider = Provider<ChallengeRepository>((ref) {
   return ChallengeRepository();
 });
 
+/// Lista de desafios em modo **somente leitura**.
+///
+/// As acoes de participar, cancelar, "meus desafios" e check-in foram removidas:
+/// as rotas usadas ate entao (`/mission/challenge/join`, `/cancel`, `/my`) nao
+/// existem na API (`404`) e nem aparecem no APK oficial, e o check-in anterior
+/// apenas exibia uma mensagem de sucesso sem chamar a API.
 class ChallengesScreen extends ConsumerStatefulWidget {
   const ChallengesScreen({super.key});
 
@@ -18,130 +24,89 @@ class ChallengesScreen extends ConsumerStatefulWidget {
   ConsumerState<ChallengesScreen> createState() => _ChallengesScreenState();
 }
 
-class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
   List<ChallengeModel> _available = [];
-  List<ChallengeModel> _myChallenges = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _loadChallenges();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadChallenges() async {
     setState(() => _isLoading = true);
     final repo = ref.read(challengeRepositoryProvider);
 
-    final results = await Future.wait([
-      repo.fetchAvailableChallenges(),
-      repo.fetchMyChallenges(),
-    ]);
+    final available = await repo.fetchAvailableChallenges();
 
     if (mounted) {
       setState(() {
-        _available = results[0];
-        _myChallenges = results[1];
+        _available = available;
         _isLoading = false;
       });
     }
   }
 
-  Future<void> _joinChallenge(ChallengeModel challenge) async {
-    final t = ref.read(appTranslationProvider);
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: context.appCard,
-        title: Text('${t.tr("join", fallback: "Participar")}: ${challenge.name}', style: const TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(challenge.description, style: TextStyle(color: context.appTextSecondary)),
-            const SizedBox(height: 12),
-            Text('${t.tr("bet", fallback: "Entrada")}: ${challenge.flameCost} ${t.tr("points", fallback: "pts")}', style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 15)),
-            const SizedBox(height: 8),
-            Text(challenge.rules, style: TextStyle(color: context.appTextMuted, fontSize: 12)),
-          ],
-        ),
+  @override
+  Widget build(BuildContext context) {
+    final t = ref.watch(appTranslationProvider);
+
+    return Scaffold(
+      backgroundColor: context.appBackground,
+      appBar: AppBar(
+        backgroundColor: context.appSurface,
+        title: Text(t.tr('challenges', fallback: 'Desafios & Metas'),
+            style: AppTextStyles.titleLarge),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-            child: Text(t.tr('confirm', fallback: 'Confirmar'), style: const TextStyle(color: Colors.white)),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: t.tr('refresh', fallback: 'Atualizar'),
+            onPressed: _loadChallenges,
           ),
         ],
       ),
-    );
-
-    if (confirm == true) {
-      final repo = ref.read(challengeRepositoryProvider);
-      final success = await repo.joinChallenge(challenge.id, challenge.flameCost);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? '${t.tr("challenge_success", fallback: "Inscrição confirmada!")} 🚀'
-                  : t.tr("challenge_fail", fallback: "Falha ao inscrever no desafio."),
-            ),
-            backgroundColor: success ? AppColors.primary : AppColors.error,
-          ),
-        );
-        if (success) _loadChallenges();
-      }
-    }
-  }
-
-  Future<void> _doCheckIn(ChallengeModel challenge) async {
-    final t = ref.read(appTranslationProvider);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${t.tr("challenge_proof", fallback: "Check-in registrado com sucesso!")} 🎉'),
-        backgroundColor: AppColors.success,
-      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(color: context.appPrimary))
+          : _available.isEmpty
+              ? _buildEmptyState(t)
+              : _buildChallengeGrid(_available, t),
     );
   }
 
-  Widget _buildChallengeGrid(List<ChallengeModel> list, AppTranslation t, {bool isMyList = false}) {
-    if (list.isEmpty) {
-      return Center(
+  Widget _buildEmptyState(AppTranslation t) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.emoji_events_outlined, size: 64, color: context.appTextMuted),
             const SizedBox(height: 16),
             Text(
-              isMyList
-                  ? t.tr('no_my_challenges', fallback: 'Você ainda não entrou em nenhum desafio.')
-                  : t.tr('no_challenges', fallback: 'Nenhum desafio disponível no momento.'),
+              t.tr('no_challenges', fallback: 'Nenhum desafio disponível no momento.'),
+              textAlign: TextAlign.center,
               style: TextStyle(color: context.appTextSecondary, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              t.tr('challenges_read_only',
+                  fallback: 'Esta lista é somente para consulta: participar e cancelar ainda não são suportados.'),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: context.appTextMuted, fontSize: 12),
             ),
           ],
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  Widget _buildChallengeGrid(List<ChallengeModel> list, AppTranslation t) {
     return GridView.builder(
       padding: const EdgeInsets.all(20),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 420,
-        childAspectRatio: 0.85,
+        childAspectRatio: 0.95,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
@@ -149,16 +114,12 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
       itemBuilder: (context, index) {
         final challenge = list[index];
         final df = DateFormat('dd/MM');
-        final progress = (challenge.checkInCount / 7.0).clamp(0.0, 1.0);
 
         return Card(
           color: context.appCard,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(
-              color: challenge.isJoined ? context.appPrimary : context.appBorder,
-              width: challenge.isJoined ? 2 : 1,
-            ),
+            side: BorderSide(color: context.appBorder),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -207,33 +168,10 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                 const SizedBox(height: 6),
                 Text(
                   challenge.description,
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                 ),
-                const SizedBox(height: 14),
-
-                if (isMyList || challenge.isJoined) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(t.tr('checkin', fallback: 'Check-in'), style: TextStyle(color: context.appTextMuted, fontSize: 11)),
-                      Text('${(progress * 100).toInt()}%', style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold, fontSize: 11)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      backgroundColor: context.appSurface,
-                      color: context.appPrimary,
-                      minHeight: 6,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                ],
-
                 const Spacer(),
                 Row(
                   children: [
@@ -252,63 +190,11 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: challenge.isJoined
-                      ? ElevatedButton.icon(
-                          onPressed: () => _doCheckIn(challenge),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.success,
-                          ),
-                          icon: const Icon(Icons.check_circle, color: Colors.white, size: 18),
-                          label: Text(t.tr('do_checkin', fallback: 'Fazer Check-in'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        )
-                      : ElevatedButton(
-                          onPressed: () => _joinChallenge(challenge),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: context.appPrimary,
-                          ),
-                          child: Text(t.tr('join_challenge', fallback: 'Participar do Desafio'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        ),
-                ),
               ],
             ),
           ),
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = ref.watch(appTranslationProvider);
-
-    return Scaffold(
-      backgroundColor: context.appBackground,
-      appBar: AppBar(
-        backgroundColor: context.appSurface,
-        title: Text(t.tr('challenges', fallback: 'Desafios & Metas'), style: AppTextStyles.titleLarge),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: context.appPrimary,
-          labelColor: Colors.white,
-          unselectedLabelColor: context.appTextSecondary,
-          tabs: [
-            Tab(text: t.tr('available_challenges', fallback: 'Desafios Disponíveis')),
-            Tab(text: t.tr('my_challenges', fallback: 'Meus Desafios')),
-          ],
-        ),
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: context.appPrimary))
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildChallengeGrid(_available, t),
-                _buildChallengeGrid(_myChallenges, t, isMyList: true),
-              ],
-            ),
     );
   }
 }
