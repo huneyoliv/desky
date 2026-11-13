@@ -89,6 +89,9 @@ msix_config:
   languages: en-us, pt-br, es-es, ko-kr, ja-jp, zh-cn, zh-tw
   store: true
   build_windows: false
+  # Registra a associacao de tipo de arquivo no manifesto do MSIX
+  # (windows.fileTypeAssociation), o equivalente ao "Abrir com" do instalador.
+  file_extension: .pdf
 
 flutter_launcher_icons:
   image_path: "assets/icons/icon.png"

@@ -71,6 +71,12 @@ class SidebarNav extends ConsumerWidget {
       fallbackIcon: Icons.style_outlined,
     ),
     SidebarNavItemData(
+      keyName: 'pdf_reader_title',
+      defaultTitle: 'Leitor de PDF',
+      route: '/smartbook',
+      fallbackIcon: Icons.menu_book_rounded,
+    ),
+    SidebarNavItemData(
       keyName: 'my_avatars',
       defaultTitle: 'Meus Avatares',
       route: '/store',

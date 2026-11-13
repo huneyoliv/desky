@@ -38,12 +38,13 @@ package() {
 Name=Desky
 GenericName=Study Timer
 Comment=Focus & Study Timer Desktop Client for Yeolpumta (YPT)
-Exec=/usr/bin/${pkgname}
+Exec=/usr/bin/${pkgname} %f
 Icon=${pkgname}
 Terminal=false
 Type=Application
 Categories=Utility;Education;
-Keywords=study;timer;focus;yeolpumta;ypt;pomodoro;
+MimeType=application/pdf;
+Keywords=study;timer;focus;yeolpumta;ypt;pomodoro;pdf;
 StartupWMClass=desky
 EOF
 
