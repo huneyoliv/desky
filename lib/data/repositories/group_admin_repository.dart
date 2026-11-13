@@ -1,4 +1,5 @@
 import '../../core/api/api_client.dart';
+import '../../core/constants/api_constants.dart';
 
 class GroupAdminRepository {
   final ApiClient _apiClient;
@@ -6,11 +7,12 @@ class GroupAdminRepository {
   GroupAdminRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();
 
-  Future<bool> updateGroupName(int groupId, String name) async {
+  /// Partial update: /group/info/edit keys on `id` and only touches sent fields.
+  Future<bool> _editGroup(int groupId, Map<String, dynamic> fields) async {
     try {
       final response = await _apiClient.post(
-        '/group/setting/name',
-        data: {'groupID': groupId, 'name': name},
+        ApiConstants.groupInfoEdit,
+        data: {'id': groupId, ...fields},
       );
       final data = response.data;
       return data is Map<String, dynamic> && data['s'] == true;
@@ -18,53 +20,20 @@ class GroupAdminRepository {
     return false;
   }
 
-  Future<bool> updateGroupCategory(int groupId, int categoryId) async {
-    try {
-      final response = await _apiClient.post(
-        '/group/setting/category',
-        data: {'groupID': groupId, 'category_id': categoryId},
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
-  }
+  Future<bool> updateGroupName(int groupId, String name) =>
+      _editGroup(groupId, {'t': name});
 
-  Future<bool> updateGroupCapacity(int groupId, int capacity) async {
-    try {
-      final response = await _apiClient.post(
-        '/group/setting/max-member',
-        data: {'groupID': groupId, 'maxMember': capacity},
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
-  }
+  Future<bool> updateGroupCategory(int groupId, int categoryId) =>
+      _editGroup(groupId, {'cid': categoryId});
 
-  Future<bool> updateGroupGoal(int groupId, int goalHours) async {
-    try {
-      final response = await _apiClient.post(
-        '/group/setting/goal-time',
-        data: {'groupID': groupId, 'goalTime': goalHours},
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
-  }
+  Future<bool> updateGroupCapacity(int groupId, int capacity) =>
+      _editGroup(groupId, {'mc': capacity});
 
-  Future<bool> updateGroupPassword(int groupId, String password) async {
-    try {
-      final response = await _apiClient.post(
-        '/group/setting/password',
-        data: {'groupID': groupId, 'password': password},
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
-  }
+  Future<bool> updateGroupGoal(int groupId, int goalHours) =>
+      _editGroup(groupId, {'gt': goalHours});
+
+  Future<bool> updateGroupPassword(int groupId, String password) =>
+      _editGroup(groupId, {'pw': password});
 
   Future<bool> promoteGroup(int groupId) async {
     try {
@@ -78,17 +47,8 @@ class GroupAdminRepository {
     return false;
   }
 
-  Future<bool> updateNotice(int groupId, String notice) async {
-    try {
-      final response = await _apiClient.post(
-        '/group/setting/notice',
-        data: {'groupID': groupId, 'notice': notice},
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
-  }
+  Future<bool> updateNotice(int groupId, String notice) =>
+      _editGroup(groupId, {'nt': notice});
 
   Future<bool> warnMember(int groupId, int targetUserId) async {
     try {

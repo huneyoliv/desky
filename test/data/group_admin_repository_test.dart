@@ -76,7 +76,7 @@ void main() {
     test('updateGroupName succeeds on valid response', () async {
       mockDio.interceptors.add(InterceptorsWrapper(
         onRequest: (options, handler) {
-          if (options.method == 'POST' && options.path == '/group/setting/name') {
+          if (options.method == 'POST' && options.path == '/group/info/edit') {
             return handler.resolve(Response(
               requestOptions: options,
               statusCode: 200,

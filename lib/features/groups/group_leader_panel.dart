@@ -90,30 +90,52 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
     final newNotice = _noticeController.text.trim();
     final newPassword = _passwordController.text.trim();
 
+    final failures = <String>[];
+    var attempted = 0;
+
     if (newName.isNotEmpty && newName != widget.group.name) {
-      await repo.updateGroupName(widget.group.id, newName);
+      attempted++;
+      if (!await repo.updateGroupName(widget.group.id, newName)) {
+        failures.add(t.tr('group_name', fallback: 'Nome do Grupo'));
+      }
     }
     if (_capacity != widget.group.maxCapacity) {
-      await repo.updateGroupCapacity(widget.group.id, _capacity);
+      attempted++;
+      if (!await repo.updateGroupCapacity(widget.group.id, _capacity)) {
+        failures.add(t.tr('member_capacity', fallback: 'Capacidade de Membros'));
+      }
     }
     if (_goalHours != widget.group.dailyGoalHours) {
-      await repo.updateGroupGoal(widget.group.id, _goalHours);
+      attempted++;
+      if (!await repo.updateGroupGoal(widget.group.id, _goalHours)) {
+        failures.add(t.tr('daily_goal_hours', fallback: 'Meta Diária (Horas)'));
+      }
     }
     if (newNotice.isNotEmpty) {
-      await repo.updateNotice(widget.group.id, newNotice);
+      attempted++;
+      if (!await repo.updateNotice(widget.group.id, newNotice)) {
+        failures.add(t.tr('group_notice', fallback: 'Aviso do Grupo (Notice Board)'));
+      }
     }
     if (newPassword.isNotEmpty) {
-      await repo.updateGroupPassword(widget.group.id, newPassword);
+      attempted++;
+      if (!await repo.updateGroupPassword(widget.group.id, newPassword)) {
+        failures.add(t.tr('group_password_hint', fallback: 'Senha de Acesso'));
+      }
     }
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(t.tr('settings_updated_success', fallback: 'Configurações atualizadas com sucesso!')),
-          backgroundColor: context.appPrimary,
-        ),
-      );
-    }
+    if (!mounted || attempted == 0) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      failures.isEmpty
+          ? SnackBar(
+              content: Text(t.tr('settings_updated_success', fallback: 'Configurações atualizadas com sucesso!')),
+              backgroundColor: context.appPrimary,
+            )
+          : SnackBar(
+              content: Text('${t.tr('save_fail', fallback: 'Falha ao salvar')}: ${failures.join(', ')}'),
+              backgroundColor: AppColors.error,
+            ),
+    );
   }
 
   Future<void> _promoteGroup() async {

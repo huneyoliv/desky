@@ -37,6 +37,7 @@ class ApiConstants {
   static const String groupMembers = '/logs/group/members/v2';
   static const String groupShake = '/group/push/shake';
   static const String groupChatMessages = '/chat/group/messages';
+  static const String groupInfoEdit = '/group/info/edit';
 
   // Default Headers & App Configuration Defaults
   static const String userAgent = 'Dart/3.11 (dart:io)';
