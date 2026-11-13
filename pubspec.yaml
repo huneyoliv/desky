@@ -78,7 +78,11 @@ msix_config:
   identity_name: DevHuney.Desky
   publisher: CN=B81D5CBC-296B-44D2-9E7C-AF85E6AF4AD8
   msix_version: 1.1.7.0
-  logo_path: assets/icons/icon.png
+  # O msix emite BackgroundColor="transparent" no manifesto, entao o Windows
+  # pinta o bloco com a cor de destaque. Um icone com cantos transparentes
+  # deixava esse azul aparecer e o bloco parecia quebrado na Store; este arquivo
+  # e a versao full-bleed opaca do mesmo logo.
+  logo_path: windows/store/desky_store_logo.png
   output_name: Desky-Windows-Store-x64
   architecture: x64
   capabilities: internetClient
