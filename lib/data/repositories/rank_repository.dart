@@ -172,6 +172,54 @@ class RankRepository {
     }
   }
 
+  /// Reserved key for studied time that carries no session subject.
+  static const String unknownSubjectKey = '__unknown__';
+
+  /// Study milliseconds per day and subject for any date range.
+  ///
+  /// Returns 'yyyy-MM-dd' -> subject -> ms, so a series can be stacked per day.
+  Future<Map<String, Map<String, int>>> fetchSubjectDailyMs({
+    required int userId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final data = await fetchUserStats(
+      userId: userId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+
+    final byDay = <String, Map<String, int>>{};
+    final rawLogs = data['ls'];
+    if (rawLogs is! List) return byDay;
+
+    for (final log in rawLogs) {
+      if (log is! Map<String, dynamic>) continue;
+      final day = _normalizeDay(log['dt'] as String? ?? '');
+      if (day.isEmpty) continue;
+      final buckets = byDay.putIfAbsent(day, () => <String, int>{});
+
+      final sessions = log['ls'];
+      var attributed = false;
+      if (sessions is List) {
+        for (final session in sessions) {
+          if (session is! Map<String, dynamic>) continue;
+          final subject = (session['sb'] as String? ?? '').trim();
+          final ms = session['sm'] as int? ?? 0;
+          if (subject.isEmpty || ms <= 0) continue;
+          buckets[subject] = (buckets[subject] ?? 0) + ms;
+          attributed = true;
+        }
+      }
+      if (!attributed) {
+        final ms = log['sm'] as int? ?? 0;
+        if (ms > 0) buckets[unknownSubjectKey] = ms;
+      }
+    }
+
+    return byDay;
+  }
+
   Future<Map<String, dynamic>> fetchUserStats({
     required int userId,
     required String startDate,

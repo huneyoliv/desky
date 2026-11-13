@@ -27,6 +27,9 @@ class RanksScreen extends ConsumerStatefulWidget {
 /// Ranking scope: true = my category only, false = global/region
 enum _RankScope { category, region }
 
+/// Period shown by the per-subject series in the statistics tab.
+enum _StatsRange { thisWeek, lastWeek, thisMonth, lastMonth }
+
 class _RanksScreenState extends ConsumerState<RanksScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
@@ -34,8 +37,10 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   _RankScope _rankScope = _RankScope.category;
   int? _myRank;
   List<RankEntryModel> _ranks = [];
-  List<double> _weeklyHours = List.filled(7, 0.0);
   Map<String, double> _subjectDistribution = {};
+  _StatsRange _statsRange = _StatsRange.thisWeek;
+  Map<String, Map<String, int>> _subjectDailyMs = {};
+  bool _isLoadingSeries = true;
   DateTime _calendarMonth = DateTime.now();
   Map<String, int> _calendarStudyMs = {};
   Map<String, List<int>> _hourlyLogs = {};
@@ -50,6 +55,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     _loadUserStats();
     _loadCalendarMonth();
     _loadHourlyMap();
+    _loadSubjectSeries();
   }
 
   @override
@@ -115,7 +121,6 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     );
 
     final rawLogs = data['ls'];
-    final weekly = List.filled(7, 0.0);
     final subjectMap = <String, double>{};
 
     if (rawLogs is List) {
@@ -124,13 +129,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
           final dtStr = log['dt'] as String? ?? '';
           final ms = (log['sm'] as int? ?? 0);
           final hours = ms / 3600000.0;
-          if (dtStr.isNotEmpty) {
-            try {
-              final parsedDate = DateTime.parse(dtStr);
-              final dayIndex = (parsedDate.weekday - 1) % 7;
-              weekly[dayIndex] += hours;
-            } catch (_) {}
-          }
+          if (dtStr.isEmpty) continue;
 
           // 'sb' lives on each session inside 'ls', never on the day object, so
           // reading it at day level collapsed the whole month into one 'Geral' slice.
@@ -155,7 +154,6 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
 
     if (mounted) {
       setState(() {
-        _weeklyHours = weekly;
         _subjectDistribution = subjectMap;
         _isLoadingStats = false;
       });
@@ -188,6 +186,293 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
       endDate: DateFormat('yyyy-MM-dd').format(now),
     );
     if (mounted) setState(() => _hourlyLogs = byDay);
+  }
+
+  /// Per-subject series with period navigation, stacked per day.
+  Widget _buildSubjectSeriesCard(BuildContext context, AppTranslation t) {
+    final (start, end) = _statsRangeBounds();
+
+    final days = <String>[];
+    for (var day = DateTime(start.year, start.month, start.day);
+        !day.isAfter(DateTime(end.year, end.month, end.day));
+        day = day.add(const Duration(days: 1))) {
+      days.add(DateFormat('yyyy-MM-dd').format(day));
+    }
+
+    final totals = <String, int>{};
+    for (final day in days) {
+      final buckets = _subjectDailyMs[day];
+      if (buckets == null) continue;
+      buckets.forEach((subject, ms) {
+        totals[subject] = (totals[subject] ?? 0) + ms;
+      });
+    }
+
+    final ranked = totals.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    const maxSlices = 5;
+    final top = ranked.take(maxSlices).map((entry) => entry.key).toList();
+    final hasOthers = ranked.length > maxSlices;
+
+    final palette = <Color>[
+      context.appPrimary,
+      AppColors.flame,
+      AppColors.success,
+      AppColors.warning,
+      context.appAccent,
+    ];
+    final colorOf = <String, Color>{
+      for (var i = 0; i < top.length; i++) top[i]: palette[i % palette.length],
+    };
+    const othersColor = AppColors.error;
+
+    String labelOf(String key) => key == RankRepository.unknownSubjectKey
+        ? t.tr('general', fallback: 'Geral')
+        : key;
+
+    var maxHours = 1.0;
+    final groups = <BarChartGroupData>[];
+    for (var i = 0; i < days.length; i++) {
+      final buckets = _subjectDailyMs[days[i]] ?? const <String, int>{};
+      final stack = <BarChartRodStackItem>[];
+      var from = 0.0;
+
+      for (final subject in top) {
+        final hours = (buckets[subject] ?? 0) / 3600000.0;
+        if (hours <= 0) continue;
+        stack.add(BarChartRodStackItem(from, from + hours, colorOf[subject]!));
+        from += hours;
+      }
+      if (hasOthers) {
+        var others = 0.0;
+        for (final entry in ranked.skip(maxSlices)) {
+          others += (buckets[entry.key] ?? 0) / 3600000.0;
+        }
+        if (others > 0) {
+          stack.add(BarChartRodStackItem(from, from + others, othersColor));
+          from += others;
+        }
+      }
+      if (from > maxHours) maxHours = from;
+
+      groups.add(BarChartGroupData(
+        x: i,
+        barRods: [
+          BarChartRodData(
+            toY: from,
+            width: days.length > 15 ? 7 : 20,
+            rodStackItems: stack,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ],
+      ));
+    }
+
+    final hasData = totals.isNotEmpty;
+    final weekdayNames = [
+      t.tr('day_mon_short', fallback: 'Seg'),
+      t.tr('day_tue_short', fallback: 'Ter'),
+      t.tr('day_wed_short', fallback: 'Qua'),
+      t.tr('day_thu_short', fallback: 'Qui'),
+      t.tr('day_fri_short', fallback: 'Sex'),
+      t.tr('day_sat_short', fallback: 'Sáb'),
+      t.tr('day_sun_short', fallback: 'Dom'),
+    ];
+
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: context.appCard,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.appBorder),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              t.tr('analytics_stacked_bar_subject_name', fallback: 'Tempo de estudo por matéria'),
+              style: AppTextStyles.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            // Period navigation: any week or month, including the past ones.
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: _StatsRange.values.map((range) {
+                final selected = _statsRange == range;
+                return ChoiceChip(
+                  label: Text(
+                    _statsRangeLabel(range, t),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: selected ? Colors.white : context.appTextMuted,
+                    ),
+                  ),
+                  selected: selected,
+                  selectedColor: context.appPrimary,
+                  backgroundColor: context.appCard,
+                  visualDensity: VisualDensity.compact,
+                  onSelected: (_) {
+                    if (_statsRange == range) return;
+                    setState(() => _statsRange = range);
+                    _loadSubjectSeries();
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: _isLoadingSeries
+                  ? const Center(child: CircularProgressIndicator())
+                  : !hasData
+                      ? Center(
+                          child: Text(
+                            t.tr('no_study_records', fallback: 'Nenhum registro de estudo'),
+                            style: TextStyle(color: context.appTextSecondary),
+                          ),
+                        )
+                      : BarChart(
+                          BarChartData(
+                            alignment: BarChartAlignment.spaceAround,
+                            maxY: maxHours * 1.2,
+                            barTouchData: BarTouchData(enabled: false),
+                            titlesData: FlTitlesData(
+                              show: true,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    final index = value.toInt();
+                                    if (index < 0 || index >= days.length) {
+                                      return const Text('');
+                                    }
+                                    final date = DateTime.parse(days[index]);
+                                    if (days.length <= 7) {
+                                      return Text(
+                                        weekdayNames[(date.weekday - 1) % 7],
+                                        style: TextStyle(
+                                            color: context.appTextSecondary,
+                                            fontSize: 12),
+                                      );
+                                    }
+                                    // Only some day numbers, to stay readable.
+                                    if (date.day % 5 != 0 &&
+                                        index != days.length - 1 &&
+                                        date.day != 1) {
+                                      return const Text('');
+                                    }
+                                    return Text(
+                                      '${date.day}',
+                                      style: TextStyle(
+                                          color: context.appTextSecondary,
+                                          fontSize: 11),
+                                    );
+                                  },
+                                ),
+                              ),
+                              leftTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false)),
+                              topTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false)),
+                              rightTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false)),
+                            ),
+                            borderData: FlBorderData(show: false),
+                            barGroups: groups,
+                          ),
+                        ),
+            ),
+            if (hasData && top.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 12,
+                runSpacing: 6,
+                children: [
+                  for (final subject in top)
+                    _seriesLegendItem(context, labelOf(subject), colorOf[subject]!),
+                  if (hasOthers)
+                    _seriesLegendItem(
+                        context, t.tr('others', fallback: 'Outros'), othersColor),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _seriesLegendItem(BuildContext context, String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 9,
+          height: 9,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: TextStyle(color: context.appTextSecondary, fontSize: 11),
+        ),
+      ],
+    );
+  }
+
+  /// Start and end dates of the period currently selected in the series.
+  (DateTime, DateTime) _statsRangeBounds() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final monday = today.subtract(Duration(days: today.weekday - 1));
+    switch (_statsRange) {
+      case _StatsRange.thisWeek:
+        return (monday, monday.add(const Duration(days: 6)));
+      case _StatsRange.lastWeek:
+        final last = monday.subtract(const Duration(days: 7));
+        return (last, last.add(const Duration(days: 6)));
+      case _StatsRange.thisMonth:
+        return (DateTime(today.year, today.month, 1),
+            DateTime(today.year, today.month + 1, 0));
+      case _StatsRange.lastMonth:
+        return (DateTime(today.year, today.month - 1, 1),
+            DateTime(today.year, today.month, 0));
+    }
+  }
+
+  String _statsRangeLabel(_StatsRange range, AppTranslation t) {
+    switch (range) {
+      case _StatsRange.thisWeek:
+        return t.tr('analytics_stairs_info_this_week', fallback: 'Esta semana');
+      case _StatsRange.lastWeek:
+        return t.tr('analytics_stairs_info_last_week', fallback: 'Semana passada');
+      case _StatsRange.thisMonth:
+        return t.tr('analytics_stairs_info_this_month', fallback: 'Este mês');
+      case _StatsRange.lastMonth:
+        return t.tr('analytics_stairs_info_last_month', fallback: 'Mês passado');
+    }
+  }
+
+  Future<void> _loadSubjectSeries() async {
+    final user = ref.read(authStateProvider).user;
+    if (user == null) return;
+    setState(() => _isLoadingSeries = true);
+
+    final repo = ref.read(rankRepositoryProvider);
+    final (start, end) = _statsRangeBounds();
+    final byDay = await repo.fetchSubjectDailyMs(
+      userId: user.id,
+      startDate: DateFormat('yyyy-MM-dd').format(start),
+      endDate: DateFormat('yyyy-MM-dd').format(end),
+    );
+
+    if (mounted) {
+      setState(() {
+        _subjectDailyMs = byDay;
+        _isLoadingSeries = false;
+      });
+    }
   }
 
   String _formatMs(int ms) {
@@ -262,9 +547,6 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
 
   @override
   Widget build(BuildContext context) {
-    final maxWeeklyHour = _weeklyHours.fold<double>(
-        4.0, (max, h) => h > max ? h : max);
-
     final colors = [
       context.appPrimary,
       AppColors.flame,
@@ -503,85 +785,11 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 320,
+                        height: 380,
                         child: Row(
                           children: [
-                            // Weekly Bar Chart
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: context.appCard,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: context.appBorder),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      t.tr('this_week', fallback: 'Horas Estudadas na Semana'),
-                                      style: AppTextStyles.titleMedium,
-                                    ),
-                                    const SizedBox(height: 24),
-                                    Expanded(
-                                      child: BarChart(
-                                        BarChartData(
-                                          alignment: BarChartAlignment.spaceAround,
-                                          maxY: maxWeeklyHour * 1.2,
-                                          barTouchData: BarTouchData(enabled: false),
-                                          titlesData: FlTitlesData(
-                                            show: true,
-                                            bottomTitles: AxisTitles(
-                                              sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, meta) {
-                                                  final days = [
-                                                    t.tr('day_mon_short', fallback: 'Seg'),
-                                                    t.tr('day_tue_short', fallback: 'Ter'),
-                                                    t.tr('day_wed_short', fallback: 'Qua'),
-                                                    t.tr('day_thu_short', fallback: 'Qui'),
-                                                    t.tr('day_fri_short', fallback: 'Sex'),
-                                                    t.tr('day_sat_short', fallback: 'Sáb'),
-                                                    t.tr('day_sun_short', fallback: 'Dom'),
-                                                  ];
-                                                  if (value.toInt() >= 0 && value.toInt() < days.length) {
-                                                    return Text(
-                                                      days[value.toInt()],
-                                                      style: TextStyle(
-                                                          color: context.appTextSecondary,
-                                                          fontSize: 12),
-                                                    );
-                                                  }
-                                                  return const Text('');
-                                                },
-                                              ),
-                                            ),
-                                            leftTitles: const AxisTitles(
-                                                sideTitles: SideTitles(showTitles: false)),
-                                            topTitles: const AxisTitles(
-                                                sideTitles: SideTitles(showTitles: false)),
-                                            rightTitles: const AxisTitles(
-                                                sideTitles: SideTitles(showTitles: false)),
-                                          ),
-                                          borderData: FlBorderData(show: false),
-                                          barGroups: List.generate(7, (index) {
-                                            return BarChartGroupData(
-                                              x: index,
-                                              barRods: [
-                                                BarChartRodData(
-                                                  toY: _weeklyHours[index],
-                                                  color: context.appPrimary,
-                                                )
-                                              ],
-                                            );
-                                          }),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // Per-subject series with period navigation
+                            _buildSubjectSeriesCard(context, t),
                             const SizedBox(width: 24),
 
                             // Subject Distribution Pie Chart
