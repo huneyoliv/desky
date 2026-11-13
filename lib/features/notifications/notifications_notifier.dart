@@ -48,10 +48,11 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
   }
 
   Future<void> markAllAsRead() async {
+    final unreadIds = state.notifications.where((n) => !n.isRead).map((n) => n.id).toList();
     final updated = state.notifications.map((n) => n.copyWith(isRead: true)).toList();
     state = state.copyWith(notifications: updated, unreadCount: 0);
 
-    await _repository.markAllAsRead();
+    await _repository.markAllAsRead(ids: unreadIds);
   }
 
   Future<void> deleteNotification(int notificationId) async {

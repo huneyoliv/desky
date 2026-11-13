@@ -5,6 +5,7 @@ import '../../core/localization/app_translation.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/notification_model.dart';
+import 'notification_visuals.dart';
 import '../../data/repositories/notification_repository.dart';
 
 class NotificationsPanel extends ConsumerStatefulWidget {
@@ -102,13 +103,9 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
                               radius: 16,
                               backgroundColor: context.appSurface,
                               child: Icon(
-                                notice.type == 'shake'
-                                    ? Icons.vibration
-                                    : notice.type == 'warning'
-                                        ? Icons.warning_amber_rounded
-                                        : Icons.notifications_none,
+                                notificationIcon(notice),
                                 size: 16,
-                                color: notice.type == 'warning' ? AppColors.error : context.appPrimary,
+                                color: notificationColor(notice, primary: context.appPrimary),
                               ),
                             ),
                             title: Text(
@@ -120,7 +117,9 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
                               ),
                             ),
                             subtitle: Text(
-                              '${notice.message}\n${df.format(notice.createdAt)}',
+                              notice.message.isEmpty
+                                  ? df.format(notice.createdAt)
+                                  : '${notice.message}\n${df.format(notice.createdAt)}',
                               style: TextStyle(color: context.appTextMuted, fontSize: 11),
                             ),
                             onTap: () => _markRead(notice),

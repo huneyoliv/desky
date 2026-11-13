@@ -20,7 +20,7 @@ class FakeNotificationRepository extends NotificationRepository {
   Future<bool> markAsRead(int notificationId) async => true;
 
   @override
-  Future<bool> markAllAsRead() async => true;
+  Future<bool> markAllAsRead({Iterable<int> ids = const []}) async => true;
 
   @override
   Future<bool> deleteNotification(int notificationId) async => true;

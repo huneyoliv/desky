@@ -27,7 +27,7 @@ class FakeNotificationRepository extends NotificationRepository {
   }
 
   @override
-  Future<bool> markAllAsRead() async {
+  Future<bool> markAllAsRead({Iterable<int> ids = const []}) async {
     markAllAsReadCalled = true;
     return true;
   }

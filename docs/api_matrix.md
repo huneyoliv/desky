@@ -75,7 +75,10 @@ Esta matriz apresenta a especificação atualizada e exaustiva de **TODOS os 15 
 | **Música & Ruído Branco** | Tocador de sons ambientais (chuva, café, fogueira) | `GET /music/ranks` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
 | **Playlists de Estudo** | Lista de faixas e registro de reprodução | `GET /playlist/musics` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
 | **Timelapses em Vídeo** | Vídeos gravados em acelerado dos estudos | `GET /timelapses` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
-| **Central de Notificações** | Mensagens de sistema, convites e lembretes | `GET /user/notifications` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** |
+| **Central de Notificações** | Mensagens de sistema, convites e lembretes | `GET /user/notifications?page=` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** — lista em `ns[]` (`id`,`i1`..`i4`,`c`,`ir`,`nt`) |
+| **Marcar Notificação como Lida** | Marca uma notificação do usuário como lida | `POST /user/read-notice` | `pi.tgclab.com` | **Validado ao Vivo (rota existe)** — corpo `{noticeID}`; sem rota em lote |
+| **Contador de Não Lidas (comunidade)** | Total de notificações não lidas da comunidade | `GET /community/notifications/unread-count` | `pi.tgclab.com` | **Validado ao Vivo (200 OK)** — campo `unreadNotificationCount` |
+| **Registro de Push (FCM)** | Token do dispositivo para push do app móvel | `POST /user/push-token` | `pi.tgclab.com` | **Não usado** — push é do app móvel, fora do escopo do desktop |
 
 ---
 

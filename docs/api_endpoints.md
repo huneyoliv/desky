@@ -361,3 +361,61 @@ Authorization: JWT <TOKEN_JWT_SESSION>
 - **Função**: valida se o nome do grupo está disponível.
 - **Request Body**: `{"title": "Nome do grupo"}`
 - **Response Body (200 OK)**: `{"s": true}` quando disponível.
+
+---
+
+### Módulo: Notificações
+
+Três sistemas distintos coexistem, e não são a mesma coisa:
+
+| Sistema | Listagem | Conteúdo |
+| :--- | :--- | :--- |
+| Notificações do usuário | `GET /user/notifications?page=N` | `ns[]` |
+| Notificações da comunidade | `GET /community/notifications?page=N` | `rs[]` com `nextCursor` |
+| Mural de avisos | `GET /notice/list` | `notices[]` (title, body, imagens, reações) |
+
+#### `GET https://pi.tgclab.com/user/notifications?page=1&is_new=true`
+- **Response Body (200 OK)**:
+```json
+{
+  "s": true,
+  "ns": [
+    { "id": 0, "i1": "", "i2": "", "i3": "", "i4": "", "c": "", "ir": false, "nt": "" }
+  ]
+}
+```
+- **Campos**: `id` (int), `i1`..`i4` (String), `c` (data `YYYY-MM-DD HH:MM:SS.ffffff`),
+  `ir` (bool, lida), `nt` (código do tipo).
+- Na conta observada apenas **`i1`** estava preenchido (6/6 itens); `i2` e `i3` vazios e
+  `i4` em 1 item.
+- `is_new=true` **não filtra** por não lidas (retorna os mesmos itens de `page=1`).
+
+#### `POST https://pi.tgclab.com/user/read-notice`
+- **Função**: Marca uma notificação como lida.
+- **Request Body**: `{"noticeID": 0}`
+- **Response Body (200 OK)**: `{"s": true}`
+- **Não existem** rotas de marcar-como-lida em lote nem de exclusão para as notificações do
+  usuário: `/notice/read`, `/notice/read-all`, `/user/notifications/read-all`,
+  `/user/notifications/delete`, `/notice/delete` e `/notice/unread_count` respondem **404**.
+
+#### `GET https://pi.tgclab.com/community/notifications/unread-count`
+- **Response Body (200 OK)**: `{"s": true, "unreadNotificationCount": 0}`
+- Conta as notificações **da comunidade**; a lista `rs[]` desta conta estava vazia enquanto
+  `ns[]` tinha itens, então esse contador não serve como fonte de verdade das não lidas do
+  usuário.
+
+#### `POST https://pi.tgclab.com/community/notifications/delete`
+- Existe (responde **405** a `GET`), mas pertence às notificações da comunidade.
+
+#### Códigos de `nt` (do binário oficial)
+`GROUP`, `GROUP_JOIN_APPROVED`, `GROUP_JOIN_REJECTED`, `GROUP_JOIN_WAITING`,
+`GROUP_MISSION_SAVE_IMAGE_TO_GALLERY`, `GROUP_NEW_MEMBER`, `GROUP_NEW_REQUEST`,
+`GROUP_OUT`, `GROUP_OWNER`, `GROUP_POST`, `GROUP_POST_COMMENT`, `GROUP_WARNING`, `WARNING`.
+
+> **Não existe tipo de cutucada**: não há `SHAKE` nem `NUDGE` entre os códigos do app
+> oficial. A cutucada (`POST /group/push/shake`) é entrega por push, não um item desta
+> lista.
+
+#### Rotas de push (fora do escopo do cliente desktop)
+- `POST /user/push-token` — registro do token FCM do dispositivo.
+- `/push/messages`, `/group/push/notice`, `/mission/push/remind` — envio de push.
