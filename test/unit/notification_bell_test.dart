@@ -18,6 +18,22 @@ class MockDioWithNoticeAdapter implements HttpClientAdapter {
     lastOptions = options;
     lastData = options.data;
 
+    if (options.path.contains('/user/notifications')) {
+      return ResponseBody.fromString(
+        '{"s": true, "ns": ['
+        '{"id": 1, "i1": "a", "ir": false},'
+        '{"id": 2, "i1": "b", "ir": false},'
+        '{"id": 3, "i1": "c", "ir": true}'
+        ']}',
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      );
+    }
+
+    // Rota morta (404 na API real): se o codigo voltar a usa-la, a contagem
+    // viria 3 e o teste abaixo falharia.
     if (options.path.contains('/notice/unread_count')) {
       return ResponseBody.fromString(
         '{"unread_count": 3, "s": true}',
@@ -74,7 +90,7 @@ void main() {
       expect(n2.message, 'Meta diária alterada para 4 horas');
     });
 
-    test('NotificationRepository fetchUnreadCount returns correct unread count', () async {
+    test('NotificationRepository fetchUnreadCount conta os nao lidos de user/notifications', () async {
       final dio = Dio();
       final adapter = MockDioWithNoticeAdapter();
       dio.httpClientAdapter = adapter;
@@ -83,8 +99,10 @@ void main() {
       final repo = NotificationRepository(apiClient: apiClient);
       final count = await repo.fetchUnreadCount();
 
-      expect(count, 3);
-      expect(adapter.lastOptions?.path, contains('/notice/unread_count'));
+      // 2 de 3 itens com `ir: false`. O adapter responderia 3 se a rota morta
+      // `/notice/unread_count` (404 na API real) fosse usada.
+      expect(count, 2);
+      expect(adapter.lastOptions?.path, contains('/user/notifications'));
     });
 
     test('NotificationRepository deleteNotification sends delete request with id and persists locally', () async {

@@ -34,6 +34,22 @@ class NotificationModel {
     );
   }
 
+  /// The live API sends uppercase codes with underscores in `nt`
+  /// (GROUP_WARNING, GROUP_JOIN_APPROVED, GROUP_OUT, ...). There is no SHAKE
+  /// type in the official app, so the raw code is normalised to a small set.
+  String get normalizedType {
+    final raw = type.trim().toUpperCase();
+    if (raw.contains('WARNING')) return 'warning';
+    // 'REQUEST'/'WAITING' vem antes de 'JOIN', senao GROUP_JOIN_WAITING cairia
+    // no mesmo grupo de "entrada aprovada" e perderia o sentido de pendencia.
+    if (raw.contains('REQUEST') || raw.contains('WAITING')) return 'request';
+    if (raw.contains('JOIN')) return 'join';
+    if (raw.contains('POST') || raw.contains('COMMENT')) return 'post';
+    if (raw.contains('NEW_MEMBER')) return 'member';
+    if (raw.contains('OUT') || raw.contains('OWNER')) return 'membership';
+    return 'info';
+  }
+
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     final rawI1 = (json['i1'] ?? json['title'] ?? json['t'] ?? '').toString().trim();
     final rawI2 = (json['i2'] ?? '').toString().trim();
@@ -56,12 +72,14 @@ class NotificationModel {
       title = rawI1.isNotEmpty ? rawI1 : trMsg('notification_ypt_title', fallback: 'Notificação YPT');
       message = rawMsg;
     } else {
+      // The live API fills only `i1` (6/6 items observed), so an invented
+      // placeholder would be shown on every notification.
       title = rawI1.isNotEmpty ? rawI1 : trMsg('notification_ypt_title', fallback: 'Notificação YPT');
-      message = rawI2.isNotEmpty ? rawI2 : 'Sem detalhes';
+      message = rawI2;
     }
 
     final type = (json['nt'] ?? json['type'] ?? json['tp'] ?? 'info').toString();
-    final dateStr = json['c'] ?? json['created_at'];
+    final dateStr = json['c'] ?? json['created_at'] ?? json['published_at'];
     final createdAt = dateStr != null ? DateTime.tryParse(dateStr.toString()) ?? DateTime.now() : DateTime.now();
     final isRead = json['ir'] as bool? ?? json['is_read'] as bool? ?? json['read'] as bool? ?? false;
 

@@ -73,29 +73,16 @@ class NotificationRepository {
       }
     } catch (_) {}
 
-    try {
-      final response = await _apiClient.get('/notice/list');
-      final data = response.data;
-      if (data is Map<String, dynamic>) {
-        final list = data['ns'] ?? data['notices'] ?? data['list'];
-        if (list is List) {
-          return list
-              .whereType<Map<String, dynamic>>()
-              .map((item) => NotificationModel.fromJson(item))
-              .where((item) => !deletedIds.contains(item.id))
-              .toList();
-        }
-      }
-    } catch (_) {}
-
     return [];
   }
 
+  /// Real route from the official binary: `/notice/read` and
+  /// `/user/notifications/read-all` answer 404 on the live API.
   Future<bool> markAsRead(int notificationId) async {
     try {
       final response = await _apiClient.post(
-        '/notice/read',
-        data: {'noticeID': notificationId, 'id': notificationId},
+        '/user/read-notice',
+        data: {'noticeID': notificationId},
       );
       final data = response.data;
       return data is Map<String, dynamic> && data['s'] == true;
@@ -103,54 +90,31 @@ class NotificationRepository {
     return false;
   }
 
-  Future<bool> markAllAsRead() async {
-    try {
-      final response = await _apiClient.post(
-        '/user/notifications/read-all',
-        data: {'all': true},
-      );
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-
-    try {
-      final response = await _apiClient.post('/notice/read-all');
-      final data = response.data;
-      return data is Map<String, dynamic> && data['s'] == true;
-    } catch (_) {}
-    return false;
+  /// No bulk route exists, so every unread notice is marked individually.
+  Future<bool> markAllAsRead({Iterable<int> ids = const []}) async {
+    var allOk = true;
+    for (final id in ids) {
+      final ok = await markAsRead(id);
+      if (!ok) allOk = false;
+    }
+    return allOk;
   }
 
+  /// The API exposes no delete route for user notifications
+  /// (`/user/notifications/delete` and `/notice/delete` are 404), so the item is
+  /// marked read and hidden locally.
   Future<bool> deleteNotification(int notificationId) async {
     await saveDeletedIds([notificationId]);
     await markAsRead(notificationId);
-
-    try {
-      await _apiClient.post(
-        '/user/notifications/delete',
-        data: {'id': notificationId, 'noticeID': notificationId},
-      );
-    } catch (_) {}
-
-    try {
-      await _apiClient.post(
-        '/notice/delete',
-        data: {'id': notificationId},
-      );
-    } catch (_) {}
-
     return true;
   }
 
+  /// Same as [deleteNotification]: there is no server route, so read notices are
+  /// hidden locally.
   Future<bool> deleteAllRead({List<int>? readIds}) async {
     if (readIds != null && readIds.isNotEmpty) {
       await saveDeletedIds(readIds);
     }
-
-    try {
-      await _apiClient.post('/user/notifications/delete-read');
-    } catch (_) {}
-
     return true;
   }
 
@@ -172,13 +136,9 @@ class NotificationRepository {
       }
     } catch (_) {}
 
-    try {
-      final response = await _apiClient.get('/notice/unread_count');
-      final data = response.data;
-      if (data is Map<String, dynamic>) {
-        return (data['unread_count'] ?? data['cnt'] as num?)?.toInt() ?? 0;
-      }
-    } catch (_) {}
+    // `/notice/unread_count` answers 404; the live counter is
+    // `/community/notifications/unread-count` and belongs to the community feed,
+    // so the unread notices from `ns` remain the source of truth here.
     return 0;
   }
 }

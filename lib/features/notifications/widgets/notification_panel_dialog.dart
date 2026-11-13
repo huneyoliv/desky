@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../data/models/notification_model.dart';
+import '../../../shared/widgets/notification_visuals.dart';
 import '../../../data/repositories/notification_repository.dart';
 
 class NotificationPanelDialog extends ConsumerStatefulWidget {
@@ -142,20 +143,11 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                           children: [
                             CircleAvatar(
                               radius: 18,
-                              backgroundColor: notice.type == 'shake'
-                                  ? AppColors.warning.withValues(alpha: 0.2)
-                                  : context.appPrimary.withValues(alpha: 0.2),
+                              backgroundColor: notificationColor(notice, primary: context.appPrimary)
+                                  .withValues(alpha: 0.2),
                               child: Icon(
-                                notice.type == 'shake'
-                                    ? Icons.vibration
-                                    : notice.type == 'warning'
-                                        ? Icons.warning_amber_rounded
-                                        : Icons.notifications,
-                                color: notice.type == 'shake'
-                                    ? AppColors.warning
-                                    : notice.type == 'warning'
-                                        ? AppColors.error
-                                        : context.appPrimary,
+                                notificationIcon(notice),
+                                color: notificationColor(notice, primary: context.appPrimary),
                                 size: 18,
                               ),
                             ),
@@ -173,15 +165,17 @@ class _NotificationPanelDialogState extends ConsumerState<NotificationPanelDialo
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    notice.message,
-                                    style: TextStyle(
-                                      color: context.appTextSecondary,
-                                      fontSize: 13,
-                                      height: 1.3,
+                                  if (notice.message.isNotEmpty) ...[
+                                    Text(
+                                      notice.message,
+                                      style: TextStyle(
+                                        color: context.appTextSecondary,
+                                        fontSize: 13,
+                                        height: 1.3,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 6),
+                                    const SizedBox(height: 6),
+                                  ],
                                   Text(
                                     df.format(notice.createdAt),
                                     style: TextStyle(color: context.appTextMuted, fontSize: 11),
