@@ -185,25 +185,21 @@ class GroupRepository {
     return [];
   }
 
+  /// The live API takes `{group_id, message}` and derives the sender from the
+  /// token, so nickname/userID/createdAt are not sent at all.
   Future<ChatMessageModel> sendMessage({
     required int groupId,
-    String? nickname,
-    int userId = 0,
     String message = '',
-    int category = 0,
     String? stickerUrl,
     String? imageUrl,
     String? thumbUrl,
   }) async {
     final payload = <String, dynamic>{
       'group_id': groupId,
-      'nickname': nickname,
-      'category': category,
-      'userID': userId,
       'message': message.isNotEmpty ? message : (imageUrl != null ? 'Photo' : ''),
-      'createdAt': null,
-      'updatedAt': null,
     };
+    // shortcut: only the text payload is confirmed against the live API; the
+    // sticker and image keys still need verification before they are trusted.
     if (stickerUrl != null) payload['stickerUrl'] = stickerUrl;
     if (imageUrl != null) {
       payload['img'] = imageUrl;

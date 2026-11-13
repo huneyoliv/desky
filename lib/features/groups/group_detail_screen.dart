@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/localization/app_translation.dart';
@@ -66,10 +67,34 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       _chatMessages = [newMsg, ..._chatMessages];
     });
 
+    await _sendWithRollback(
+      newMsg,
+      (repo) => repo.sendMessage(groupId: widget.group.id, stickerUrl: sticker.url),
+    );
+  }
+
+  /// Sends an already displayed message and removes it again when the API
+  /// rejects it, so a failed send is never shown as delivered.
+  Future<void> _sendWithRollback(
+    ChatMessageModel optimistic,
+    Future<ChatMessageModel> Function(GroupRepository repo) send,
+  ) async {
+    final t = ref.read(appTranslationProvider);
     try {
-      final repo = ref.read(groupRepositoryProvider);
-      await repo.sendMessage(groupId: widget.group.id, stickerUrl: sticker.url);
-    } catch (_) {}
+      await send(ref.read(groupRepositoryProvider));
+      _loadChatSilently();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _chatMessages = _chatMessages.where((m) => m.id != optimistic.id).toList();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.tr('group_send_message_failed', fallback: 'Falha ao enviar mensagem')),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   Future<void> _joinGroup() async {
@@ -260,16 +285,10 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       _chatMessages = [newMsg, ..._chatMessages];
     });
 
-    try {
-      final repo = ref.read(groupRepositoryProvider);
-      await repo.sendMessage(
-        groupId: widget.group.id,
-        nickname: user?.name ?? trMsg('common_user', fallback: 'Usuário'),
-        userId: user?.id ?? 0,
-        message: text,
-      );
-      _loadChatSilently();
-    } catch (_) {}
+    await _sendWithRollback(
+      newMsg,
+      (repo) => repo.sendMessage(groupId: widget.group.id, message: text),
+    );
   }
 
   Future<void> _toggleReaction(ChatMessageModel msg, String emoji) async {
@@ -398,15 +417,10 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         _chatMessages = [newMsg, ..._chatMessages];
       });
 
-      try {
-        final repo = ref.read(groupRepositoryProvider);
-        await repo.sendMessage(
-          groupId: widget.group.id,
-          nickname: user?.name ?? trMsg('common_you', fallback: 'Você'),
-          userId: user?.id ?? 0,
-          imageUrl: url,
-        );
-      } catch (_) {}
+      await _sendWithRollback(
+        newMsg,
+        (repo) => repo.sendMessage(groupId: widget.group.id, imageUrl: url),
+      );
     }
   }
 
@@ -594,6 +608,15 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                     ),
                                 ],
                               ),
+                            ),
+                          ),
+
+                          // Timestamp straight from the API, previously dropped.
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              DateFormat('HH:mm').format(msg.sentAt),
+                              style: TextStyle(color: context.appTextMuted, fontSize: 10),
                             ),
                           ),
 
