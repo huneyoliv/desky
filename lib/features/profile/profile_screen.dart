@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/localization/app_translation.dart';
@@ -43,6 +44,19 @@ class ProfileScreen extends ConsumerWidget {
       return Icons.desktop_windows;
     }
     return Icons.computer;
+  }
+
+  static const String _repositoryUrl = 'https://github.com/${AppConstants.githubRepo}';
+
+  Future<void> _openRepository() async {
+    try {
+      final uri = Uri.parse(_repositoryUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      // A missing system URL handler must not break the settings screen.
+    }
   }
 
   String _formatHours(int ms) {
@@ -713,6 +727,18 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
                     onTap: () => OpenSourceLicensesDialog.show(context),
+                  ),
+                  Divider(color: context.appBorder, height: 1),
+                  ListTile(
+                    leading: Icon(Icons.open_in_new_rounded, color: context.appPrimary),
+                    title: Text(t.tr('view_on_github', fallback: 'Ver no GitHub'),
+                        style: const TextStyle(color: Colors.white)),
+                    subtitle: Text(
+                      _repositoryUrl.replaceFirst('https://', ''),
+                      style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                    ),
+                    trailing: Icon(Icons.chevron_right, color: context.appTextMuted),
+                    onTap: _openRepository,
                   ),
                 ],
               ),
