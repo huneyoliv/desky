@@ -67,34 +67,30 @@ void main() {
       expect(challenges.first.flameCost, equals(30));
     });
 
-    test('fetchMyChallenges parses user enrolled challenges', () async {
+    test('fetchAvailableChallenges le a chave `rs` devolvida pela API', () async {
+      // A API real responde {"s": true, "rs": [...]}; a lista vinha vazia porque
+      // o repositorio so olhava `challenges`/`c`.
       mockApiClient.getResponse = {
-        'challenges': [
-          {
-            'id': 2,
-            'name': 'Desafio Noturno',
-            'flame_cost': 50,
-            'is_joined': true,
-          }
-        ]
+        's': true,
+        'rs': [
+          {'id': 9, 'name': 'Desafio YPT', 'flame_cost': 30},
+        ],
       };
 
-      final challenges = await repository.fetchMyChallenges();
+      final challenges = await repository.fetchAvailableChallenges();
       expect(challenges.length, equals(1));
-      expect(challenges.first.name, equals('Desafio Noturno'));
-      expect(challenges.first.isJoined, isTrue);
+      expect(challenges.first.name, equals('Desafio YPT'));
     });
 
-    test('joinChallenge sends POST to /mission/challenge/join and returns true', () async {
-      mockApiClient.postResponse = {'s': true};
-      final result = await repository.joinChallenge(1, 30);
-      expect(result, isTrue);
+    test('fetchAvailableChallenges devolve lista vazia quando rs vem vazia', () async {
+      mockApiClient.getResponse = {'s': true, 'rs': <dynamic>[]};
+
+      expect(await repository.fetchAvailableChallenges(), isEmpty);
     });
 
-    test('cancelParticipation sends POST to /mission/challenge/cancel and returns true', () async {
-      mockApiClient.postResponse = {'s': true};
-      final result = await repository.cancelParticipation(1);
-      expect(result, isTrue);
-    });
+    // As rotas de escrita foram removidas do repositorio: /mission/challenge/my,
+    // /join e /cancel respondem 404 na API e nao existem no APK oficial. A
+    // ausencia e garantida em tempo de compilacao, entao nao ha teste a escrever
+    // aqui; reintroduzi-las exigira confirmar o contrato primeiro.
   });
 }

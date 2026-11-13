@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/challenge_model.dart';
@@ -100,10 +100,7 @@ void main() {
       expect(list.first.name, 'Desafio YPT');
     });
 
-    test('joinChallenge returns true on success', () async {
-      mockApiClient.postResponse = {'s': true};
-      final result = await repository.joinChallenge(1, 50);
-      expect(result, isTrue);
-    });
+    // joinChallenge/cancelParticipation/fetchMyChallenges foram removidos: as
+    // rotas correspondentes respondem 404 e nao existem no APK oficial.
   });
 }

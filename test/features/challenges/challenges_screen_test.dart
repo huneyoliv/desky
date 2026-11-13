@@ -7,101 +7,80 @@ import 'package:desky/data/repositories/challenge_repository.dart';
 import 'package:desky/features/challenges/challenges_screen.dart';
 
 class FakeChallengeRepository extends ChallengeRepository {
-  final List<ChallengeModel> mockAvailable;
-  final List<ChallengeModel> mockMy;
+  FakeChallengeRepository({this.mockAvailable = const []});
 
-  FakeChallengeRepository({
-    this.mockAvailable = const [],
-    this.mockMy = const [],
-  });
+  final List<ChallengeModel> mockAvailable;
 
   @override
   Future<List<ChallengeModel>> fetchAvailableChallenges() async => mockAvailable;
+}
 
-  @override
-  Future<List<ChallengeModel>> fetchMyChallenges() async => mockMy;
+ChallengeModel _challenge({int id = 101, String name = 'Desafio 50 Horas'}) {
+  return ChallengeModel(
+    id: id,
+    name: name,
+    description: 'Meta de 50h de foco no mês',
+    rules: 'Estude com o timer ligado',
+    flameCost: 40,
+    checkInMethod: 'timer',
+    startDate: DateTime.now(),
+    endDate: DateTime.now().add(const Duration(days: 30)),
+    checkInCount: 0,
+    successThreshold: 0.8,
+    participantCount: 25,
+    status: 'active',
+    isJoined: false,
+  );
+}
 
-  @override
-  Future<bool> joinChallenge(int challengeId, int flameBet) async => true;
+Future<void> _pump(WidgetTester tester, FakeChallengeRepository repo) async {
+  tester.view.physicalSize = const Size(1280, 800);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        challengeRepositoryProvider.overrideWithValue(repo),
+        appTranslationProvider.overrideWith(
+          (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'pt'),
+        ),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(splashFactory: InkRipple.splashFactory),
+        home: const ChallengesScreen(),
+      ),
+    ),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 500));
 }
 
 void main() {
-  testWidgets('ChallengesScreen renders available challenges and my challenges tab', (tester) async {
-    tester.view.physicalSize = const Size(1280, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(() {
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-    });
-
-    final available = [
-      ChallengeModel(
-        id: 101,
-        name: 'Desafio 50 Horas',
-        description: 'Meta de 50h de foco no mês',
-        rules: 'Estude com o timer ligado',
-        flameCost: 40,
-        checkInMethod: 'timer',
-        startDate: DateTime.now(),
-        endDate: DateTime.now().add(const Duration(days: 30)),
-        checkInCount: 0,
-        successThreshold: 0.8,
-        participantCount: 25,
-        status: 'active',
-        isJoined: false,
-      ),
-    ];
-
-    final my = [
-      ChallengeModel(
-        id: 202,
-        name: 'Meu Desafio Semanal',
-        description: 'Estudo consistente por 7 dias',
-        rules: 'Faça check-in diário',
-        flameCost: 20,
-        checkInMethod: 'timer',
-        startDate: DateTime.now(),
-        endDate: DateTime.now().add(const Duration(days: 7)),
-        checkInCount: 3,
-        successThreshold: 0.8,
-        participantCount: 10,
-        status: 'active',
-        isJoined: true,
-      ),
-    ];
-
-    final fakeRepo = FakeChallengeRepository(
-      mockAvailable: available,
-      mockMy: my,
-    );
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          challengeRepositoryProvider.overrideWithValue(fakeRepo),
-          appTranslationProvider.overrideWith(
-            (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'pt'),
-          ),
-        ],
-        child: MaterialApp(
-          theme: ThemeData(
-            splashFactory: InkRipple.splashFactory,
-          ),
-          home: const ChallengesScreen(),
-        ),
-      ),
-    );
-
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+  testWidgets('a aba lista os desafios disponiveis em modo somente leitura', (tester) async {
+    await _pump(tester, FakeChallengeRepository(mockAvailable: [_challenge()]));
 
     expect(find.text('Desafio 50 Horas'), findsOneWidget);
 
-    // Switch to 'Meus Desafios' tab
-    await tester.tap(find.text('Meus Desafios'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+    // Acoes removidas: rotas join/cancel/my nao existem na API (404).
+    expect(find.text('Participar do Desafio'), findsNothing);
+    expect(find.text('Fazer Check-in'), findsNothing);
+    expect(find.text('Meus Desafios'), findsNothing);
+    expect(find.byType(TabBar), findsNothing);
+  });
 
-    expect(find.text('Meu Desafio Semanal'), findsOneWidget);
+  testWidgets('estado vazio explica que a lista e somente consulta', (tester) async {
+    await _pump(tester, FakeChallengeRepository());
+
+    expect(find.text('Nenhum desafio disponível no momento.'), findsOneWidget);
+    expect(
+      find.textContaining('somente para consulta'),
+      findsOneWidget,
+      reason: 'o estado vazio precisa deixar claro que participar nao e suportado',
+    );
+    expect(find.text('Participar do Desafio'), findsNothing);
   });
 }
