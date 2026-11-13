@@ -902,7 +902,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     return false;
   }
 
-  Future<void> createSubject(String title, int colorInt) async {
+  Future<SubjectModel?> createSubject(String title, int colorInt) async {
     try {
       final newSubject = await _subjectRepository.createSubject(
         title: title,
@@ -913,6 +913,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
         subjects: updatedList,
         currentSubject: newSubject,
       );
+      return newSubject;
     } catch (_) {
       final newSubject = SubjectModel(
         id: DateTime.now().millisecondsSinceEpoch,
@@ -924,6 +925,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
         subjects: updatedList,
         currentSubject: newSubject,
       );
+      return newSubject;
     }
   }
 
