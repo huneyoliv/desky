@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
+import 'core/window/window_state.dart';
+import 'core/window/window_state_store.dart';
 import 'core/services/discord_rpc_coordinator.dart';
 import 'core/services/discord_rpc_service.dart';
 import 'core/theme/app_colors.dart';
@@ -39,36 +41,28 @@ void main() async {
   // Initialize Desktop Window Manager
   await windowManager.ensureInitialized();
 
-  // A janela nao pode nascer maior que a area util do monitor: em telas 720p o
-  // tamanho padrao (1280x800) ficava mais alto que a tela e, como a barra de
-  // titulo e desenhada pelo proprio app (janela sem moldura), ela abria fora da
-  // tela, exigindo redimensionar para recuperar a janela.
-  const preferredSize = Size(1280, 800);
-  const preferredMinimumSize = Size(1024, 700);
-  var windowSize = preferredSize;
-  var minimumWindowSize = preferredMinimumSize;
+  // Restaura o tamanho/estado salvos e, principalmente, limita tudo a area util
+  // do monitor ATUAL: em telas 720p o tamanho padrao (1280x800) ficava mais alto
+  // que a tela e, como a barra de titulo e desenhada pelo app (janela sem
+  // moldura), ela abria fora da tela. O mesmo limite protege quem trocou de
+  // monitor ou de resolucao desde a ultima execucao.
+  final windowStateStore = WindowStateStore(prefs: prefs);
+  Size? visibleArea;
   try {
     final display = await screenRetriever.getPrimaryDisplay();
-    final visible = display.visibleSize ?? display.size;
-    if (visible.width > 0 && visible.height > 0) {
-      windowSize = Size(
-        preferredSize.width < visible.width ? preferredSize.width : visible.width,
-        preferredSize.height < visible.height ? preferredSize.height : visible.height,
-      );
-      minimumWindowSize = Size(
-        preferredMinimumSize.width < visible.width ? preferredMinimumSize.width : visible.width,
-        preferredMinimumSize.height < windowSize.height
-            ? preferredMinimumSize.height
-            : windowSize.height,
-      );
-    }
+    visibleArea = display.visibleSize ?? display.size;
   } catch (_) {
-    // Sem informacao do monitor, mantem o tamanho padrao.
+    // Sem informacao do monitor: resolveWindowState usa o tamanho padrao.
   }
+  final restoredWindow = resolveWindowState(
+    storedSize: await windowStateStore.readSize(),
+    storedMaximized: await windowStateStore.readMaximized(),
+    visibleArea: visibleArea,
+  );
 
   final windowOptions = WindowOptions(
-    size: windowSize,
-    minimumSize: minimumWindowSize,
+    size: restoredWindow.size,
+    minimumSize: restoredWindow.minimumSize,
     center: true,
     backgroundColor: Platform.isMacOS ? AppColors.background : Colors.transparent,
     skipTaskbar: false,
@@ -83,6 +77,11 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
     await windowManager.setPreventClose(true);
+    if (restoredWindow.maximized) {
+      try {
+        await windowManager.maximize();
+      } catch (_) {}
+    }
   });
 
   runApp(
@@ -108,9 +107,22 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   StreamSubscription<ProcessSignal>? _sigtermSub;
   StreamSubscription<ProcessSignal>? _sigintSub;
 
+  /// O resize dispara a cada quadro, entao gravar em disco e adiado (debounce).
+  static const Duration _windowStateDebounceDelay = Duration(milliseconds: 400);
+  Timer? _windowStateDebounce;
+  WindowStateStore? _windowStateStore;
+  Size _lastNormalSize = kDefaultWindowSize;
+  bool _lastMaximized = false;
+
+  WindowStateStore get _windowStore =>
+      _windowStateStore ??= WindowStateStore(
+        prefs: ref.read(sharedPreferencesProvider),
+      );
+
   @override
   void initState() {
     super.initState();
+    _primeWindowState();
     windowManager.addListener(this);
     WidgetsBinding.instance.addObserver(this);
     _setupSignalHandlers();
@@ -140,6 +152,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
 
   @override
   void dispose() {
+    _windowStateDebounce?.cancel();
     _sigtermSub?.cancel();
     _sigintSub?.cancel();
     windowManager.removeListener(this);
@@ -150,6 +163,8 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   Future<void> _handleAppExit() async {
     if (_isExiting) return;
     _isExiting = true;
+    // Antes de qualquer coisa: guarda tamanho/estado da janela.
+    await _saveWindowState();
     try {
       final timerNotifier = ref.read(timerNotifierProvider.notifier);
       final timerState = ref.read(timerNotifierProvider);
@@ -177,6 +192,52 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
     } catch (_) {}
 
     exit(0);
+  }
+
+  Future<void> _primeWindowState() async {
+    try {
+      _lastMaximized = await windowManager.isMaximized();
+      if (!_lastMaximized) {
+        _lastNormalSize = await windowManager.getSize();
+      }
+    } catch (_) {}
+  }
+
+  /// Grava o estado com o tamanho "normal": o de uma janela maximizada nunca e
+  /// salvo como tamanho de restauracao.
+  Future<void> _saveWindowState() async {
+    try {
+      final maximized = await windowManager.isMaximized();
+      if (!maximized) {
+        _lastNormalSize = await windowManager.getSize();
+      }
+      _lastMaximized = maximized;
+      await _windowStore.save(size: _lastNormalSize, maximized: maximized);
+    } catch (_) {}
+  }
+
+  void _scheduleWindowStateSave() {
+    _windowStateDebounce?.cancel();
+    _windowStateDebounce = Timer(_windowStateDebounceDelay, () {
+      _saveWindowState();
+    });
+  }
+
+  @override
+  void onWindowResize() {
+    _scheduleWindowStateSave();
+  }
+
+  @override
+  void onWindowMaximize() {
+    _lastMaximized = true;
+    _saveWindowState();
+  }
+
+  @override
+  void onWindowUnmaximize() {
+    _lastMaximized = false;
+    _saveWindowState();
   }
 
   @override
