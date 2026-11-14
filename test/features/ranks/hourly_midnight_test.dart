@@ -23,6 +23,26 @@ class _StubApiClient extends ApiClient {
   }
 }
 
+/// Resposta com um unico dia e uma sessao cujo `st` e a string ISO crua da API.
+Map<String, dynamic> _oneDayIso({
+  required String dt,
+  required String st,
+  required int minutes,
+}) {
+  return {
+    's': true,
+    'ls': [
+      {
+        'dt': dt,
+        'sm': minutes * 60000,
+        'ls': [
+          {'sb': 'Matemática', 'sm': minutes * 60000, 'st': st},
+        ],
+      },
+    ],
+  };
+}
+
 /// Resposta com um unico dia e uma unica sessao.
 Map<String, dynamic> _oneDay({
   required String dt,
@@ -207,6 +227,63 @@ void main() {
 
       expect(byDay.keys.toList(), equals(['2026-11-07']));
       expect(byDay['2026-11-07']![23], equals(10));
+    });
+
+    test('st em UTC e convertido para o fuso do dispositivo', () async {
+      // A API devolve `st` sempre com +00:00. O mapa precisa usar a hora LOCAL
+      // (toLocal), nao a hora de parede gravada na string.
+      const iso = '2026-08-11T01:01:54+00:00';
+      final local = DateTime.parse(iso).toLocal();
+      final wallHour = DateTime.parse(iso).toUtc().hour;
+
+      final byDay = await _run(
+        _oneDayIso(dt: '2026-08-10', st: iso, minutes: 1),
+        startDate: '2026-08-09',
+        endDate: '2026-08-11',
+      );
+
+      expect(byDay['2026-08-10']![local.hour], equals(1),
+          reason: 'o minuto pertence a hora local de inicio');
+      expect(byDay.values.map(_total).reduce((a, b) => a + b), equals(1));
+
+      if (local.hour != wallHour) {
+        expect(byDay['2026-08-10']![wallHour], equals(0),
+            reason: 'nao pode usar a hora de parede da string em UTC');
+      }
+    });
+
+    test('st com offset positivo diferente do dispositivo tambem e convertido',
+        () async {
+      // Offset de +05:30 (nao inteiro) para exercitar minutos tambem.
+      const iso = '2026-11-07T23:50:00+05:30';
+      final local = DateTime.parse(iso).toLocal();
+      final wallHour = DateTime.parse(iso).toUtc().hour;
+
+      final byDay = await _run(
+        _oneDayIso(dt: '2026-11-07', st: iso, minutes: 1),
+        startDate: '2026-11-06',
+        endDate: '2026-11-08',
+      );
+
+      expect(byDay['2026-11-07']![local.hour], equals(1));
+      expect(byDay.values.map(_total).reduce((a, b) => a + b), equals(1));
+      if (local.hour != wallHour) {
+        expect(byDay['2026-11-07']![wallHour], equals(0));
+      }
+    });
+
+    test('sessao com st em UTC nao perde minutos', () async {
+      const iso = '2026-11-07T23:50:00+00:00';
+      final local = DateTime.parse(iso).toLocal();
+
+      final byDay = await _run(
+        _oneDayIso(dt: '2026-11-07', st: iso, minutes: 30),
+        startDate: '2026-11-06',
+        endDate: '2026-11-09',
+      );
+
+      expect(byDay.values.map(_total).reduce((a, b) => a + b), equals(30));
+      expect(byDay['2026-11-07']![local.hour], greaterThan(0));
     });
 
     test('dias sem sessao ficam zerados e com 24 blocos', () async {
