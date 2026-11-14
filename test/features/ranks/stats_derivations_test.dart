@@ -154,6 +154,33 @@ void main() {
       expect(series.hasData, isTrue);
     });
 
+    test('por padrao mantem as cinco maiores materias', () {
+      // O mesmo numero de fatias da serie por materia da aba, para os dois
+      // graficos agruparem igual.
+      final byDay = {
+        '2026-11-09': {
+          'A': 60 * _min,
+          'B': 50 * _min,
+          'C': 40 * _min,
+          'D': 30 * _min,
+          'E': 20 * _min,
+          'F': 10 * _min,
+          'G': 5 * _min,
+        },
+      };
+
+      final series = StatsDerivations.cumulativeBySubject(byDay);
+
+      expect(StatsDerivations.defaultTopSubjects, equals(5));
+      expect(series.subjects, hasLength(6)); // A..E + Outros
+      expect(series.subjects, containsAll(['A', 'B', 'C', 'D', 'E']));
+      expect(series.subjects, isNot(contains('F')));
+      expect(
+        series.totals[StatsDerivations.otherSubjectsKey],
+        equals([15 * _min]), // F + G
+      );
+    });
+
     test('materia desconhecida cai no bucket de Outros', () {
       final byDay = {
         '2026-11-09': {

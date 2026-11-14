@@ -111,6 +111,13 @@ class StatsDerivations {
     );
   }
 
+  /// How many subjects a stacked or cumulative chart keeps before folding the
+  /// rest into [otherSubjectsKey].
+  ///
+  /// Kept in sync with the subject series on the statistics tab, which uses the
+  /// same number of slices, so both charts group the same way.
+  static const int defaultTopSubjects = 5;
+
   /// Running total per subject, one point per day, keeping the [topSubjects]
   /// largest subjects and folding the rest into a single bucket.
   ///
@@ -118,7 +125,7 @@ class StatsDerivations {
   /// milliseconds at every day (same length as the day list).
   static CumulativeSeries cumulativeBySubject(
     Map<String, Map<String, int>> byDaySubjectMs, {
-    int topSubjects = 4,
+    int topSubjects = defaultTopSubjects,
   }) {
     final days = byDaySubjectMs.keys.toList()..sort();
     if (days.isEmpty) {
