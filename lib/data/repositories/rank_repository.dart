@@ -1,3 +1,5 @@
+﻿import 'package:flutter/foundation.dart';
+
 import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
 import '../models/rank_entry_model.dart';
@@ -102,6 +104,17 @@ class RankRepository {
   ///
   /// Every session carries `st` (ISO start) and `sm` (duration), so the minutes
   /// land on the hours that were actually studied instead of one daily block.
+  ///
+  /// Day rule: the row is `dt` (the day the API groups the session under, which
+  /// is the authority for daily totals), and only the wall-clock time of the day
+  /// comes from `st`. In every session observed so far `dt` equals the civil day
+  /// of `st`, so this matches the calendar; when the two disagree, the API wins
+  /// and the divergence is logged instead of silently moving the minutes.
+  ///
+  /// A session that runs past midnight keeps going into the **next civil day's**
+  /// row, which is why the walk below advances a real timestamp instead of a
+  /// plain hour counter. Minutes that would land outside the requested range are
+  /// dropped rather than inventing rows the caller did not ask for.
   Future<Map<String, List<int>>> fetchHourlyStudyMinutes({
     required int userId,
     required String startDate,
@@ -114,8 +127,19 @@ class RankRepository {
     );
 
     final byDay = <String, List<int>>{};
+    final rangeStart = _normalizeDay(startDate);
+    final rangeEnd = _normalizeDay(endDate);
     for (final day in _eachDay(startDate, endDate)) {
       byDay[day] = List.filled(24, 0);
+    }
+
+    /// Buckets for [day], or `null` when the day is outside the requested range.
+    List<int>? bucketsFor(String day) {
+      if (day.isEmpty) return null;
+      if (day.compareTo(rangeStart) < 0 || day.compareTo(rangeEnd) > 0) {
+        return null;
+      }
+      return byDay.putIfAbsent(day, () => List.filled(24, 0));
     }
 
     final rawLogs = data['ls'];
@@ -124,7 +148,8 @@ class RankRepository {
         if (log is! Map<String, dynamic>) continue;
         final day = _normalizeDay(log['dt'] as String? ?? '');
         if (day.isEmpty) continue;
-        final buckets = byDay.putIfAbsent(day, () => List.filled(24, 0));
+        final logDay = DateTime.tryParse(day);
+        if (logDay == null) continue;
 
         final sessions = log['ls'];
         if (sessions is! List) continue;
@@ -135,15 +160,32 @@ class RankRepository {
           final start = DateTime.tryParse(session['st'] as String? ?? '')?.toLocal();
           if (start == null) continue;
 
+          // `dt` gives the date, `st` gives the time of day.
+          final anchor = DateTime(
+            logDay.year,
+            logDay.month,
+            logDay.day,
+            start.hour,
+            start.minute,
+          );
+          if (_dayKey(anchor) != _dayKey(start)) {
+            debugPrint(
+              '[stats] session day differs between dt ($day) and st '
+              '(${_dayKey(start)}); keeping dt',
+            );
+          }
+
           var remaining = minutes;
-          var hour = start.hour;
+          var cursor = anchor;
           // The first hour only takes the part of it that was studied.
-          var capacity = 60 - start.minute;
-          while (remaining > 0 && hour < 24) {
+          var capacity = 60 - anchor.minute;
+          while (remaining > 0) {
+            final buckets = bucketsFor(_dayKey(cursor));
+            if (buckets == null) break; // past the requested range
             final take = remaining < capacity ? remaining : capacity;
-            buckets[hour] += take;
+            buckets[cursor.hour] += take;
             remaining -= take;
-            hour++;
+            cursor = cursor.add(Duration(minutes: take));
             capacity = 60;
           }
         }
@@ -152,6 +194,10 @@ class RankRepository {
 
     return byDay;
   }
+
+  static String _dayKey(DateTime value) =>
+      '${value.year}-${value.month.toString().padLeft(2, '0')}'
+      '-${value.day.toString().padLeft(2, '0')}';
 
   static String _normalizeDay(String raw) {
     final parsed = DateTime.tryParse(raw);
