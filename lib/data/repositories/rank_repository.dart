@@ -1,5 +1,6 @@
 import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
+import '../../features/ranks/session_derivations.dart';
 import '../models/rank_entry_model.dart';
 
 class RankRepository {
@@ -174,6 +175,23 @@ class RankRepository {
 
   /// Reserved key for studied time that carries no session subject.
   static const String unknownSubjectKey = '__unknown__';
+
+  /// Every session of the range, normalised by [StudySessionParser].
+  ///
+  /// Callers that need per-session data (start time, duration) use this instead
+  /// of re-reading `dt`, `st` and `sm` themselves.
+  Future<List<StudySession>> fetchStudySessions({
+    required int userId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    final data = await fetchUserStats(
+      userId: userId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+    return StudySessionParser.parse(data);
+  }
 
   /// Study milliseconds per day and subject for any date range.
   ///

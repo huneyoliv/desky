@@ -12,6 +12,8 @@ import '../auth/auth_notifier.dart';
 import '../settings/settings_notifier.dart';
 import 'widgets/heatmap_grid.dart';
 import 'widgets/study_calendar.dart';
+import 'widgets/time_of_day_cards.dart';
+import 'session_derivations.dart';
 
 final rankRepositoryProvider = Provider<RankRepository>((ref) {
   return RankRepository();
@@ -44,6 +46,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   DateTime _calendarMonth = DateTime.now();
   Map<String, int> _calendarStudyMs = {};
   Map<String, List<int>> _hourlyLogs = {};
+  /// Sessions of the visible range, used by the time-of-day cards.
+  List<StudySession> _sessions = [];
+  bool _isLoadingTimeOfDay = true;
   bool _isLoadingRanks = true;
   bool _isLoadingStats = true;
 
@@ -56,6 +61,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     _loadCalendarMonth();
     _loadHourlyMap();
     _loadSubjectSeries();
+    _loadTimeOfDay();
   }
 
   @override
@@ -186,6 +192,29 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
       endDate: DateFormat('yyyy-MM-dd').format(now),
     );
     if (mounted) setState(() => _hourlyLogs = byDay);
+  }
+
+  /// Sessions of the visible range for the time-of-day cards.
+  Future<void> _loadTimeOfDay() async {
+    final user = ref.read(authStateProvider).user;
+    if (user == null) {
+      if (mounted) setState(() => _isLoadingTimeOfDay = false);
+      return;
+    }
+    setState(() => _isLoadingTimeOfDay = true);
+    final (start, end) = _statsRangeBounds();
+    final repo = ref.read(rankRepositoryProvider);
+    final sessions = await repo.fetchStudySessions(
+      userId: user.id,
+      startDate: DateFormat('yyyy-MM-dd').format(start),
+      endDate: DateFormat('yyyy-MM-dd').format(end),
+    );
+    if (mounted) {
+      setState(() {
+        _sessions = sessions;
+        _isLoadingTimeOfDay = false;
+      });
+    }
   }
 
   /// Per-subject series with period navigation, stacked per day.
@@ -833,6 +862,44 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                           ],
                         ),
                       ),
+                      const SizedBox(height: 24),
+
+                      // Time of day: average start/end, regularity and the
+                      // start-against-end scatter.
+                      if (_isLoadingTimeOfDay)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final wide = constraints.maxWidth >= 900;
+                            final avg = AvgTimesCard(
+                              stats: TimeOfDayStats.fromSessions(_sessions),
+                            );
+                            final scatter = SessionScatterCard(
+                              points: scatterPoints(_sessions),
+                            );
+                            if (!wide) {
+                              return Column(
+                                children: [
+                                  avg,
+                                  const SizedBox(height: 24),
+                                  scatter,
+                                ],
+                              );
+                            }
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: avg),
+                                const SizedBox(width: 24),
+                                Expanded(child: scatter),
+                              ],
+                            );
+                          },
+                        ),
                       const SizedBox(height: 24),
 
                       // 24h Heatmap Component
