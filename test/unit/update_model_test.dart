@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/features/updates/models/update_model.dart';
 
@@ -64,6 +64,47 @@ void main() {
       expect(release.isNewerThan('1.1.0'), isFalse);
       expect(release.isNewerThan('1.1.1'), isFalse);
       expect(release.isNewerThan('2.0.0'), isFalse);
+    });
+
+    AppRelease releaseWithTag(String tag) => AppRelease(
+          id: 1,
+          tagName: tag,
+          name: tag,
+          body: '',
+          htmlUrl: 'https://github.com',
+        );
+
+    test('isNewerThan entende pre-lancamento', () {
+      // Estes tres eram "falsos" com o comparador antigo, que descartava tudo
+      // apos o primeiro hifen: quem instalava a beta ficava preso para sempre.
+      expect(releaseWithTag('v1.2.0-beta.2').isNewerThan('1.2.0-beta.1'), isTrue);
+      expect(releaseWithTag('v1.2.0-beta.1').isNewerThan('1.2.0-beta.1'), isFalse);
+      expect(releaseWithTag('v1.2.0-rc.1').isNewerThan('1.2.0-beta.2'), isTrue);
+      expect(releaseWithTag('v1.2.0').isNewerThan('1.2.0-beta.1'), isTrue);
+      expect(releaseWithTag('v1.2.0').isNewerThan('1.2.0-rc.1'), isTrue);
+    });
+
+    test('isNewerThan nunca oferece downgrade', () {
+      // Da versao final, nenhuma pre-release da mesma base pode ser oferecida.
+      expect(releaseWithTag('v1.2.0-beta.2').isNewerThan('1.2.0'), isFalse);
+      expect(releaseWithTag('v1.2.0-beta.1').isNewerThan('1.2.0'), isFalse);
+      expect(releaseWithTag('v1.2.0-rc.1').isNewerThan('1.2.0'), isFalse);
+      // Nem uma versao anterior qualquer.
+      expect(releaseWithTag('v1.1.7').isNewerThan('1.2.0'), isFalse);
+      expect(releaseWithTag('v1.2.0-beta.1').isNewerThan('1.2.0-beta.2'), isFalse);
+    });
+
+    test('isNewerThan ignora build metadata', () {
+      expect(releaseWithTag('v1.2.0+19').isNewerThan('1.2.0+18'), isFalse);
+      expect(releaseWithTag('v1.2.0+18').isNewerThan('1.2.0'), isFalse);
+      expect(releaseWithTag('v1.2.0-beta.1+19').isNewerThan('1.2.0-beta.1'), isFalse);
+      expect(releaseWithTag('v1.2.0+5').isNewerThan('1.2.0-beta.9'), isTrue);
+    });
+
+    test('isNewerThan devolve false para versao ilegivel', () {
+      expect(releaseWithTag('v1.2.0').isNewerThan(''), isFalse);
+      expect(releaseWithTag('v1.2.0').isNewerThan('nao-e-versao'), isFalse);
+      expect(releaseWithTag('lixo').isNewerThan('1.0.0'), isFalse);
     });
 
     test('getAssetForPlatform retrieves appropriate installer per OS', () {
