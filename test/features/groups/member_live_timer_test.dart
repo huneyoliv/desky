@@ -88,6 +88,33 @@ void main() {
       expect(find.text('Estudando (1h30)'), findsOneWidget);
     });
 
+    testWidgets('dl.st preenchido com is == false nao mostra contador',
+        (tester) async {
+      // O `dl.st` da API nao fica vazio quando o membro esta ocioso: ele aponta
+      // para a ultima sessao. O contador so pode existir quando `dl.is` diz que
+      // ha sessao em andamento, entao este caso precisa continuar estatico.
+      final start = DateTime(2026, 11, 18, 10, 0, 0);
+      var fakeNow = start.add(const Duration(minutes: 4, seconds: 12));
+
+      await _pump(
+        tester,
+        isStudying: false,
+        isPaused: false,
+        sessionStartedAt: start,
+        now: () => fakeNow,
+      );
+
+      // Nunca renderiza tempo decorrido, mesmo com o inicio disponivel.
+      expect(find.text('Estudando (1h30)'), findsOneWidget);
+      expect(find.textContaining('04:12'), findsNothing);
+
+      // E nao existe ticker: avancar o relogio e o tempo de teste nao muda nada.
+      fakeNow = start.add(const Duration(minutes: 10));
+      await tester.pump(const Duration(seconds: 5));
+      expect(find.text('Estudando (1h30)'), findsOneWidget);
+      expect(find.textContaining('10:00'), findsNothing);
+    });
+
     testWidgets('st invalido/ausente: mostra o valor estatico', (tester) async {
       await _pump(
         tester,

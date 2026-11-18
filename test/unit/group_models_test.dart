@@ -107,6 +107,23 @@ void main() {
           equals(DateTime.utc(2026, 11, 18, 5, 0)));
     });
 
+    test('GroupMemberModel guarda dl.st mesmo com is == false', () {
+      // O campo vem preenchido apontando para a ultima sessao, entao o modelo
+      // nao descarta o valor; quem decide exibir o contador e o widget, que
+      // exige isStudying == true. Este teste fixa essa divisao de
+      // responsabilidade: dado no modelo, decisao na UI.
+      final member = GroupMemberModel.fromJson({
+        'ud': 781,
+        'n': 'Elisa',
+        'dl': {'is': false, 'ia': false, 'st': '2026-11-18T08:00:00Z'},
+      });
+
+      expect(member.isStudying, isFalse);
+      expect(member.sessionStartedAt, isNotNull);
+      expect(member.sessionStartedAt!.toUtc(),
+          equals(DateTime.utc(2026, 11, 18, 8, 0)));
+    });
+
     test('ChatMessageModel parses message and reaction maps', () {
       final json = {
         'idx': 9001,
