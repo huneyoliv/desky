@@ -107,6 +107,28 @@ Download the latest version directly from our official [**Releases Page**](https
 | **Linux (Arch/CachyOS)** | `Desky-Linux-x64.pkg.tar.zst` | Pacman Package | Run `sudo pacman -U Desky-Linux-x64.pkg.tar.zst` or build via `makepkg -si`. |
 | **Linux (Other Distros)** | `Desky-Linux-x64.tar.gz` | Portable Archive | Extract the archive and execute `./desky`. |
 
+### Update channels
+
+Desky checks for updates on its own, from this repository's releases.
+
+| Channel | What you get | Who is on it |
+| :--- | :--- | :--- |
+| **Stable** (default) | Only finished releases, e.g. `1.2.0` | Everyone who never touched the setting |
+| **Beta** | Also pre-releases, e.g. `1.2.0-beta.2`, `1.2.0-rc.1` | Only users who opt in |
+
+To opt in, open **Settings → Study preferences** and turn on **Join the beta**.
+Beta builds are listed with the pre-release flag on GitHub, and they are never
+marked as the latest release, so stable users are not offered them.
+
+**Leaving the beta:** turn the toggle off. The next check goes back to the
+stable channel, but note that Desky never downgrades on its own — to go back to
+a stable build from a beta one, download the current stable installer from the
+[Releases Page](https://github.com/huneyoliv/desky/releases/latest) and install
+it over the beta.
+
+The Microsoft Store build has no update channel setting at all: the Store
+delivers its own updates, and only stable versions are ever published there.
+
 ---
 
 ## 🏗️ Architecture & Technologies

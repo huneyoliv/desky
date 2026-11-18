@@ -83,16 +83,23 @@ jobs:
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer\desky_setup.iss
 
       - name: Build Windows Release for Microsoft Store (MSIX)
+        if: ${{ !contains(github.ref_name, '-') && (github.event_name != 'workflow_dispatch' || !contains(github.event.inputs.version_tag, '-')) }}
         run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=false --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
 
       - name: Create Windows MSIX Package
+        if: ${{ !contains(github.ref_name, '-') && (github.event_name != 'workflow_dispatch' || !contains(github.event.inputs.version_tag, '-')) }}
         run: dart run msix:create --store --build-windows false
 
       - name: Stage Windows Artifacts
         shell: pwsh
         run: |
           Copy-Item "windows\installer\Desky-Windows-Installer-x64.exe" -Destination "Desky-Windows-Installer-x64.exe"
-          Copy-Item "build\windows\x64\runner\Release\Desky-Windows-Store-x64.msix" -Destination "Desky-Windows-Store-x64.msix"
+          $msix = "build\windows\x64\runner\Release\Desky-Windows-Store-x64.msix"
+          if (Test-Path $msix) {
+            Copy-Item $msix -Destination "Desky-Windows-Store-x64.msix"
+          } else {
+            Write-Host "Sem MSIX (pre-release): o pacote da Store nao aceita sufixo."
+          }
 
       - name: Upload Windows Standalone Installer Artifact
         uses: actions/upload-artifact@v4
@@ -193,6 +200,10 @@ jobs:
           if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF_NAME" ]; then
             VERSION="1.0.0"
           fi
+          # Debian: `1.2.0-beta.1` would be upstream `1.2.0` plus revision
+          # `beta.1`, sorting AFTER the final. `~` sorts a pre-release first.
+          VERSION="${VERSION/-/~}"
+          echo "Versao do pacote .deb: ${VERSION}"
           
           mkdir -p pkg/DEBIAN
           mkdir -p pkg/usr/lib/desky
@@ -273,6 +284,10 @@ jobs:
             cp linux_artifacts/Desky-Linux-x64.tar.gz /home/builder/
             cp linux/archpkg/PKGBUILD /home/builder/
             
+            # pkgver do PKGBUILD estava fixo em 1.1.5 (defasado). makepkg
+            # proibe hifen, entao uma pre-release usa `_`.
+            PKGVER=\$(echo \"${GITHUB_REF_NAME#v}\" | tr '-' '_')
+            sed -i \"s/^pkgver=.*/pkgver=\${PKGVER}/\" /home/builder/PKGBUILD
             sed -i \"s/sha256sums=('SKIP')/sha256sums=('\${SHA256}')/\" /home/builder/PKGBUILD
             sed -i \"s|source=.*|source=(\\\"Desky-Linux-x64.tar.gz\\\")|\" /home/builder/PKGBUILD
             
@@ -318,6 +333,13 @@ jobs:
             TAG="${{ github.ref_name }}"
           fi
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          # A hyphen marks a pre-release (v1.2.0-beta.1); the same rule holds
+          # for a pushed tag and for a manual run.
+          if [[ "${TAG}" == *-* ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
           python3 scripts/extract_changelog.py "${TAG}"
 
       - name: Verify All Required Multiplatform Release Artifacts
@@ -358,7 +380,11 @@ jobs:
           tag_name: ${{ steps.release_info.outputs.tag }}
           name: "Desky ${{ steps.release_info.outputs.tag }}"
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.release_info.outputs.prerelease == 'true' }}
+          # A pre-release must never become the "latest" release: /releases/latest
+          # is what the stable channel reads, so promoting a beta there would
+          # offer it to every user.
+          make_latest: ${{ steps.release_info.outputs.prerelease != 'true' }}
           fail_on_unmatched_files: true
           body_path: release_notes.md
           generate_release_notes: true
@@ -372,10 +398,13 @@ jobs:
   deploy-microsoft-store:
     name: Deploy to Microsoft Store (MSIX)
     needs: [publish-release, build-windows]
+    # A pre-release never goes to the Store: the Store only accepts a stable
+    # version, and a submission would become the public build for everyone.
     if: |
       always() &&
       needs.publish-release.result == 'success' &&
-      needs.build-windows.result == 'success'
+      needs.build-windows.result == 'success' &&
+      !contains(github.ref_name, '-') && (github.event_name != 'workflow_dispatch' || !contains(github.event.inputs.version_tag, '-'))
     runs-on: windows-latest
 
     env:
