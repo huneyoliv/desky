@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/constants/app_constants.dart';
+import '../../features/updates/update_channel.dart';
 import '../models/category_model.dart';
 import '../models/country_model.dart';
 
@@ -28,6 +30,7 @@ class SettingsRepository {
   static const String keyBlockedUsers = 'blocked_users_list';
   static const String keyDiscordRpc = 'discord_rpc_enabled';
   static const String keyThemePreset = 'selected_theme_preset';
+  static const String keyBetaChannel = 'beta_update_channel';
 
   static const CountryModel defaultCountry = CountryModel(
     id: 23,
@@ -300,6 +303,27 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setBool(keySoundEffects, value);
+    } catch (_) {}
+  }
+
+  /// Whether update checks should include pre-releases.
+  ///
+  /// When the user never touched the toggle, the default follows the running
+  /// build: a pre-release build keeps the beta channel, a stable build does not.
+  Future<bool> getBetaChannel() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getBool(keyBetaChannel) ??
+          UpdateChannel.defaultEnabledFor(AppConstants.appVersion);
+    } catch (_) {
+      return UpdateChannel.defaultEnabledFor(AppConstants.appVersion);
+    }
+  }
+
+  Future<void> saveBetaChannel(bool value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setBool(keyBetaChannel, value);
     } catch (_) {}
   }
 

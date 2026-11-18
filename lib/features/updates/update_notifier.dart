@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/services/update_service.dart';
+import '../settings/settings_notifier.dart';
 import 'models/update_model.dart';
 
 import '../../core/utils/package_helper.dart';
@@ -47,14 +48,28 @@ class UpdateNotifier extends StateNotifier<UpdateState> {
   final UpdateService _service;
   CancelToken? _cancelToken;
 
+  /// Whether checks should include pre-releases. Mutable so flipping the
+  /// setting re-checks through the new channel without recreating the notifier.
+  bool betaChannel;
+
   UpdateNotifier({
     required UpdateService service,
     String currentVersion = AppConstants.appVersion,
+    this.betaChannel = false,
   })  : _service = service,
         super(UpdateState(currentVersion: currentVersion)) {
     if (!PackageHelper.isStoreOrMsix) {
       checkForUpdates();
     }
+  }
+
+  /// Switches channel and re-checks, so the badge reflects the new channel
+  /// immediately instead of waiting for the next app start.
+  Future<void> setBetaChannel(bool value) async {
+    if (betaChannel == value) return;
+    betaChannel = value;
+    if (PackageHelper.isStoreOrMsix) return;
+    await checkForUpdates();
   }
 
   Future<void> checkForUpdates() async {
@@ -66,7 +81,10 @@ class UpdateNotifier extends StateNotifier<UpdateState> {
     _cancelToken = CancelToken();
 
     try {
-      final release = await _service.fetchLatestRelease(cancelToken: _cancelToken);
+      final release = await _service.fetchReleaseForChannel(
+        betaChannel: betaChannel,
+        cancelToken: _cancelToken,
+      );
       if (!mounted) return;
 
       if (release == null) {
@@ -105,5 +123,17 @@ class UpdateNotifier extends StateNotifier<UpdateState> {
 final updateNotifierProvider =
     StateNotifierProvider<UpdateNotifier, UpdateState>((ref) {
   final service = ref.watch(updateServiceProvider);
-  return UpdateNotifier(service: service);
+  final betaChannel = ref.watch(
+    settingsNotifierProvider.select((settings) => settings.betaChannel),
+  );
+  final notifier = UpdateNotifier(
+    service: service,
+    betaChannel: betaChannel,
+  );
+  // Keep the notifier in sync when the user flips the toggle.
+  ref.listen<bool>(
+    settingsNotifierProvider.select((settings) => settings.betaChannel),
+    (_, next) => notifier.setBetaChannel(next),
+  );
+  return notifier;
 });
