@@ -9,6 +9,11 @@ class GroupMemberModel {
   final bool isPaused;
   final int studyMs;
   final int? sessionStartMs;
+
+  /// When the current session started, parsed from `dl.st` (ISO with UTC
+  /// offset). Null when the API does not report a start or the value is not a
+  /// valid timestamp, in which case callers must keep a static display.
+  final DateTime? sessionStartedAt;
   final bool hasCustomAvatar;
   final String? currentSubject;
   final int? subjectColor;
@@ -21,6 +26,7 @@ class GroupMemberModel {
     this.isPaused = false,
     required this.studyMs,
     this.sessionStartMs,
+    this.sessionStartedAt,
     required this.hasCustomAvatar,
     this.currentSubject,
     this.subjectColor,
@@ -68,6 +74,16 @@ class GroupMemberModel {
 
     final sessionStart = dl?['ss'] != null ? safeInt(dl?['ss']) : null;
 
+    // `dl.st` is an ISO timestamp with a UTC offset (verified against the live
+    // API); it carries the wall-clock start of the running session and is the
+    // only field a local elapsed-time counter can rely on. Anything that is not
+    // a parseable timestamp stays null so the UI falls back to a static value.
+    final rawSessionStart = dl?['st'];
+    final sessionStartedAt =
+        rawSessionStart is String && rawSessionStart.isNotEmpty
+            ? DateTime.tryParse(rawSessionStart)
+            : null;
+
     return GroupMemberModel(
       userId: safeInt(json['ud'] ?? json['userId'] ?? json['id']),
       name: safeString(json['n'] ?? json['name'] ?? json['nickname'], 'Membro').trim(),
@@ -76,6 +92,7 @@ class GroupMemberModel {
       isPaused: isPaused,
       studyMs: studyMs,
       sessionStartMs: sessionStart,
+      sessionStartedAt: sessionStartedAt,
       hasCustomAvatar: safeBool(json['hasCustomAvatar']),
       currentSubject: dl?['sn'] != null || dl?['sb'] != null
           ? safeString(dl?['sn'] ?? dl?['sb'])

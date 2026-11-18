@@ -10,9 +10,11 @@ import '../../data/models/group_member_model.dart';
 import '../../data/models/chat_message_model.dart';
 import '../../data/repositories/group_repository.dart';
 import 'group_leader_panel.dart';
+import 'lifecycle_poll_coordinator.dart';
 import 'widgets/cam_study_member_tile.dart';
 import 'widgets/sticker_picker_panel.dart';
 import 'widgets/group_studicon_picker_dialog.dart';
+import 'widgets/member_live_timer.dart';
 import '../../data/models/sticker_model.dart';
 import '../../shared/widgets/studicon_avatar.dart';
 import '../../core/cdn/cdn_resolver.dart';
@@ -38,6 +40,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   Timer? _refreshTimer;
+  late final LifecyclePollCoordinator _pollCoordinator;
 
   List<GroupMemberModel> _members = [];
   List<GroupMemberModel> _groupRanks = [];
@@ -166,27 +169,50 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
 
   Timer? _chatTimer;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _loadGroupData();
-
+  /// Starts both poll timers (members every 30 s, chat every 3 s), replacing
+  /// any previous pair so a resume cannot stack timers.
+  void _startPollTimers() {
+    _refreshTimer?.cancel();
+    _chatTimer?.cancel();
     // Auto refresh active members every 30 seconds
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       _loadMembersSilently();
     });
-
     // Auto refresh live chat messages every 3 seconds
     _chatTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       _loadChatSilently();
     });
   }
 
+  /// Stops both poll timers without touching the local per-row counters.
+  void _stopPollTimers() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
+    _chatTimer?.cancel();
+    _chatTimer = null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _pollCoordinator = LifecyclePollCoordinator(
+      onResume: () {
+        // Immediate refresh on return, then the normal cadence.
+        _loadMembersSilently();
+        _loadChatSilently();
+        _startPollTimers();
+      },
+      onBackground: _stopPollTimers,
+    )..attach();
+    _loadGroupData();
+    _startPollTimers();
+  }
+
   @override
   void dispose() {
-    _refreshTimer?.cancel();
-    _chatTimer?.cancel();
+    _pollCoordinator.detach();
+    _stopPollTimers();
     _tabController.dispose();
     _chatInputController.dispose();
     super.dispose();
@@ -1058,21 +1084,32 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            isActivelyStudying
-                ? '${t.tr("studying", fallback: "Estudando")} (${_formatMs(member.studyMs)})'
-                : member.isPaused
-                    ? '${t.tr("paused", fallback: "Pausado")} (${_formatMs(member.studyMs)})'
-                    : '${t.tr("resting", fallback: "Resting")} (${_formatMs(member.studyMs)})',
-            style: TextStyle(
-              fontSize: 12,
-              color: isActivelyStudying
-                  ? context.appPrimary
-                  : member.isPaused
-                      ? AppColors.warning
-                      : context.appTextMuted,
+          if (isActivelyStudying)
+            // Ticks locally from `dl.st` once per second, without any request,
+            // so the row no longer freezes between the 30-second polls. Falls
+            // back to the static label when the API sent no usable start.
+            MemberLiveTimer(
+              isStudying: member.isStudying,
+              isPaused: member.isPaused,
+              sessionStartedAt: member.sessionStartedAt,
+              activePrefix: t.tr("studying", fallback: "Estudando"),
+              staticLabel:
+                  '${t.tr("studying", fallback: "Estudando")} (${_formatMs(member.studyMs)})',
+              style: TextStyle(
+                fontSize: 12,
+                color: context.appPrimary,
+              ),
+            )
+          else
+            Text(
+              member.isPaused
+                  ? '${t.tr("paused", fallback: "Pausado")} (${_formatMs(member.studyMs)})'
+                  : '${t.tr("resting", fallback: "Resting")} (${_formatMs(member.studyMs)})',
+              style: TextStyle(
+                fontSize: 12,
+                color: member.isPaused ? AppColors.warning : context.appTextMuted,
+              ),
             ),
-          ),
           if (!isActivelyStudying) ...[
             const SizedBox(height: 8),
             InkWell(
