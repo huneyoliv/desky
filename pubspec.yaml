@@ -2,7 +2,7 @@ name: desky
 description: "Desky - Focus & Study Timer Desktop Client"
 publish_to: 'none'
 
-version: 1.2.0+19
+version: 1.2.1+20
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -77,7 +77,7 @@ msix_config:
   publisher_display_name: Desky
   identity_name: DevHuney.Desky
   publisher: CN=B81D5CBC-296B-44D2-9E7C-AF85E6AF4AD8
-  msix_version: 1.2.0.0
+  msix_version: 1.2.1.0
   # O msix emite BackgroundColor="transparent" no manifesto, entao o Windows
   # pinta o bloco com a cor de destaque. Um icone com cantos transparentes
   # deixava esse azul aparecer e o bloco parecia quebrado na Store; este arquivo

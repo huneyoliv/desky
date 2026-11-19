@@ -73,6 +73,29 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.2.1] - 2026-11-19
+
+### Fixed
+
+- **The Timer Layout Moved With the Subject and the Mode**: The screen is used as a window-capture
+  overlay, so a crop set once must keep working. The header bar was a `Container` without a width
+  inside a centred `Column`: it shrank to its content and was centred, so a longer subject name
+  pushed the whole bar sideways. It now spans the window, the subject chip truncates instead of
+  widening the bar, and the total-time field has a fixed width with tabular figures so `0s`
+  becoming `1h 23m` no longer nudges the mode switcher. Switching to Pomodoro inserted a banner
+  that pushed the timer block down; the slot is now reserved in both modes and only its content
+  toggles. The line under the clock (subject name or the paused chip) moved the digits when it
+  changed height; it now sits in a fixed-height slot. The clock keeps `hh:mm:ss` with tabular
+  figures, and the start button has a fixed minimum width so `INICIAR` and `INICIAR FOCO` occupy
+  the same box.
+
+### Changed
+
+- **API Matrix Rewritten With the Verified Contracts**: `docs/api_matrix.md` now records what was
+  actually validated: the planner's `/study/study-plan/*` contract that backs To-Do, the routes
+  that answer errors (`/study/task/make`, `/rest/record`, `/study/study-plan/rest`), the mission
+  routes that do not exist at all, and the daily-history limit that could not be verified.
+
 ## [1.2.0] - 2026-11-18
 
 ### Added
