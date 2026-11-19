@@ -12,6 +12,11 @@ import '../auth/auth_notifier.dart';
 import '../settings/settings_notifier.dart';
 import 'widgets/heatmap_grid.dart';
 import 'widgets/study_calendar.dart';
+import 'widgets/stats_summary_cards.dart';
+import 'widgets/cumulative_and_quarter.dart';
+import 'widgets/time_of_day_cards.dart';
+import 'stats_derivations.dart';
+import 'session_derivations.dart';
 
 final rankRepositoryProvider = Provider<RankRepository>((ref) {
   return RankRepository();
@@ -43,7 +48,14 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   bool _isLoadingSeries = true;
   DateTime _calendarMonth = DateTime.now();
   Map<String, int> _calendarStudyMs = {};
+  /// Daily totals for the same range as the subject series, used by the
+  /// comparisons, the maxima and the cumulative card.
+  Map<String, int> _rangeDailyMs = {};
+  bool _isLoadingDerived = true;
   Map<String, List<int>> _hourlyLogs = {};
+  /// Sessions of the visible range, used by the time-of-day cards.
+  List<StudySession> _sessions = [];
+  bool _isLoadingTimeOfDay = true;
   bool _isLoadingRanks = true;
   bool _isLoadingStats = true;
 
@@ -56,6 +68,8 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     _loadCalendarMonth();
     _loadHourlyMap();
     _loadSubjectSeries();
+    _loadDerivedRange();
+    _loadTimeOfDay();
   }
 
   @override
@@ -186,6 +200,55 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
       endDate: DateFormat('yyyy-MM-dd').format(now),
     );
     if (mounted) setState(() => _hourlyLogs = byDay);
+  }
+
+  /// Daily totals for comparisons, maxima and the cumulative card.
+  ///
+  /// Uses the same range as the subject series so every card on the tab talks
+  /// about the same window.
+  Future<void> _loadDerivedRange() async {
+    final user = ref.read(authStateProvider).user;
+    if (user == null) {
+      if (mounted) setState(() => _isLoadingDerived = false);
+      return;
+    }
+    setState(() => _isLoadingDerived = true);
+    final (start, end) = _statsRangeBounds();
+    final repo = ref.read(rankRepositoryProvider);
+    final byDay = await repo.fetchDailyStudyMs(
+      userId: user.id,
+      startDate: DateFormat('yyyy-MM-dd').format(start),
+      endDate: DateFormat('yyyy-MM-dd').format(end),
+    );
+    if (mounted) {
+      setState(() {
+        _rangeDailyMs = byDay;
+        _isLoadingDerived = false;
+      });
+    }
+  }
+
+  /// Sessions of the visible range for the time-of-day cards.
+  Future<void> _loadTimeOfDay() async {
+    final user = ref.read(authStateProvider).user;
+    if (user == null) {
+      if (mounted) setState(() => _isLoadingTimeOfDay = false);
+      return;
+    }
+    setState(() => _isLoadingTimeOfDay = true);
+    final (start, end) = _statsRangeBounds();
+    final repo = ref.read(rankRepositoryProvider);
+    final sessions = await repo.fetchStudySessions(
+      userId: user.id,
+      startDate: DateFormat('yyyy-MM-dd').format(start),
+      endDate: DateFormat('yyyy-MM-dd').format(end),
+    );
+    if (mounted) {
+      setState(() {
+        _sessions = sessions;
+        _isLoadingTimeOfDay = false;
+      });
+    }
   }
 
   /// Per-subject series with period navigation, stacked per day.
@@ -833,6 +896,106 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                           ],
                         ),
                       ),
+                      const SizedBox(height: 24),
+
+                      // Derived summaries: comparisons, records and cumulative.
+                      if (_isLoadingDerived)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else ...[
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final wide = constraints.maxWidth >= 900;
+                            final cards = [
+                              StatsComparisonCard(
+                                comparisons: StatsDerivations.comparePeriods(
+                                  _rangeDailyMs,
+                                  now: DateTime.now(),
+                                ),
+                              ),
+                              StatsMaximaCard(
+                                maxima: StatsDerivations.maxima(_rangeDailyMs),
+                              ),
+                            ];
+                            if (!wide) {
+                              return Column(
+                                children: [
+                                  for (final card in cards) ...[
+                                    card,
+                                    const SizedBox(height: 24),
+                                  ],
+                                ],
+                              );
+                            }
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: cards[0]),
+                                const SizedBox(width: 24),
+                                Expanded(child: cards[1]),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        CumulativeSubjectCard(
+                          series: StatsDerivations.cumulativeBySubject(
+                            _subjectDailyMs,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        QuarterlyCalendar(
+                          quarterDays: StatsDerivations.quarterDays(
+                            _calendarStudyMs,
+                            month: _calendarMonth,
+                          ),
+                          month: _calendarMonth,
+                          onMonthChanged: (month) {
+                            setState(() => _calendarMonth = month);
+                            _loadCalendarMonth();
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
+                      // Time of day: average start/end, regularity and the
+                      // start-against-end scatter.
+                      if (_isLoadingTimeOfDay)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final wide = constraints.maxWidth >= 900;
+                            final avg = AvgTimesCard(
+                              stats: TimeOfDayStats.fromSessions(_sessions),
+                            );
+                            final scatter = SessionScatterCard(
+                              points: scatterPoints(_sessions),
+                            );
+                            if (!wide) {
+                              return Column(
+                                children: [
+                                  avg,
+                                  const SizedBox(height: 24),
+                                  scatter,
+                                ],
+                              );
+                            }
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: avg),
+                                const SizedBox(width: 24),
+                                Expanded(child: scatter),
+                              ],
+                            );
+                          },
+                        ),
                       const SizedBox(height: 24),
 
                       // 24h Heatmap Component
