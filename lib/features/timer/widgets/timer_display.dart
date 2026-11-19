@@ -29,6 +29,8 @@ class TimerDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final timeStr = _formatDuration(elapsedMs);
 
+    // Tabular figures keepeach digit the same width, so the clock does not
+    // jitter or shift the block while the seconds change.
     return Text(
       timeStr,
       style: TextStyle(
@@ -37,6 +39,7 @@ class TimerDisplay extends StatelessWidget {
         fontWeight: FontWeight.w700,
         color: context.palette.textPrimary,
         letterSpacing: 3.0,
+        fontFeatures: const [FontFeature.tabularFigures()],
       ),
     );
   }
