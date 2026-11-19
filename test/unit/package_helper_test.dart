@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/core/utils/package_helper.dart';
 import 'package:desky/features/updates/update_notifier.dart';
 import 'package:desky/core/services/update_service.dart';
@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 
 class FakeUpdateService implements UpdateService {
   int fetchCalls = 0;
+  int betaFetchCalls = 0;
 
   @override
   Future<AppRelease?> fetchLatestRelease({CancelToken? cancelToken}) async {
@@ -18,6 +19,15 @@ class FakeUpdateService implements UpdateService {
       body: 'New release',
       htmlUrl: 'https://github.com',
     );
+  }
+
+  @override
+  Future<AppRelease?> fetchReleaseForChannel({
+    required bool betaChannel,
+    CancelToken? cancelToken,
+  }) async {
+    if (betaChannel) betaFetchCalls++;
+    return fetchLatestRelease(cancelToken: cancelToken);
   }
 }
 

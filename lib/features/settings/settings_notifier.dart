@@ -37,6 +37,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final soundEffects = await _repository.getSoundEffects();
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
+      final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
       state = state.copyWith(
@@ -48,6 +49,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         soundEffects: soundEffects,
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
         discordRpcEnabled: discordRpc,
+        betaChannel: betaChannel,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
       );
@@ -133,6 +135,12 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleDiscordRpc(bool value) async {
     state = state.copyWith(discordRpcEnabled: value);
     await _repository.saveDiscordRpcEnabled(value);
+  }
+
+  /// Opts in or out of pre-release update checks.
+  Future<void> toggleBetaChannel(bool value) async {
+    state = state.copyWith(betaChannel: value);
+    await _repository.saveBetaChannel(value);
   }
 
   Future<void> blockUser(String nickname) async {

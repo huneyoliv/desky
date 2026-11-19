@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/localization/app_translation.dart';
+import '../../../core/utils/package_helper.dart';
 import '../settings_notifier.dart';
 
 class StudyPreferencesDialog extends ConsumerWidget {
@@ -154,6 +155,28 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       value: settings.discordRpcEnabled,
                       onChanged: (val) => notifier.toggleDiscordRpc(val),
                     ),
+
+                    // Beta updates. Hidden in the Store/MSIX build: the packaged
+                    // app is updated by the Store, and offering a downloaded
+                    // installer there would bypass managed updates.
+                    if (!PackageHelper.isStoreOrMsix) ...[
+                      Divider(color: context.appBorder, height: 16),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: context.appPrimary,
+                        title: Text(
+                          t.tr('beta_updates_title', fallback: 'Participar do beta'),
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          t.tr('beta_updates_desc',
+                              fallback: 'Receber também versões de teste (pré-lançamento) antes do lançamento estável'),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                        ),
+                        value: settings.betaChannel,
+                        onChanged: (val) => notifier.toggleBetaChannel(val),
+                      ),
+                    ],
                   ],
                 ),
               ),
