@@ -3,25 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/app_translation.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../data/models/todo_model.dart';
+import '../../../data/models/todo_item_model.dart';
 import '../todo_notifier.dart';
 
-/// Create or edit a task. The time is optional, so a plain reminder and a
-/// scheduled task use the same dialog.
+/// Creates a task, or renames an existing one.
+///
+/// The API keeps more fields (subject, recurrence, order) that the planner
+/// already manages; this dialog edits only what the standalone list exposes:
+/// the title.
 class TodoDialog extends ConsumerStatefulWidget {
-  const TodoDialog({super.key, required this.day, this.existing});
+  const TodoDialog({super.key, this.existing});
 
-  final String day;
-  final TodoModel? existing;
+  final TodoItemModel? existing;
 
-  static Future<void> show(
-    BuildContext context, {
-    required String day,
-    TodoModel? existing,
-  }) {
+  static Future<void> show(BuildContext context, {TodoItemModel? existing}) {
     return showDialog(
       context: context,
-      builder: (_) => TodoDialog(day: day, existing: existing),
+      builder: (_) => TodoDialog(existing: existing),
     );
   }
 
@@ -30,65 +28,46 @@ class TodoDialog extends ConsumerStatefulWidget {
 }
 
 class _TodoDialogState extends ConsumerState<TodoDialog> {
-  late final TextEditingController _titleController;
-  late final TextEditingController _noteController;
-  TimeOfDay? _time;
+  late final TextEditingController _controller;
   bool _saving = false;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    final existing = widget.existing;
-    _titleController = TextEditingController(text: existing?.title ?? '');
-    _noteController = TextEditingController(text: existing?.note ?? '');
-    final minute = existing?.startMinute;
-    if (minute != null) {
-      _time = TimeOfDay(hour: (minute ~/ 60) % 24, minute: minute % 60);
-    }
+    _controller = TextEditingController(text: widget.existing?.title ?? '');
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _noteController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    final title = _titleController.text.trim();
+    final title = _controller.text.trim();
     if (title.isEmpty || _saving) return;
 
-    setState(() => _saving = true);
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
     final notifier = ref.read(todoNotifierProvider.notifier);
-    final minute = _time == null ? null : _time!.hour * 60 + _time!.minute;
-
     final existing = widget.existing;
-    if (existing == null) {
-      await notifier.add(
-        title: title,
-        note: _noteController.text,
-        day: widget.day,
-        startMinute: minute,
-      );
-    } else {
-      await notifier.update(
-        id: existing.id,
-        title: title,
-        note: _noteController.text,
-        startMinute: minute,
-        clearStartMinute: minute == null,
-      );
+
+    final ok = existing == null
+        ? await notifier.add(title)
+        : await notifier.rename(existing, title);
+
+    if (!mounted) return;
+    if (!ok) {
+      setState(() {
+        _saving = false;
+        _error = 'save_failed';
+      });
+      return;
     }
-
-    if (mounted) Navigator.of(context).pop();
-  }
-
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _time ?? const TimeOfDay(hour: 8, minute: 0),
-    );
-    if (picked != null) setState(() => _time = picked);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -111,50 +90,24 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              controller: _titleController,
+              controller: _controller,
               autofocus: true,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: t.tr('todo_input_hint', fallback: 'O que você vai fazer?'),
+                labelText:
+                    t.tr('todo_input_hint', fallback: 'O que você vai fazer?'),
                 labelStyle: TextStyle(color: context.appTextMuted),
               ),
               onSubmitted: (_) => _save(),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _noteController,
-              style: const TextStyle(color: Colors.white),
-              maxLines: 2,
-              decoration: InputDecoration(
-                labelText: t.tr('todo_note', fallback: 'Observação (opcional)'),
-                labelStyle: TextStyle(color: context.appTextMuted),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                t.tr('todo_save_failed',
+                    fallback: 'Não foi possível salvar. Tente novamente.'),
+                style: TextStyle(color: AppColors.error, fontSize: 12),
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Text(
-                  t.tr('todo_start_time', fallback: 'Horário de início'),
-                  style: TextStyle(color: context.appTextSecondary, fontSize: 13),
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: _pickTime,
-                  icon: Icon(Icons.schedule, size: 18, color: context.appPrimary),
-                  label: Text(
-                    _time == null
-                        ? t.tr('todo_time_none', fallback: 'Sem horário')
-                        : _time!.format(context),
-                    style: TextStyle(color: context.appPrimary),
-                  ),
-                ),
-                if (_time != null)
-                  IconButton(
-                    icon: Icon(Icons.close, size: 16, color: context.appTextMuted),
-                    onPressed: () => setState(() => _time = null),
-                  ),
-              ],
-            ),
+            ],
           ],
         ),
       ),

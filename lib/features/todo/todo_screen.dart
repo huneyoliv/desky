@@ -5,11 +5,12 @@ import 'package:intl/intl.dart';
 import '../../core/localization/app_translation.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
-import '../../data/models/todo_model.dart';
+import '../../data/models/todo_item_model.dart';
 import 'todo_notifier.dart';
 import 'widgets/todo_dialog.dart';
 
-/// To-Do list of the current study day, with free navigation to any other day.
+/// Standalone To-Do section: the planner's tasks, on their own screen with day
+/// navigation, so they are reachable straight from the sidebar.
 class TodoScreen extends ConsumerWidget {
   const TodoScreen({super.key});
 
@@ -18,10 +19,7 @@ class TodoScreen extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
     final state = ref.watch(todoNotifierProvider);
     final notifier = ref.read(todoNotifierProvider.notifier);
-    final day = notifier.activeDay;
-    final tasks = notifier.forDay();
-    final progress = notifier.progressForActiveDay();
-    final isToday = day == notifier.todayKey;
+    final progress = notifier.progress;
 
     return Scaffold(
       backgroundColor: context.appBackground,
@@ -35,13 +33,18 @@ class TodoScreen extends ConsumerWidget {
           IconButton(
             tooltip: t.tr('todo_today', fallback: 'Hoje'),
             icon: const Icon(Icons.today_rounded),
-            onPressed: isToday ? null : () => notifier.selectDay(null),
+            onPressed: notifier.isToday ? null : () => notifier.selectDay(null),
+          ),
+          IconButton(
+            tooltip: t.tr('refresh', fallback: 'Atualizar'),
+            icon: const Icon(Icons.refresh),
+            onPressed: notifier.refresh,
           ),
           const SizedBox(width: 8),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => TodoDialog.show(context, day: day),
+        onPressed: () => TodoDialog.show(context),
         backgroundColor: context.appPrimary,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text(
@@ -49,56 +52,55 @@ class TodoScreen extends ConsumerWidget {
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-      body: state.isLoading
-          ? Center(child: CircularProgressIndicator(color: context.appPrimary))
-          : Column(
-              children: [
-                _DayHeader(
-                  day: day,
-                  isToday: isToday,
-                  total: progress.total,
-                  done: progress.done,
-                  onPrevious: () => notifier.selectDay(_shift(day, -1)),
-                  onNext: () => notifier.selectDay(_shift(day, 1)),
-                  onPick: () => _pickDay(context, notifier, day),
-                ),
-                Expanded(
-                  child: tasks.isEmpty
-                      ? _EmptyState(t: t)
-                      : ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(24, 8, 24, 96),
-                          itemCount: tasks.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 8),
-                          itemBuilder: (context, index) => _TodoTile(
-                            todo: tasks[index],
-                            onToggle: () => notifier.toggleDone(tasks[index].id),
-                            onEdit: () => TodoDialog.show(
-                              context,
-                              day: day,
-                              existing: tasks[index],
-                            ),
-                            onDelete: () => notifier.remove(tasks[index].id),
-                          ),
-                        ),
-                ),
-              ],
+      body: Column(
+        children: [
+          _DayHeader(
+            day: notifier.activeDay,
+            isToday: notifier.isToday,
+            total: progress.total,
+            done: progress.done,
+            onPrevious: () => notifier.shiftDay(-1),
+            onNext: () => notifier.shiftDay(1),
+            onPick: () => _pickDay(context, notifier),
+          ),
+          if (state.errorMessage != null)
+            Container(
+              width: double.infinity,
+              color: AppColors.error.withValues(alpha: 0.15),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Text(
+                t.tr('todo_sync_failed',
+                    fallback: 'Não foi possível salvar no servidor. A lista foi recarregada.'),
+                style: TextStyle(color: AppColors.error, fontSize: 12),
+              ),
             ),
+          Expanded(
+            child: state.isLoading
+                ? Center(child: CircularProgressIndicator(color: context.appPrimary))
+                : state.todos.isEmpty
+                    ? _EmptyState(t: t)
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(24, 8, 24, 96),
+                        itemCount: state.todos.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, index) {
+                          final todo = state.todos[index];
+                          return _TodoTile(
+                            todo: todo,
+                            onToggle: () => notifier.toggle(todo),
+                            onEdit: () => TodoDialog.show(context, existing: todo),
+                            onDelete: () => notifier.remove(todo),
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
     );
   }
 
-  static String _shift(String day, int delta) {
-    final parsed = DateTime.tryParse(day) ?? DateTime.now();
-    final moved = DateTime(parsed.year, parsed.month, parsed.day)
-        .add(Duration(days: delta));
-    return DateFormat('yyyy-MM-dd').format(moved);
-  }
-
-  static Future<void> _pickDay(
-    BuildContext context,
-    TodoNotifier notifier,
-    String day,
-  ) async {
-    final parsed = DateTime.tryParse(day) ?? DateTime.now();
+  static Future<void> _pickDay(BuildContext context, TodoNotifier notifier) async {
+    final parsed = DateTime.tryParse(notifier.activeDay) ?? DateTime.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: parsed,
@@ -159,9 +161,7 @@ class _DayHeader extends ConsumerWidget {
                 child: Column(
                   children: [
                     Text(
-                      isToday
-                          ? '${t.tr('today', fallback: 'Hoje')} · $label'
-                          : label,
+                      isToday ? '${t.tr('today', fallback: 'Hoje')} · $label' : label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -203,7 +203,7 @@ class _TodoTile extends ConsumerWidget {
     required this.onDelete,
   });
 
-  final TodoModel todo;
+  final TodoItemModel todo;
   final VoidCallback onToggle;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -211,6 +211,11 @@ class _TodoTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(appTranslationProvider);
+    final subtitle = StringBuffer(todo.subjectTitle);
+    if (todo.isRecurring) {
+      if (subtitle.isNotEmpty) subtitle.write(' · ');
+      subtitle.write(t.tr('todo_recurring', fallback: 'recorrente'));
+    }
 
     return Material(
       color: context.appCard,
@@ -223,7 +228,7 @@ class _TodoTile extends ConsumerWidget {
           child: Row(
             children: [
               Checkbox(
-                value: todo.done,
+                value: todo.isCompleted,
                 activeColor: context.appPrimary,
                 onChanged: (_) => onToggle(),
               ),
@@ -236,42 +241,25 @@ class _TodoTile extends ConsumerWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: todo.done
+                        color: todo.isCompleted
                             ? context.appTextMuted
                             : context.appTextPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         decoration:
-                            todo.done ? TextDecoration.lineThrough : null,
+                            todo.isCompleted ? TextDecoration.lineThrough : null,
                       ),
                     ),
-                    if (todo.note.isNotEmpty) ...[
+                    if (subtitle.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(
-                        todo.note,
+                        subtitle.toString(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: context.appTextSecondary,
                           fontSize: 12,
                         ),
-                      ),
-                    ],
-                    if (todo.hasTime) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.schedule,
-                              size: 12, color: context.appTextMuted),
-                          const SizedBox(width: 4),
-                          Text(
-                            todo.timeLabel,
-                            style: TextStyle(
-                              color: context.appTextMuted,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ],
