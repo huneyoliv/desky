@@ -156,6 +156,15 @@ class TimerNotifier extends StateNotifier<TimerState> {
   int _accumulatedRestMs = 0;
   int _segmentStartRemainingMs = 0;
   bool _reconciling = false;
+
+  /// Whether the server has ever confirmed this session as running.
+  ///
+  /// The day log lags behind `/study/start`: right after a successful start the
+  /// log can still report `is: false`, and the 60-second reconcile used to read
+  /// that as "the session ended elsewhere" and stop a timer the user had just
+  /// started. Tracking the confirmation lets the reconcile tell a real
+  /// server-side stop from a log that has not caught up yet.
+  bool _serverConfirmedSession = false;
   String _language;
   String _timezone;
 
@@ -232,6 +241,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       todayTotalMs: state.todayTotalMs > elapsed ? state.todayTotalMs : elapsed,
       currentSubject: subject ?? state.currentSubject,
     );
+    _serverConfirmedSession = false;
     _startTicker();
     debugPrint('[timer] restored local session started at ${snapshot.startAt.toIso8601String()}');
   }
@@ -273,7 +283,25 @@ class TimerNotifier extends StateNotifier<TimerState> {
       if (isStudying && !state.isRunning) {
         await _adoptServerSession(Map<String, dynamic>.from(dl));
       } else if (!isStudying && state.isRunning) {
-        await _stopFromServer();
+        // A running session is only stopped when the server actually knows
+        // about it. Two independent signals count as proof: the server
+        // confirmed the session earlier, or the log carries a stop time later
+        // than our start. Without either, the log is simply behind and the
+        // local timer is kept, which is what the user started.
+        final serverStop = _parseServerInstant(dl['sp']);
+        final startAt = state.sessionStartAt;
+        final serverSawTheStop = serverStop != null &&
+            startAt != null &&
+            serverStop.isAfter(startAt);
+
+        if (_serverConfirmedSession || serverSawTheStop) {
+          await _stopFromServer();
+        } else {
+          debugPrint(
+            '[timer] day log still reports no active session; keeping the local '
+            'session instead of stopping it',
+          );
+        }
       }
     } catch (_) {
     } finally {
@@ -299,6 +327,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       todayTotalMs: elapsed > state.todayTotalMs ? elapsed : state.todayTotalMs,
       currentSubject: subject ?? state.currentSubject,
     );
+    _serverConfirmedSession = true;
     _startTicker();
     await _saveSnapshot();
     debugPrint('[timer] adopted active ypt session started at ${startAt.toIso8601String()}');
@@ -318,6 +347,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       lastSyncedSessionElapsedMs: 0,
       sessionRestMs: 0,
     );
+    _serverConfirmedSession = false;
     await _sessionStore.clear();
     debugPrint('[timer] ypt reports no active session; local timer cleared');
   }
@@ -519,11 +549,14 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
     if (state.pomodoroPhase == PomodoroPhase.focus && state.currentSubject != null) {
       try {
-        await _timerRepository.startStudy(
+        final accepted = await _timerRepository.startStudy(
           subjectTitle: state.currentSubject!.title,
           subjectId: state.currentSubject!.id,
           startAt: now,
         );
+        // Only trust the day log once the server accepted the start; otherwise
+        // a lagging log would stop the session on the next reconcile.
+        _serverConfirmedSession = accepted;
       } catch (_) {}
     }
 

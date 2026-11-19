@@ -72,11 +72,6 @@ void main() {
       expect(longStudyUrl, equals('https://alicdn.tgclab.com/sc.v2/377/sweat2.png'));
     });
 
-    test('camStudyUrl generates camera check URL', () {
-      final url = CdnResolver.camStudyUrl('2026-08-09', 16300695);
-      expect(url, equals('https://alicdn.tgclab.com/cam/2026-08-09/16300695'));
-    });
-
     test('chatPhotoUrl resolves relative chat photo path', () {
       final url = CdnResolver.chatPhotoUrl('/chat/groups/6487271/thumb.jpg');
       expect(url, equals('https://alicdn.tgclab.com/chat/groups/6487271/thumb.jpg'));

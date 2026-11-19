@@ -238,12 +238,12 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: (group.isCamStudy ? context.palette.accent : context.palette.primary).withValues(alpha: 0.15),
+            color: context.palette.primary.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(
-            group.isCamStudy ? Icons.videocam_rounded : Icons.group_work_rounded,
-            color: group.isCamStudy ? context.palette.accent : context.palette.primary,
+            Icons.group_work_rounded,
+            color: context.palette.primary,
           ),
         ),
         title: Row(
@@ -263,24 +263,6 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             if (group.isPrivate) ...[
               const SizedBox(width: 6),
               const Icon(Icons.lock_rounded, size: 16, color: AppColors.warning),
-            ],
-            if (group.isCamStudy) ...[
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: context.appAccent.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  t.tr('live_study', fallback: 'LIVE STUDY').toUpperCase(),
-                  style: TextStyle(
-                    color: context.appAccent,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ],
           ],
         ),

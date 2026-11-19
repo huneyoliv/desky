@@ -11,7 +11,6 @@ import '../../data/models/chat_message_model.dart';
 import '../../data/repositories/group_repository.dart';
 import 'group_leader_panel.dart';
 import 'lifecycle_poll_coordinator.dart';
-import 'widgets/cam_study_member_tile.dart';
 import 'widgets/sticker_picker_panel.dart';
 import 'widgets/group_studicon_picker_dialog.dart';
 import 'widgets/member_live_timer.dart';
@@ -1011,13 +1010,6 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
   }
 
   Widget _buildMemberCard(GroupMemberModel member, AppTranslation t) {
-    if (widget.group.isCamStudy) {
-      return CamStudyMemberTile(
-        member: member,
-        onShake: () => _shakeUser(member),
-      );
-    }
-
     final isActivelyStudying = member.isStudying && !member.isPaused;
     final StudiconPose pose;
     if (isActivelyStudying) {
