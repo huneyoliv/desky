@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:desky/core/constants/app_constants.dart';
 import 'package:desky/core/localization/app_translation.dart';
 import 'package:desky/data/models/user_model.dart';
 import 'package:desky/data/repositories/auth_repository.dart';
@@ -102,6 +103,10 @@ void main() {
     expect(find.text('Licenças Open Source'), findsNothing);
     expect(find.text('Ver no GitHub'), findsOneWidget);
     expect(find.text('Versão do app'), findsOneWidget);
-    expect(find.textContaining('Build 18'), findsOneWidget);
+    // Deriva do AppConstants para nao quebrar a cada bump de versao.
+    expect(
+      find.textContaining('Build ${AppConstants.buildNumber}'),
+      findsOneWidget,
+    );
   });
 }

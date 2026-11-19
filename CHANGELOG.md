@@ -73,6 +73,245 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [1.2.0] - 2026-11-18
+
+### Added
+
+- **Opt-In Beta Channel**: Update checks only ever saw finished releases, because
+  GitHub's `/releases/latest` excludes pre-releases by design. A **Join the beta** setting
+  now exists in the study preferences: when it is on, the check reads the release list
+  instead, drops drafts, accepts pre-releases and picks the highest by SemVer. The toggle
+  starts enabled only when the running build is itself a pre-release, so a stable install is
+  never opted in silently, and it is hidden in the Microsoft Store build, where the updater
+  is already suppressed and a downloaded installer would bypass managed updates. Flipping it
+  re-checks immediately.
+
+- **Per-Subject Study Series with Period Navigation (Refs Issue #4)**: The statistics
+  tab showed a fixed current-week bar chart that could not be navigated and did not
+  break time down by subject. It is now a stacked series (one bar per day, one segment
+  per subject, top five subjects plus "Outros") with week and month navigation,
+  including past periods, backed by a new `fetchSubjectDailyMs` aggregation.
+- **Visible Link to the Project Repository (Fixes Issue #5)**: Settings had no way to
+  reach the repository from inside the app, since the only "View on GitHub" entry lived
+  in the update dialog. A help/legal entry now opens `AppConstants.githubRepo`.
+- **Window Size and Maximized State Persist Across Sessions**: The app
+  always reopened at 1280x800, so anyone who resized or maximized the window had to redo it
+  every launch. The size and the maximized state are now saved while the window is resized
+  (debounced, so a drag does not write on every frame) and on exit, and restored on the next
+  start. On restore the stored size is clamped to the usable area of the current monitor, so
+  moving to a smaller screen or a lower resolution cannot push the app-drawn title bar
+  off-screen, and an absent or corrupted stored value falls back to the default instead of
+  breaking startup. The maximized state is never stored as the restore size.
+- **PDF Reader Moved to Its Own Tab and Opens Files from the OS (Fixes Issue #5)**: The
+  reader was reachable only through a small icon inside Flashcards. It now has its own
+  sidebar entry while Flashcards keeps its tab, and the app can open a PDF handed to it by
+  the system: the first file argument is validated (missing path, directory, or non-PDF are
+  reported instead of silently ignored), a second launched instance forwards the path to the
+  running window and exits, and on macOS the Finder open event is forwarded from the
+  AppDelegate because Launch Services never passes a path in argv. Associations are optional
+  and non-invasive: the Windows installer adds an unchecked "associate PDF files" task that
+  registers only an OpenWithProgids entry (the user's default program is never changed), the
+  Linux desktop entries declare `MimeType=application/pdf` with `%f`, and the MSIX manifest
+  declares `windows.fileTypeAssociation`.
+- **Statistics Now Shows Comparisons, Records, Cumulative Time and a Quarterly Calendar
+  (Refs Issue #4)**: The tab had a subject series, a pie, the 24h map and a monthly calendar,
+  but nothing answered "am I improving?" or "what is my best week?". Four cards were added,
+  all derived from `dt` + `sm` (plus `sb` for the subject breakdown) so none of them depends on
+  data the API does not provide: today/week/month against the previous equivalent period (with
+  growth shown only when there is a previous base), best day/week/month plus the number of days
+  with study, cumulative time per subject keeping the four largest and folding the rest into
+  "Outros", and a quarterly heat calendar with quarter navigation. Each card has a clear empty
+  state, since a fresh account may have no history at all to compare.
+
+### Known Limitations (1.2.0)
+
+- **Window persistence only considers the primary monitor**: the restored size is clamped to
+  the usable area of the primary display (`getPrimaryDisplay`), not of the display the window
+  was on, and the window position is not saved. Closing the app on a secondary monitor makes
+  the window reopen centred on the primary one. Accepted as-is; no implementation planned.
+- **Joining challenges is not supported**: the join/cancel contract of the official app is
+  unconfirmed (no challenge was available on the test account), so the Challenges tab is
+  read-only and the element schema of `/mission/challenges` is unverified.
+- **MS Store wide tile keeps transparent edges**: the `msix` package generates
+  `Wide310x150Logo` with transparency and offers no option for it, so a pinned wide tile still
+  shows the system accent colour at the sides. Fixing it would require patching
+  `AppxManifest.xml` in CI; not planned.
+- **Taskbar icon is a solid square in the MSIX build**: the unplated taskbar assets are now
+  opaque too, so packaged installs show a solid tile instead of the rounded silhouette.
+  Non-MSIX installs keep the `.ico`.
+- **Nudge reception on desktop is not possible yet**: the API has no nudge notification type
+  (the official app uses FCM push), so a nudge sent to a Desky user is not received. Pending
+  the push investigation.
+- **Statistics history limit is unverified**: the official catalog claims three years of
+  history, but the test account only has ten days of records (oldest 2026-04-19), so the limit
+  could not be tested and no client-side cap was added. Recorded as unverified; no action.
+- **24h map day rule is partly confirmed**: the API serialises `st` in UTC and groups days by
+  the user's local day (`dt` matched the local day in 17/17 sessions, the UTC day in 12/17), so
+  the hour is taken from `st` converted to the device timezone. If the device timezone differs
+  from the account's, the hours shift. The data cannot tell whether the server uses calendar
+  days or a 05:00 study-day reset, so sessions between 00:00 and 04:59 may not match the
+  official app's daily sums.
+- **PDF file association is not offered in the MS Store build**: the `msix` package cannot
+  declare that the app must not become the default handler, so the association was left out.
+- **Study vs rest breakdown is not available**: the rest route contract of the phone app is
+  unknown (`/rest/record` expects `{tag}` in the WearOS path; `/study/study-plan/rest` has no
+  recoverable body) and the account has no rest data.
+- **The To-Do section cannot be built yet**: `GET /logs/calendar/todos` works and returns
+  `{s, ts, gl}`, but the creation route `/study/task/make` answers a Django 500 page to every
+  method and payload tried (13 combinations), so nothing can be created, and with no to-do in
+  the account across four years the element schema of `ts` was never observed. Blocked on the
+  server, not on the client.
+- **Cam study photos cannot be sent**: the reader side works (`/cam/{date}/{userId}`), but no
+  route in the official binary links cam study to an upload, and `/study/cam-ms` returns
+  `{s: true}` even for an empty body, so it validates nothing and cannot be the photo route.
+  Closing this needs a capture of the official app during a real cam submission.
+- **PDF file associations are unverified on installed builds**: the Windows installer task, the
+  MSIX file type association, the Linux `MimeType` entry and the macOS open-file event were
+  checked in code and manifests only, not on installed packages (the MSIX association was read
+  back from a generated `AppxManifest.xml`, and the macOS Swift was never compiled). What *is*
+  covered by automated tests is the command-line argument handling and the sidebar entry.
+
+### Technical Debt
+
+- **`screen_retriever` pinned to 0.1.9**: it is a direct dependency since window persistence,
+  but `window_manager 0.3.9` requires `^0.1.9`, which blocks upgrading to 0.3.x/0.4.x.
+  Upgrading `window_manager` to `>=0.4` releases a newer `screen_retriever` and should be done
+  as its own item (larger upgrade, with a regression check on the window behaviour).
+- **`dio` advisory (CVE-2021-31402 / GHSA-9324-jv53-9cc8)**: reported by the dependency audit,
+  but it only affects `< 5.0.0`; the installed version is 5.11.0. No action.
+- **`/study/start` and `/study/stop` send extra fields**: compared with the official WearOS path
+  they add `subject_id`, `startedAt`, `study_ms` and `taskId`; the server tolerates them. Audit
+  before changing.
+
+### Changed
+
+- **Releases Can Be Pre-Releases (Fixes Issue #5)**: The release workflow published
+  everything as a normal release and always promoted it to "latest", so a `-beta` tag would
+  have been offered to every stable user through `/releases/latest`. A tag containing a
+  hyphen is now published with the pre-release flag and without becoming latest, the
+  Microsoft Store submission and the MSIX package are skipped for it (the Store accepts only
+  stable versions and the MSIX version has no room for a suffix), the `.deb` package uses
+  `~` instead of `-` so a pre-release sorts before the final, the Arch `pkgver` is finally
+  derived from the tag instead of being frozen at 1.1.5, and the changelog extractor reads
+  the `[Unreleased]` section for a pre-release while failing the job when a stable tag has
+  no section at all.
+
+- **Missions Are Read-Only Until the Contract Is Known**: The challenges
+  tab offered an "Available"/"My challenges" tab split plus join and check-in buttons, but
+  `/mission/challenge/my`, `/mission/challenge/join` and `/mission/challenge/cancel` answer
+  404 on the live API and appear in none of the 20 mission routes the official app calls,
+  and the check-in button only showed a success message without calling anything. Those
+  actions and the second tab are gone; the tab lists `GET /mission/challenges` (which returns
+  the list in `rs`) as read-only, with an empty state that says so. `ChallengeModel` was left
+  untouched: no real challenge element was ever observed, and `flameBet`/`entryFee`/
+  `threshold` do not exist in the official binary, so the element schema stays unconfirmed.
+- **Settings Cleanup and Visible Version**: The "Open Source Licenses"
+  entry was removed from Settings. The repository link moved up into its place and the
+  Desky version and build number are now shown directly underneath it, replacing the
+  duplicated version line that lived in the About box.
+- **Portuguese Text Fixes**: 41 entries in the Portuguese dictionary were
+  double-encoded, so words such as "Versão", "Notificação", "Configurações", "Título" and
+  the 🚀 emoji rendered as broken characters (for example "VersÃ£o") in labels, hints and
+  dialogs. The affected strings were repaired in `pt.json` and `en.json`.
+
+### Fixed
+
+- **A Pre-Release Never Reached the Beta User (Fixes Issue #5)**: The update check
+  compared only the first three numbers of a version and discarded everything after the
+  first hyphen, so `1.2.0-beta.1` and `1.2.0` looked identical. Anyone who installed a
+  pre-release would never be offered `beta.2` and never be offered the final either — they
+  were stuck for good. Versions are now compared with full SemVer 2.0.0 precedence, so
+  `1.2.0-beta.1 < 1.2.0-beta.2 < 1.2.0-rc.1 < 1.2.0`, numeric identifiers compare as
+  numbers (`beta.9 < beta.10`), build metadata is ignored, and because the check is a
+  strict "greater than", a downgrade is never offered.
+
+- **MS Store Tile Showed a Blue Square Around the App Icon**: The `msix` package emits
+  `BackgroundColor="transparent"` in `AppxManifest.xml` and generates every tile asset from
+  `logo_path` keeping its transparency. Because the Desky logo is a rounded square with
+  transparent corners, Windows painted the system accent colour behind it, so the Start menu,
+  the apps list and the Store listing showed a blue block around the icon. The MSIX now uses
+  a full-bleed opaque version of the same artwork (plate colour extended into the corners), so
+  the square tiles, the Store logo and the taskbar icon render as one solid tile regardless of
+  the accent colour. The transparent original is still used for `.ico`, macOS and Linux.
+  Verified by inspecting the generated PNG assets; not yet confirmed on an installed package.
+- **Notifications Against the Real API**: Receiving worked, but every
+  write path used routes that do not exist. Verified against the live API: marking a
+  notification as read posted to `/notice/read` (404) instead of the real
+  `/user/read-notice` (key `noticeID`), so read state never persisted and the unread badge
+  came back on the next poll. The unread-count fallback `/notice/unread_count` is also 404,
+  and the `/notice/list` fallback is the announcements board (title/body/images/reactions),
+  not notifications, so it was removed. There is no bulk read route, so marking all now
+  posts once per unread notice, and deletion is local-only because the API exposes no delete
+  route for user notifications. The UI also compared `type` against `'shake'` and
+  `'warning'`, but the API sends uppercase codes (`GROUP_WARNING`, `GROUP_JOIN_APPROVED`,
+  ...) and has no shake type at all, so icons and colours now follow a normalised kind. The
+  empty "Sem detalhes" placeholder was dropped: the API fills only `i1`.
+- **Empty Band Around the Planner Panel**: The planner's left panel has a
+  fixed width, and the surrounding Row did not stretch its children, so the panel was
+  centred vertically and left a 101 px empty band above the D-Days and another one beside
+  the to-do list. The row now stretches its children, so the panel fills the tab height.
+  A layout test pins the panel's top and height to the tab's.
+- **Subject Dialog Did Not Refresh and Rows Had a Dead Zone (Fixes Issue #5)**: A newly
+  created subject only appeared after reopening the dialog because the list was a
+  snapshot taken when it opened; the row also only reacted to taps on the colour dot
+  and the title, so tapping the empty area did nothing. The dialog now appends the
+  created subject, validates empty and duplicate titles, surfaces submission errors, and
+  the whole row is a single tap target.
+- **Muted Text Failed WCAG AA in Every Theme (Fixes Issue #5)**: The low-emphasis text
+  token reached as low as 1.74:1 (Cyberpunk Neon) and 1.81:1 (Sunset Amber), and four of
+  the seven palettes stayed under 3:1. `textMuted` was recomputed per theme so every
+  surface reaches at least 4.6:1, the theme-blind `AppColors.textMuted` constant was
+  replaced by the `context.appTextMuted` token across nine files, the 0.8 alpha on the
+  login legal disclaimer was dropped (2.90:1 when blended) and `AppTextStyles.labelSmall`
+  now takes its colour from the active theme. A dedicated WCAG test guards the palette.
+- **Subject Names Ignored the Active Theme**: Subject names were painted
+  with fixed colours (pure white in the selection dialog and the management list, and the
+  subject accent colour in the badge under the clock), unlike ranking rows and every other
+  label. They now follow the theme text colour, while the colour dot, border and caret keep
+  the subject accent colour.
+- **Group Settings Could Never Save and Always Reported Success (Fixes Issue #5)**: All six
+  `/group/setting/*` routes answer 404 on the live API, and the panel still reported success
+  when all five calls failed. Verified against the live API that `POST /group/info/edit` is
+  keyed by `id` (not `groupID`, which answers 500) and is a partial update accepting
+  `t, cid, gt, mc, nt, pw, il, ic`; the settings now route through that endpoint and the
+  panel reports success only when every attempted update succeeded, naming the fields that
+  failed otherwise.
+- **Group Discovery Always Searched Brazil (Fixes Issue #5)**: `/group/list-new-2` honours
+  `country_id`, but the explore call never sent one, so the repository defaulted to 23 and
+  every user browsed the Brazilian board. The selected country is now sent and the list
+  reloads when the region changes; an empty region names the region searched and offers an
+  explicit action to view another one instead of silently widening the query.
+- **Group Chat Could Not Send and Hid Timestamps (Fixes Issue #5)**: The client posted a
+  guessed payload (`nickname`, `userID`, `category`, `createdAt`, `updatedAt`) while the live
+  API accepts `{group_id, message}` and derives the sender from the token, and the optimistic
+  bubble stayed on screen when the call failed, so a rejected message looked delivered. The
+  payload now matches the verified schema, a failed send removes the bubble and reports the
+  error, each message renders its `ts` timestamp, and `did` (a device id) is no longer read
+  as a studicon id.
+- **Nudge Reported Success Even When Refused (Refs Issue #5)**: `shakeMember` answers `false`
+  on failure instead of throwing, but the screen showed a success message on both branches,
+  the error branch even using the success colour. The sent message now appears only when the
+  API accepted the nudge. Reception on desktop is **still not possible**: the API exposes no
+  nudge notification type at all (the official app delivers nudges over FCM push, and the
+  notification list schema has no shake/nudge code), so the 30-second notification poll cannot
+  receive one. This stays pending the push investigation.
+- **Presence Calendar Could Not Go Back a Month (Fixes Issue #5)**: The calendar always
+  rendered the current month, kept no month state and built every cell from "today". It now
+  takes an explicit month plus a change callback, derives the grid and the today highlight
+  from the displayed month, adds previous/next controls, and loads the displayed month on
+  demand through the new `fetchDailyStudyMs`.
+- **Statistics Pie Collapsed Into a Single Slice (Fixes Issue #5)**: The pie read `sb` from
+  each day object, but the subject only exists on the sessions nested inside `ls`, so an
+  entire month became one "Geral" slice. Time is now aggregated per session, falling back to
+  the day total only when the day carries no session detail. The "Região" scope also sent no
+  country, so rankings always used the hardcoded Brazilian id.
+- **The 24h Map Was a Hardcoded Placeholder (Refs Issue #4)**: The heatmap was painted from
+  a fixed day (`2026-08-11` plus a generated pattern) and never showed the user's data.
+  Sessions carry `st` (ISO start) and `sm` (duration), so a new `fetchHourlyStudyMinutes`
+  places minutes on the hours actually studied across the requested range. Sessions that cross
+  midnight continue into the next calendar day's row instead of losing the remainder, and a
+  session is placed on the API's `dt` day with the hour taken from `st` in the local timezone.
+
 ## [1.1.7] - 2026-11-01
 
 ### Fixed
