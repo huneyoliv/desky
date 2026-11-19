@@ -119,9 +119,6 @@ class CdnResolver {
     return studiconUrl(studiconId, pose);
   }
 
-  static String camStudyUrl(String dateYmd, int userId) {
-    return '${ApiConstants.mediaCdnUrl}/cam/$dateYmd/$userId';
-  }
 
   static String chatPhotoUrl(String relativePath) {
     if (relativePath.startsWith('http')) return relativePath;

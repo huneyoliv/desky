@@ -152,14 +152,58 @@ void main() {
       expect(await store.load(), isNotNull);
     });
 
-    test('stops the local timer when YPT reports no active session', () async {
+    test('keeps the local timer when the day log has not caught up', () async {
+      // The day log lags behind /study/start: it can report `is: false` right
+      // after a session began. Stopping there killed a timer the user had just
+      // started, which is the "timer stops by itself" report.
       await seedSession(ago: const Duration(minutes: 5));
       timerRepository.dailyLog = {'s': true, 'dl': {'is': false}};
 
       final notifier = await buildNotifier();
 
+      expect(notifier.state.isRunning, isTrue);
+      expect(notifier.state.sessionElapsedMs, greaterThan(4 * 60 * 1000));
+      expect(await store.load(), isNotNull);
+    });
+
+    test('stops when the day log reports a stop after our session start',
+        () async {
+      // A stop timestamp later than the session start is proof that the server
+      // saw this session end, so the local timer must follow it.
+      await seedSession(ago: const Duration(minutes: 30));
+      final snapshot = await store.load();
+      final start = snapshot!.startAt.toLocal();
+      timerRepository.dailyLog = {
+        's': true,
+        'dl': {
+          'is': false,
+          'sp': start.add(const Duration(minutes: 10)).toUtc().toIso8601String(),
+        },
+      };
+
+      final notifier = await buildNotifier();
+
       expect(notifier.state.isRunning, isFalse);
       expect(notifier.state.sessionElapsedMs, 0);
+      expect(await store.load(), isNull);
+    });
+
+    test('stops once the server had confirmed the session and then reports none',
+        () async {
+      // After the server accepted the start, a later "not studying" is a real
+      // server-side stop and must win over the local state.
+      SharedPreferences.setMockInitialValues({});
+      timerRepository.dailyLog = {'s': true, 'dl': {'is': false}};
+
+      final notifier = await buildNotifier();
+      await notifier.loadSubjects();
+      await notifier.startStudy();
+
+      expect(notifier.state.isRunning, isTrue);
+      // startStudy returned true, so the session counts as confirmed.
+      await notifier.reconcileWithServer();
+
+      expect(notifier.state.isRunning, isFalse);
       expect(await store.load(), isNull);
     });
 

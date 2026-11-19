@@ -112,8 +112,7 @@ void main() {
       expect(smokeUrl, contains('/10/smoke1.png'));
     });
 
-    test('camStudyUrl and chatPhotoUrl format paths correctly', () {
-      expect(CdnResolver.camStudyUrl('2026-08-16', 77), equals('https://alicdn.tgclab.com/cam/2026-08-16/77'));
+    test('chatPhotoUrl formats paths correctly', () {
       expect(CdnResolver.chatPhotoUrl('chat/img_123.jpg'), equals('https://alicdn.tgclab.com/chat/img_123.jpg'));
       expect(CdnResolver.chatPhotoUrl('https://example.com/custom.png'), equals('https://example.com/custom.png'));
     });
