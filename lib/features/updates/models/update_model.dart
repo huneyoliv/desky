@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../semver.dart';
+
 class ReleaseAsset {
   final int id;
   final String name;
@@ -100,36 +102,17 @@ class AppRelease {
     return tag;
   }
 
+  /// Whether this release is strictly newer than [currentVersion].
+  ///
+  /// Uses full SemVer 2.0.0 precedence, so pre-releases order correctly
+  /// (`1.2.0-beta.1 < 1.2.0-beta.2 < 1.2.0-rc.1 < 1.2.0`) and build metadata
+  /// is ignored. A strictly-greater comparison also means a downgrade is never
+  /// offered: from `1.2.0` the release `1.2.0-beta.2` reads as "not newer".
   bool isNewerThan(String currentVersion) {
-    final cleanCurrent = currentVersion.trim().replaceAll(RegExp(r'^[vV]'), '');
-    final cleanRemote = cleanVersion;
-
-    if (cleanRemote.isEmpty || cleanCurrent.isEmpty) {
-      return false;
-    }
-
-    final remoteParts = _extractSemVerParts(cleanRemote);
-    final currentParts = _extractSemVerParts(cleanCurrent);
-
-    for (int i = 0; i < 3; i++) {
-      if (remoteParts[i] > currentParts[i]) {
-        return true;
-      }
-      if (remoteParts[i] < currentParts[i]) {
-        return false;
-      }
-    }
-
-    return false;
-  }
-
-  static List<int> _extractSemVerParts(String version) {
-    final baseVersion = version.split('+').first.split('-').first;
-    final segments = baseVersion.split('.');
-    final major = segments.isNotEmpty ? (int.tryParse(segments[0]) ?? 0) : 0;
-    final minor = segments.length > 1 ? (int.tryParse(segments[1]) ?? 0) : 0;
-    final patch = segments.length > 2 ? (int.tryParse(segments[2]) ?? 0) : 0;
-    return [major, minor, patch];
+    final remote = SemVer.tryParse(cleanVersion);
+    final current = SemVer.tryParse(currentVersion);
+    if (remote == null || current == null) return false;
+    return remote > current;
   }
 
   ReleaseAsset? getAssetForPlatform(TargetPlatform platform) {
