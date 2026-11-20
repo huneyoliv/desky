@@ -10,11 +10,13 @@ import 'widgets/pomodoro_config_dialog.dart';
 import 'widgets/manual_study_log_dialog.dart';
 import 'offline_sync_notifier.dart';
 import 'focus_mode_notifier.dart';
+import '../settings/widgets/app_settings_dialog.dart';
 
 class TimerScreen extends ConsumerWidget {
   /// Identifies the top bar in tests, which assert it spans the window so the
   /// bar cannot be centred by its own content.
   static const Key headerKey = ValueKey('timer-header');
+  static const settingsButtonKey = ValueKey('timer-settings-button');
 
   const TimerScreen({super.key});
 
@@ -73,7 +75,10 @@ class TimerScreen extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               color: palette.surface,
-              child: SingleChildScrollView(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -229,6 +234,16 @@ class TimerScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+              ),
+                  ),
+                  // App settings: Discord, OBS overlay, look.
+                  IconButton(
+                    key: TimerScreen.settingsButtonKey,
+                    tooltip: t.tr('settings', fallback: 'Settings'),
+                    icon: Icon(Icons.settings_outlined, color: palette.textSecondary),
+                    onPressed: () => AppSettingsDialog.show(context),
+                  ),
+                ],
               ),
             ),
 
