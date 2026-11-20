@@ -56,8 +56,9 @@ void main() {
       expect(payload!.details, contains('Matemática'));
       expect(payload.state, equals('Estudando'));
       expect(payload.startTime, isNotNull);
-      expect(payload.buttonLabel, equals('Desky'));
-      expect(payload.buttonUrl, equals('https://desky.app'));
+      expect(payload.largeText, startsWith('YPT'));
+      expect(payload.buttonLabel, isNull);
+      expect(payload.smallText, isNull);
     });
 
     test('buildPayload creates paused payload with state Em pausa and without startTime', () {
@@ -99,17 +100,16 @@ void main() {
   group('DiscordRpcService IPC Connection (Live when Discord open)', () {
     test('connect and updatePresence executes successfully without premature timeout', () async {
       final service = DiscordRpcService();
-      await service.connect();
+      await service.initialize();
 
       if (Platform.isWindows && service.isConnected) {
-        final payload = DiscordPresencePayload(
+        const payload = DiscordPresencePayload(
           details: 'No Desky Test Suite',
-          largeImage: 'https://picf.tgclab.com/sc.v2/1/normal1.png',
-          largeText: 'Tempo Total: 01h 00m',
-          smallImage: 'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png',
-          smallText: 'Desky',
+          largeImage: 'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/images/studicon/ic_user_on_s.png',
+          largeText: 'YPT · Tempo Total: 01h 00m',
         );
-        await service.updatePresence(payload);
+        service.setPresence(payload);
+        await service.clearPresence();
         expect(service.isConnected, isTrue);
       }
 

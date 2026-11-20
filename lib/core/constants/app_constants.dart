@@ -13,6 +13,13 @@ class AppConstants {
     defaultValue: true,
   );
 
+  /// Name shown in Discord Rich Presence texts.
+  static const String discordDisplayName = 'YPT';
+
+  /// Raw files of this repository (bundled assets Discord can fetch).
+  static const String repoRawBaseUrl =
+      'https://raw.githubusercontent.com/huneyoliv/desky/main';
+
   /// Public PNG icon URL for Discord RPC small image and external services.
   static const String deskyIconUrl =
       'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/icons/icon.png';

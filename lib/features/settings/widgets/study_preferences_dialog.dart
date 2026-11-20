@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/utils/package_helper.dart';
+import '../../../core/window/overlay_window_channel.dart';
 import '../settings_notifier.dart';
 
 class StudyPreferencesDialog extends ConsumerWidget {
@@ -155,6 +156,26 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       value: settings.discordRpcEnabled,
                       onChanged: (val) => notifier.toggleDiscordRpc(val),
                     ),
+
+                    // OBS overlay mode (Windows only: see OverlayWindowChannel)
+                    if (OverlayWindowChannel.isSupported) ...[
+                      Divider(color: context.appBorder, height: 16),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: context.appPrimary,
+                        title: Text(
+                          t.tr('obs_overlay_title', fallback: 'OBS overlay mode'),
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          t.tr('obs_overlay_desc',
+                              fallback: 'Minimizing sends the window behind the others instead, so an OBS Window Capture keeps showing it'),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                        ),
+                        value: settings.obsOverlayMode,
+                        onChanged: (val) => notifier.toggleObsOverlayMode(val),
+                      ),
+                    ],
 
                     // Beta updates. Hidden in the Store/MSIX build: the packaged
                     // app is updated by the Store, and offering a downloaded

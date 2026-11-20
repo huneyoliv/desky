@@ -16,6 +16,10 @@ class SettingsState {
   final bool soundEffects;
   final List<String> blockedUsers;
   final bool discordRpcEnabled;
+
+  /// Windows: minimizing sends the window behind the others instead of
+  /// really minimizing it, so an OBS Window Capture keeps receiving frames.
+  final bool obsOverlayMode;
   final bool betaChannel;
 
   const SettingsState({
@@ -32,6 +36,7 @@ class SettingsState {
     this.soundEffects = true,
     this.blockedUsers = const [],
     this.discordRpcEnabled = true,
+    this.obsOverlayMode = false,
     this.betaChannel = false,
   });
 
@@ -49,6 +54,7 @@ class SettingsState {
     bool? soundEffects,
     List<String>? blockedUsers,
     bool? discordRpcEnabled,
+    bool? obsOverlayMode,
     bool? betaChannel,
   }) {
     return SettingsState(
@@ -65,6 +71,7 @@ class SettingsState {
       soundEffects: soundEffects ?? this.soundEffects,
       blockedUsers: blockedUsers ?? this.blockedUsers,
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
+      obsOverlayMode: obsOverlayMode ?? this.obsOverlayMode,
       betaChannel: betaChannel ?? this.betaChannel,
     );
   }

@@ -108,10 +108,11 @@ class EnvConfig {
     return _snowflakeRegex.hasMatch(cleaned) ? cleaned : null;
   }
 
+  /// A `.env` next to the executable (or the DISCORD_CLIENT_ID environment
+  /// variable) wins over the id baked in at build time, so a user can point
+  /// Rich Presence at their own Discord application, e.g. one named "YPT":
+  /// Discord shows that application's name in "Playing ...".
   static String get discordClientId {
-    final fromDartDefine = _sanitizeSnowflake(_dartDefineDiscordClientId);
-    if (fromDartDefine != null) return fromDartDefine;
-
     if (!_initialized) loadSync();
 
     final fromMap = _sanitizeSnowflake(_envMap['DISCORD_CLIENT_ID']);
@@ -119,6 +120,9 @@ class EnvConfig {
 
     final fromEnv = _sanitizeSnowflake(Platform.environment['DISCORD_CLIENT_ID']);
     if (fromEnv != null) return fromEnv;
+
+    final fromDartDefine = _sanitizeSnowflake(_dartDefineDiscordClientId);
+    if (fromDartDefine != null) return fromDartDefine;
 
     return defaultDiscordClientId;
   }

@@ -37,6 +37,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final soundEffects = await _repository.getSoundEffects();
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
+      final obsOverlayMode = await _repository.getObsOverlayMode();
       final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
@@ -49,6 +50,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         soundEffects: soundEffects,
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
         discordRpcEnabled: discordRpc,
+        obsOverlayMode: obsOverlayMode,
         betaChannel: betaChannel,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
@@ -135,6 +137,12 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleDiscordRpc(bool value) async {
     state = state.copyWith(discordRpcEnabled: value);
     await _repository.saveDiscordRpcEnabled(value);
+  }
+
+  /// Keeps the window rendering for OBS when the user minimizes it.
+  Future<void> toggleObsOverlayMode(bool value) async {
+    state = state.copyWith(obsOverlayMode: value);
+    await _repository.saveObsOverlayMode(value);
   }
 
   /// Opts in or out of pre-release update checks.
