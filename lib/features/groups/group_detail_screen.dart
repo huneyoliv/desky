@@ -1054,10 +1054,13 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                       backgroundColor: context.appSurface,
                       backgroundImage: ResizeImage(NetworkImage(member.avatarUrl), width: 128, height: 128),
                     )
-                  : StudiconAvatar(
-                      studiconId: member.studiconId,
-                      pose: pose,
-                      size: 56,
+                  : Greyed(
+                      enabled: !isActivelyStudying,
+                      child: StudiconAvatar(
+                        studiconId: member.studiconId,
+                        pose: pose,
+                        size: 56,
+                      ),
                     ),
               if (isActivelyStudying)
                 Positioned(

@@ -15,6 +15,7 @@ import '../../shared/widgets/classic_layout.dart';
 import '../../shared/widgets/studicon_avatar.dart';
 import '../auth/auth_notifier.dart';
 import '../groups/group_detail_screen.dart' show groupRepositoryProvider;
+import '../groups/group_order.dart';
 import '../groups/widgets/member_sheet.dart';
 import '../settings/settings_notifier.dart';
 import '../statistics/stats_data.dart';
@@ -759,7 +760,7 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
   }
 
   Future<void> _load({bool force = false}) async {
-    final groups = ref.read(authStateProvider).user?.userGroups ?? const [];
+    final groups = ref.read(orderedMyGroupsProvider);
     if (groups.isEmpty || ref.read(settingsNotifierProvider).offlineMode) return;
     final group = groups[_index % groups.length];
     if (!force && _loadedGroup == group.id) return;
@@ -792,7 +793,7 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
   Widget build(BuildContext context) {
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
-    final groups = ref.watch(authStateProvider.select((s) => s.user?.userGroups)) ?? const [];
+    final groups = ref.watch(orderedMyGroupsProvider);
     final myId = ref.watch(authStateProvider.select((s) => s.user?.id));
     if (ref.watch(settingsNotifierProvider.select((s) => s.offlineMode))) {
       return ClassicCard(
@@ -918,13 +919,15 @@ class _MemberTile extends StatelessWidget {
             children: [
               SizedBox(
                 height: 66,
-                child: active
-                    ? StudiconAvatar(
-                        studiconId: member.studiconId,
-                        pose: CdnResolver.resolvePose(isStudying: true, studyMs: member.studyMs),
-                        size: 64,
-                      )
-                    : Icon(Icons.desk_outlined, size: 52, color: palette.textMuted),
+                // Same avatar either way; not studying is just greyed out.
+                child: Greyed(
+                  enabled: !active,
+                  child: StudiconAvatar(
+                    studiconId: member.studiconId,
+                    pose: CdnResolver.resolvePose(isStudying: true, studyMs: member.studyMs),
+                    size: 64,
+                  ),
+                ),
               ),
               const SizedBox(height: 6),
               Text(member.name,

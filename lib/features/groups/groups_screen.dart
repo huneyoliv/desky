@@ -7,6 +7,7 @@ import '../../data/models/category_model.dart';
 import '../../data/models/group_model.dart';
 import '../../data/repositories/group_repository.dart';
 import '../auth/auth_notifier.dart';
+import 'group_order.dart';
 import '../settings/settings_notifier.dart';
 import '../settings/widgets/select_country_dialog.dart';
 import 'group_detail_screen.dart';
@@ -409,7 +410,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final myGroups = ref.watch(authStateProvider).user?.userGroups ?? [];
+    final myGroups = ref.watch(orderedMyGroupsProvider);
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
 
@@ -486,11 +487,36 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                   onRefresh: () async {
                     await ref.read(authStateProvider.notifier).refreshUserGroups();
                   },
-                  child: ListView.builder(
+                  // Drag a group to rearrange the list (saved on this device;
+                  // the timer's group panel follows the same order).
+                  child: ReorderableListView.builder(
+                    key: const ValueKey('my-groups-list'),
                     padding: const EdgeInsets.all(24),
                     itemCount: myGroups.length,
+                    buildDefaultDragHandles: false,
+                    proxyDecorator: (child, _, __) => Material(color: Colors.transparent, elevation: 8, child: child),
+                    onReorder: (from, to) => ref.read(groupOrderProvider.notifier).move(myGroups, from, to),
                     itemBuilder: (context, index) {
-                      return _buildGroupCard(myGroups[index], t, isMyGroup: true);
+                      final group = myGroups[index];
+                      return ReorderableDelayedDragStartListener(
+                        key: ValueKey('my-group-${group.id}'),
+                        index: index,
+                        child: Row(
+                          children: [
+                            ReorderableDragStartListener(
+                              index: index,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.grab,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 8, bottom: 12),
+                                  child: Icon(Icons.drag_indicator_rounded, color: palette.textMuted),
+                                ),
+                              ),
+                            ),
+                            Expanded(child: _buildGroupCard(group, t, isMyGroup: true)),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ),
