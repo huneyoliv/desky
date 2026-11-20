@@ -42,6 +42,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final classicUiScale = await _repository.getClassicUiScale();
       final miniOpacity = await _repository.getMiniOpacity();
       final offlineMode = await _repository.getOfflineMode();
+      final dial = await _repository.getDialStyle();
       final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
@@ -59,6 +60,9 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         classicUiScale: classicUiScale,
         miniOpacity: miniOpacity,
         offlineMode: offlineMode,
+        dialStudyColor: dial.study,
+        dialBreakColor: dial.rest,
+        showStopwatchDial: dial.show,
         betaChannel: betaChannel,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
@@ -176,6 +180,17 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     final clamped = value.clamp(0.3, 1.0).toDouble();
     state = state.copyWith(miniOpacity: clamped);
     await _repository.saveMiniOpacity(clamped);
+  }
+
+  /// Timer dial look: study and break colours, and whether the dial shows
+  /// outside Pomodoro.
+  Future<void> setDialStyle({int? study, int? rest, bool? show}) async {
+    state = state.copyWith(dialStudyColor: study, dialBreakColor: rest, showStopwatchDial: show);
+    await _repository.saveDialStyle(
+      study: state.dialStudyColor,
+      rest: state.dialBreakColor,
+      show: state.showStopwatchDial,
+    );
   }
 
   Future<void> toggleOfflineMode(bool value) async {

@@ -33,6 +33,13 @@ class SettingsState {
   /// Offline mode: no network calls from the timer; sessions are queued and
   /// synced when it is turned off.
   final bool offlineMode;
+
+  /// Timer dial colours (ARGB) for study and for breaks.
+  final int dialStudyColor;
+  final int dialBreakColor;
+
+  /// Show the filling dial outside Pomodoro too (the Pomodoro dial always shows).
+  final bool showStopwatchDial;
   final bool betaChannel;
 
   const SettingsState({
@@ -54,6 +61,9 @@ class SettingsState {
     this.classicUiScale = 1.0,
     this.miniOpacity = 0.95,
     this.offlineMode = false,
+    this.dialStudyColor = 0xFFFF6B1A,
+    this.dialBreakColor = 0xFF2F7CF6,
+    this.showStopwatchDial = true,
     this.betaChannel = false,
   });
 
@@ -76,6 +86,9 @@ class SettingsState {
     double? classicUiScale,
     double? miniOpacity,
     bool? offlineMode,
+    int? dialStudyColor,
+    int? dialBreakColor,
+    bool? showStopwatchDial,
     bool? betaChannel,
   }) {
     return SettingsState(
@@ -97,6 +110,9 @@ class SettingsState {
       classicUiScale: classicUiScale ?? this.classicUiScale,
       miniOpacity: miniOpacity ?? this.miniOpacity,
       offlineMode: offlineMode ?? this.offlineMode,
+      dialStudyColor: dialStudyColor ?? this.dialStudyColor,
+      dialBreakColor: dialBreakColor ?? this.dialBreakColor,
+      showStopwatchDial: showStopwatchDial ?? this.showStopwatchDial,
       betaChannel: betaChannel ?? this.betaChannel,
     );
   }

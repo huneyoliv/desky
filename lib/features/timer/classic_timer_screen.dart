@@ -23,15 +23,15 @@ import '../todo/todo_notifier.dart';
 import 'focus_mode_notifier.dart';
 import 'timer_notifier.dart';
 import 'timer_screen.dart';
+import 'widgets/dial_style_dialog.dart';
 import 'widgets/pomodoro_config_dialog.dart';
 import 'widgets/subject_management_dialog.dart';
 
-const Color _breakBlue = Color(0xFF2F7CF6);
 
 /// Header and timer box have one fixed size in every state (idle, Pomodoro,
 /// studying, break), so a single OBS crop fits all of them.
 const double kClassicHeaderHeight = 56;
-const Size kClassicTimerAreaSize = Size(560, 164);
+const Size kClassicTimerAreaSize = Size(600, 120);
 
 /// `/home`: the Classic YPT timer when that look is on, the regular one
 /// otherwise.
@@ -174,9 +174,9 @@ class _Header extends ConsumerWidget {
   }
 }
 
-/// The timer: clock-face dial, label, the time with its buttons on the right,
-/// and the studicon with today's total, in a box of [kClassicTimerAreaSize]
-/// that never moves between states.
+/// The timer, built for a stream crop: [dial] [label + time] … [buttons]
+/// [studicon + today]. One fixed box in every state; buttons sit at the right
+/// end so the time never shifts, and nothing else (no captions) changes.
 class _TimerArea extends ConsumerWidget {
   const _TimerArea();
 
@@ -186,10 +186,14 @@ class _TimerArea extends ConsumerWidget {
     final state = ref.watch(timerNotifierProvider);
     final notifier = ref.read(timerNotifierProvider.notifier);
     final user = ref.watch(authStateProvider.select((s) => s.user));
+    final settings = ref.watch(settingsNotifierProvider);
     final palette = context.palette;
     final isPomodoro = state.mode == TimerMode.pomodoro;
     final focusTotal = math.max(1, state.pomodoroFocusMinutes * 60000);
     final goal = math.max(1, state.dailyGoalMinutes * 60000);
+    final studyColor = Color(settings.dialStudyColor);
+    final breakColor = Color(settings.dialBreakColor);
+    final showDial = isPomodoro || state.isPaused || settings.showStopwatchDial;
 
     Future<void> start() async {
       final subjects = state.subjects.where((s) => !s.isArchived && !s.isDeleted);
@@ -207,7 +211,7 @@ class _TimerArea extends ConsumerWidget {
     VoidCallback? onDialTap;
 
     if (state.isPaused) {
-      color = _breakBlue;
+      color = breakColor;
       fraction = (state.sessionRestMs / math.max(1, state.pomodoroShortBreakMinutes * 60000)).clamp(0.0, 1.0);
       label = t.tr('classic_break', fallback: 'Break');
       value = _clock(state.sessionRestMs);
@@ -216,7 +220,7 @@ class _TimerArea extends ConsumerWidget {
         _RoundButton(icon: Icons.stop_rounded, tooltip: t.tr('classic_finish', fallback: 'Finish'), onTap: notifier.stopStudy, filled: false),
       ];
     } else if (state.isRunning) {
-      color = kStatOrange;
+      color = studyColor;
       fraction = isPomodoro
           ? (state.pomodoroRemainingMs / focusTotal).clamp(0.0, 1.0)
           : (state.sessionElapsedMs % 3600000) / 3600000;
@@ -229,125 +233,121 @@ class _TimerArea extends ConsumerWidget {
         _RoundButton(icon: Icons.stop_rounded, tooltip: t.tr('stop', fallback: 'Stop'), onTap: notifier.stopStudy, filled: false),
       ];
     } else if (isPomodoro) {
-      color = kStatOrange;
+      color = studyColor;
       fraction = 1;
       label = t.tr('classic_focus_time', fallback: 'Focus time');
       value = _clock(state.pomodoroRemainingMs);
       onDialTap = () => PomodoroConfigDialog.show(context, state: state, onSave: notifier.configurePomodoro);
       actions = [_RoundButton(icon: Icons.play_arrow_rounded, tooltip: t.tr('start', fallback: 'Start'), onTap: start)];
     } else {
-      color = kStatOrange;
+      color = studyColor;
       fraction = (state.todayTotalMs / goal).clamp(0.0, 1.0);
       label = t.tr('classic_total_today', fallback: 'Total time today');
       value = _clock(state.todayTotalMs);
       actions = [_RoundButton(icon: Icons.play_arrow_rounded, tooltip: t.tr('start', fallback: 'Start'), onTap: start)];
     }
 
-    final subject = state.currentSubject;
-    final footer = state.isRunning || state.isPaused
-        ? '${subject?.title ?? ''} · ${t.tr('classic_total_today', fallback: 'Total time today')} ${_clock(state.todayTotalMs)}'
-        : '${t.tr('classic_daily_goal', fallback: 'Daily goal')} ${formatHourMin(goal)} · ${(fraction * 100).round()}%';
-
     return Align(
       alignment: Alignment.centerLeft,
       child: SizedBox.fromSize(
         key: const ValueKey('classic-timer-area'),
         size: kClassicTimerAreaSize,
-        child: Column(
+        child: Row(
           children: [
-            Expanded(
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: onDialTap,
-                    child: SizedBox(
-                      width: 132,
-                      height: 132,
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(end: fraction),
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, f, _) => CustomPaint(painter: _TickDialPainter(f, color, palette.textMuted)),
-                      ),
+            if (showDial) ...[
+              Tooltip(
+                message: t.tr('classic_dial_hint', fallback: 'Right-click to change colours'),
+                waitDuration: const Duration(seconds: 1),
+                child: GestureDetector(
+                  key: const ValueKey('classic-dial'),
+                  onTap: onDialTap,
+                  onSecondaryTap: () => DialStyleDialog.show(context),
+                  onLongPress: () => DialStyleDialog.show(context),
+                  child: SizedBox(
+                    width: 104,
+                    height: 104,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(end: fraction),
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, f, _) => CustomPaint(painter: _TickDialPainter(f, color, palette.textMuted)),
                     ),
                   ),
-                  const SizedBox(width: 28),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 20,
-                          child: Text(label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 14, color: palette.textSecondary)),
-                        ),
-                        SizedBox(
-                          height: 72,
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    value,
-                                    key: const ValueKey('classic-focus-time'),
-                                    style: TextStyle(
-                                      fontSize: 56,
-                                      fontWeight: FontWeight.w700,
-                                      color: palette.textPrimary,
-                                      fontFeatures: const [FontFeature.tabularFigures()],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              for (final a in actions) Padding(padding: const EdgeInsets.only(right: 8), child: a),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                ),
+              ),
+              const SizedBox(width: 24),
+            ],
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 24,
+                    child: Text(label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 15, height: 1.3, color: palette.textSecondary)),
                   ),
                   SizedBox(
-                    width: 96,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        StudiconAvatar(
-                          studiconId: user?.studiconId ?? state.studiconId,
-                          pose: CdnResolver.resolvePose(
-                            isStudying: state.isRunning,
-                            isPaused: state.isPaused,
-                            studyMs: state.todayTotalMs,
-                          ),
-                          size: 72,
-                          isStudying: state.isRunning,
+                    height: 68,
+                    width: double.infinity,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        value,
+                        key: const ValueKey('classic-focus-time'),
+                        style: TextStyle(
+                          fontSize: 54,
+                          fontWeight: FontWeight.w700,
+                          color: palette.textPrimary,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
-                        const SizedBox(height: 4),
-                        Text(_clock(state.todayTotalMs),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: kStatOrange,
-                              fontFeatures: [FontFeature.tabularFigures()],
-                            )),
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+            // Fixed slot for up to two buttons, right-aligned: Pause/Stop and
+            // Play take the same space, so nothing moves between states.
             SizedBox(
-              height: 22,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(footer,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12, color: palette.textMuted)),
+              width: 100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  for (var i = 0; i < actions.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 10),
+                    actions[i],
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            SizedBox(
+              width: 96,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  StudiconAvatar(
+                    studiconId: user?.studiconId ?? state.studiconId,
+                    pose: CdnResolver.resolvePose(
+                      isStudying: state.isRunning,
+                      isPaused: state.isPaused,
+                      studyMs: state.todayTotalMs,
+                    ),
+                    size: 68,
+                    isStudying: state.isRunning,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(_clock(state.todayTotalMs),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: color,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      )),
+                ],
               ),
             ),
           ],

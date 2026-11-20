@@ -4,6 +4,7 @@ import '../../../core/localization/app_translation.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/window/overlay_window_channel.dart';
+import '../../timer/widgets/dial_style_dialog.dart';
 import '../settings_notifier.dart';
 
 /// App-level settings, opened from the gear in the timer header:
@@ -76,6 +77,22 @@ class AppSettingsDialog extends ConsumerWidget {
                   fallback: 'Tabs along the top and the YPT-style Timer, Calendar and Statistics screens'),
               value: settings.classicYptLook,
               onChanged: notifier.toggleClassicYptLook,
+            ),
+            Divider(color: context.appBorder, height: 16),
+            ListTile(
+              key: const ValueKey('settings-dial-style'),
+              contentPadding: EdgeInsets.zero,
+              title: Text(t.tr('classic_dial_title', fallback: 'Timer dial'),
+                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+              subtitle: Text(t.tr('classic_dial_desc', fallback: 'Study and break colours, show or hide the dial'),
+                  style: TextStyle(color: context.appTextSecondary, fontSize: 12)),
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                CircleAvatar(radius: 8, backgroundColor: Color(settings.dialStudyColor)),
+                const SizedBox(width: 4),
+                CircleAvatar(radius: 8, backgroundColor: Color(settings.dialBreakColor)),
+                const Icon(Icons.chevron_right_rounded),
+              ]),
+              onTap: () => DialStyleDialog.show(context),
             ),
             Divider(color: context.appBorder, height: 16),
             toggle(

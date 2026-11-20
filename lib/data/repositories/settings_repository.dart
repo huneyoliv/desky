@@ -34,6 +34,9 @@ class SettingsRepository {
   static const String keyClassicUiScale = 'classic_ui_scale';
   static const String keyMiniOpacity = 'mini_opacity';
   static const String keyOfflineMode = 'offline_mode';
+  static const String keyDialStudy = 'dial_study_color';
+  static const String keyDialBreak = 'dial_break_color';
+  static const String keyDialShow = 'dial_show_stopwatch';
   static const String keyThemePreset = 'selected_theme_preset';
   static const String keyBetaChannel = 'beta_update_channel';
 
@@ -425,6 +428,28 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setDouble(keyMiniOpacity, value);
+    } catch (_) {}
+  }
+
+  Future<({int study, int rest, bool show})> getDialStyle() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return (
+        study: prefs.getInt(keyDialStudy) ?? 0xFFFF6B1A,
+        rest: prefs.getInt(keyDialBreak) ?? 0xFF2F7CF6,
+        show: prefs.getBool(keyDialShow) ?? true,
+      );
+    } catch (_) {
+      return (study: 0xFFFF6B1A, rest: 0xFF2F7CF6, show: true);
+    }
+  }
+
+  Future<void> saveDialStyle({required int study, required int rest, required bool show}) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setInt(keyDialStudy, study);
+      await prefs.setInt(keyDialBreak, rest);
+      await prefs.setBool(keyDialShow, show);
     } catch (_) {}
   }
 

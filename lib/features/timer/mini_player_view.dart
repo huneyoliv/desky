@@ -15,7 +15,6 @@ import 'focus_mode_notifier.dart';
 import 'timer_notifier.dart';
 
 const Color _orange = Color(0xFFFF6B1A);
-const Color _blue = Color(0xFF2F7CF6);
 
 /// This week's study time for the mini player: one small request, made when
 /// the stats row is shown and dropped when it is hidden.
@@ -209,21 +208,22 @@ class _MiniContent extends ConsumerWidget {
     final isPomodoro = state.mode == TimerMode.pomodoro;
     final subject = state.currentSubject;
 
+    final settings = ref.watch(settingsNotifierProvider);
     final double fraction;
     final String time;
     final Color ring;
     if (state.isPaused) {
-      ring = _blue;
+      ring = Color(settings.dialBreakColor);
       time = _clock(state.sessionRestMs);
       fraction = (state.sessionRestMs / math.max(1, state.pomodoroShortBreakMinutes * 60000)).clamp(0.0, 1.0);
     } else if (state.isRunning) {
-      ring = _orange;
+      ring = Color(settings.dialStudyColor);
       time = _clock(isPomodoro ? state.pomodoroRemainingMs : state.sessionElapsedMs);
       fraction = isPomodoro
           ? (state.pomodoroRemainingMs / math.max(1, state.pomodoroFocusMinutes * 60000)).clamp(0.0, 1.0)
           : (state.sessionElapsedMs % 3600000) / 3600000;
     } else {
-      ring = _orange;
+      ring = Color(settings.dialStudyColor);
       time = isPomodoro ? _clock(state.pomodoroRemainingMs) : _clock(state.todayTotalMs);
       fraction = isPomodoro ? 1 : 0;
     }
