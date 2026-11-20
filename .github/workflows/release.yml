@@ -10,6 +10,11 @@ on:
         description: 'Tag da versão da release (ex: v1.0.0)'
         required: true
         default: 'v1.0.0'
+      windows_only:
+        description: 'Build and publish only the Windows installer (skips macOS and Linux)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -76,7 +81,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows Release for Installer (Standalone)
-        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=true --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
+        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=true --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID || '1545409138211823747' }}"
 
       - name: Compile Inno Setup Installer
         run: |
@@ -84,7 +89,7 @@ jobs:
 
       - name: Build Windows Release for Microsoft Store (MSIX)
         if: ${{ !contains(github.ref_name, '-') && (github.event_name != 'workflow_dispatch' || !contains(github.event.inputs.version_tag, '-')) }}
-        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=false --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
+        run: flutter build windows --release --dart-define=ENABLE_IN_APP_UPDATER=false --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID || '1545409138211823747' }}"
 
       - name: Create Windows MSIX Package
         if: ${{ !contains(github.ref_name, '-') && (github.event_name != 'workflow_dispatch' || !contains(github.event.inputs.version_tag, '-')) }}
@@ -121,6 +126,7 @@ jobs:
   build-macos:
     name: macOS Disk Image (.dmg)
     needs: [quality-gate]
+    if: ${{ github.event.inputs.windows_only != 'true' }}
     runs-on: macos-latest
 
     steps:
@@ -146,7 +152,7 @@ jobs:
         run: flutter pub get
 
       - name: Build macOS Release
-        run: flutter build macos --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
+        run: flutter build macos --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID || '1545409138211823747' }}"
 
       - name: Create DMG Installer
         run: |
@@ -165,6 +171,7 @@ jobs:
   build-linux:
     name: Linux Debian Package (.deb & .tar.gz)
     needs: [quality-gate]
+    if: ${{ github.event.inputs.windows_only != 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -195,7 +202,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Linux Release
-        run: flutter build linux --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
+        run: flutter build linux --release --dart-define=GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" --dart-define=GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" --dart-define=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID || '1545409138211823747' }}"
 
       - name: Package Debian (.deb) & Portable (.tar.gz)
         run: |
@@ -261,6 +268,7 @@ jobs:
   build-archpkg:
     name: Arch Linux Package (.pkg.tar.zst)
     needs: [quality-gate, build-linux]
+    if: ${{ github.event.inputs.windows_only != 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -313,6 +321,14 @@ jobs:
   publish-release:
     name: Publish GitHub Release
     needs: [quality-gate, build-windows, build-macos, build-linux, build-archpkg]
+    # Windows-only runs skip the other builds; publish as long as everything
+    # that did run succeeded.
+    if: |
+      !cancelled() &&
+      needs.quality-gate.result == 'success' &&
+      needs.build-windows.result == 'success' &&
+      (github.event.inputs.windows_only == 'true' ||
+       (needs.build-macos.result == 'success' && needs.build-linux.result == 'success' && needs.build-archpkg.result == 'success'))
     runs-on: ubuntu-latest
 
     steps:
@@ -353,13 +369,15 @@ jobs:
           echo "Checking release assets directory..."
           ls -la release_assets/
           
-          REQUIRED_FILES=(
-            "release_assets/Desky-Windows-Installer-x64.exe"
-            "release_assets/Desky-macOS-Installer.dmg"
-            "release_assets/Desky-Linux-x64.deb"
-            "release_assets/Desky-Linux-x64.tar.gz"
-            "release_assets/Desky-Linux-x64.pkg.tar.zst"
-          )
+          REQUIRED_FILES=("release_assets/Desky-Windows-Installer-x64.exe")
+          if [ "${{ github.event.inputs.windows_only }}" != "true" ]; then
+            REQUIRED_FILES+=(
+              "release_assets/Desky-macOS-Installer.dmg"
+              "release_assets/Desky-Linux-x64.deb"
+              "release_assets/Desky-Linux-x64.tar.gz"
+              "release_assets/Desky-Linux-x64.pkg.tar.zst"
+            )
+          fi
           
           MISSING=0
           for file in "${REQUIRED_FILES[@]}"; do
@@ -375,7 +393,7 @@ jobs:
             echo "❌ Pipeline failed: One or more platform artifacts are missing."
             exit 1
           fi
-          echo "🎉 All 5 platform release artifacts verified successfully!"
+          echo "🎉 All required release artifacts verified successfully!"
 
       - name: Create Official GitHub Release
         uses: softprops/action-gh-release@v2
@@ -388,7 +406,7 @@ jobs:
           # is what the stable channel reads, so promoting a beta there would
           # offer it to every user.
           make_latest: ${{ steps.release_info.outputs.prerelease != 'true' }}
-          fail_on_unmatched_files: true
+          fail_on_unmatched_files: ${{ github.event.inputs.windows_only != 'true' }}
           body_path: release_notes.md
           generate_release_notes: true
           files: |
