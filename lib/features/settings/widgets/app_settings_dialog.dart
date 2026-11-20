@@ -7,7 +7,7 @@ import '../../../core/window/overlay_window_channel.dart';
 import '../settings_notifier.dart';
 
 /// App-level settings, opened from the gear in the timer header:
-/// Discord Rich Presence and the OBS overlay mode.
+/// look (Classic YPT), Discord Rich Presence and the OBS overlay mode.
 class AppSettingsDialog extends ConsumerWidget {
   const AppSettingsDialog({super.key});
 
@@ -70,6 +70,14 @@ class AppSettingsDialog extends ConsumerWidget {
               ],
             ),
             Divider(color: context.appBorder, height: 24),
+            toggle(
+              title: t.tr('classic_ypt_look_title', fallback: 'Classic YPT look'),
+              subtitle: t.tr('classic_ypt_look_desc',
+                  fallback: 'Tabs along the top and the YPT-style Timer, Calendar and Statistics screens'),
+              value: settings.classicYptLook,
+              onChanged: notifier.toggleClassicYptLook,
+            ),
+            Divider(color: context.appBorder, height: 16),
             toggle(
               title: t.tr('discord_rpc_title', fallback: 'Discord Rich Presence'),
               subtitle: t.tr('discord_rpc_desc',

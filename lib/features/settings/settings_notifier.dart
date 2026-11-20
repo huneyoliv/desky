@@ -38,6 +38,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
       final obsOverlayMode = await _repository.getObsOverlayMode();
+      final classicYptLook = await _repository.getClassicYptLook();
       final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
@@ -51,6 +52,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
         discordRpcEnabled: discordRpc,
         obsOverlayMode: obsOverlayMode,
+        classicYptLook: classicYptLook,
         betaChannel: betaChannel,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
@@ -143,6 +145,12 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleObsOverlayMode(bool value) async {
     state = state.copyWith(obsOverlayMode: value);
     await _repository.saveObsOverlayMode(value);
+  }
+
+  /// Switches between the sidebar layout and the Classic YPT top tabs.
+  Future<void> toggleClassicYptLook(bool value) async {
+    state = state.copyWith(classicYptLook: value);
+    await _repository.saveClassicYptLook(value);
   }
 
   /// Opts in or out of pre-release update checks.

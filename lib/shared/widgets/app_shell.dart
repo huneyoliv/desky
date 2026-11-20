@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/theme_palette.dart';
 import '../../core/localization/app_translation.dart';
 import '../../features/timer/focus_mode_notifier.dart';
+import '../../features/settings/settings_notifier.dart';
+import 'classic_tab_bar.dart';
 import 'sidebar_nav.dart';
 
 class AppShell extends ConsumerWidget {
@@ -21,6 +23,19 @@ class AppShell extends ConsumerWidget {
     final isFocusActive = focusState.isStrictFocus || focusState.isMiniPlayer;
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
+    final classic = ref.watch(settingsNotifierProvider.select((s) => s.classicYptLook));
+
+    if (classic) {
+      return Scaffold(
+        backgroundColor: palette.background,
+        body: Column(
+          children: [
+            if (!isFocusActive) ClassicTabBar(currentRoute: currentRoute),
+            Expanded(child: child),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: palette.background,

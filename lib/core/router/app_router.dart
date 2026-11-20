@@ -1,3 +1,6 @@
+import '../../features/statistics/statistics_screen.dart';
+import '../../features/statistics/study_calendar_screen.dart';
+import '../../features/planner/timetable_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -71,6 +74,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/planner',
             builder: (context, state) => const PlannerScreen(),
+          ),
+          GoRoute(
+            path: '/statistics',
+            builder: (context, state) => const StatisticsScreen(),
+          ),
+          GoRoute(
+            path: '/calendar',
+            builder: (context, state) => const StudyCalendarScreen(),
+          ),
+          GoRoute(
+            path: '/weekly',
+            builder: (context, state) => const Scaffold(body: TimetableScreen()),
           ),
           GoRoute(
             path: '/ranks',

@@ -20,6 +20,9 @@ class SettingsState {
   /// Windows: minimizing sends the window behind the others instead of
   /// really minimizing it, so an OBS Window Capture keeps receiving frames.
   final bool obsOverlayMode;
+
+  /// Layout modelled on the YPT desktop app: top tabs instead of the sidebar.
+  final bool classicYptLook;
   final bool betaChannel;
 
   const SettingsState({
@@ -37,6 +40,7 @@ class SettingsState {
     this.blockedUsers = const [],
     this.discordRpcEnabled = true,
     this.obsOverlayMode = false,
+    this.classicYptLook = false,
     this.betaChannel = false,
   });
 
@@ -55,6 +59,7 @@ class SettingsState {
     List<String>? blockedUsers,
     bool? discordRpcEnabled,
     bool? obsOverlayMode,
+    bool? classicYptLook,
     bool? betaChannel,
   }) {
     return SettingsState(
@@ -72,6 +77,7 @@ class SettingsState {
       blockedUsers: blockedUsers ?? this.blockedUsers,
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
       obsOverlayMode: obsOverlayMode ?? this.obsOverlayMode,
+      classicYptLook: classicYptLook ?? this.classicYptLook,
       betaChannel: betaChannel ?? this.betaChannel,
     );
   }
