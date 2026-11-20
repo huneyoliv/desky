@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/json_utils.dart';
 import '../../core/utils/study_date_helper.dart';
 import '../../data/models/subject_model.dart';
@@ -201,6 +202,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           lastStudyDate: StudyDateHelper.getStudyDateString(null, dayResetHour),
         )) {
     loadSubjects();
+    _loadDailyGoal();
     _dayResetTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       _checkStudyDateReset();
     });
@@ -504,8 +506,25 @@ class TimerNotifier extends StateNotifier<TimerState> {
     );
   }
 
-  void setDailyGoalMinutes(int minutes) {
-    state = state.copyWith(dailyGoalMinutes: minutes);
+  static const String dailyGoalKey = 'daily_goal_minutes';
+
+  /// Daily goal in minutes (15 min to 24 h), saved on this device: the YPT
+  /// API exposes no goal, so it used to reset to 6 h on every start.
+  Future<void> setDailyGoalMinutes(int minutes) async {
+    final clamped = minutes.clamp(15, 24 * 60);
+    state = state.copyWith(dailyGoalMinutes: clamped);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(dailyGoalKey, clamped);
+    } catch (_) {}
+  }
+
+  Future<void> _loadDailyGoal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getInt(dailyGoalKey);
+      if (saved != null && saved >= 15 && mounted) state = state.copyWith(dailyGoalMinutes: saved);
+    } catch (_) {}
   }
 
   void configurePomodoro({

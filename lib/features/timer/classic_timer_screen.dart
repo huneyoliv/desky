@@ -23,6 +23,7 @@ import '../todo/todo_notifier.dart';
 import 'focus_mode_notifier.dart';
 import 'timer_notifier.dart';
 import 'timer_screen.dart';
+import 'widgets/daily_goal_dialog.dart';
 import 'widgets/dial_style_dialog.dart';
 import 'widgets/pomodoro_config_dialog.dart';
 import 'widgets/subject_management_dialog.dart';
@@ -596,8 +597,22 @@ class _TodayPane extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              Text('${t.tr('classic_daily_goal', fallback: 'Daily goal')} ${formatHourMin(goal)} · ${(progress * 100).round()}%',
-                  style: TextStyle(fontSize: 12, color: palette.textMuted)),
+              InkWell(
+                key: const ValueKey('classic-edit-goal'),
+                borderRadius: BorderRadius.circular(6),
+                onTap: () => DailyGoalDialog.show(context),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(children: [
+                    Expanded(
+                      child: Text(
+                          '${t.tr('classic_daily_goal', fallback: 'Daily goal')} ${formatHourMin(goal)} · ${(progress * 100).round()}%',
+                          style: TextStyle(fontSize: 13, color: palette.textSecondary)),
+                    ),
+                    Icon(Icons.edit_outlined, size: 15, color: palette.textMuted),
+                  ]),
+                ),
+              ),
             ],
           ),
         ),
