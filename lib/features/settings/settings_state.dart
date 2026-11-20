@@ -26,6 +26,9 @@ class SettingsState {
 
   /// Zoom of the Classic look (1.0 = 100 %), changed with Ctrl +/- or Ctrl + wheel.
   final double classicUiScale;
+
+  /// Opacity of the floating mini player (0.3 to 1.0).
+  final double miniOpacity;
   final bool betaChannel;
 
   const SettingsState({
@@ -45,6 +48,7 @@ class SettingsState {
     this.obsOverlayMode = false,
     this.classicYptLook = false,
     this.classicUiScale = 1.0,
+    this.miniOpacity = 0.95,
     this.betaChannel = false,
   });
 
@@ -65,6 +69,7 @@ class SettingsState {
     bool? obsOverlayMode,
     bool? classicYptLook,
     double? classicUiScale,
+    double? miniOpacity,
     bool? betaChannel,
   }) {
     return SettingsState(
@@ -84,6 +89,7 @@ class SettingsState {
       obsOverlayMode: obsOverlayMode ?? this.obsOverlayMode,
       classicYptLook: classicYptLook ?? this.classicYptLook,
       classicUiScale: classicUiScale ?? this.classicUiScale,
+      miniOpacity: miniOpacity ?? this.miniOpacity,
       betaChannel: betaChannel ?? this.betaChannel,
     );
   }

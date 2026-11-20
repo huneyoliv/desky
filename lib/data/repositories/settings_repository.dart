@@ -32,6 +32,7 @@ class SettingsRepository {
   static const String keyObsOverlayMode = 'obs_overlay_mode';
   static const String keyClassicYptLook = 'classic_ypt_look';
   static const String keyClassicUiScale = 'classic_ui_scale';
+  static const String keyMiniOpacity = 'mini_opacity';
   static const String keyThemePreset = 'selected_theme_preset';
   static const String keyBetaChannel = 'beta_update_channel';
 
@@ -407,6 +408,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setDouble(keyClassicUiScale, value);
+    } catch (_) {}
+  }
+
+  Future<double> getMiniOpacity() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getDouble(keyMiniOpacity) ?? 0.95;
+    } catch (_) {
+      return 0.95;
+    }
+  }
+
+  Future<void> saveMiniOpacity(double value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setDouble(keyMiniOpacity, value);
     } catch (_) {}
   }
 

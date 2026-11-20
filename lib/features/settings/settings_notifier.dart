@@ -40,6 +40,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final obsOverlayMode = await _repository.getObsOverlayMode();
       final classicYptLook = await _repository.getClassicYptLook();
       final classicUiScale = await _repository.getClassicUiScale();
+      final miniOpacity = await _repository.getMiniOpacity();
       final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
@@ -55,6 +56,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         obsOverlayMode: obsOverlayMode,
         classicYptLook: classicYptLook,
         classicUiScale: classicUiScale,
+        miniOpacity: miniOpacity,
         betaChannel: betaChannel,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
@@ -165,6 +167,13 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     if (clamped == state.classicUiScale) return;
     state = state.copyWith(classicUiScale: clamped);
     await _repository.saveClassicUiScale(clamped);
+  }
+
+  /// Opacity of the mini player, 30 % to 100 %.
+  Future<void> setMiniOpacity(double value) async {
+    final clamped = value.clamp(0.3, 1.0).toDouble();
+    state = state.copyWith(miniOpacity: clamped);
+    await _repository.saveMiniOpacity(clamped);
   }
 
   /// Opts in or out of pre-release update checks.

@@ -26,6 +26,7 @@ import 'core/localization/app_translation.dart';
 import 'features/auth/auth_notifier.dart';
 import 'features/settings/settings_notifier.dart';
 import 'features/settings/theme_notifier.dart';
+import 'features/timer/focus_mode_notifier.dart';
 import 'features/timer/timer_notifier.dart';
 import 'shared/widgets/app_title_bar.dart';
 
@@ -396,26 +397,28 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
       ],
       routerConfig: router,
       builder: (context, child) {
+        // Mini player: no title bar, no resize border and a transparent
+        // window, so only its rounded card floats on the desktop.
+        final mini = ref.watch(focusModeProvider.select((s) => s.isMiniPlayer));
+        final content = Material(
+          color: mini ? Colors.transparent : currentPalette.background,
+          clipBehavior: Clip.antiAlias,
+          child: Overlay(
+            initialEntries: [
+              OverlayEntry(
+                builder: (context) => Column(
+                  children: [
+                    if (!mini) const AppTitleBar(title: 'Desky'),
+                    Expanded(child: child ?? const SizedBox.shrink()),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
         return Directionality(
           textDirection: TextDirection.ltr,
-          child: DragToResizeArea(
-            child: Material(
-              color: currentPalette.background,
-              clipBehavior: Clip.antiAlias,
-              child: Overlay(
-                initialEntries: [
-                  OverlayEntry(
-                    builder: (context) => Column(
-                      children: [
-                        const AppTitleBar(title: 'Desky'),
-                        Expanded(child: child ?? const SizedBox.shrink()),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          child: mini ? content : DragToResizeArea(child: content),
         );
       },
     );
