@@ -18,6 +18,16 @@ class _Timer extends TimerRepository {
   @override
   Future<bool> startStudy({required String subjectTitle, required int subjectId, required DateTime startAt}) async =>
       true;
+
+  @override
+  Future<Map<String, dynamic>?> stopStudy({
+    required String subjectTitle,
+    required int subjectId,
+    required DateTime stopAt,
+    required int studyMs,
+    required DateTime startAt,
+  }) async =>
+      {'s': true};
 }
 
 class _Subjects extends SubjectRepository {
@@ -80,11 +90,16 @@ void main() {
     expect(find.byKey(const ValueKey('classic-edit-subject')), findsOneWidget);
     await _shot(tester, 'classic_idle');
 
+    // One OBS crop for every state: the timer box never moves or resizes.
+    final area = find.byKey(const ValueKey('classic-timer-area'));
+    final idleRect = tester.getRect(area);
+    expect(idleRect.size, kClassicTimerAreaSize);
+
     final container = ProviderScope.containerOf(tester.element(find.byType(ClassicTimerScreen)));
     container.read(timerNotifierProvider.notifier).setTimerMode(TimerMode.pomodoro);
     await tester.pump(const Duration(milliseconds: 200));
-    expect(find.textContaining(RegExp('Focus time', caseSensitive: false)), findsOneWidget);
-    expect(find.text('25:00'), findsOneWidget);
+    expect(find.text('0:25:00'), findsOneWidget);
+    expect(tester.getRect(area), idleRect, reason: 'Pomodoro');
     await _shot(tester, 'classic_pomodoro');
 
     container.read(timerNotifierProvider.notifier).setTimerMode(TimerMode.stopwatch);
@@ -92,9 +107,17 @@ void main() {
     await tester.tap(find.text('GS1'));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
-    expect(find.text('Current focus time'), findsOneWidget);
     expect(find.byKey(const ValueKey('classic-focus-time')), findsOneWidget);
+    expect(tester.getRect(area), idleRect, reason: 'studying');
     await _shot(tester, 'classic_running');
+
+    container.read(timerNotifierProvider.notifier).pauseStudy();
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(seconds: 1));
+    }
+    expect(container.read(timerNotifierProvider).isPaused, isTrue);
+    expect(tester.getRect(area), idleRect, reason: 'break');
+    await _shot(tester, 'classic_break');
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 5));

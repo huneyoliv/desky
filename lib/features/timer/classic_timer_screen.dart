@@ -68,6 +68,12 @@ String _mmss(int ms) {
   return '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
 }
 
+
+/// Fixed size of the timer area. It is the same box, at the same place, in
+/// every state (idle, Pomodoro, studying, break), so one OBS crop fits all.
+const double kClassicHeaderHeight = 48;
+const Size kClassicTimerAreaSize = Size(400, 132);
+
 class _IdleView extends ConsumerWidget {
   const _IdleView();
 
@@ -81,87 +87,27 @@ class _IdleView extends ConsumerWidget {
     final onBreak = state.isPaused;
     final subjects = state.subjects.where((s) => !s.isArchived && !s.isDeleted).toList();
 
-    Widget hero;
-    if (onBreak) {
-      hero = _Dial(
-        color: _breakBlue,
-        progress: null,
-        label: t.tr('classic_break', fallback: 'Break'),
-        value: _mmss(state.sessionRestMs),
-        action: TextButton(
-          onPressed: notifier.stopStudy,
-          child: Text(t.tr('classic_finish', fallback: 'Finish'),
-              style: TextStyle(fontSize: 11, color: palette.textSecondary)),
-        ),
-        onTap: notifier.startStudy,
-      );
-    } else if (isPomodoro) {
-      hero = _Dial(
-        color: kStatOrange,
-        progress: null,
-        label: t.tr('classic_focus_time', fallback: 'Focus time'),
-        value: _mmss(state.pomodoroRemainingMs),
-        caption: '${t.tr('classic_now', fallback: 'Now')} ${DateFormat('h:mm a').format(DateTime.now())}',
-        onTap: () => PomodoroConfigDialog.show(context, state: state, onSave: notifier.configurePomodoro),
-      );
-    } else {
-      hero = Column(
-        children: [
-          Text(
-            _clock(state.todayTotalMs),
-            key: const ValueKey('classic-today-total'),
-            style: TextStyle(
-              fontSize: 54,
-              fontWeight: FontWeight.w500,
-              color: palette.textPrimary,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
-          Text(t.tr('classic_total_today', fallback: 'Total time today'),
-              style: TextStyle(fontSize: 11, color: palette.textMuted)),
-        ],
-      );
-    }
-
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 8, 0),
-          child: Row(
-            children: [
-              _ModeSwitch(isPomodoro: isPomodoro, enabled: !onBreak),
-              Expanded(
-                child: Center(
-                  child: Text(DateFormat('EEE, M/d').format(DateTime.now()),
-                      style: TextStyle(fontSize: 13, color: palette.textPrimary, fontWeight: FontWeight.w600)),
-                ),
-              ),
-              IconButton(
-                tooltip: t.tr('focus', fallback: 'Focus mode'),
-                icon: Icon(Icons.fullscreen_rounded, size: 18, color: palette.textSecondary),
-                onPressed: () => ref.read(focusModeProvider.notifier).toggleStrictFocus(),
-              ),
-              IconButton(
-                tooltip: t.tr('mini_player', fallback: 'Mini player'),
-                icon: Icon(Icons.picture_in_picture_alt_rounded, size: 18, color: palette.textSecondary),
-                onPressed: () => ref.read(focusModeProvider.notifier).toggleMiniPlayer(),
-              ),
-            ],
-          ),
-        ),
-        Padding(padding: const EdgeInsets.symmetric(vertical: 18), child: hero),
-        if (isPomodoro || onBreak)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+        SizedBox(
+          height: kClassicHeaderHeight,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
             child: Row(
               children: [
-                Text(t.tr('classic_total_today', fallback: 'Total time today'),
-                    style: TextStyle(fontSize: 11, color: palette.textMuted)),
-                const Spacer(),
-                Text(_clock(state.todayTotalMs), style: TextStyle(fontSize: 11, color: palette.textMuted)),
+                _ModeSwitch(isPomodoro: isPomodoro, enabled: !onBreak),
+                Expanded(
+                  child: Center(
+                    child: Text(DateFormat('EEE, M/d').format(DateTime.now()),
+                        style: TextStyle(fontSize: 13, color: palette.textPrimary, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+                const _FocusButtons(),
               ],
             ),
           ),
+        ),
+        const _TimerArea(),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
@@ -198,6 +144,179 @@ class _IdleView extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _FocusButtons extends ConsumerWidget {
+  const _FocusButtons();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          tooltip: t.tr('focus', fallback: 'Focus mode'),
+          icon: Icon(Icons.fullscreen_rounded, size: 18, color: palette.textSecondary),
+          onPressed: () => ref.read(focusModeProvider.notifier).toggleStrictFocus(),
+        ),
+        IconButton(
+          tooltip: t.tr('mini_player', fallback: 'Mini player'),
+          icon: Icon(Icons.picture_in_picture_alt_rounded, size: 18, color: palette.textSecondary),
+          onPressed: () => ref.read(focusModeProvider.notifier).toggleMiniPlayer(),
+        ),
+      ],
+    );
+  }
+}
+
+/// The timer itself, in a box of [kClassicTimerAreaSize] centred under the
+/// header in every state. Left: the studicon (stopwatch), the Pomodoro dial
+/// or the blue break dial, always the same slot. Right: label, the time in a
+/// fixed-width slot, and a fixed-height row for buttons or a caption.
+class _TimerArea extends ConsumerWidget {
+  const _TimerArea();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(appTranslationProvider);
+    final state = ref.watch(timerNotifierProvider);
+    final notifier = ref.read(timerNotifierProvider.notifier);
+    final user = ref.watch(authStateProvider.select((s) => s.user));
+    final palette = context.palette;
+    final isPomodoro = state.mode == TimerMode.pomodoro;
+    final focusTotal = state.pomodoroFocusMinutes * 60000;
+
+    final Widget dial;
+    final String label;
+    final String value;
+    final Widget actions;
+    VoidCallback? onDialTap;
+
+    if (state.isPaused) {
+      dial = CustomPaint(painter: _DialPainter(_breakBlue, null));
+      label = t.tr('classic_break', fallback: 'Break');
+      value = _clock(state.sessionRestMs);
+      onDialTap = notifier.startStudy;
+      actions = Row(mainAxisSize: MainAxisSize.min, children: [
+        _RoundButton(icon: Icons.play_arrow_rounded, tooltip: t.tr('restart', fallback: 'Resume'), onTap: notifier.startStudy),
+        const SizedBox(width: 6),
+        _RoundButton(icon: Icons.stop_rounded, tooltip: t.tr('classic_finish', fallback: 'Finish'), onTap: notifier.stopStudy),
+      ]);
+    } else if (state.isRunning) {
+      dial = isPomodoro
+          ? CustomPaint(
+              painter: _DialPainter(
+                kStatOrange,
+                focusTotal <= 0 ? 0 : (state.pomodoroRemainingMs / focusTotal).clamp(0.0, 1.0),
+              ),
+            )
+          : StudiconAvatar(
+              studiconId: user?.studiconId ?? state.studiconId,
+              pose: CdnResolver.resolvePose(isStudying: true, studyMs: state.todayTotalMs),
+              size: 80,
+            );
+      label = isPomodoro
+          ? t.tr('classic_remaining_time', fallback: 'Remaining time')
+          : t.tr('classic_current_focus_time', fallback: 'Current focus time');
+      value = isPomodoro ? _clock(state.pomodoroRemainingMs) : _clock(state.sessionElapsedMs);
+      actions = Row(mainAxisSize: MainAxisSize.min, children: [
+        _RoundButton(icon: Icons.pause_rounded, tooltip: t.tr('pause', fallback: 'Pause'), onTap: notifier.pauseStudy),
+        const SizedBox(width: 6),
+        _RoundButton(icon: Icons.stop_rounded, tooltip: t.tr('stop', fallback: 'Stop'), onTap: notifier.stopStudy),
+      ]);
+    } else if (isPomodoro) {
+      dial = CustomPaint(
+        painter: _DialPainter(kStatOrange, null),
+        child: const Center(child: Icon(Icons.water_drop_rounded, size: 16, color: Colors.white)),
+      );
+      label = t.tr('classic_focus_time', fallback: 'Focus time');
+      value = _clock(state.pomodoroRemainingMs);
+      onDialTap = () => PomodoroConfigDialog.show(context, state: state, onSave: notifier.configurePomodoro);
+      actions = Text('${t.tr('classic_now', fallback: 'Now')} ${DateFormat('h:mm a').format(DateTime.now())}',
+          style: TextStyle(fontSize: 10, color: palette.textMuted));
+    } else {
+      dial = StudiconAvatar(
+        studiconId: user?.studiconId ?? state.studiconId,
+        pose: CdnResolver.resolvePose(isStudying: false, studyMs: state.todayTotalMs),
+        size: 80,
+        isStudying: false,
+      );
+      label = t.tr('classic_total_today', fallback: 'Total time today');
+      value = _clock(state.todayTotalMs);
+      actions = const SizedBox.shrink();
+    }
+
+    // Under the box, a quiet line keeps today's total visible in every state.
+    final subject = state.currentSubject;
+    final footer = state.isRunning || state.isPaused
+        ? '${subject?.title ?? ''} · ${t.tr('classic_total_today', fallback: 'Total time today')} ${_clock(state.todayTotalMs)}'
+        : '';
+
+    return Center(
+      child: SizedBox.fromSize(
+        key: const ValueKey('classic-timer-area'),
+        size: kClassicTimerAreaSize,
+        child: Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: onDialTap,
+                    child: SizedBox(width: 92, height: 92, child: dial),
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 16,
+                          child: Text(label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 11, color: palette.textSecondary)),
+                        ),
+                        SizedBox(
+                          height: 52,
+                          width: double.infinity,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              value,
+                              key: const ValueKey('classic-focus-time'),
+                              style: TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.w600,
+                                color: palette.textPrimary,
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 28, child: Align(alignment: Alignment.centerLeft, child: actions)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 18,
+              child: Text(footer,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 10, color: palette.textMuted)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -286,69 +405,6 @@ class _SubjectRow extends StatelessWidget {
 }
 
 /// Big round dial: a filled circle, or a pie of the remaining Pomodoro time.
-class _Dial extends StatelessWidget {
-  const _Dial({
-    required this.color,
-    required this.progress,
-    required this.label,
-    required this.value,
-    this.caption,
-    this.action,
-    this.onTap,
-  });
-
-  final Color color;
-
-  /// Remaining fraction (1 → full); null draws a plain filled circle.
-  final double? progress;
-  final String label;
-  final String value;
-  final String? caption;
-  final Widget? action;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: SizedBox(
-            width: 92,
-            height: 92,
-            child: CustomPaint(
-              painter: _DialPainter(color, progress),
-              child: Center(
-                child: progress == null
-                    ? const Icon(Icons.water_drop_rounded, size: 16, color: Colors.white)
-                    : null,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 40),
-        Column(
-          children: [
-            Text(label, style: TextStyle(fontSize: 11, color: palette.textSecondary)),
-            Text(value,
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w600,
-                  color: palette.textPrimary,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                )),
-            if (caption != null)
-              Text(caption!, style: TextStyle(fontSize: 9, color: palette.textMuted)),
-            if (action != null) action!,
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 class _DialPainter extends CustomPainter {
   _DialPainter(this.color, this.progress);
   final Color color;
@@ -440,117 +496,46 @@ class _FocusingView extends ConsumerWidget {
   }
 }
 
+
 class _StudyingView extends ConsumerWidget {
   const _StudyingView();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(appTranslationProvider);
     final state = ref.watch(timerNotifierProvider);
-    final notifier = ref.read(timerNotifierProvider.notifier);
-    final user = ref.watch(authStateProvider.select((s) => s.user));
     final palette = context.palette;
-    final isPomodoro = state.mode == TimerMode.pomodoro;
     final subject = state.currentSubject;
-    final focusTotal = state.pomodoroFocusMinutes * 60000;
-
-    final controls = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _RoundButton(icon: Icons.pause_rounded, tooltip: t.tr('pause', fallback: 'Pause'), onTap: notifier.pauseStudy),
-        const SizedBox(width: 6),
-        _RoundButton(icon: Icons.stop_rounded, tooltip: t.tr('stop', fallback: 'Stop'), onTap: notifier.stopStudy),
-      ],
-    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 8, 0),
-          child: Row(
-            children: [
-              if (subject != null)
-                Container(
-                  width: 8,
-                  height: 8,
-                  margin: const EdgeInsets.only(right: 6),
-                  decoration: BoxDecoration(color: Color(subject.colorInt), shape: BoxShape.circle),
-                ),
-              Text(
-                '${subject?.title ?? ''}  ${_clock(subject?.studyMs ?? 0)}',
-                style: TextStyle(fontSize: 12, color: palette.textSecondary),
-              ),
-              const Spacer(),
-              IconButton(
-                tooltip: t.tr('focus', fallback: 'Focus mode'),
-                icon: Icon(Icons.fullscreen_rounded, size: 18, color: palette.textSecondary),
-                onPressed: () => ref.read(focusModeProvider.notifier).toggleStrictFocus(),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-          child: Row(
-            children: [
-              if (isPomodoro) ...[
-                SizedBox(
-                  width: 64,
-                  height: 64,
-                  child: CustomPaint(
-                    painter: _DialPainter(
-                      kStatOrange,
-                      focusTotal <= 0 ? 0 : (state.pomodoroRemainingMs / focusTotal).clamp(0.0, 1.0),
-                    ),
+        SizedBox(
+          height: kClassicHeaderHeight,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+            child: Row(
+              children: [
+                if (subject != null)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(right: 6),
+                    decoration: BoxDecoration(color: Color(subject.colorInt), shape: BoxShape.circle),
+                  ),
+                Expanded(
+                  child: Text(
+                    '${subject?.title ?? ''}  ${_clock(subject?.studyMs ?? 0)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: palette.textSecondary),
                   ),
                 ),
-                const SizedBox(width: 24),
+                const _FocusButtons(),
               ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: isPomodoro ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isPomodoro
-                          ? t.tr('classic_remaining_time', fallback: 'Remaining time')
-                          : t.tr('classic_current_focus_time', fallback: 'Current focus time'),
-                      style: TextStyle(fontSize: 11, color: palette.textSecondary),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          isPomodoro ? _mmss(state.pomodoroRemainingMs) : _clock(state.sessionElapsedMs),
-                          key: const ValueKey('classic-focus-time'),
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600,
-                            color: palette.textPrimary,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        controls,
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                children: [
-                  StudiconAvatar(
-                    studiconId: user?.studiconId ?? state.studiconId,
-                    pose: CdnResolver.resolvePose(isStudying: true, studyMs: state.todayTotalMs),
-                    size: 44,
-                  ),
-                  Text(_clock(state.todayTotalMs),
-                      style: const TextStyle(fontSize: 10, color: kStatOrange)),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
+        const _TimerArea(),
         const Expanded(child: _GroupPanel()),
       ],
     );
