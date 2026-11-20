@@ -122,9 +122,9 @@ Before creating and pushing any release tag, the version string and build number
   disconnects completely.
 - **Studicon Not Rendering on Discord**: Users without a CDN studicon got a `/sc.v2/-1/` URL that
   does not exist; they now get the bundled studicon PNGs.
-- **Discord Showed "Desky"**: The presence texts say YPT. The "Playing ..." name is the Discord
-  application's; a `DISCORD_CLIENT_ID` in a `.env` next to the executable now overrides the
-  build-time id, so it can point to an application named YPT.
+- **Custom Discord Application**: a `DISCORD_CLIENT_ID` in a `.env` next to the executable now
+  overrides the build-time id, so Rich Presence can point at another Discord application; the
+  presence still says Desky by default.
 - **Portuguese Text Shown to Other Languages**: Strings with no translation fell back to Portuguese
   for every language. Defaults are now English; Portuguese users keep their wording. New labels
   reuse YPT's own keys, so all 28 locales have them.

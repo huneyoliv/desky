@@ -110,8 +110,8 @@ class EnvConfig {
 
   /// A `.env` next to the executable (or the DISCORD_CLIENT_ID environment
   /// variable) wins over the id baked in at build time, so a user can point
-  /// Rich Presence at their own Discord application, e.g. one named "YPT":
-  /// Discord shows that application's name in "Playing ...".
+  /// Rich Presence at their own Discord application (Discord shows that
+  /// application's name in "Playing ...").
   static String get discordClientId {
     if (!_initialized) loadSync();
 

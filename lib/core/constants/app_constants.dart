@@ -14,7 +14,7 @@ class AppConstants {
   );
 
   /// Name shown in Discord Rich Presence texts.
-  static const String discordDisplayName = 'YPT';
+  static const String discordDisplayName = 'Desky';
 
   /// Raw files of this repository (bundled assets Discord can fetch).
   static const String repoRawBaseUrl =

@@ -501,8 +501,10 @@ class DiscordRpcService {
       state: statusLabel,
       largeImage: imageUrl,
       largeText: largeImageTooltip,
-      smallImage: null,
-      smallText: null,
+      smallImage: AppConstants.deskyIconUrl,
+      smallText: AppConstants.discordDisplayName,
+      buttonLabel: AppConstants.discordDisplayName,
+      buttonUrl: 'https://desky.app',
       startTime: startTime,
     );
   }

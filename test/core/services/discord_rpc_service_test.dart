@@ -56,9 +56,9 @@ void main() {
       expect(payload!.details, contains('Matemática'));
       expect(payload.state, equals('Estudando'));
       expect(payload.startTime, isNotNull);
-      expect(payload.largeText, startsWith('YPT'));
-      expect(payload.buttonLabel, isNull);
-      expect(payload.smallText, isNull);
+      expect(payload.largeText, startsWith('Desky'));
+      expect(payload.buttonLabel, 'Desky');
+      expect(payload.smallText, 'Desky');
     });
 
     test('buildPayload creates paused payload with state Em pausa and without startTime', () {
@@ -106,7 +106,7 @@ void main() {
         const payload = DiscordPresencePayload(
           details: 'No Desky Test Suite',
           largeImage: 'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/images/studicon/ic_user_on_s.png',
-          largeText: 'YPT · Tempo Total: 01h 00m',
+          largeText: 'Desky · Tempo Total: 01h 00m',
         );
         service.setPresence(payload);
         await service.clearPresence();

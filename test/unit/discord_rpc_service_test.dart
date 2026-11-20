@@ -55,8 +55,8 @@ void main() {
       expect(payload, isNotNull);
       expect(payload!.details, 'Matemática');
       expect(payload.state, 'Estudando');
-      expect(payload.smallImage, isNull);
-      expect(payload.largeText, startsWith('YPT'));
+      expect(payload.smallImage, contains('assets/icons/icon.png'));
+      expect(payload.largeText, startsWith('Desky'));
       expect(payload.largeImage, contains('/sc.v2/1/sweat1.png'));
       expect(payload.largeText, contains('01h 00m'));
       expect(payload.startTime, isNotNull);
