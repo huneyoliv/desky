@@ -109,6 +109,9 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Windows Microsoft Store Package Artifact
+        # Pre-releases build no MSIX (the Store rejects a suffix), so uploading
+        # it there failed the whole Windows job.
+        if: ${{ !contains(github.ref_name, '-') && (github.event_name != 'workflow_dispatch' || !contains(github.event.inputs.version_tag, '-')) }}
         uses: actions/upload-artifact@v4
         with:
           name: Desky-Windows-Store-Package
