@@ -3,6 +3,9 @@ import 'dart:ui' as ui;
 
 import 'package:desky/core/localization/app_translation.dart';
 import 'package:desky/data/models/subject_model.dart';
+import 'package:desky/data/models/todo_item_model.dart';
+import 'package:desky/data/repositories/planner_repository.dart';
+import 'package:desky/features/planner/planner_screen.dart' show plannerRepositoryProvider;
 import 'package:desky/data/repositories/subject_repository.dart';
 import 'package:desky/data/repositories/timer_repository.dart';
 import 'package:desky/features/timer/classic_timer_screen.dart';
@@ -28,6 +31,25 @@ class _Timer extends TimerRepository {
     required DateTime startAt,
   }) async =>
       {'s': true};
+}
+
+class _Planner extends PlannerRepository {
+  @override
+  Future<List<TodoItemModel>> fetchTodos(String dateYmd, {required Duration gmtOffset, int resetHour = 5}) async => [
+        TodoItemModel(
+          id: 1,
+          subjectId: 3,
+          subjectTitle: 'GS1',
+          subjectColorInt: 0xFFFF5A1F,
+          title: 'Read chapter 4',
+          isCompleted: false,
+          dateYmd: dateYmd,
+          parentId: null,
+          recurrenceRule: null,
+          startAtRaw: '',
+          startAt: null,
+        ),
+      ];
 }
 
 class _Subjects extends SubjectRepository {
@@ -65,7 +87,7 @@ Future<void> _shot(WidgetTester tester, String name) async {
 void main() {
   testWidgets('Classic timer: subject list, then studying, then Pomodoro', (tester) async {
     await tester.runAsync(_fonts);
-    tester.view.physicalSize = const Size(1100, 760);
+    tester.view.physicalSize = const Size(1600, 1000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
@@ -73,6 +95,7 @@ void main() {
       overrides: [
         timerRepositoryProvider.overrideWithValue(_Timer()),
         subjectRepositoryProvider.overrideWithValue(_Subjects()),
+        plannerRepositoryProvider.overrideWithValue(_Planner()),
         appTranslationProvider.overrideWith(
           (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'en'),
         ),
@@ -86,7 +109,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.text('Revision & Anki'), findsOneWidget);
-    expect(find.text('0:00:47'), findsOneWidget);
+    expect(find.text('0:00:47'), findsWidgets);
+    expect(find.text('Read chapter 4'), findsOneWidget); // wide: the To-Do pane
     expect(find.byKey(const ValueKey('classic-edit-subject')), findsOneWidget);
     await _shot(tester, 'classic_idle');
 
@@ -132,6 +156,7 @@ void main() {
       overrides: [
         timerRepositoryProvider.overrideWithValue(_Timer()),
         subjectRepositoryProvider.overrideWithValue(_Subjects()),
+        plannerRepositoryProvider.overrideWithValue(_Planner()),
         focusModeProvider.overrideWith((ref) => focus),
         appTranslationProvider.overrideWith(
           (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'en'),
@@ -143,6 +168,34 @@ void main() {
     expect(find.byKey(const ValueKey('classic-focusing-time')), findsOneWidget);
     expect(find.byKey(const ValueKey('classic-edit-subject')), findsNothing);
     expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('a tall 9:16 window gets one centred column without overflow', (tester) async {
+    await tester.runAsync(_fonts);
+    tester.view.physicalSize = const Size(540, 960);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        timerRepositoryProvider.overrideWithValue(_Timer()),
+        subjectRepositoryProvider.overrideWithValue(_Subjects()),
+        plannerRepositoryProvider.overrideWithValue(_Planner()),
+        appTranslationProvider.overrideWith(
+          (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'en'),
+        ),
+      ],
+      child: MaterialApp(
+        theme: ThemeData.dark(),
+        home: const RepaintBoundary(key: ValueKey('shot'), child: ClassicTimerScreen()),
+      ),
+    ));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.takeException(), isNull);
+    expect(find.text('Read chapter 4'), findsNothing); // the To-Do pane is wide-only
+    expect(find.byKey(const ValueKey('classic-timer-area')), findsOneWidget);
+    await _shot(tester, 'classic_portrait');
     await tester.pumpWidget(const SizedBox());
   });
 }

@@ -21,6 +21,14 @@ class ClassicZoom extends ConsumerStatefulWidget {
   ConsumerState<ClassicZoom> createState() => _ClassicZoomState();
 }
 
+/// Base scale from the window size, before the user's zoom: a big landscape
+/// window gets roomier, tablet-like sizing; a small or tall 9:16 window stays
+/// at 1.0 so nothing is cut off.
+double autoScale(Size size) {
+  final basis = size.width * 0.6 < size.height ? size.width * 0.6 : size.height;
+  return (basis / 760).clamp(1.0, 1.4);
+}
+
 class _ClassicZoomState extends ConsumerState<ClassicZoom> {
   static const double _step = 0.1;
   bool _ctrlHeld = false;
@@ -81,7 +89,7 @@ class _ClassicZoomState extends ConsumerState<ClassicZoom> {
 
   @override
   Widget build(BuildContext context) {
-    final scale = ref.watch(settingsNotifierProvider.select((s) => s.classicUiScale));
+    final userScale = ref.watch(settingsNotifierProvider.select((s) => s.classicUiScale));
     final palette = context.palette;
     Widget child = widget.child;
     if (_ctrlHeld) {
@@ -98,7 +106,8 @@ class _ClassicZoomState extends ConsumerState<ClassicZoom> {
         children: [
           Positioned.fill(
             child: LayoutBuilder(builder: (context, c) {
-              if (scale == 1.0) return child;
+              final scale = userScale * autoScale(Size(c.maxWidth, c.maxHeight));
+              if ((scale - 1.0).abs() < 0.001) return child;
               final size = Size(c.maxWidth / scale, c.maxHeight / scale);
               return ClipRect(
                 child: Transform.scale(
@@ -132,7 +141,7 @@ class _ClassicZoomState extends ConsumerState<ClassicZoom> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: palette.border),
                   ),
-                  child: Text('${(scale * 100).round()}%',
+                  child: Text('${(userScale * 100).round()}%',
                       style: TextStyle(fontSize: 12, color: palette.textPrimary)),
                 ),
               ),
