@@ -101,7 +101,7 @@ class _MemberSheetState extends ConsumerState<MemberSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               m.hasCustomAvatar
-                  ? CircleAvatar(radius: 48, backgroundImage: NetworkImage(m.avatarUrl))
+                  ? CircleAvatar(radius: 48, backgroundImage: ResizeImage(NetworkImage(m.avatarUrl), width: 192, height: 192))
                   : StudiconAvatar(
                       studiconId: m.studiconId,
                       pose: CdnResolver.resolvePose(isStudying: m.isStudying, isPaused: m.isPaused, studyMs: m.studyMs),

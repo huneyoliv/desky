@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
+import 'core/diagnostics/crash_log.dart';
 import 'core/pdf/macos_document_channel.dart';
 import 'core/pdf/pdf_open_request.dart';
 import 'core/pdf/single_instance_channel.dart';
@@ -36,6 +37,8 @@ void main(List<String> args) async {
   // Keep decoded images bounded (default is 100 MB): the app shows many small
   // avatars, so a smaller cache keeps the desktop footprint low.
   PaintingBinding.instance.imageCache.maximumSizeBytes = 48 << 20;
+  // Uncaught errors go to crash.log in the app support folder.
+  await CrashLog.install();
 
   // Abrir um PDF pela associacao de arquivos: o caminho chega como argumento.
   final initialPdf = PdfOpenRequest.parse(args);
