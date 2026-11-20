@@ -226,6 +226,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
   }
 
   Widget _buildGroupCard(GroupModel group, AppTranslation t, {bool isMyGroup = false}) {
+    if (isMyGroup && ref.read(settingsNotifierProvider).classicYptLook) {
+      return _buildClassicGroupRow(group, t);
+    }
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       color: context.palette.card,
@@ -318,6 +321,64 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                 : t.tr('join', fallback: 'Entrar'),
             style: const TextStyle(color: Colors.white),
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Classic YPT look: a flat row with the group's name, a muted summary and
+  /// a chat button, like the "My groups" list of the YPT desktop app.
+  Widget _buildClassicGroupRow(GroupModel group, AppTranslation t) {
+    final palette = context.palette;
+    Future<void> open() async {
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => GroupDetailScreen(group: group)),
+      );
+      if (mounted) ref.read(authStateProvider.notifier).refreshUserGroups();
+    }
+
+    return InkWell(
+      onTap: open,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(group.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${group.category} · ${group.membersCount}/${group.maxCapacity} '
+                    '${t.tr('classic_people', fallback: 'people')} · ${group.leaderName}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 11, color: palette.textMuted),
+                  ),
+                ],
+              ),
+            ),
+            if (group.isPrivate)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Icon(Icons.lock_outline_rounded, size: 14, color: palette.textMuted),
+              ),
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(color: palette.card, borderRadius: BorderRadius.circular(8)),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                tooltip: t.tr('open', fallback: 'Open'),
+                icon: Icon(Icons.chat_bubble_rounded, size: 16, color: palette.textSecondary),
+                onPressed: open,
+              ),
+            ),
+          ],
         ),
       ),
     );
