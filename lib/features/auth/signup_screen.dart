@@ -358,7 +358,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             Text(
                               widget.oauthInfo != null
                                   ? t.tr('complete_profile', fallback: 'Complete seu Perfil')
-                                  : '${t.tr("step", fallback: "Passo")} $_currentStep ${t.tr("of", fallback: "de")} 3',
+                                  : '${t.tr("step", fallback: "Passo")} $_currentStep ${t.tr("of", fallback: "of")} 3',
                               style: TextStyle(
                                 color: context.appPrimary,
                                 fontWeight: FontWeight.bold,

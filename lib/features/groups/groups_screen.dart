@@ -38,7 +38,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
 
   List<Map<String, dynamic>> _getCategories(List<CategoryModel> countryCategories, AppTranslation t) {
     return [
-      {'id': 0, 'name': t.tr('all', fallback: 'Todos')},
+      {'id': 0, 'name': t.tr('all', fallback: 'All')},
       ...countryCategories.map((c) => {
             'id': c.id,
             'name': c.shortTitle.isNotEmpty ? c.shortTitle : c.title,
@@ -275,7 +275,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${group.category} • ${group.membersCount}/${group.maxCapacity} ${t.tr("members", fallback: "membros")} • ${t.tr("goal", fallback: "Meta")}: ${group.dailyGoalHours}h/${t.tr("today", fallback: "dia")}',
+                '${group.category} • ${group.membersCount}/${group.maxCapacity} ${t.tr("members_lower", fallback: "members")} • ${t.tr("goal", fallback: "Meta")}: ${group.dailyGoalHours}h/${t.tr("today", fallback: "dia")}',
                 style: TextStyle(
                   color: context.appTextSecondary,
                   fontSize: 13,
@@ -404,7 +404,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: t.tr('refresh', fallback: 'Atualizar'),
+            tooltip: t.tr('refresh', fallback: 'Refresh'),
             onPressed: () {
               ref.read(authStateProvider.notifier).refreshUserGroups();
               if (_tabController.index == 1) {
@@ -612,7 +612,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                           ElevatedButton.icon(
                                             onPressed: () => SelectCountryDialog.show(context),
                                             icon: const Icon(Icons.public_rounded, size: 18),
-                                            label: Text(t.tr('view_other_region_groups', fallback: 'Ver grupos de outra região')),
+                                            label: Text(t.tr('view_other_region_groups', fallback: 'See groups from another region')),
                                             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                                           ),
                                         ],

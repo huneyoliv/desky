@@ -220,7 +220,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${t.tr('pdf_open_failed', fallback: 'Não foi possível abrir o arquivo')}: '
+              '${t.tr('pdf_open_failed', fallback: 'Could not open the file')}: '
               '\${request.fileName ?? ''}',
             ),
             backgroundColor: AppColors.error,

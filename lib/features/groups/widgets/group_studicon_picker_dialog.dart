@@ -261,7 +261,7 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                         )
                       : Text(
-                          t.tr('apply', fallback: 'Definir para este Grupo'),
+                          t.tr('apply', fallback: 'Set for this group'),
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                 ),

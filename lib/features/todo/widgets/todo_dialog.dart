@@ -104,7 +104,7 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
               const SizedBox(height: 12),
               Text(
                 t.tr('todo_save_failed',
-                    fallback: 'Não foi possível salvar. Tente novamente.'),
+                    fallback: 'Could not save. Please try again.'),
                 style: TextStyle(color: AppColors.error, fontSize: 12),
               ),
             ],

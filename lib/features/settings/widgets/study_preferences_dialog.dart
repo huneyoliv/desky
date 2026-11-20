@@ -94,7 +94,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       contentPadding: EdgeInsets.zero,
                       activeColor: context.appPrimary,
                       title: Text(
-                        t.tr('drawer_settings_menu_show_rest', fallback: 'Exibir Tempo de Descanso'),
+                        t.tr('drawer_settings_menu_show_rest', fallback: 'Show break time'),
                         style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
@@ -111,7 +111,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       contentPadding: EdgeInsets.zero,
                       activeColor: context.appPrimary,
                       title: Text(
-                        t.tr('drawer_settings_menu_wake_notification', fallback: 'Notificações de Cutucada (Nudge)'),
+                        t.tr('drawer_settings_menu_wake_notification', fallback: 'Nudge notifications'),
                         style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
@@ -175,7 +175,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: Text(t.tr('close_btn', fallback: 'Concluir'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(t.tr('close_btn', fallback: 'Done'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
           ],

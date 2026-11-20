@@ -349,7 +349,7 @@ class TimerScreen extends ConsumerWidget {
                             const Icon(Icons.cloud_off, color: AppColors.warning, size: 18),
                             const SizedBox(width: 8),
                             Text(
-                              '${syncState.pendingCount} ${t.tr("pending", fallback: "pendente(s)")}',
+                              '${syncState.pendingCount} ${t.tr("pending", fallback: "pending")}',
                               style: const TextStyle(color: AppColors.warning, fontSize: 13, fontWeight: FontWeight.w600),
                             ),
                           ],
@@ -365,7 +365,7 @@ class TimerScreen extends ConsumerWidget {
                                         content: Text(
                                           res.remaining == 0
                                               ? t.tr('synchronized', fallback: 'Sincronizado!')
-                                              : '${res.totalSynced} ${t.tr("sent", fallback: "enviadas")}, ${res.remaining} ${t.tr("pending", fallback: "pendentes.")}',
+                                              : '${res.totalSynced} ${t.tr("sent", fallback: "sent")}, ${res.remaining} ${t.tr("pending_sentence", fallback: "pending.")}',
                                         ),
                                         backgroundColor: res.remaining == 0 ? AppColors.success : AppColors.warning,
                                       ),
@@ -379,7 +379,7 @@ class TimerScreen extends ConsumerWidget {
                                   child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.warning),
                                 )
                               : Text(
-                                  t.tr('refresh', fallback: 'Sincronizar'),
+                                  t.tr('refresh_sync', fallback: 'Sync'),
                                   style: const TextStyle(color: AppColors.warning, fontWeight: FontWeight.bold, fontSize: 12),
                                 ),
                         ),
@@ -483,8 +483,8 @@ class TimerScreen extends ConsumerWidget {
                             ),
                             label: Text(
                               isPomodoro
-                                  ? '${t.tr("start", fallback: "INICIAR")} $phaseLabel'.toUpperCase()
-                                  : t.tr("start", fallback: "INICIAR").toUpperCase(),
+                                  ? '${t.tr("start", fallback: "START")} $phaseLabel'.toUpperCase()
+                                  : t.tr("start", fallback: "START").toUpperCase(),
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
@@ -503,7 +503,7 @@ class TimerScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: const Icon(Icons.pause_rounded, color: Colors.white, size: 24),
-                            label: Text(t.tr('pause', fallback: 'PAUSAR').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                            label: Text(t.tr('pause', fallback: 'PAUSE').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                           ),
                           const SizedBox(width: 16),
                           ElevatedButton.icon(
@@ -514,7 +514,7 @@ class TimerScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: const Icon(Icons.stop_rounded, color: Colors.white, size: 24),
-                            label: Text(t.tr('stop', fallback: 'PARAR').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                            label: Text(t.tr('stop', fallback: 'STOP').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                           ),
                         ],
 
@@ -527,7 +527,7 @@ class TimerScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-                            label: Text(t.tr('restart', fallback: 'RETOMAR').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                            label: Text(t.tr('restart', fallback: 'RESUME').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                           ),
                           const SizedBox(width: 16),
                           ElevatedButton.icon(
@@ -538,7 +538,7 @@ class TimerScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: const Icon(Icons.stop_rounded, color: Colors.white, size: 24),
-                            label: Text(t.tr('stop', fallback: 'PARAR').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                            label: Text(t.tr('stop', fallback: 'STOP').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                           ),
                         ],
                       ],

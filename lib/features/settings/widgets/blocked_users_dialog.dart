@@ -51,7 +51,7 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    t.tr('drawer_settings_block_user_title', fallback: 'Usuários Bloqueados'),
+                    t.tr('drawer_settings_block_user_title', fallback: 'Blocked users'),
                     style: AppTextStyles.titleMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -109,7 +109,7 @@ class _BlockedUsersDialogState extends ConsumerState<BlockedUsersDialog> {
                       Icon(Icons.sentiment_satisfied_rounded, size: 40, color: context.appTextMuted),
                       const SizedBox(height: 12),
                       Text(
-                        t.tr('drawer_settings_block_user_empty_msg', fallback: 'Você não tem nenhum usuário bloqueado.'),
+                        t.tr('drawer_settings_block_user_empty_msg', fallback: 'You have not blocked anyone.'),
                         style: TextStyle(color: context.appTextSecondary, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),

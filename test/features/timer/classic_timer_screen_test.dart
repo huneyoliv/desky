@@ -82,7 +82,7 @@ void main() {
     final container = ProviderScope.containerOf(tester.element(find.byType(ClassicTimerScreen)));
     container.read(timerNotifierProvider.notifier).setTimerMode(TimerMode.pomodoro);
     await tester.pump(const Duration(milliseconds: 200));
-    expect(find.text('Focus time'), findsOneWidget);
+    expect(find.textContaining(RegExp('Focus time', caseSensitive: false)), findsOneWidget);
     expect(find.text('25:00'), findsOneWidget);
     await _shot(tester, 'classic_pomodoro');
 

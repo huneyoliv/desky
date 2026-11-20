@@ -117,7 +117,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
               Divider(color: context.appBorder),
               _buildStepper(
                 label: t.tr('cycles_to_long_break', fallback: 'Ciclos até Pausa Longa'),
-                value: '$_totalCycles ${t.tr("cycles", fallback: "ciclos")}',
+                value: '$_totalCycles ${t.tr("cycles", fallback: "cycles")}',
                 icon: Icons.repeat,
                 iconColor: AppColors.textSecondary,
                 onDecrement: _totalCycles > 2 ? () => setState(() => _totalCycles -= 1) : null,

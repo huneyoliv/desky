@@ -210,7 +210,7 @@ class FlashcardsScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${deck.cardCount} ${t.tr("cards", fallback: "cartões")}',
+                '${deck.cardCount} ${t.tr("cards", fallback: "cards")}',
                 style: TextStyle(color: context.appTextMuted, fontSize: 13),
               ),
               ElevatedButton.icon(

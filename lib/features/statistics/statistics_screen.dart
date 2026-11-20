@@ -288,8 +288,8 @@ class _StatsViews {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _caption('${tr('stats_avg_start', 'Avg start')}\n${avg(sumStart)}'),
-            _caption('${tr('stats_avg_end', 'Avg end')}\n${avg(sumEnd)}'),
+            _caption('${tr('stats_avg_begin', 'Avg start')}\n${avg(sumStart)}'),
+            _caption('${tr('stats_avg_finish', 'Avg end')}\n${avg(sumEnd)}'),
           ],
         ),
       ),
@@ -830,7 +830,7 @@ class _StatsViews {
       StatCard(child: totals(tr('stats_weekly_max', 'Weekly max'), [for (final (l, a, b) in weeklyB) (l, ms(a, b))])),
       StatCard(child: totals(tr('stats_monthly_max', 'Monthly max'), [for (final (l, a, b) in monthlyB) (l, ms(a, b))])),
       StatCard(
-        title: tr('stats_regularity', 'Study start/end regularity'),
+        title: tr('stats_trend_regularity', 'Study start/end regularity'),
         child: RangeBarsChart(ranges: [
           for (final d in regularityDays)
             if (data.spanOf(d) case final span?)

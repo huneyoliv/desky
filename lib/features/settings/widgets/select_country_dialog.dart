@@ -60,7 +60,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
   String _formatContinentLabel(String continent, AppTranslation t) {
     switch (continent) {
       case 'Todos':
-        return t.tr('all', fallback: 'Todos');
+        return t.tr('all', fallback: 'All');
       case 'South America':
         return t.tr('continent_south_america', fallback: 'América do Sul');
       case 'North America':
@@ -134,7 +134,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                   const SizedBox(height: 4),
                   // Deixa explicito que nao existe etapa de senha: a troca e
                   // aplicada na hora, neste dispositivo, como no app oficial.
-                  Text('• ${t.tr("change_region_no_password", fallback: "A troca é aplicada imediatamente neste dispositivo, sem pedir senha.")}',
+                  Text('• ${t.tr("change_region_no_password", fallback: "The change applies right away on this device, without a password.")}',
                       style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                 ],
               ),

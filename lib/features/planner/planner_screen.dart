@@ -125,7 +125,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text(t.tr('alert_todo_add', fallback: 'Nova Tarefa do Planner'), style: const TextStyle(color: Colors.white)),
+          title: Text(t.tr('alert_todo_add', fallback: 'New planner task'), style: const TextStyle(color: Colors.white)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -392,7 +392,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text('${t.tr("delete", fallback: "Excluir")} "${todo.title}"?', style: const TextStyle(color: Colors.white)),
+          title: Text('${t.tr("delete", fallback: "Delete")} "${todo.title}"?', style: const TextStyle(color: Colors.white)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,7 +679,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      '${t.tr("today", fallback: "Progresso")}: $completedCount / $totalCount ${t.tr("done", fallback: "concluídas")}',
+                                      '${t.tr("today", fallback: "Progresso")}: $completedCount / $totalCount ${t.tr("done_count", fallback: "done")}',
                                       style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600),
@@ -725,7 +725,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                               size: 48, color: context.appTextMuted),
                                           const SizedBox(height: 12),
                                           Text(
-                                            t.tr('alert_todo_add_error', fallback: 'Nenhuma tarefa agendada para este dia.'),
+                                            t.tr('alert_todo_add_error', fallback: 'No tasks scheduled for this day.'),
                                             style: TextStyle(color: context.appTextSecondary),
                                           ),
                                           const SizedBox(height: 12),

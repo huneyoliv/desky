@@ -84,7 +84,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: t.tr('refresh', fallback: 'Atualizar'),
+            tooltip: t.tr('refresh', fallback: 'Refresh'),
             onPressed: _loadMyStudicons,
           ),
           const SizedBox(width: 16),

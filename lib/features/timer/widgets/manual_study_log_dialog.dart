@@ -155,7 +155,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
               ],
 
               // Subject Dropdown
-              Text(t.tr('subjects', fallback: 'Matéria:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
+              Text(t.tr('subjects', fallback: 'Subject:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               DropdownButtonFormField<SubjectModel>(
                 value: _selectedSubject,
