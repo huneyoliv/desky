@@ -6,6 +6,7 @@ import 'package:desky/data/models/subject_model.dart';
 import 'package:desky/data/repositories/subject_repository.dart';
 import 'package:desky/data/repositories/timer_repository.dart';
 import 'package:desky/features/timer/classic_timer_screen.dart';
+import 'package:desky/features/timer/focus_mode_notifier.dart';
 import 'package:desky/features/timer/timer_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -97,5 +98,28 @@ void main() {
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 5));
+  });
+
+  testWidgets('Focus mode and mini player use the minimal Focusing view', (tester) async {
+    tester.view.physicalSize = const Size(360, 208);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final focus = FocusModeNotifier()..state = const FocusModeState(isMiniPlayer: true, isStrictFocus: true);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        timerRepositoryProvider.overrideWithValue(_Timer()),
+        subjectRepositoryProvider.overrideWithValue(_Subjects()),
+        focusModeProvider.overrideWith((ref) => focus),
+        appTranslationProvider.overrideWith(
+          (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'en'),
+        ),
+      ],
+      child: const MaterialApp(home: ClassicTimerScreen()),
+    ));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.byKey(const ValueKey('classic-focusing-time')), findsOneWidget);
+    expect(find.byKey(const ValueKey('classic-edit-subject')), findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
   });
 }

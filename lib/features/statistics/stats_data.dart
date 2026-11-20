@@ -31,7 +31,14 @@ DateTime mondayOf(DateTime d) => dateOnly(d).subtract(Duration(days: d.weekday -
 /// Built once from the `/logs/range/days` payload; every chart of the
 /// Statistics screen is a pure function of this object, so it is easy to test.
 class StatsData {
-  StatsData._(this.sessions, this.dailyMs, this.dailySubjectMs);
+  StatsData._(this.sessions, this.dailyMs, this.dailySubjectMs) {
+    for (final s in sessions) {
+      (_byDay[s.day] ??= []).add(s);
+    }
+  }
+
+  /// Sessions per study day, so day lookups do not scan the whole history.
+  final Map<DateTime, List<StatSession>> _byDay = {};
 
   static final StatsData empty = StatsData._(const [], const {}, const {});
 
@@ -100,7 +107,15 @@ class StatsData {
 
   List<StatSession> sessionsBetween(DateTime from, DateTime to) {
     final a = dateOnly(from), b = dateOnly(to);
-    return sessions.where((s) => !s.day.isBefore(a) && !s.day.isAfter(b)).toList();
+    if (b.difference(a).inDays > 400) {
+      return sessions.where((s) => !s.day.isBefore(a) && !s.day.isAfter(b)).toList();
+    }
+    final out = <StatSession>[];
+    for (var d = a; !d.isAfter(b); d = DateTime(d.year, d.month, d.day + 1)) {
+      final list = _byDay[d];
+      if (list != null) out.addAll(list);
+    }
+    return out;
   }
 
   /// Subject totals of the window, largest first.

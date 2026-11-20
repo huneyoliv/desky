@@ -47,7 +47,13 @@ class ClassicTimerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(timerNotifierProvider);
+    final focus = ref.watch(focusModeProvider);
     final palette = context.palette;
+    // Focus mode and the mini player: YPT's minimal "Focusing" screen, which
+    // also keeps a fixed layout for an OBS crop.
+    if (focus.isStrictFocus || focus.isMiniPlayer) {
+      return Scaffold(backgroundColor: palette.background, body: const _FocusingView());
+    }
     if (state.isRunning) {
       return Scaffold(backgroundColor: palette.background, body: const _StudyingView());
     }
@@ -368,6 +374,70 @@ class _DialPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DialPainter old) => old.progress != progress || old.color != color;
+}
+
+class _FocusingView extends ConsumerWidget {
+  const _FocusingView();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(appTranslationProvider);
+    final state = ref.watch(timerNotifierProvider);
+    final notifier = ref.read(timerNotifierProvider.notifier);
+    final palette = context.palette;
+    final isPomodoro = state.mode == TimerMode.pomodoro;
+    final String label;
+    final String value;
+    if (state.isPaused) {
+      label = t.tr('classic_break', fallback: 'Break');
+      value = _mmss(state.sessionRestMs);
+    } else if (state.isRunning) {
+      label = isPomodoro
+          ? t.tr('classic_remaining_time', fallback: 'Remaining time')
+          : t.tr('classic_focusing', fallback: 'Focusing');
+      value = isPomodoro ? _mmss(state.pomodoroRemainingMs) : _clock(state.sessionElapsedMs);
+    } else {
+      label = t.tr('classic_total_today', fallback: 'Total time today');
+      value = _clock(state.todayTotalMs);
+    }
+
+    return Center(
+      child: FittedBox(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: TextStyle(fontSize: 12, color: palette.textSecondary)),
+              Text(
+                value,
+                key: const ValueKey('classic-focusing-time'),
+                style: TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w600,
+                  color: palette.textPrimary,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+              Text(
+                '${state.currentSubject?.title ?? ''}  ${_clock(state.todayTotalMs)}',
+                style: TextStyle(fontSize: 11, color: palette.textMuted),
+              ),
+              const SizedBox(height: 10),
+              if (state.isRunning)
+                _RoundButton(
+                    icon: Icons.pause_rounded, tooltip: t.tr('pause', fallback: 'Pause'), onTap: notifier.pauseStudy)
+              else if (state.isPaused)
+                _RoundButton(
+                    icon: Icons.play_arrow_rounded,
+                    tooltip: t.tr('restart', fallback: 'Resume'),
+                    onTap: notifier.startStudy),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _StudyingView extends ConsumerWidget {

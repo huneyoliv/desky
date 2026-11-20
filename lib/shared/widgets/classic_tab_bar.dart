@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/localization/app_translation.dart';
 import '../../core/theme/theme_palette.dart';
+import '../../data/repositories/notification_repository.dart';
 import '../../features/auth/auth_notifier.dart';
 import '../../features/settings/widgets/app_settings_dialog.dart';
 import '../../features/settings/widgets/theme_selection_dialog.dart';
@@ -72,7 +73,13 @@ class ClassicTabBar extends ConsumerWidget {
           IconButton(
             key: const ValueKey('classic-more-button'),
             tooltip: t.tr('classic_more', fallback: 'All features'),
-            icon: Icon(Icons.grid_view_rounded, size: 18, color: palette.textSecondary),
+            icon: Badge(
+              isLabelVisible: ref
+                  .watch(unreadNotificationCountProvider)
+                  .maybeWhen(data: (n) => n > 0, orElse: () => false),
+              smallSize: 7,
+              child: Icon(Icons.grid_view_rounded, size: 18, color: palette.textSecondary),
+            ),
             onPressed: () => ClassicFeatureMenu.show(context),
           ),
         ],

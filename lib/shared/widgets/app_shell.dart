@@ -25,36 +25,32 @@ class AppShell extends ConsumerWidget {
     final palette = context.palette;
     final classic = ref.watch(settingsNotifierProvider.select((s) => s.classicYptLook));
 
-    if (classic) {
-      return Scaffold(
-        backgroundColor: palette.background,
-        body: Column(
-          children: [
-            if (!isFocusActive) ClassicTabBar(currentRoute: currentRoute),
-            Expanded(child: child),
-          ],
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: palette.background,
       body: Stack(
         children: [
-          Row(
-            children: [
-              if (!isFocusActive) ...[
-                SidebarNav(currentRoute: currentRoute),
-                Container(
-                  width: 1,
-                  color: palette.border,
+          if (classic)
+            Column(
+              children: [
+                if (!isFocusActive) ClassicTabBar(currentRoute: currentRoute),
+                Expanded(child: child),
+              ],
+            )
+          else
+            Row(
+              children: [
+                if (!isFocusActive) ...[
+                  SidebarNav(currentRoute: currentRoute),
+                  Container(
+                    width: 1,
+                    color: palette.border,
+                  ),
+                ],
+                Expanded(
+                  child: child,
                 ),
               ],
-              Expanded(
-                child: child,
-              ),
-            ],
-          ),
+            ),
 
           // Floating Exit Focus Button when in Focus Mode
           if (isFocusActive)

@@ -59,6 +59,7 @@ class AppTranslation {
     'classic_tab_groups': ['tab_group'],
     'classic_tab_statistics': ['tab_statistics'],
     'classic_focus_time': ['focus_time'],
+    'classic_focusing': ['study_table_studying_time'],
     'classic_break': ['pomodoro_rest_title'],
     'classic_finish': ['pomodoro_end_button'],
     'classic_edit_subject': ['subject_edit'],
