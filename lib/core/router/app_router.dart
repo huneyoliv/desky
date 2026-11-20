@@ -1,4 +1,5 @@
 import '../../features/statistics/statistics_screen.dart';
+import '../../features/timer/classic_timer_screen.dart';
 import '../../features/statistics/study_calendar_screen.dart';
 import '../../features/planner/timetable_screen.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_notifier.dart';
 import '../../features/auth/login_screen.dart';
-import '../../features/timer/timer_screen.dart';
 import '../../features/groups/groups_screen.dart';
 import '../../features/planner/planner_screen.dart';
 import '../../features/ranks/ranks_screen.dart';
@@ -61,7 +61,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/home',
-            builder: (context, state) => const TimerScreen(),
+            builder: (context, state) => const HomeTimerScreen(),
           ),
           GoRoute(
             path: '/groups',

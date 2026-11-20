@@ -73,7 +73,7 @@ Future<void> _loadFonts() async {
   await loader.load();
 }
 
-/// Set DESKY_SCREENSHOTS=<dir> to save PNGs of each tab for a visual check.
+/// Set DESKY_SCREENSHOTS to a directory to save PNGs of each tab for a visual check.
 Future<void> _shot(WidgetTester tester, String name) async {
   final dir = Platform.environment['DESKY_SCREENSHOTS'];
   if (dir == null) return;
