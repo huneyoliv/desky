@@ -73,6 +73,61 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Classic YPT Look (Settings → Classic YPT look)**: An optional layout modelled on the YPT
+  desktop app. Tabs along the top (Timer, To-Do, Calendar, Groups, Statistics, Weekly planner)
+  replace the sidebar, and a grid button opens every other feature (Rankings, Pomodoro, Edit log,
+  PDF reader, Flashcards, Mission, Theme, Studicon, Planner, Notice, Profile, Settings, Log out)
+  with the unread-notification dot. Off by default; the sidebar layout is unchanged.
+- **Statistics Screen**: Day, Week, Month, Period and Trend tabs built from the real study
+  history: heatmap calendar, quarter and year grids, today vs yesterday / last week / last month,
+  start and end times, subject donuts, stacked bars and cumulative charts, hour grid, session
+  timeline, average focus by hour and weekday, and a subject filter on Trend.
+- **Classic Timer, Calendar, To-Do and Groups**: The timer lists subjects with a play button and
+  today's time per subject, shows the Pomodoro and break dials, and the live member grid of the
+  user's groups while studying. Calendar shows each day's study time on a month grid. To-Do groups
+  tasks by subject with an inline "+" (sent with the subject to the API). My groups is a compact
+  list.
+- **Settings Gear in the Timer Header**: Discord Rich Presence, OBS overlay mode and the Classic
+  look are configured in one place.
+- **OBS Overlay Mode (Windows)**: When on, minimizing sends the window behind the others instead of
+  minimizing it, so an OBS Window Capture keeps receiving frames.
+
+### Fixed
+
+- **One OBS Crop for Every Timer State (Classic look)**: The header and the timer box have a fixed
+  size and position whether idle, in Pomodoro, studying or on a break; a test checks the box's
+  rect is identical in all four.
+- **Discord Kept Showing the Timer After Stopping**: Presence was resent every second, over
+  Discord's limit of 5 updates per 20 s, so the clear on stop was dropped; reconnects could also
+  open several pipes. Updates are now serialised, sent only on change and at most every 5 s, the
+  clear is immediate, and a failed clear closes the connection. Turning Rich Presence off now
+  disconnects completely.
+- **Studicon Not Rendering on Discord**: Users without a CDN studicon got a `/sc.v2/-1/` URL that
+  does not exist; they now get the bundled studicon PNGs.
+- **Discord Showed "Desky"**: The presence texts say YPT. The "Playing ..." name is the Discord
+  application's; a `DISCORD_CLIENT_ID` in a `.env` next to the executable now overrides the
+  build-time id, so it can point to an application named YPT.
+- **Portuguese Text Shown to Other Languages**: Strings with no translation fell back to Portuguese
+  for every language. Defaults are now English; Portuguese users keep their wording. New labels
+  reuse YPT's own keys, so all 28 locales have them.
+- **Exit-Focus Button Missing in the Classic Look**: Restored for Focus mode and the mini player,
+  which now show a minimal fixed "Focusing" view.
+
+### Performance
+
+- Statistics history is released from memory 3 minutes after leaving Statistics and Calendar,
+  refetched only when the user changes, and indexed per day.
+- Studicons are decoded at display size and the image cache is capped at 48 MB.
+
+### Credits
+
+- Classic YPT look, Statistics, OBS overlay mode and the Discord fixes contributed by
+  **SxjeeL** (built with Claude Code).
+
 ## [1.2.1] - 2026-11-19
 
 ### Fixed
