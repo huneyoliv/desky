@@ -745,7 +745,7 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
 
   Future<void> _load({bool force = false}) async {
     final groups = ref.read(authStateProvider).user?.userGroups ?? const [];
-    if (groups.isEmpty) return;
+    if (groups.isEmpty || ref.read(settingsNotifierProvider).offlineMode) return;
     final group = groups[_index % groups.length];
     if (!force && _loadedGroup == group.id) return;
     _loadedGroup = group.id;
@@ -779,6 +779,14 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
     final palette = context.palette;
     final groups = ref.watch(authStateProvider.select((s) => s.user?.userGroups)) ?? const [];
     final myId = ref.watch(authStateProvider.select((s) => s.user?.id));
+    if (ref.watch(settingsNotifierProvider.select((s) => s.offlineMode))) {
+      return ClassicCard(
+        child: Center(
+          child: Text(t.tr('classic_group_offline', fallback: 'Offline mode: your group shows up when you go online.'),
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: palette.textMuted)),
+        ),
+      );
+    }
     if (groups.isEmpty) {
       return ClassicCard(
         child: Center(

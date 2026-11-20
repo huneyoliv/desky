@@ -5,7 +5,9 @@ import '../../core/localization/app_translation.dart';
 import '../../core/theme/theme_palette.dart';
 import '../../data/repositories/notification_repository.dart';
 import '../../features/auth/auth_notifier.dart';
+import '../../features/settings/settings_notifier.dart';
 import '../../features/settings/widgets/app_settings_dialog.dart';
+import '../../features/timer/offline_sync_notifier.dart';
 import '../../features/settings/widgets/theme_selection_dialog.dart';
 import '../../features/timer/timer_notifier.dart';
 import '../../features/timer/widgets/manual_study_log_dialog.dart';
@@ -69,7 +71,8 @@ class ClassicTabBar extends ConsumerWidget {
                 onTap: () => context.go(tab.route),
               ),
             ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
+          const _SyncIndicator(),
           IconButton(
             key: const ValueKey('classic-more-button'),
             tooltip: t.tr('classic_more', fallback: 'All features'),
@@ -187,6 +190,16 @@ class ClassicFeatureMenu extends ConsumerWidget {
             go('/home');
           }),
           item('classic_edit_log', 'Edit log', Icons.edit_outlined, () => open(ManualStudyLogDialog.show)),
+          item(
+            'classic_offline_mode',
+            ref.read(settingsNotifierProvider).offlineMode ? 'Go online' : 'Offline mode',
+            Icons.cloud_off_outlined,
+            () {
+              Navigator.of(context).pop();
+              final n = ref.read(settingsNotifierProvider.notifier);
+              n.toggleOfflineMode(!ref.read(settingsNotifierProvider).offlineMode);
+            },
+          ),
         ],
       ),
       (
@@ -272,6 +285,65 @@ class _MenuItem extends StatelessWidget {
               child: Text(label, style: TextStyle(fontSize: 14, color: palette.textPrimary)),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Offline / unsynced indicator in the tab bar. Hidden when online with
+/// nothing waiting; otherwise a cloud chip that syncs or toggles offline mode.
+class _SyncIndicator extends ConsumerWidget {
+  const _SyncIndicator();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
+    final offline = ref.watch(settingsNotifierProvider.select((s) => s.offlineMode));
+    final sync = ref.watch(offlineSyncNotifierProvider);
+    if (!offline && !sync.hasPending) return const SizedBox.shrink();
+
+    final label = offline
+        ? t.tr('classic_offline', fallback: 'Offline')
+        : '${sync.pendingCount} ${t.tr('classic_unsynced', fallback: 'to sync')}';
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: PopupMenuButton<String>(
+        key: const ValueKey('classic-sync-indicator'),
+        tooltip: label,
+        color: palette.card,
+        onSelected: (v) {
+          if (v == 'sync') ref.read(offlineAutoSyncProvider).trigger();
+          if (v == 'toggle') ref.read(settingsNotifierProvider.notifier).toggleOfflineMode(!offline);
+        },
+        itemBuilder: (_) => [
+          if (!offline && sync.hasPending)
+            PopupMenuItem(
+              value: 'sync',
+              child: Text('${t.tr('classic_sync_now', fallback: 'Sync now')} (${sync.pendingCount})'),
+            ),
+          PopupMenuItem(
+            value: 'toggle',
+            child: Text(offline
+                ? t.tr('classic_go_online', fallback: 'Go online')
+                : t.tr('classic_offline_mode', fallback: 'Offline mode')),
+          ),
+        ],
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: (offline ? const Color(0xFFFF9F0A) : palette.primary).withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            sync.isSyncing
+                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                : Icon(offline ? Icons.cloud_off_rounded : Icons.cloud_upload_outlined,
+                    size: 16, color: offline ? const Color(0xFFFF9F0A) : palette.primary),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(fontSize: 13, color: palette.textPrimary)),
+          ]),
         ),
       ),
     );

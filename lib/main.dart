@@ -27,6 +27,7 @@ import 'features/auth/auth_notifier.dart';
 import 'features/settings/settings_notifier.dart';
 import 'features/settings/theme_notifier.dart';
 import 'features/timer/focus_mode_notifier.dart';
+import 'features/timer/offline_sync_notifier.dart';
 import 'features/timer/timer_notifier.dart';
 import 'shared/widgets/app_title_bar.dart';
 
@@ -198,6 +199,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
       } catch (_) {}
       ref.read(authStateProvider.notifier).checkAuthStatus();
       ref.read(discordRpcCoordinatorProvider);
+      ref.read(offlineAutoSyncProvider);
     });
   }
 
@@ -348,6 +350,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
     if (state == AppLifecycleState.resumed) {
       try {
         ref.read(timerNotifierProvider.notifier).reconcileWithServer();
+        ref.read(offlineAutoSyncProvider).trigger();
       } catch (_) {}
     }
   }

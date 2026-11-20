@@ -29,6 +29,10 @@ class SettingsState {
 
   /// Opacity of the floating mini player (0.3 to 1.0).
   final double miniOpacity;
+
+  /// Offline mode: no network calls from the timer; sessions are queued and
+  /// synced when it is turned off.
+  final bool offlineMode;
   final bool betaChannel;
 
   const SettingsState({
@@ -49,6 +53,7 @@ class SettingsState {
     this.classicYptLook = false,
     this.classicUiScale = 1.0,
     this.miniOpacity = 0.95,
+    this.offlineMode = false,
     this.betaChannel = false,
   });
 
@@ -70,6 +75,7 @@ class SettingsState {
     bool? classicYptLook,
     double? classicUiScale,
     double? miniOpacity,
+    bool? offlineMode,
     bool? betaChannel,
   }) {
     return SettingsState(
@@ -90,6 +96,7 @@ class SettingsState {
       classicYptLook: classicYptLook ?? this.classicYptLook,
       classicUiScale: classicUiScale ?? this.classicUiScale,
       miniOpacity: miniOpacity ?? this.miniOpacity,
+      offlineMode: offlineMode ?? this.offlineMode,
       betaChannel: betaChannel ?? this.betaChannel,
     );
   }

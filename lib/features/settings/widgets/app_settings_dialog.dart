@@ -79,6 +79,14 @@ class AppSettingsDialog extends ConsumerWidget {
             ),
             Divider(color: context.appBorder, height: 16),
             toggle(
+              title: t.tr('classic_offline_mode', fallback: 'Offline mode'),
+              subtitle: t.tr('classic_offline_desc',
+                  fallback: 'Study without internet: sessions are saved on this device and sent when you turn it off'),
+              value: settings.offlineMode,
+              onChanged: notifier.toggleOfflineMode,
+            ),
+            Divider(color: context.appBorder, height: 16),
+            toggle(
               title: t.tr('discord_rpc_title', fallback: 'Discord Rich Presence'),
               subtitle: t.tr('discord_rpc_desc',
                   fallback: 'Display subject and study time in real-time on Discord status'),

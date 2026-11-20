@@ -41,6 +41,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final classicYptLook = await _repository.getClassicYptLook();
       final classicUiScale = await _repository.getClassicUiScale();
       final miniOpacity = await _repository.getMiniOpacity();
+      final offlineMode = await _repository.getOfflineMode();
       final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
@@ -57,6 +58,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         classicYptLook: classicYptLook,
         classicUiScale: classicUiScale,
         miniOpacity: miniOpacity,
+        offlineMode: offlineMode,
         betaChannel: betaChannel,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
@@ -174,6 +176,11 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     final clamped = value.clamp(0.3, 1.0).toDouble();
     state = state.copyWith(miniOpacity: clamped);
     await _repository.saveMiniOpacity(clamped);
+  }
+
+  Future<void> toggleOfflineMode(bool value) async {
+    state = state.copyWith(offlineMode: value);
+    await _repository.saveOfflineMode(value);
   }
 
   /// Opts in or out of pre-release update checks.

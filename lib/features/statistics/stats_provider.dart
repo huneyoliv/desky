@@ -4,7 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../auth/auth_notifier.dart';
 import '../ranks/ranks_screen.dart' show rankRepositoryProvider;
+import '../settings/settings_notifier.dart';
 import 'stats_data.dart';
+
+/// Statistics need the server; raised while Offline mode is on.
+class StatsOfflineException implements Exception {
+  const StatsOfflineException();
+}
 
 /// Study history from January of last year until today.
 ///
@@ -20,6 +26,10 @@ final statisticsDataProvider = FutureProvider.autoDispose<StatsData>((ref) async
   ref.onDispose(() => release?.cancel());
 
   // Only the id: refreshing the user's groups or avatar must not refetch.
+  // Offline mode: fail at once instead of waiting on eight network timeouts.
+  if (ref.watch(settingsNotifierProvider.select((s) => s.offlineMode))) {
+    throw const StatsOfflineException();
+  }
   final userId = ref.watch(authStateProvider.select((s) => s.user?.id));
   if (userId == null) return StatsData.empty;
   final repo = ref.read(rankRepositoryProvider);

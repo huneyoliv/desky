@@ -100,7 +100,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             child: async.when(
               loading: () => const Center(child: CircularProgressIndicator(color: kStatOrange)),
               error: (e, _) => Center(
-                child: Text(t.tr('stats_load_failed', fallback: 'Could not load statistics'),
+                child: Text(e is StatsOfflineException
+                        ? t.tr('stats_offline', fallback: 'Statistics need a connection. Turn off Offline mode to load them.')
+                        : t.tr('stats_load_failed', fallback: 'Could not load statistics'),
                     style: TextStyle(color: palette.textSecondary)),
               ),
               data: (data) => _StatsViews(

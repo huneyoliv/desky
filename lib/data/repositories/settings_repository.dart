@@ -33,6 +33,7 @@ class SettingsRepository {
   static const String keyClassicYptLook = 'classic_ypt_look';
   static const String keyClassicUiScale = 'classic_ui_scale';
   static const String keyMiniOpacity = 'mini_opacity';
+  static const String keyOfflineMode = 'offline_mode';
   static const String keyThemePreset = 'selected_theme_preset';
   static const String keyBetaChannel = 'beta_update_channel';
 
@@ -424,6 +425,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setDouble(keyMiniOpacity, value);
+    } catch (_) {}
+  }
+
+  Future<bool> getOfflineMode() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getBool(keyOfflineMode) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> saveOfflineMode(bool value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setBool(keyOfflineMode, value);
     } catch (_) {}
   }
 
