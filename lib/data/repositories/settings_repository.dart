@@ -31,6 +31,7 @@ class SettingsRepository {
   static const String keyDiscordRpc = 'discord_rpc_enabled';
   static const String keyObsOverlayMode = 'obs_overlay_mode';
   static const String keyClassicYptLook = 'classic_ypt_look';
+  static const String keyClassicUiScale = 'classic_ui_scale';
   static const String keyThemePreset = 'selected_theme_preset';
   static const String keyBetaChannel = 'beta_update_channel';
 
@@ -390,6 +391,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setBool(keyClassicYptLook, value);
+    } catch (_) {}
+  }
+
+  Future<double> getClassicUiScale() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getDouble(keyClassicUiScale) ?? 1.0;
+    } catch (_) {
+      return 1.0;
+    }
+  }
+
+  Future<void> saveClassicUiScale(double value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setDouble(keyClassicUiScale, value);
     } catch (_) {}
   }
 

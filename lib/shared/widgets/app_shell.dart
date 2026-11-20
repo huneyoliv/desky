@@ -5,6 +5,7 @@ import '../../core/localization/app_translation.dart';
 import '../../features/timer/focus_mode_notifier.dart';
 import '../../features/settings/settings_notifier.dart';
 import 'classic_tab_bar.dart';
+import 'classic_zoom.dart';
 import 'sidebar_nav.dart';
 
 class AppShell extends ConsumerWidget {
@@ -33,7 +34,7 @@ class AppShell extends ConsumerWidget {
             Column(
               children: [
                 if (!isFocusActive) ClassicTabBar(currentRoute: currentRoute),
-                Expanded(child: child),
+                Expanded(child: ClassicZoom(child: child)),
               ],
             )
           else

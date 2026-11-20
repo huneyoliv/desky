@@ -23,6 +23,9 @@ class SettingsState {
 
   /// Layout modelled on the YPT desktop app: top tabs instead of the sidebar.
   final bool classicYptLook;
+
+  /// Zoom of the Classic look (1.0 = 100 %), changed with Ctrl +/- or Ctrl + wheel.
+  final double classicUiScale;
   final bool betaChannel;
 
   const SettingsState({
@@ -41,6 +44,7 @@ class SettingsState {
     this.discordRpcEnabled = true,
     this.obsOverlayMode = false,
     this.classicYptLook = false,
+    this.classicUiScale = 1.0,
     this.betaChannel = false,
   });
 
@@ -60,6 +64,7 @@ class SettingsState {
     bool? discordRpcEnabled,
     bool? obsOverlayMode,
     bool? classicYptLook,
+    double? classicUiScale,
     bool? betaChannel,
   }) {
     return SettingsState(
@@ -78,6 +83,7 @@ class SettingsState {
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
       obsOverlayMode: obsOverlayMode ?? this.obsOverlayMode,
       classicYptLook: classicYptLook ?? this.classicYptLook,
+      classicUiScale: classicUiScale ?? this.classicUiScale,
       betaChannel: betaChannel ?? this.betaChannel,
     );
   }
