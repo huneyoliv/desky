@@ -14,6 +14,7 @@ import 'lifecycle_poll_coordinator.dart';
 import 'widgets/sticker_picker_panel.dart';
 import 'widgets/group_studicon_picker_dialog.dart';
 import 'widgets/member_live_timer.dart';
+import 'widgets/member_sheet.dart';
 import '../../data/models/sticker_model.dart';
 import '../../shared/widgets/studicon_avatar.dart';
 import '../../core/cdn/cdn_resolver.dart';
@@ -1020,7 +1021,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       pose = StudiconPose.normal1;
     }
 
-    return Container(
+    // Left click opens the member card: stats, weekly rank and Nudge.
+    return InkWell(
+      key: ValueKey('group-member-${member.userId}'),
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => MemberSheet.show(context, groupId: widget.group.id, member: member),
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: context.palette.card,
@@ -1126,6 +1132,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           ],
         ],
       ),
+    ),
     );
   }
 }
