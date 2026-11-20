@@ -31,6 +31,9 @@ import 'shared/widgets/app_title_bar.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Keep decoded images bounded (default is 100 MB): the app shows many small
+  // avatars, so a smaller cache keeps the desktop footprint low.
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 48 << 20;
 
   // Abrir um PDF pela associacao de arquivos: o caminho chega como argumento.
   final initialPdf = PdfOpenRequest.parse(args);
