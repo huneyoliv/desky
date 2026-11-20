@@ -32,6 +32,9 @@ class StudiconAvatar extends StatelessWidget {
     }
 
     final primaryUrl = CdnResolver.studiconUrl(studiconId, pose);
+    // Decode at the size it is drawn, not the CDN's full resolution: group
+    // grids show dozens of these and full-size bitmaps add up quickly.
+    final cachePx = (size * MediaQuery.devicePixelRatioOf(context)).round();
     final fallbackAsset = CdnResolver.defaultStudiconAsset(
       pose,
       isStudying: isStudying,
@@ -42,6 +45,7 @@ class StudiconAvatar extends StatelessWidget {
       child: CachedNetworkImage(
         key: ValueKey(primaryUrl),
         imageUrl: primaryUrl,
+        memCacheWidth: cachePx,
         width: size,
         height: size,
         fit: BoxFit.contain,
