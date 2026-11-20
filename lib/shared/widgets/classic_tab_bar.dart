@@ -51,7 +51,7 @@ class ClassicTabBar extends ConsumerWidget {
     final active = tabFor(currentRoute);
 
     return Container(
-      height: 40,
+      height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: palette.surface,
@@ -107,17 +107,17 @@ class _TabButton extends StatelessWidget {
     final palette = context.palette;
     final color = selected ? palette.textPrimary : palette.textMuted;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
       child: Material(
         color: selected ? palette.card : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           onTap: onTap,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 14, color: color),
+              Icon(icon, size: 18, color: color),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -125,7 +125,7 @@ class _TabButton extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     color: color,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                   ),
@@ -225,7 +225,7 @@ class ClassicFeatureMenu extends ConsumerWidget {
       elevation: 12,
       borderRadius: BorderRadius.circular(14),
       child: Container(
-        width: 360,
+        width: 400,
         padding: const EdgeInsets.all(14),
         child: Wrap(
           spacing: 12,
@@ -237,7 +237,7 @@ class ClassicFeatureMenu extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: TextStyle(fontSize: 10, color: palette.textMuted)),
+                    Text(title, style: TextStyle(fontSize: 12, color: palette.textMuted)),
                     const SizedBox(height: 4),
                     ...items,
                   ],
@@ -269,7 +269,7 @@ class _MenuItem extends StatelessWidget {
             Icon(icon, size: 15, color: palette.textSecondary),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(label, style: TextStyle(fontSize: 12, color: palette.textPrimary)),
+              child: Text(label, style: TextStyle(fontSize: 14, color: palette.textPrimary)),
             ),
           ],
         ),

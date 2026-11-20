@@ -105,7 +105,7 @@ void main() {
 
   testWidgets('every Statistics tab renders without layout errors', (tester) async {
     await tester.runAsync(_loadFonts);
-    tester.view.physicalSize = const Size(1500, 2600);
+    tester.view.physicalSize = const Size(1900, 2600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 

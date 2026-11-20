@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../shared/widgets/classic_layout.dart';
 import '../../core/localization/app_translation.dart';
 import '../../core/theme/theme_palette.dart';
 import '../../data/models/todo_item_model.dart';
@@ -57,9 +58,8 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
     final palette = context.palette;
     final state = ref.watch(todoNotifierProvider);
     final notifier = ref.read(todoNotifierProvider.notifier);
-    final subjects = ref.watch(timerNotifierProvider.select((s) => s.subjects))
-        .where((s) => !s.isArchived && !s.isDeleted)
-        .toList();
+    final subjects =
+        ref.watch(timerNotifierProvider.select((s) => s.subjects)).where((s) => !s.isArchived && !s.isDeleted).toList();
     final active = DateTime.tryParse(notifier.activeDay) ?? DateTime.now();
     final monday = mondayOf(active);
     final today = DateUtils.dateOnly(DateTime.now());
@@ -82,8 +82,7 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
               children: [
                 Container(width: 3, height: 14, color: color),
                 const SizedBox(width: 6),
-                Text(title,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.textPrimary)),
                 const SizedBox(width: 4),
                 InkWell(
                   key: ValueKey('classic-todo-add-$id'),
@@ -110,11 +109,11 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
               child: TextField(
                 controller: _controller,
                 autofocus: true,
-                style: TextStyle(fontSize: 12, color: palette.textPrimary),
+                style: TextStyle(fontSize: 14, color: palette.textPrimary),
                 decoration: InputDecoration(
                   isDense: true,
                   hintText: t.tr('classic_enter_todo', fallback: 'Enter to-do'),
-                  hintStyle: TextStyle(fontSize: 12, color: palette.textMuted),
+                  hintStyle: TextStyle(fontSize: 14, color: palette.textMuted),
                 ),
                 onSubmitted: (_) => _submit(),
                 onTapOutside: (_) => _submit(),
@@ -126,59 +125,61 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
 
     return Scaffold(
       backgroundColor: palette.background,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Row(
-              children: [
-                Text(DateFormat('EEE, M/d').format(active),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: palette.textPrimary)),
-                const Spacer(),
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  icon: Icon(Icons.chevron_left, size: 18, color: palette.textSecondary),
-                  onPressed: () => notifier.shiftDay(-7),
-                ),
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  icon: Icon(Icons.chevron_right, size: 18, color: palette.textSecondary),
-                  onPressed: () => notifier.shiftDay(7),
-                ),
-              ],
+      body: ClassicPage(
+        maxWidth: 860,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Row(
+                children: [
+                  Text(DateFormat('EEE, M/d').format(active),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                  const Spacer(),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(Icons.chevron_left, size: 18, color: palette.textSecondary),
+                    onPressed: () => notifier.shiftDay(-7),
+                  ),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(Icons.chevron_right, size: 18, color: palette.textSecondary),
+                    onPressed: () => notifier.shiftDay(7),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                for (var i = 0; i < 7; i++)
-                  Expanded(
-                    child: _WeekDay(
-                      day: monday.add(Duration(days: i)),
-                      selected: DateUtils.isSameDay(monday.add(Duration(days: i)), active),
-                      isToday: DateUtils.isSameDay(monday.add(Duration(days: i)), today),
-                      onTap: () => notifier.selectDay(
-                          DateFormat('yyyy-MM-dd').format(monday.add(Duration(days: i)))),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  for (var i = 0; i < 7; i++)
+                    Expanded(
+                      child: _WeekDay(
+                        day: monday.add(Duration(days: i)),
+                        selected: DateUtils.isSameDay(monday.add(Duration(days: i)), active),
+                        isToday: DateUtils.isSameDay(monday.add(Duration(days: i)), today),
+                        onTap: () => notifier.selectDay(DateFormat('yyyy-MM-dd').format(monday.add(Duration(days: i)))),
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: state.isLoading
-                ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-                    children: [
-                      for (final s in subjects) section(s.id, s.title, Color(s.colorInt)),
-                      if (subjects.isEmpty || bySubject.containsKey(0))
-                        section(0, t.tr('classic_todo_general', fallback: 'General'), palette.textMuted),
-                    ],
-                  ),
-          ),
-        ],
+            Expanded(
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                  : ListView(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                      children: [
+                        for (final s in subjects) section(s.id, s.title, Color(s.colorInt)),
+                        if (subjects.isEmpty || bySubject.containsKey(0))
+                          section(0, t.tr('classic_todo_general', fallback: 'General'), palette.textMuted),
+                      ],
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -201,7 +202,7 @@ class _WeekDay extends StatelessWidget {
         child: Column(
           children: [
             Text('${day.day} ${DateFormat('E').format(day)}',
-                style: TextStyle(fontSize: 9, color: isToday ? palette.textPrimary : palette.textMuted)),
+                style: TextStyle(fontSize: 11, color: isToday ? palette.textPrimary : palette.textMuted)),
             const SizedBox(height: 4),
             Container(
               width: 14,
@@ -247,7 +248,7 @@ class _TodoRow extends StatelessWidget {
               child: Text(
                 todo.title,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 14,
                   color: todo.isCompleted ? palette.textMuted : palette.textPrimary,
                   decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
                 ),

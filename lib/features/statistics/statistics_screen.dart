@@ -60,35 +60,40 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       backgroundColor: palette.background,
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
-              children: [
-                for (final tab in StatsTab.values)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: ChoiceChip(
-                      key: ValueKey('stats-tab-${tab.name}'),
-                      label: Text(label(tab)),
-                      selected: _tab == tab,
-                      showCheckmark: false,
-                      selectedColor: kStatOrange,
-                      backgroundColor: Colors.transparent,
-                      side: BorderSide.none,
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        color: _tab == tab ? Colors.white : palette.textSecondary,
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1320),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+                child: Row(
+                  children: [
+                    for (final tab in StatsTab.values)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: ChoiceChip(
+                          key: ValueKey('stats-tab-${tab.name}'),
+                          label: Text(label(tab)),
+                          selected: _tab == tab,
+                          showCheckmark: false,
+                          selectedColor: kStatOrange,
+                          backgroundColor: Colors.transparent,
+                          side: BorderSide.none,
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: _tab == tab ? Colors.white : palette.textSecondary,
+                          ),
+                          onSelected: (_) => setState(() => _tab = tab),
+                        ),
                       ),
-                      onSelected: (_) => setState(() => _tab = tab),
+                    const Spacer(),
+                    IconButton(
+                      tooltip: t.tr('refresh', fallback: 'Refresh'),
+                      icon: Icon(Icons.refresh_rounded, size: 18, color: palette.textSecondary),
+                      onPressed: () => ref.invalidate(statisticsDataProvider),
                     ),
-                  ),
-                const Spacer(),
-                IconButton(
-                  tooltip: t.tr('refresh', fallback: 'Refresh'),
-                  icon: Icon(Icons.refresh_rounded, size: 18, color: palette.textSecondary),
-                  onPressed: () => ref.invalidate(statisticsDataProvider),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           Expanded(
@@ -139,18 +144,19 @@ class _StatsViews {
       Widget column(List<Widget> cards) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final card in cards) ...[card, const SizedBox(height: 10)],
+              for (final card in cards) ...[card, const SizedBox(height: 16)],
             ],
           );
       return SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding:
+            EdgeInsets.fromLTRB(math.max(20, (c.maxWidth - 1320) / 2), 4, math.max(20, (c.maxWidth - 1320) / 2), 24),
         child: c.maxWidth < 820
             ? column([...left, ...right])
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(child: column(left)),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 16),
                   Expanded(child: column(right)),
                 ],
               ),
@@ -207,15 +213,12 @@ class _StatsViews {
           labelEvery: labelEvery,
           groups: [
             for (final d in list)
-              BarGroup((fmt ?? (d) => '${d.month}/${d.day}')(d),
-                  [(data.msOn(d) / 3600000, kStatOrange)],
+              BarGroup((fmt ?? (d) => '${d.month}/${d.day}')(d), [(data.msOn(d) / 3600000, kStatOrange)],
                   highlight: d == today),
           ],
           overlays: [
-            OverlayLine([for (var i = 0; i < list.length; i++) minuteOf(spans[i]?.start, list[i])],
-                Colors.white, 1440),
-            OverlayLine([for (var i = 0; i < list.length; i++) minuteOf(spans[i]?.end, list[i])],
-                kStatGray, 1440),
+            OverlayLine([for (var i = 0; i < list.length; i++) minuteOf(spans[i]?.start, list[i])], Colors.white, 1440),
+            OverlayLine([for (var i = 0; i < list.length; i++) minuteOf(spans[i]?.end, list[i])], kStatGray, 1440),
           ],
         ),
       ],
@@ -256,8 +259,7 @@ class _StatsViews {
         CumulativeAreaChart(
           reference: reference,
           layers: [
-            for (final s in top)
-              (colors.of(s), [for (final d in list) (data.subjectsOn(d)[s] ?? 0) / 3600000]),
+            for (final s in top) (colors.of(s), [for (final d in list) (data.subjectsOn(d)[s] ?? 0) / 3600000]),
           ],
         ),
         const SizedBox(height: 6),
@@ -296,8 +298,8 @@ class _StatsViews {
     );
   }
 
-  Widget _caption(String s) => Text(s,
-      textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, color: Colors.white60));
+  Widget _caption(String s) =>
+      Text(s, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.white60));
 
   /// "Up to now ±h:mm:ss" header plus the step chart.
   Widget compare(String refLabel, List<double> current, List<double> reference, int currentMs, int refMs) {
@@ -305,24 +307,29 @@ class _StatsViews {
     return Row(
       children: [
         SizedBox(
-          width: 110,
+          width: 150,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(tr('stats_up_to_now', 'Up to now'),
-                  style: const TextStyle(fontSize: 10, color: Colors.white60)),
+              Text(tr('stats_up_to_now', 'Up to now'), style: const TextStyle(fontSize: 12, color: Colors.white60)),
               Text('${diff >= 0 ? '+' : '-'}${formatHms(diff.abs())}',
-                  style: const TextStyle(fontSize: 16, color: Colors.white)),
+                  style: const TextStyle(fontSize: 18, color: Colors.white)),
               const SizedBox(height: 8),
               Row(children: [
                 Container(width: 14, height: 2, color: kStatOrange),
                 const SizedBox(width: 4),
-                Text(tr('stats_today', 'Today'), style: const TextStyle(fontSize: 10, color: Colors.white60)),
+                Flexible(
+                  child: Text(tr('stats_today', 'Today'),
+                      overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: Colors.white60)),
+                ),
               ]),
               Row(children: [
                 Container(width: 14, height: 8, color: const Color(0xFFD1D1D6)),
                 const SizedBox(width: 4),
-                Text(refLabel, style: const TextStyle(fontSize: 10, color: Colors.white60)),
+                Flexible(
+                  child: Text(refLabel,
+                      overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: Colors.white60)),
+                ),
               ]),
             ],
           ),
@@ -346,7 +353,7 @@ class _StatsViews {
               visualDensity: VisualDensity.compact,
               icon: const Icon(Icons.chevron_left, size: 18, color: Colors.white70),
               onPressed: prev),
-          Text(title, style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600)),
+          Text(title, style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
           IconButton(
               visualDensity: VisualDensity.compact,
               icon: Icon(Icons.chevron_right, size: 18, color: next == null ? Colors.white24 : Colors.white70),
@@ -385,7 +392,7 @@ class _StatsViews {
                     size: 110,
                   ),
                   const SizedBox(height: 8),
-                  Text(formatHms(ms), style: const TextStyle(fontSize: 18, color: kStatOrange)),
+                  Text(formatHms(ms), style: const TextStyle(fontSize: 20, color: kStatOrange)),
                 ],
               ),
             ),
@@ -427,17 +434,16 @@ class _StatsViews {
           children: [
             if (sessions.isEmpty)
               Text(tr('stats_no_sessions', 'No study sessions'),
-                  style: const TextStyle(fontSize: 11, color: Colors.white38)),
+                  style: const TextStyle(fontSize: 13, color: Colors.white38)),
             for (final s in sessions.reversed)
               ListTile(
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 leading: Container(width: 3, height: 26, color: colors.of(s.subject)),
-                title: Text(s.subject, style: const TextStyle(fontSize: 12, color: Colors.white)),
+                title: Text(s.subject, style: const TextStyle(fontSize: 14, color: Colors.white)),
                 subtitle: Text('${formatClock(s.start)} ~ ${formatClock(s.end)}',
-                    style: const TextStyle(fontSize: 10, color: Colors.white54)),
-                trailing: Text(formatHourMin(s.ms),
-                    style: const TextStyle(fontSize: 11, color: Colors.white70)),
+                    style: const TextStyle(fontSize: 12, color: Colors.white54)),
+                trailing: Text(formatHourMin(s.ms), style: const TextStyle(fontSize: 13, color: Colors.white70)),
               ),
           ],
         ),
@@ -466,7 +472,7 @@ class _StatsViews {
         Row(children: [
           for (final w in const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
             Expanded(
-              child: Center(child: Text(w, style: const TextStyle(fontSize: 9, color: Colors.white54))),
+              child: Center(child: Text(w, style: const TextStyle(fontSize: 11, color: Colors.white54))),
             ),
         ]),
         const SizedBox(height: 4),
@@ -490,13 +496,12 @@ class _StatsViews {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('${d.day}',
-                          style: TextStyle(
-                              fontSize: 10, color: d.month == month.month ? Colors.white : Colors.white30)),
+                          style:
+                              TextStyle(fontSize: 12, color: d.month == month.month ? Colors.white : Colors.white30)),
                       if (data.msOn(d) > 0)
                         Text(formatHm(data.msOn(d)),
                             style: TextStyle(
-                                fontSize: 9,
-                                color: d.month == month.month ? Colors.white70 : Colors.white24)),
+                                fontSize: 11, color: d.month == month.month ? Colors.white70 : Colors.white24)),
                     ],
                   ),
                 ),
@@ -508,7 +513,7 @@ class _StatsViews {
           child: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text('${DateFormat('MMM').format(month)}: ${formatHourMin(monthTotal)}',
-                style: const TextStyle(fontSize: 9, color: Colors.white38)),
+                style: const TextStyle(fontSize: 11, color: Colors.white38)),
           ),
         ),
       ],
@@ -562,18 +567,24 @@ class _StatsViews {
             columns: 5,
             tiles: [
               for (final w in weeks)
-                ('${w.month}/${w.day} ~', data.totalBetween(w, w.add(const Duration(days: 6))), w == from,
-                    !w.isAfter(today)),
+                (
+                  '${w.month}/${w.day} ~',
+                  data.totalBetween(w, w.add(const Duration(days: 6))),
+                  w == from,
+                  !w.isAfter(today)
+                ),
             ],
             onTap: (i) => state.update(() => state._week = weeks[i]),
           ),
         ]),
       ),
-      StatCard(title: tr('stats_start_end_distribution', 'Study start/end time distribution'),
+      StatCard(
+          title: tr('stats_start_end_distribution', 'Study start/end time distribution'),
           child: startEndScatter(from, to)),
-      StatCard(title: tr('stats_study_time_by_subject', 'Study time by subject'),
-          child: subjectBars(from, to, fmt: wd)),
-      StatCard(title: tr('stats_cumulative_study_time', 'Cumulative study time'),
+      StatCard(
+          title: tr('stats_study_time_by_subject', 'Study time by subject'), child: subjectBars(from, to, fmt: wd)),
+      StatCard(
+          title: tr('stats_cumulative_study_time', 'Cumulative study time'),
           child: cumulative(from, to, reference: refMs / 3600000)),
     ];
     final right = <Widget>[
@@ -586,9 +597,11 @@ class _StatsViews {
       ),
       StatCard(child: compare(tr('stats_last_week', 'Last week'), current, reference, total, refMs)),
       StatCard(child: startEndBars(from, to, fmt: wd)),
-      StatCard(title: tr('stats_ratio_by_subject', 'Ratio by subject'),
+      StatCard(
+          title: tr('stats_ratio_by_subject', 'Ratio by subject'),
           child: DonutWithLegend(slices: subjectSlices(from, to))),
-      StatCard(title: tr('stats_study_other_ratio', 'Study/other ratio'),
+      StatCard(
+          title: tr('stats_study_other_ratio', 'Study/other ratio'),
           child: DonutWithLegend(slices: studyOther(from, to))),
     ];
     return (left, right);
@@ -634,9 +647,11 @@ class _StatsViews {
         ]),
       ),
       StatCard(child: startEndBars(from, to, labelEvery: 7, fmt: dayFmt)),
-      StatCard(title: tr('stats_ratio_by_subject', 'Ratio by subject'),
+      StatCard(
+          title: tr('stats_ratio_by_subject', 'Ratio by subject'),
           child: DonutWithLegend(slices: subjectSlices(from, to))),
-      StatCard(title: tr('stats_cumulative_study_time', 'Cumulative study time'),
+      StatCard(
+          title: tr('stats_cumulative_study_time', 'Cumulative study time'),
           child: cumulative(from, to, reference: refMs / 3600000)),
     ];
     final right = <Widget>[
@@ -648,11 +663,14 @@ class _StatsViews {
         ]),
       ),
       StatCard(child: compare(tr('stats_last_month', 'Last month'), current, reference, total, refMs)),
-      StatCard(title: tr('stats_start_end_distribution', 'Study start/end time distribution'),
+      StatCard(
+          title: tr('stats_start_end_distribution', 'Study start/end time distribution'),
           child: startEndScatter(from, to)),
-      StatCard(title: tr('stats_study_time_by_subject', 'Study time by subject'),
+      StatCard(
+          title: tr('stats_study_time_by_subject', 'Study time by subject'),
           child: subjectBars(from, to, labelEvery: 7, fmt: dayFmt)),
-      StatCard(title: tr('stats_study_other_ratio', 'Study/other ratio'),
+      StatCard(
+          title: tr('stats_study_other_ratio', 'Study/other ratio'),
           child: DonutWithLegend(slices: studyOther(from, to))),
     ];
     return (left, right);
@@ -681,15 +699,16 @@ class _StatsViews {
               value: n,
               dropdownColor: context.palette.card,
               underline: const SizedBox.shrink(),
-              style: const TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w600),
               items: [
                 for (final v in const [7, 14, 28, 90])
-                  DropdownMenuItem(value: v, child: Text(tr('stats_last_n_days', 'Last {n} days').replaceAll('{n}', '$v'))),
+                  DropdownMenuItem(
+                      value: v, child: Text(tr('stats_last_n_days', 'Last {n} days').replaceAll('{n}', '$v'))),
               ],
               onChanged: (v) => state.update(() => state._periodDays = v ?? 28),
             ),
             Text('${DateFormat('M/d').format(from)} ~ ${DateFormat('M/d').format(to)} (${n}d)',
-                style: const TextStyle(fontSize: 10, color: Colors.white54)),
+                style: const TextStyle(fontSize: 12, color: Colors.white54)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 2,
@@ -703,7 +722,7 @@ class _StatsViews {
                       height: 18,
                       color: heatColor(data.msOn(d), maxMs),
                       alignment: Alignment.center,
-                      child: Text('${d.day}', style: const TextStyle(fontSize: 8, color: Colors.white70)),
+                      child: Text('${d.day}', style: const TextStyle(fontSize: 10, color: Colors.white70)),
                     ),
                   ),
               ],
@@ -711,10 +730,10 @@ class _StatsViews {
           ],
         ),
       ),
-      StatCard(title: tr('stats_subject_time_per_day', 'Subject time per day'),
+      StatCard(
+          title: tr('stats_subject_time_per_day', 'Subject time per day'),
           child: subjectBars(from, to, labelEvery: every, fmt: dayFmt)),
-      StatCard(title: tr('stats_cumulative_by_subject', 'Cumulative time by subject'),
-          child: cumulative(from, to)),
+      StatCard(title: tr('stats_cumulative_by_subject', 'Cumulative time by subject'), child: cumulative(from, to)),
       StatCard(
         title: tr('stats_avg_focus_by_hour', 'Avg. focus time (min)'),
         child: BarsChart(
@@ -738,9 +757,10 @@ class _StatsViews {
           ],
         ),
       ),
-      StatCard(title: tr('stats_subject_ratio', 'Subject ratio'),
-          child: DonutWithLegend(slices: subjectSlices(from, to))),
-      StatCard(title: tr('stats_start_end_per_day', 'Start/end per day'),
+      StatCard(
+          title: tr('stats_subject_ratio', 'Subject ratio'), child: DonutWithLegend(slices: subjectSlices(from, to))),
+      StatCard(
+          title: tr('stats_start_end_per_day', 'Start/end per day'),
           child: startEndBars(from, to, labelEvery: every, fmt: dayFmt)),
       StatCard(
         title: tr('stats_avg_focus_per_weekday', 'Avg. focus time per day'),
@@ -762,10 +782,7 @@ class _StatsViews {
 
   (List<Widget>, List<Widget>) _trend(BuildContext context) {
     final filter = state._trendSubject;
-    final allSubjects = data
-        .subjectTotals(today.subtract(const Duration(days: 240)), today)
-        .map((e) => e.key)
-        .toList();
+    final allSubjects = data.subjectTotals(today.subtract(const Duration(days: 240)), today).map((e) => e.key).toList();
     int ms(DateTime a, DateTime b) {
       if (filter == null) return data.totalBetween(a, b);
       var sum = 0;
@@ -786,7 +803,9 @@ class _StatsViews {
       return BarsChart(
         height: 110,
         maxLabel: '$title: ${formatHourMin(maxMs)}',
-        groups: [for (final (l, v) in buckets) BarGroup(l, [(v / 3600000, kStatOrange)])],
+        groups: [
+          for (final (l, v) in buckets) BarGroup(l, [(v / 3600000, kStatOrange)])
+        ],
       );
     }
 
@@ -797,7 +816,11 @@ class _StatsViews {
         groups: [
           for (final (l, a, b) in buckets)
             BarGroup(l, [
-              for (final s in top) (data.subjectTotals(a, b).where((e) => e.key == s).fold<int>(0, (x, e) => x + e.value) / 3600000, colors.of(s)),
+              for (final s in top)
+                (
+                  data.subjectTotals(a, b).where((e) => e.key == s).fold<int>(0, (x, e) => x + e.value) / 3600000,
+                  colors.of(s)
+                ),
             ]),
         ],
       );
@@ -820,7 +843,7 @@ class _StatsViews {
                 selected: filter == s,
                 showCheckmark: false,
                 selectedColor: kStatOrange,
-                labelStyle: TextStyle(fontSize: 11, color: filter == s ? Colors.white : Colors.white70),
+                labelStyle: TextStyle(fontSize: 13, color: filter == s ? Colors.white : Colors.white70),
                 onSelected: (_) => state.update(() => state._trendSubject = s),
               ),
           ],
@@ -828,7 +851,8 @@ class _StatsViews {
       ),
       StatCard(child: totals(tr('stats_daily_max', 'Daily max'), [for (final (l, a, b) in dailyB) (l, ms(a, b))])),
       StatCard(child: totals(tr('stats_weekly_max', 'Weekly max'), [for (final (l, a, b) in weeklyB) (l, ms(a, b))])),
-      StatCard(child: totals(tr('stats_monthly_max', 'Monthly max'), [for (final (l, a, b) in monthlyB) (l, ms(a, b))])),
+      StatCard(
+          child: totals(tr('stats_monthly_max', 'Monthly max'), [for (final (l, a, b) in monthlyB) (l, ms(a, b))])),
       StatCard(
         title: tr('stats_trend_regularity', 'Study start/end regularity'),
         child: RangeBarsChart(ranges: [
@@ -857,7 +881,7 @@ class _StatsViews {
                     SizedBox(
                       width: 70,
                       child: Text(DateFormat('E, M/d').format(d),
-                          style: const TextStyle(fontSize: 10, color: Colors.white60)),
+                          style: const TextStyle(fontSize: 12, color: Colors.white60)),
                     ),
                     Expanded(child: _DayStrip(sessions: data.sessionsBetween(d, d), colorOf: colors.of)),
                   ],

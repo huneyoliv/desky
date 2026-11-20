@@ -44,10 +44,10 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: context.palette.surface,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +58,7 @@ class StatCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(title!,
-                      style: TextStyle(fontSize: 12, color: context.palette.textSecondary)),
+                      style: TextStyle(fontSize: 14, color: context.palette.textSecondary)),
                 ),
                 if (trailing != null) trailing!,
               ],
@@ -88,12 +88,12 @@ class StatPair extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    Text(label, style: const TextStyle(fontSize: 11, color: kStatOrange)),
+                    Text(label, style: const TextStyle(fontSize: 13, color: kStatOrange)),
                     const SizedBox(height: 2),
                     FittedBox(
                       child: Text(value,
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 28,
                             fontWeight: FontWeight.w600,
                             color: context.palette.textPrimary,
                             fontFeatures: const [FontFeature.tabularFigures()],
@@ -107,7 +107,7 @@ class StatPair extends StatelessWidget {
         if (caption != null)
           Padding(
             padding: const EdgeInsets.only(top: 2),
-            child: Text(caption!, style: TextStyle(fontSize: 10, color: context.palette.textMuted)),
+            child: Text(caption!, style: TextStyle(fontSize: 12, color: context.palette.textMuted)),
           ),
       ],
     );
@@ -124,7 +124,7 @@ class Slice {
 
 /// Donut with percentages and a "name   h:mm · %" legend on the right.
 class DonutWithLegend extends StatelessWidget {
-  const DonutWithLegend({super.key, required this.slices, this.size = 110, this.maxLegend = 20});
+  const DonutWithLegend({super.key, required this.slices, this.size = 136, this.maxLegend = 20});
   final List<Slice> slices;
   final double size;
   final int maxLegend;
@@ -157,11 +157,11 @@ class DonutWithLegend extends StatelessWidget {
                         child: Text(s.label,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 11, color: palette.textPrimary)),
+                            style: TextStyle(fontSize: 13, color: palette.textPrimary)),
                       ),
                       Text(
                         '${formatHm(s.ms)} · ${total == 0 ? 0 : (s.ms * 100 / total).round()}%',
-                        style: TextStyle(fontSize: 10, color: palette.textMuted),
+                        style: TextStyle(fontSize: 12, color: palette.textMuted),
                       ),
                     ],
                   ),
@@ -210,7 +210,7 @@ class _DonutPainter extends CustomPainter {
               style: const TextStyle(
                   fontFamily: AppTextStyles.fontText,
                   fontFamilyFallback: AppTextStyles.fontFallbacks,
-                  fontSize: 9,
+                  fontSize: 11,
                   color: Colors.white,
                   fontWeight: FontWeight.w600)),
           textDirection: TextDirection.ltr,
@@ -250,7 +250,7 @@ class BarsChart extends StatelessWidget {
     super.key,
     required this.groups,
     this.overlays = const [],
-    this.height = 140,
+    this.height = 170,
     this.maxLabel,
     this.valueLabel,
     this.labelEvery = 1,
@@ -270,7 +270,7 @@ class BarsChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (maxLabel != null)
-          Text(maxLabel!, style: TextStyle(fontSize: 9, color: muted)),
+          Text(maxLabel!, style: TextStyle(fontSize: 11, color: muted)),
         SizedBox(
           height: height,
           width: double.infinity,
@@ -374,7 +374,7 @@ class _BarsPainter extends CustomPainter {
 /// Stacked cumulative areas (one layer per subject), like
 /// "Cumulative study time".
 class CumulativeAreaChart extends StatelessWidget {
-  const CumulativeAreaChart({super.key, required this.layers, this.height = 130, this.reference});
+  const CumulativeAreaChart({super.key, required this.layers, this.height = 160, this.reference});
 
   /// Per layer (bottom first): colour and per-bucket values (not cumulative).
   final List<(Color, List<double>)> layers;
@@ -499,7 +499,7 @@ class _StepPainter extends CustomPainter {
 /// Scatter of (x, y) points with two colours, used for start/end time
 /// distribution (x = minute of day, y = study hours).
 class ScatterChart extends StatelessWidget {
-  const ScatterChart({super.key, required this.series, this.height = 120, this.xMax = 1440, this.footer});
+  const ScatterChart({super.key, required this.series, this.height = 180, this.xMax = 1440, this.footer});
   final List<(Color, List<Offset>)> series;
   final double height;
   final double xMax;
@@ -691,10 +691,10 @@ class PeriodGrid extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(tiles[i].$1,
-                      style: TextStyle(fontSize: 10, color: tiles[i].$4 ? Colors.white : Colors.white38)),
+                      style: TextStyle(fontSize: 12, color: tiles[i].$4 ? Colors.white : Colors.white38)),
                   if (tiles[i].$2 > 0)
                     Text(formatHms(tiles[i].$2),
-                        style: const TextStyle(fontSize: 9, color: Colors.white70)),
+                        style: const TextStyle(fontSize: 11, color: Colors.white70)),
                 ],
               ),
             ),
@@ -724,7 +724,7 @@ class SubjectLegend extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 90),
                   child: Text(label,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 9, color: context.palette.textSecondary)),
+                      style: TextStyle(fontSize: 11, color: context.palette.textSecondary)),
                 ),
               ],
             ),

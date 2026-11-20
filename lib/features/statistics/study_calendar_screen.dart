@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../shared/widgets/classic_layout.dart';
 import '../../core/localization/app_translation.dart';
 import '../../core/theme/theme_palette.dart';
 import 'stats_data.dart';
@@ -33,71 +34,74 @@ class _StudyCalendarScreenState extends ConsumerState<StudyCalendarScreen> {
 
     return Scaffold(
       backgroundColor: palette.background,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(DateFormat('MMM y').format(_month),
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: palette.textPrimary)),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(Icons.chevron_left, color: palette.textSecondary),
-                  onPressed: () => setState(() => _month = DateTime(_month.year, _month.month - 1)),
-                ),
-                IconButton(
-                  icon: Icon(Icons.chevron_right, color: palette.textSecondary),
-                  onPressed: () => setState(() => _month = DateTime(_month.year, _month.month + 1)),
-                ),
-                TextButton(
-                  onPressed: () => setState(() => _month = DateTime(today.year, today.month)),
-                  child: Text(t.tr('stats_today', fallback: 'Today'),
-                      style: const TextStyle(fontSize: 12, color: kStatOrange)),
-                ),
-                const Spacer(),
-                Text(
-                  '${t.tr('stats_total_time', fallback: 'Total time')}: '
-                  '${formatHms(data.totalBetween(first, last))}',
-                  style: TextStyle(fontSize: 12, color: palette.textSecondary),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(children: [
-              for (final w in weekdays)
-                Expanded(
-                  child: Center(
-                    child: Text(w, style: TextStyle(fontSize: 11, color: palette.textMuted)),
-                  ),
-                ),
-            ]),
-            const SizedBox(height: 4),
-            Expanded(
-              child: Column(
+      body: ClassicPage(
+        maxWidth: 1400,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  for (var w = 0; w < weeks; w++)
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          for (var d = 0; d < 7; d++)
-                            Expanded(
-                              child: _DayCell(
-                                day: start.add(Duration(days: w * 7 + d)),
-                                inMonth: start.add(Duration(days: w * 7 + d)).month == _month.month,
-                                isToday: start.add(Duration(days: w * 7 + d)) == today,
-                                ms: data.msOn(start.add(Duration(days: w * 7 + d))),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                  Text(DateFormat('MMM y').format(_month),
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(Icons.chevron_left, color: palette.textSecondary),
+                    onPressed: () => setState(() => _month = DateTime(_month.year, _month.month - 1)),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.chevron_right, color: palette.textSecondary),
+                    onPressed: () => setState(() => _month = DateTime(_month.year, _month.month + 1)),
+                  ),
+                  TextButton(
+                    onPressed: () => setState(() => _month = DateTime(today.year, today.month)),
+                    child: Text(t.tr('stats_today', fallback: 'Today'),
+                        style: const TextStyle(fontSize: 14, color: kStatOrange)),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${t.tr('stats_total_time', fallback: 'Total time')}: '
+                    '${formatHms(data.totalBetween(first, last))}',
+                    style: TextStyle(fontSize: 14, color: palette.textSecondary),
+                  ),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Row(children: [
+                for (final w in weekdays)
+                  Expanded(
+                    child: Center(
+                      child: Text(w, style: TextStyle(fontSize: 13, color: palette.textMuted)),
+                    ),
+                  ),
+              ]),
+              const SizedBox(height: 4),
+              Expanded(
+                child: Column(
+                  children: [
+                    for (var w = 0; w < weeks; w++)
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (var d = 0; d < 7; d++)
+                              Expanded(
+                                child: _DayCell(
+                                  day: start.add(Duration(days: w * 7 + d)),
+                                  inMonth: start.add(Duration(days: w * 7 + d)).month == _month.month,
+                                  isToday: start.add(Duration(days: w * 7 + d)) == today,
+                                  ms: data.msOn(start.add(Duration(days: w * 7 + d))),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -123,13 +127,11 @@ class _DayCell extends StatelessWidget {
           Center(
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: isToday
-                  ? const BoxDecoration(color: Colors.white, shape: BoxShape.circle)
-                  : null,
+              decoration: isToday ? const BoxDecoration(color: Colors.white, shape: BoxShape.circle) : null,
               child: Text(
                 '${day.day}',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: isToday ? Colors.black : (inMonth ? palette.textPrimary : palette.textMuted),
                 ),
@@ -148,7 +150,7 @@ class _DayCell extends StatelessWidget {
                 '⏱ ${formatHm(ms)}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 10, color: kStatOrange),
+                style: const TextStyle(fontSize: 12, color: kStatOrange),
               ),
             ),
         ],

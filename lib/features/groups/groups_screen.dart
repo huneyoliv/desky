@@ -337,48 +337,71 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
       if (mounted) ref.read(authStateProvider.notifier).refreshUserGroups();
     }
 
-    return InkWell(
-      onTap: open,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(group.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: palette.textPrimary)),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${group.category} · ${group.membersCount}/${group.maxCapacity} '
-                    '${t.tr('classic_people', fallback: 'people')} · ${group.leaderName}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 11, color: palette.textMuted),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: palette.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: open,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(group.category,
+                          style: const TextStyle(fontSize: 13, color: Color(0xFFFF6B1A), fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 4),
+                      Row(children: [
+                        Flexible(
+                          child: Text(group.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                        ),
+                        if (group.isPrivate) ...[
+                          const SizedBox(width: 6),
+                          Icon(Icons.lock_outline_rounded, size: 15, color: palette.textMuted),
+                        ],
+                      ]),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${t.tr('goal', fallback: 'Goal')} ${group.dailyGoalHours}h   '
+                        '${t.tr('members', fallback: 'Members')} ${group.membersCount}/${group.maxCapacity}   '
+                        '${group.leaderName}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 13, color: palette.textSecondary),
+                      ),
+                      if ((group.notice ?? '').trim().isNotEmpty) ...[
+                        Divider(color: palette.border, height: 20),
+                        Text(group.notice!.trim(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 13, color: palette.textMuted)),
+                      ],
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(color: palette.card, borderRadius: BorderRadius.circular(12)),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    tooltip: t.tr('open', fallback: 'Open'),
+                    icon: Icon(Icons.chat_bubble_rounded, size: 18, color: palette.textSecondary),
+                    onPressed: open,
+                  ),
+                ),
+              ],
             ),
-            if (group.isPrivate)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Icon(Icons.lock_outline_rounded, size: 14, color: palette.textMuted),
-              ),
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(color: palette.card, borderRadius: BorderRadius.circular(8)),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                tooltip: t.tr('open', fallback: 'Open'),
-                icon: Icon(Icons.chat_bubble_rounded, size: 16, color: palette.textSecondary),
-                onPressed: open,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -429,7 +452,14 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
           ],
         ),
       ),
-      body: TabBarView(
+      body: Center(
+        child: ConstrainedBox(
+          // Classic look: a readable column instead of rows stretched across
+          // a wide window.
+          constraints: BoxConstraints(
+            maxWidth: ref.watch(settingsNotifierProvider.select((s) => s.classicYptLook)) ? 900 : double.infinity,
+          ),
+          child: TabBarView(
         controller: _tabController,
         children: [
           // Tab 1: My Groups
@@ -632,6 +662,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }
