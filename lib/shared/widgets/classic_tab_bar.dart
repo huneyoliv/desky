@@ -36,6 +36,7 @@ class ClassicTabBar extends ConsumerWidget {
     ClassicTab('/groups', 'classic_tab_groups', 'Groups', Icons.people_outline),
     ClassicTab('/statistics', 'classic_tab_statistics', 'Statistics', Icons.bar_chart_rounded),
     ClassicTab('/weekly', 'classic_tab_weekly_planner', 'Weekly planner', Icons.menu_book_outlined),
+    ClassicTab('/notifications', 'classic_notice', 'Notice', Icons.notifications_none_rounded),
   ];
 
   /// Which tab owns [route]; detail pages (e.g. /groups/12) light up their tab.
@@ -51,6 +52,7 @@ class ClassicTabBar extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
     final active = tabFor(currentRoute);
+    final unread = ref.watch(unreadNotificationCountProvider).valueOrNull ?? 0;
 
     return Container(
       height: 50,
@@ -68,6 +70,7 @@ class ClassicTabBar extends ConsumerWidget {
                 label: t.tr(tab.keyName, fallback: tab.fallback),
                 icon: tab.icon,
                 selected: tab.route == active,
+                badge: tab.route == '/notifications' && active != '/notifications' ? unread : 0,
                 onTap: () => context.go(tab.route),
               ),
             ),
@@ -76,13 +79,7 @@ class ClassicTabBar extends ConsumerWidget {
           IconButton(
             key: const ValueKey('classic-more-button'),
             tooltip: t.tr('classic_more', fallback: 'All features'),
-            icon: Badge(
-              isLabelVisible: ref
-                  .watch(unreadNotificationCountProvider)
-                  .maybeWhen(data: (n) => n > 0, orElse: () => false),
-              smallSize: 7,
-              child: Icon(Icons.grid_view_rounded, size: 18, color: palette.textSecondary),
-            ),
+            icon: Icon(Icons.grid_view_rounded, size: 18, color: palette.textSecondary),
             onPressed: () => ClassicFeatureMenu.show(context),
           ),
         ],
@@ -98,7 +95,11 @@ class _TabButton extends StatelessWidget {
     required this.icon,
     required this.selected,
     required this.onTap,
+    this.badge = 0,
   });
+
+  /// Unread count shown as a ping on the tab (0 hides it).
+  final int badge;
 
   final String label;
   final IconData icon;
@@ -120,7 +121,12 @@ class _TabButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 18, color: color),
+              Badge(
+                isLabelVisible: badge > 0,
+                label: Text(badge > 99 ? '99+' : '$badge'),
+                backgroundColor: const Color(0xFFFF3B30),
+                child: Icon(icon, size: 18, color: color),
+              ),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -222,7 +228,6 @@ class ClassicFeatureMenu extends ConsumerWidget {
       (
         t.tr('classic_menu_more', fallback: 'More'),
         [
-          item('classic_notice', 'Notice', Icons.notifications_none_rounded, () => go('/notifications')),
           item('profile', 'Profile', Icons.person_outline, () => go('/profile')),
           item('settings', 'Settings', Icons.settings_outlined, () => open(AppSettingsDialog.show)),
           item('logout', 'Log out', Icons.logout_rounded, () {

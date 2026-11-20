@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_client.dart';
@@ -7,7 +9,11 @@ final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   return NotificationRepository();
 });
 
+/// Unread notices. Re-checked every 3 minutes so the tab badge pings when a
+/// new one arrives (it used to be fetched once per launch).
 final unreadNotificationCountProvider = FutureProvider<int>((ref) async {
+  final refresh = Timer(const Duration(minutes: 3), ref.invalidateSelf);
+  ref.onDispose(refresh.cancel);
   final repo = ref.watch(notificationRepositoryProvider);
   return repo.fetchUnreadCount();
 });
