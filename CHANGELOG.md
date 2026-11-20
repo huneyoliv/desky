@@ -93,6 +93,20 @@ Before creating and pushing any release tag, the version string and build number
   list.
 - **Settings Gear in the Timer Header**: Discord Rich Presence, OBS overlay mode and the Classic
   look are configured in one place.
+- **Zoom in the Classic Look**: Ctrl + / Ctrl - / Ctrl 0 and Ctrl + mouse wheel scale the whole
+  interface from 70 % to 180 %, saved between launches. Big landscape windows also get roomier,
+  tablet-like sizing automatically.
+- **Adaptive, Tablet-Style Classic Screens**: content is centred and width-capped instead of
+  stretched; wide windows show the timer beside a Today pane (goal progress and today's to-dos),
+  tall 9:16 windows get one column. YPT clock-face dial, the time with pause/stop on its right,
+  bigger subject rows and member grid, smooth fades between states.
+- **Member Cards With Nudge**: clicking a group member (timer panel or group screen) shows their
+  status, today's time, live session, weekly time and rank, and a Nudge button.
+- **TickTick-Style Mini Player**: compact, always-on-top floating timer with adjustable opacity,
+  Today and Week focus, drag anywhere, and edge docking that tucks it behind a slim handle until
+  hovered. Restores the previous window size and position on exit.
+- **Offline Mode**: study without internet; sessions are stored on the device and synced
+  automatically when back online (every 2 minutes, on resume, or when Offline mode is turned off).
 - **OBS Overlay Mode (Windows)**: When on, minimizing sends the window behind the others instead of
   minimizing it, so an OBS Window Capture keeps receiving frames.
 
@@ -116,6 +130,11 @@ Before creating and pushing any release tag, the version string and build number
   reuse YPT's own keys, so all 28 locales have them.
 - **Exit-Focus Button Missing in the Classic Look**: Restored for Focus mode and the mini player,
   which now show a minimal fixed "Focusing" view.
+
+- **Starting the Timer Froze on a Bad Network**: the start waited for the server, up to the 15 s
+  timeout; the clock now starts at once and the server is told in the background.
+- **Pre-Release Builds Failed in CI**: the Windows job required the Store package that pre-releases
+  never build.
 
 ### Performance
 
