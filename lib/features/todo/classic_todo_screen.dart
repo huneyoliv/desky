@@ -73,53 +73,68 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
 
     Widget section(int id, String title, Color color) {
       final todos = bySubject[id] ?? const <TodoItemModel>[];
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 2),
-            child: Row(
-              children: [
-                Container(width: 3, height: 14, color: color),
-                const SizedBox(width: 6),
-                Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.textPrimary)),
-                const SizedBox(width: 4),
-                InkWell(
-                  key: ValueKey('classic-todo-add-$id'),
-                  customBorder: const CircleBorder(),
-                  onTap: () => setState(() {
-                    _addingTo = id;
-                    _controller.clear();
-                  }),
-                  child: Icon(Icons.add_circle_outline, size: 14, color: palette.textSecondary),
-                ),
-              ],
-            ),
-          ),
-          for (final todo in todos)
-            _TodoRow(
-              todo: todo,
-              onToggle: () => notifier.toggle(todo),
-              onEdit: () => TodoDialog.show(context, existing: todo),
-              onDelete: () => notifier.remove(todo),
-            ),
-          if (_addingTo == id)
-            Padding(
-              padding: const EdgeInsets.only(left: 10, right: 40),
-              child: TextField(
-                controller: _controller,
-                autofocus: true,
-                style: TextStyle(fontSize: 14, color: palette.textPrimary),
-                decoration: InputDecoration(
-                  isDense: true,
-                  hintText: t.tr('classic_enter_todo', fallback: 'Enter to-do'),
-                  hintStyle: TextStyle(fontSize: 14, color: palette.textMuted),
-                ),
-                onSubmitted: (_) => _submit(),
-                onTapOutside: (_) => _submit(),
+      final done = todos.where((d) => d.isCompleted).length;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: ClassicCard(
+          padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 18,
+                    decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                  ),
+                  if (todos.isNotEmpty)
+                    Text('$done/${todos.length}', style: TextStyle(fontSize: 13, color: palette.textMuted)),
+                  TextButton.icon(
+                    key: ValueKey('classic-todo-add-$id'),
+                    onPressed: () => setState(() {
+                      _addingTo = id;
+                      _controller.clear();
+                    }),
+                    icon: Icon(Icons.add_rounded, size: 18, color: color),
+                    label: Text(t.tr('classic_add', fallback: 'Add'), style: TextStyle(fontSize: 13, color: color)),
+                  ),
+                ],
               ),
-            ),
-        ],
+              for (final todo in todos)
+                _TodoRow(
+                  todo: todo,
+                  onToggle: () => notifier.toggle(todo),
+                  onEdit: () => TodoDialog.show(context, existing: todo),
+                  onDelete: () => notifier.remove(todo),
+                ),
+              if (_addingTo == id)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 4, 8, 4),
+                  child: TextField(
+                    controller: _controller,
+                    autofocus: true,
+                    style: TextStyle(fontSize: 15, color: palette.textPrimary),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      prefixIcon: Icon(Icons.radio_button_unchecked_rounded, size: 18, color: palette.textMuted),
+                      hintText: t.tr('classic_enter_todo', fallback: 'Enter to-do'),
+                      hintStyle: TextStyle(fontSize: 15, color: palette.textMuted),
+                    ),
+                    onSubmitted: (_) => _submit(),
+                    onTapOutside: (_) => _submit(),
+                  ),
+                ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -134,8 +149,8 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
               child: Row(
                 children: [
-                  Text(DateFormat('EEE, M/d').format(active),
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                  Text(DateFormat('EEE, MMM d').format(active),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: palette.textPrimary)),
                   const Spacer(),
                   IconButton(
                     visualDensity: VisualDensity.compact,
@@ -170,7 +185,7 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
               child: state.isLoading
                   ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
                   : ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                       children: [
                         for (final s in subjects) section(s.id, s.title, Color(s.colorInt)),
                         if (subjects.isEmpty || bySubject.containsKey(0))
@@ -195,25 +210,29 @@ class _WeekDay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final fg = selected ? palette.background : (isToday ? const Color(0xFFFF6B1A) : palette.textPrimary);
     return InkWell(
+      borderRadius: BorderRadius.circular(14),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           children: [
-            Text('${day.day} ${DateFormat('E').format(day)}',
-                style: TextStyle(fontSize: 11, color: isToday ? palette.textPrimary : palette.textMuted)),
-            const SizedBox(height: 4),
-            Container(
-              width: 14,
-              height: 14,
+            Text(DateFormat('E').format(day), style: TextStyle(fontSize: 12, color: palette.textMuted)),
+            const SizedBox(height: 6),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: palette.card,
-                borderRadius: BorderRadius.circular(3),
+                color: selected ? palette.textPrimary : Colors.transparent,
+                shape: BoxShape.circle,
+                border: isToday && !selected ? Border.all(color: const Color(0xFFFF6B1A), width: 1.5) : null,
               ),
+              child: Text('${day.day}',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: fg)),
             ),
-            const SizedBox(height: 4),
-            Container(width: 18, height: 2, color: selected ? palette.textPrimary : Colors.transparent),
           ],
         ),
       ),
@@ -235,20 +254,20 @@ class _TodoRow extends StatelessWidget {
       onTap: onToggle,
       onLongPress: onEdit,
       child: Padding(
-        padding: const EdgeInsets.only(left: 10, top: 4, bottom: 4),
+        padding: const EdgeInsets.only(left: 4, top: 6, bottom: 6),
         child: Row(
           children: [
             Icon(
-              todo.isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-              size: 16,
+              todo.isCompleted ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+              size: 20,
               color: todo.isCompleted ? Color(todo.subjectColorInt) : palette.textMuted,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 todo.title,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15,
                   color: todo.isCompleted ? palette.textMuted : palette.textPrimary,
                   decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
                 ),
