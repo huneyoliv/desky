@@ -17,6 +17,7 @@ class _FakeGroupRepository extends GroupRepository {
   /// No groups: these tests cover the empty-region path.
   final List<GroupModel> groups = const [];
   final List<int> requestedCountryIds = [];
+  final List<int> searchedCountryIds = [];
 
   @override
   Future<List<GroupModel>> fetchExploreGroups({
@@ -27,6 +28,16 @@ class _FakeGroupRepository extends GroupRepository {
     String? query,
   }) async {
     requestedCountryIds.add(countryId);
+    return groups;
+  }
+
+  @override
+  Future<List<GroupModel>> searchGroups(
+    String query, {
+    int categoryId = 0,
+    int countryId = 23,
+  }) async {
+    searchedCountryIds.add(countryId);
     return groups;
   }
 }
@@ -98,6 +109,18 @@ void main() {
 
     expect(repository.requestedCountryIds, isNotEmpty);
     expect(repository.requestedCountryIds.last, equals(_country.id));
+  });
+
+  testWidgets('text search also uses the country the user picked', (tester) async {
+    final repository = _FakeGroupRepository();
+    await _pumpGroups(tester, repository);
+
+    await tester.enterText(find.byType(TextField), 'physics');
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Buscar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(repository.searchedCountryIds, equals([_country.id]));
   });
 
   testWidgets('an empty region offers an explicit way to view another one', (tester) async {

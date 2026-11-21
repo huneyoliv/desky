@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/repositories/group_admin_repository.dart';
@@ -9,6 +9,8 @@ class MockApiClient extends ApiClient {
   Map<String, dynamic>? getResponse;
   Map<String, dynamic>? postResponse;
   Map<String, dynamic>? deleteResponse;
+  String? lastPostPath;
+  Object? lastPostData;
 
   @override
   Future<Response<dynamic>> get(
@@ -31,6 +33,8 @@ class MockApiClient extends ApiClient {
     Options? options,
     String? baseUrl,
   }) async {
+    lastPostPath = path;
+    lastPostData = data;
     return Response(
       requestOptions: RequestOptions(path: path),
       data: postResponse,
@@ -68,6 +72,8 @@ void main() {
       mockApiClient.postResponse = {'s': true};
       final success = await repository.updateGroupName(1, 'Novo Nome');
       expect(success, isTrue);
+      expect(mockApiClient.lastPostPath, '/group/info/edit');
+      expect(mockApiClient.lastPostData, {'id': 1, 'title': 'Novo Nome'});
     });
 
     test('warnMember returns true on success', () async {

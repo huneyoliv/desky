@@ -47,13 +47,16 @@ void main(List<String> args) async {
   // Sem argumento, o comportamento de instancia unica e mantido.
   SingleInstanceChannel? instanceChannel;
   if (Platform.isWindows || Platform.isLinux) {
-    instanceChannel = await SingleInstanceChannel.startOrForward(
+    final singleInstance = await SingleInstanceChannel.startOrForward(
       initialPdf.path ?? '',
     );
-    if (instanceChannel == null) {
+    if (singleInstance.shouldExit) {
       // O arquivo foi encaminhado para a instancia aberta; nada mais a fazer.
       exit(0);
     }
+    // Em `degraded` o canal e nulo, mas o app continua: sem instancia unica e
+    // melhor do que um processo que encerra sem abrir janela nem avisar nada.
+    instanceChannel = singleInstance.channel;
   }
   await EnvConfig.init();
   await initializeDateFormatting();

@@ -125,12 +125,28 @@ class TimerRepository {
     return null;
   }
 
+  /// Reads the server clock.
+  ///
+  /// The live endpoint answers `{"s": true, "t": 1795226620479}`: the
+  /// timestamp travels under the compact key `t`, not `timestamp`, so the
+  /// previous implementation silently always fell back to the local clock.
   Future<DateTime> syncTime() async {
-    final response = await _apiClient.get(ApiConstants.timeSync);
-    final data = response.data as Map<String, dynamic>;
-    if (data['timestamp'] != null) {
-      return DateTime.fromMillisecondsSinceEpoch(data['timestamp'] as int);
-    }
+    try {
+      final response = await _apiClient.get(ApiConstants.timeSync);
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        final raw = data['t'] ?? data['timestamp'];
+        if (raw is num) {
+          return DateTime.fromMillisecondsSinceEpoch(raw.toInt());
+        }
+        if (raw is String) {
+          final parsed = int.tryParse(raw);
+          if (parsed != null) {
+            return DateTime.fromMillisecondsSinceEpoch(parsed);
+          }
+        }
+      }
+    } catch (_) {}
     return DateTime.now();
   }
 }
