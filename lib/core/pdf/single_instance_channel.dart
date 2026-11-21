@@ -48,6 +48,12 @@ class SingleInstanceChannel {
   static const String _lockFileName = 'desky.instance.lock';
   static const String _portFileName = 'desky.instance.port';
 
+  /// Lock directories this process already holds. On Linux the file lock is a
+  /// POSIX `fcntl` lock, which is per process: a second lock on the same file
+  /// from the same process succeeds. On Windows the lock is per handle and
+  /// already refuses it. Tracking the held paths gives both the same rule.
+  static final Set<String> _held = <String>{};
+
   final Directory _dir;
   RandomAccessFile? _lock;
   ServerSocket? _server;
@@ -81,6 +87,9 @@ class SingleInstanceChannel {
       return null;
     }
 
+    final key = dir.absolute.path;
+    if (_held.contains(key)) return null;
+
     final channel = SingleInstanceChannel._(dir);
     final lockFile = File('${dir.path}${Platform.pathSeparator}$_lockFileName');
     try {
@@ -88,6 +97,7 @@ class SingleInstanceChannel {
       // Trava exclusiva: falha se outra instancia ja a detem.
       await handle.lock(FileLock.exclusive);
       channel._lock = handle;
+      _held.add(key);
     } catch (_) {
       try {
         await lockFile.open(mode: FileMode.write).then((f) => f.close());
@@ -163,6 +173,7 @@ class SingleInstanceChannel {
       await _lock?.unlock();
       await _lock?.close();
     } catch (_) {}
+    if (_lock != null) _held.remove(_dir.absolute.path);
     _lock = null;
     if (!_incoming.isClosed) await _incoming.close();
   }
