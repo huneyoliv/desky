@@ -122,7 +122,11 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
       final categories = _getCategories(countryCats, t);
       final safeIndex = _selectedCategoryIndex < categories.length ? _selectedCategoryIndex : 0;
       final catId = categories[safeIndex]['id'] as int;
-      final results = await repo.searchGroups(query, categoryId: catId);
+      final results = await repo.searchGroups(
+        query,
+        categoryId: catId,
+        countryId: ref.read(settingsNotifierProvider).selectedCountry.id,
+      );
       if (mounted) {
         setState(() {
           _searchResults = results;
