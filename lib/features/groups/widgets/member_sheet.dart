@@ -4,6 +4,7 @@ import '../../../core/cdn/cdn_resolver.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/models/group_member_model.dart';
+import '../../../data/repositories/group_repository.dart';
 import '../../../shared/widgets/studicon_avatar.dart';
 import '../../auth/auth_notifier.dart';
 import '../../statistics/stats_data.dart' show formatHms;
@@ -196,7 +197,11 @@ class _MemberSheetState extends ConsumerState<MemberSheet> {
               if (_sent == false)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text(t.tr('shake_failed', fallback: 'Could not send the nudge.'),
+                  child: Text(
+                      [
+                        t.tr('shake_failed', fallback: 'Could not send the nudge.'),
+                        if (GroupRepository.lastShakeError != null) GroupRepository.lastShakeError!,
+                      ].join('\n'),
                       style: const TextStyle(fontSize: 12, color: AppColors.error)),
                 ),
             ],
