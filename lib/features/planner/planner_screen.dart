@@ -258,45 +258,169 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     );
   }
 
-  void _showAddDDayDialog() {
+  /// D-Day deletion had no entry point either; long-press asks for confirm.
+  Future<void> _confirmDeleteDDay(DDayModel dday) async {
     final t = ref.read(appTranslationProvider);
-    showDialog(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text(t.tr('dday', fallback: 'Novo D-Day'), style: const TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _ddayTitleController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: t.tr('dday_title_hint', fallback: 'Título do D-Day...'),
-                hintStyle: TextStyle(color: context.appTextMuted),
-                filled: true,
-                fillColor: context.appSurface,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
+        title: Text(
+          t.tr('dday_delete_title', fallback: 'Excluir D-Day'),
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          dday.title,
+          style: TextStyle(color: context.appTextMuted),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              t.tr('cancel', fallback: 'Cancelar'),
+              style: TextStyle(color: context.appTextMuted),
+            ),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _ddayTitleController.clear();
-            },
+            onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-            child: Text(t.tr('add', fallback: 'Adicionar'), style: const TextStyle(color: Colors.white)),
+            child: Text(
+              t.tr('delete', fallback: 'Excluir'),
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final removed =
+        await ref.read(plannerRepositoryProvider).deleteDDay(dday.id);
+    if (removed) {
+      await _loadData();
+    }
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          removed
+              ? t.tr('dday_deleted', fallback: 'D-Day excluído')
+              : t.tr('dday_delete_failed',
+                  fallback: 'Não foi possível excluir o D-Day'),
+        ),
+      ),
+    );
+  }
+
+  /// The dialog used to only close itself, so tapping "Adicionar" discarded
+  /// the typed title and no record was ever sent. It now collects the target
+  /// date the API requires and calls [createDDay].
+  Future<void> _showAddDDayDialog() async {
+    final t = ref.read(appTranslationProvider);
+    var targetDate = _selectedDate;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          Future<void> pickDate() async {
+            final picked = await showDatePicker(
+              context: context,
+              initialDate: targetDate,
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2100),
+            );
+            if (picked != null) {
+              setDialogState(() => targetDate = picked);
+            }
+          }
+
+          return AlertDialog(
+            backgroundColor: context.appCard,
+            title: Text(
+              t.tr('dday', fallback: 'Novo D-Day'),
+              style: const TextStyle(color: Colors.white),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _ddayTitleController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: t.tr('dday_title_hint', fallback: 'Título do D-Day...'),
+                    hintStyle: TextStyle(color: context.appTextMuted),
+                    filled: true,
+                    fillColor: context.appSurface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: pickDate,
+                  icon: const Icon(Icons.calendar_today, size: 16),
+                  label: Text(
+                    '${targetDate.day.toString().padLeft(2, '0')}/'
+                    '${targetDate.month.toString().padLeft(2, '0')}/'
+                    '${targetDate.year}',
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: context.appPrimary,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  t.tr('cancel', fallback: 'Cancelar'),
+                  style: TextStyle(color: context.appTextMuted),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final title = _ddayTitleController.text.trim();
+                  if (title.isEmpty) return;
+                  final navigator = Navigator.of(context);
+                  final messenger = ScaffoldMessenger.of(context);
+                  navigator.pop();
+                  final created = await ref
+                      .read(plannerRepositoryProvider)
+                      .createDDay(
+                        title: title,
+                        targetDate: targetDate,
+                        colorInt: 4294948685,
+                      );
+                  _ddayTitleController.clear();
+                  if (created != null) {
+                    await _loadData();
+                  }
+                  if (!mounted) return;
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        created != null
+                            ? t.tr('dday_created', fallback: 'D-Day criado')
+                            : t.tr('dday_create_failed',
+                                fallback: 'Não foi possível criar o D-Day'),
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: context.appPrimary,
+                ),
+                child: Text(
+                  t.tr('add', fallback: 'Adicionar'),
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -521,8 +645,10 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                   itemCount: _ddays.length,
                                   itemBuilder: (context, index) {
                                     final dday = _ddays[index];
-                                    return Container(
-                                      width: 160,
+                                    return GestureDetector(
+                                      onLongPress: () => _confirmDeleteDDay(dday),
+                                      child: Container(
+                                        width: 160,
                                       margin: const EdgeInsets.only(right: 12),
                                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                       decoration: BoxDecoration(
@@ -554,6 +680,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                             ),
                                           ),
                                         ],
+                                      ),
                                       ),
                                     );
                                   },

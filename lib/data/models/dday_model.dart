@@ -31,14 +31,18 @@ class DDayModel {
     return 'D+${-days}';
   }
 
+  /// The live API serialises a D-Day with compact keys:
+  /// `{"id": 9369115, "tt": "QA", "dt": "2026-12-01", "st": null}`
+  /// (`tt` = title, `dt` = date). The verbose keys are kept as fallbacks.
   factory DDayModel.fromJson(Map<String, dynamic> json) {
+    final rawTitle = json['tt'] ?? json['title'];
+    final rawDate = json['dt'] ?? json['targetDate'] ?? json['date'];
+    final rawColor = json['color'] ?? json['c'];
     return DDayModel(
-      id: json['id'] as int? ?? 0,
-      title: json['title'] as String? ?? 'D-Day',
-      targetDate: json['targetDate'] != null
-          ? DateTime.parse(json['targetDate'] as String)
-          : DateTime.now(),
-      colorInt: json['color'] as int? ?? 4294948685,
+      id: _asInt(json['id']),
+      title: rawTitle?.toString() ?? 'D-Day',
+      targetDate: _parseDate(rawDate),
+      colorInt: _asInt(rawColor, 4294948685),
     );
   }
 
@@ -49,5 +53,17 @@ class DDayModel {
       'targetDate': targetDate.toIso8601String(),
       'color': colorInt,
     };
+  }
+
+  static int _asInt(dynamic value, [int fallback = 0]) {
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? fallback;
+  }
+
+  static DateTime _parseDate(dynamic value) {
+    if (value is DateTime) return value;
+    final text = value?.toString() ?? '';
+    if (text.isEmpty) return DateTime.now();
+    return DateTime.tryParse(text) ?? DateTime.now();
   }
 }

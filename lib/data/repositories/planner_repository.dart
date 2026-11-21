@@ -1,4 +1,5 @@
 import '../../core/api/api_client.dart';
+import '../../core/constants/api_constants.dart';
 import '../../core/utils/study_day_helper.dart';
 import '../models/dday_model.dart';
 import '../models/todo_item_model.dart';
@@ -9,16 +10,33 @@ class PlannerRepository {
   PlannerRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();
 
+  // Live-verified D-Day routes (see docs/api_matrix.md). The former
+  // `/planner/dday` and `/planner/ddays` paths answer 404 in production.
+  static const String _ddayGet = ApiConstants.ddayGet;
+  static const String _ddayCreate = ApiConstants.ddayCreate;
+  static const String _ddayDelete = ApiConstants.ddayDelete;
+
+  /// Lists the account's D-Days.
+  ///
+  /// `GET /user/d-day/get` answers `{"s": true}` and exposes no list key, so
+  /// the payload key is discovered defensively; an empty list is returned when
+  /// the account has none.
   Future<List<DDayModel>> fetchDDays() async {
     try {
-      final response = await _apiClient.get('/planner/ddays');
+      final response = await _apiClient.get(_ddayGet);
       final data = response.data;
-      if (data is Map<String, dynamic> && data['ddays'] is List) {
-        final list = data['ddays'] as List;
-        return list
-            .whereType<Map<String, dynamic>>()
-            .map((item) => DDayModel.fromJson(item))
-            .toList();
+      if (data is Map<String, dynamic>) {
+        final list = data['ddays'] ??
+            data['dl'] ??
+            data['r'] ??
+            data['ls'] ??
+            data['d'];
+        if (list is List) {
+          return list
+              .whereType<Map<String, dynamic>>()
+              .map((item) => DDayModel.fromJson(item))
+              .toList();
+        }
       }
     } catch (_) {}
     return [];
@@ -31,32 +49,50 @@ class PlannerRepository {
   }) async {
     try {
       final response = await _apiClient.post(
-        '/planner/dday',
+        _ddayCreate,
         data: {
           'title': title,
-          'targetDate': targetDate.toIso8601String(),
+          'date': _formatDate(targetDate),
           'color': colorInt,
         },
       );
       final data = response.data;
-      if (data is Map<String, dynamic> && (data['s'] == true || data['id'] != null)) {
-        final raw = data['dday'] ?? data;
+      if (data is Map<String, dynamic> && data['s'] == true) {
+        final raw = data['d'] ?? data['dday'];
         if (raw is Map<String, dynamic>) {
           return DDayModel.fromJson(raw);
         }
+        // The create response may omit the record; fall back to the input.
+        return DDayModel(
+          id: 0,
+          title: title,
+          targetDate: targetDate,
+          colorInt: colorInt,
+        );
       }
     } catch (_) {}
     return null;
   }
 
+  /// Deletes a D-Day by id (`{"id": <id>}` -> `{"s": true}`).
   Future<bool> deleteDDay(int ddayId) async {
     try {
-      final response = await _apiClient.delete('/planner/dday/$ddayId');
+      final response = await _apiClient.post(
+        _ddayDelete,
+        data: {'id': ddayId},
+      );
       final data = response.data;
       return data is Map<String, dynamic> && data['s'] == true;
     } catch (_) {
       return false;
     }
+  }
+
+  static String _formatDate(DateTime date) {
+    final y = date.year.toString().padLeft(4, '0');
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
   }
 
   Future<List<TodoItemModel>> fetchTodos(
