@@ -14,6 +14,7 @@ class TimerRepository {
     required String subjectTitle,
     required int subjectId,
     required DateTime startAt,
+    int? taskId,
   }) async {
     final response = await _apiClient.post(
       ApiConstants.studyStart,
@@ -21,7 +22,7 @@ class TimerRepository {
         'subject': subjectTitle,
         'subject_id': subjectId,
         'deviceModel': ApiConstants.defaultDeviceModel,
-        'taskId': null,
+        'taskId': taskId,
       },
     );
 

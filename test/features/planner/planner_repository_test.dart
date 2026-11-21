@@ -231,6 +231,81 @@ void main() {
       expect((payload as Map<String, dynamic>)['start_at'], '2026-11-01T12:15:00.000Z');
     });
 
+    test('createTodo forwards the selected subject id', () async {
+      Object? payload;
+      final repo = PlannerRepository(
+        apiClient: _FakeApiClient((path, query, body) async {
+          payload = body;
+          return _json({'s': true, 'r': {'id': 10, 't': 'nova', 'sd': 22}});
+        }),
+      );
+
+      await repo.createTodo(
+        title: 'nova',
+        dateYmd: '2026-11-01',
+        gmtOffset: brazil,
+        subjectId: 22,
+      );
+
+      expect((payload as Map<String, dynamic>)['subject_id'], 22);
+    });
+
+    test('editTodo changes, preserves, or explicitly clears the subject', () async {
+      final payloads = <Map<String, dynamic>>[];
+      final repo = PlannerRepository(
+        apiClient: _FakeApiClient((path, query, body) async {
+          payloads.add(Map<String, dynamic>.from(body as Map));
+          return _json({'s': true});
+        }),
+      );
+      const todo = TodoItemModel(
+        id: 11,
+        title: 'tarefa',
+        subjectId: 1,
+        subjectTitle: '',
+        subjectColorInt: 0,
+        isCompleted: false,
+        dateYmd: '2026-11-01',
+      );
+
+      await repo.editTodo(todo, 'renomeada', gmtOffset: brazil);
+      await repo.editTodo(
+        todo,
+        'renomeada',
+        gmtOffset: brazil,
+        subjectId: 22,
+        updateSubject: true,
+      );
+      await repo.editTodo(
+        todo,
+        'renomeada',
+        gmtOffset: brazil,
+        subjectId: null,
+        updateSubject: true,
+      );
+
+      expect(payloads.map((p) => p['subject_id']), equals([1, 22, null]));
+    });
+
+    test('deleteTodo sends the id in the JSON body, not the query', () async {
+      final calls = <({String path, Map<String, dynamic>? query, Object? body})>[];
+      final repo = PlannerRepository(
+        apiClient: _FakeApiClient((path, query, body) async {
+          calls.add((path: path, query: query, body: body));
+          return _json({'s': true});
+        }),
+      );
+
+      expect(await repo.deleteTodo(7), isTrue);
+      expect(await repo.deleteTodo(8, deleteAllSeries: true), isTrue);
+
+      expect(calls.map((c) => c.path),
+          everyElement('/study/study-plan/rest'));
+      expect(calls.map((c) => c.query), everyElement(isNull));
+      expect(calls[0].body, equals({'id': 7}));
+      expect(calls[1].body, equals({'id': 8, 'target': 'all'}));
+    });
+
     test('editTodo falls back to the study day start when the payload has no date', () async {
       Object? payload;
       final repo = PlannerRepository(

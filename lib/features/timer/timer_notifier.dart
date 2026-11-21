@@ -532,9 +532,12 @@ class TimerNotifier extends StateNotifier<TimerState> {
     );
   }
 
-  Future<void> startStudy() async {
+  Future<void> startStudy({int? taskId}) async {
     _checkStudyDateReset();
-    if (state.currentSubject == null && state.pomodoroPhase == PomodoroPhase.focus) return;
+    if (state.currentSubject == null &&
+        state.pomodoroPhase == PomodoroPhase.focus) {
+      return;
+    }
     final now = DateTime.now();
 
     if (state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
@@ -553,6 +556,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           subjectTitle: state.currentSubject!.title,
           subjectId: state.currentSubject!.id,
           startAt: now,
+          taskId: taskId,
         );
         // Only trust the day log once the server accepted the start; otherwise
         // a lagging log would stop the session on the next reconcile.
