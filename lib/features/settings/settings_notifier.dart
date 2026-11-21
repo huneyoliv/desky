@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/country_model.dart';
 import '../../data/repositories/settings_repository.dart';
+import '../../core/theme/timer_appearance.dart';
 import 'settings_state.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences?>((ref) {
@@ -38,6 +39,10 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
       final betaChannel = await _repository.getBetaChannel();
+      final timerBackground = await _repository.getTimerBackground();
+      final timerBackgroundImagePath =
+          await _repository.getTimerBackgroundImagePath();
+      final timerFont = await _repository.getTimerFont();
 
       if (!mounted) return;
       state = state.copyWith(
@@ -50,6 +55,9 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
         discordRpcEnabled: discordRpc,
         betaChannel: betaChannel,
+        timerBackground: timerBackground,
+        timerBackgroundImagePath: timerBackgroundImagePath,
+        timerFont: timerFont,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
       );
@@ -135,6 +143,27 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleDiscordRpc(bool value) async {
     state = state.copyWith(discordRpcEnabled: value);
     await _repository.saveDiscordRpcEnabled(value);
+  }
+
+  Future<void> setTimerBackground(String value) async {
+    final normalized = normalizeTimerBackground(value);
+    state = state.copyWith(timerBackground: normalized);
+    await _repository.saveTimerBackground(normalized);
+  }
+
+  Future<void> setTimerBackgroundImage(String path) async {
+    state = state.copyWith(
+      timerBackground: timerBackgroundCustomImage,
+      timerBackgroundImagePath: path,
+    );
+    await _repository.saveTimerBackgroundImagePath(path);
+    await _repository.saveTimerBackground(timerBackgroundCustomImage);
+  }
+
+  Future<void> setTimerFont(String value) async {
+    final normalized = normalizeTimerFont(value);
+    state = state.copyWith(timerFont: normalized);
+    await _repository.saveTimerFont(normalized);
   }
 
   /// Opts in or out of pre-release update checks.

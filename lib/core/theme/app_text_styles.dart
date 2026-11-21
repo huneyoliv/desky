@@ -7,11 +7,14 @@ class AppTextStyles {
   static const String fontText = 'SF-Pro-Text';
   static const String fontDisplay = 'SF-Pro-Display';
   static const String fontTimer = 'E1234';
-  // Backward compatibility alias
-  static const String fontPretendard = 'SF-Pro-Text';
+  static const String fontPretendard = 'Pretendard';
   static const String fontEmoji = 'AppleEmoji';
 
-  static const List<String> fontFallbacks = ['AppleEmoji', 'NotoColorEmoji', 'Pretendard'];
+  static const List<String> fontFallbacks = [
+    'AppleEmoji',
+    'NotoColorEmoji',
+    'Pretendard',
+  ];
 
   static const TextStyle displayLarge = TextStyle(
     fontFamily: fontDisplay,

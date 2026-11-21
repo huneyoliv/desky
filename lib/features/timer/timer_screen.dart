@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/timer_appearance.dart';
 import '../../core/localization/app_translation.dart';
 import 'timer_notifier.dart';
 import 'widgets/timer_display.dart';
@@ -10,6 +13,7 @@ import 'widgets/pomodoro_config_dialog.dart';
 import 'widgets/manual_study_log_dialog.dart';
 import 'offline_sync_notifier.dart';
 import 'focus_mode_notifier.dart';
+import '../settings/settings_notifier.dart';
 
 class TimerScreen extends ConsumerWidget {
   /// Identifies the top bar in tests, which assert it spans the window so the
@@ -57,8 +61,13 @@ class TimerScreen extends ConsumerWidget {
       PomodoroPhase.longBreak => AppColors.warning,
     };
 
-    return Scaffold(
-      backgroundColor: palette.background,
+    final appearance = ref.watch(settingsNotifierProvider);
+
+    return _TimerBackground(
+      child: Scaffold(
+      backgroundColor: appearance.timerBackground == timerBackgroundTheme
+          ? palette.background
+          : Colors.transparent,
       body: SafeArea(
         child: Column(
           children: [
@@ -387,6 +396,7 @@ class TimerScreen extends ConsumerWidget {
                         TimerDisplay(
                           elapsedMs: timerState.isPaused ? timerState.sessionRestMs : displayMs,
                           fontSize: 64,
+                          fontFamily: timerFontFamilyName(appearance.timerFont),
                         ),
                         // Fixed-height slot: the paused chip and the subject
                         // name have different heights, and without a reserved
@@ -535,6 +545,7 @@ class TimerScreen extends ConsumerWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -563,6 +574,54 @@ class TimerScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TimerBackground extends ConsumerWidget {
+  const _TimerBackground({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsNotifierProvider);
+    final style = settings.timerBackground;
+    final imagePath = settings.timerBackgroundImagePath;
+    final gradient = switch (style) {
+      timerBackgroundAurora => const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+        ),
+      timerBackgroundSunset => const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2B1055), Color(0xFF7597DE)],
+        ),
+      _ => null,
+    };
+
+    return Stack(
+      key: ValueKey('timer-background-$style'),
+      fit: StackFit.expand,
+      children: [
+        ColoredBox(color: context.palette.background),
+        if (gradient != null)
+          DecoratedBox(decoration: BoxDecoration(gradient: gradient))
+        else if (style == timerBackgroundCustomImage &&
+            imagePath != null &&
+            imagePath.isNotEmpty)
+          Image.file(
+            File(imagePath),
+            fit: BoxFit.cover,
+            cacheWidth: 1920,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        if (style != timerBackgroundTheme)
+          ColoredBox(color: Colors.black.withValues(alpha: 0.45)),
+        child,
+      ],
     );
   }
 }

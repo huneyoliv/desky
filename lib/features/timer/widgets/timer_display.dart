@@ -5,11 +5,13 @@ import '../../../core/theme/app_text_styles.dart';
 class TimerDisplay extends StatelessWidget {
   final int elapsedMs;
   final double fontSize;
+  final String? fontFamily;
 
   const TimerDisplay({
     super.key,
     required this.elapsedMs,
     this.fontSize = 56,
+    this.fontFamily,
   });
 
   String _formatDuration(int ms) {
@@ -34,7 +36,7 @@ class TimerDisplay extends StatelessWidget {
     return Text(
       timeStr,
       style: TextStyle(
-        fontFamily: AppTextStyles.fontTimer,
+        fontFamily: fontFamily ?? AppTextStyles.fontTimer,
         fontSize: fontSize,
         fontWeight: FontWeight.w700,
         color: context.palette.textPrimary,
