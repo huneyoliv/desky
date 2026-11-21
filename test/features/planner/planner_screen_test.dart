@@ -115,6 +115,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Vestibular'), findsOneWidget);
+    expect(find.text('Calendário'), findsOneWidget);
     expect(find.text('Resolver 30 questões de Matemática'), findsOneWidget);
   });
 

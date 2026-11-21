@@ -3480,6 +3480,21 @@ class AppTranslation {
       'zh-cn': '学习日历',
       'zh-tw': '學習行事曆',
     },
+    // Rotulo da aba do Planner. "Planejamento" seria redundante: a tela toda
+    // ja e o Planner. O titulo interno da grade continua sendo 'timetable'.
+    'planner_calendar_tab': {
+      'pt': 'Calendário',
+      'en': 'Calendar',
+      'es': 'Calendario',
+      'ko': '캘린더',
+      'ja': 'カレンダー',
+      'zh-cn': '日历',
+      'zh-tw': '日曆',
+      'fr': 'Calendrier',
+      'de': 'Kalender',
+      'it': 'Calendario',
+      'ru': 'Календарь',
+    },
     'timetable': {
       'pt': 'Grade Horária',
       'en': 'Timetable',

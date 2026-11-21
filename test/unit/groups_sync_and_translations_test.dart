@@ -119,6 +119,23 @@ void main() {
       expect(translationEn.tr('timetable'), equals('Timetable'));
       expect(translationEs.tr('timetable'), equals('Horario'));
 
+      // A aba do Planner deixou de se chamar "Grade Horária": "Planejamento"
+      // seria redundante dentro do proprio Planner, entao a aba e o calendario.
+      // O titulo interno da grade continua usando 'timetable'.
+      expect(translationPt.tr('planner_calendar_tab'), equals('Calendário'));
+      expect(translationEn.tr('planner_calendar_tab'), equals('Calendar'));
+      expect(translationEs.tr('planner_calendar_tab'), equals('Calendario'));
+      expect(
+        const AppTranslation(languageCode: 'fr', translations: {})
+            .tr('planner_calendar_tab'),
+        equals('Calendrier'),
+      );
+      expect(
+        const AppTranslation(languageCode: 'ja', translations: {})
+            .tr('planner_calendar_tab'),
+        equals('カレンダー'),
+      );
+
       expect(translationPt.tr('monday'), equals('Segunda-feira'));
       expect(translationEn.tr('monday'), equals('Monday'));
       expect(translationEs.tr('monday'), equals('Lunes'));
