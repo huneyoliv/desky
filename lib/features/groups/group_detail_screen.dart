@@ -14,6 +14,7 @@ import 'lifecycle_poll_coordinator.dart';
 import 'widgets/sticker_picker_panel.dart';
 import 'widgets/group_studicon_picker_dialog.dart';
 import 'widgets/member_live_timer.dart';
+import 'widgets/member_sheet.dart';
 import '../../data/models/sticker_model.dart';
 import '../../shared/widgets/studicon_avatar.dart';
 import '../../core/cdn/cdn_resolver.dart';
@@ -271,6 +272,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     final sent = await repo.shakeMember(
       groupId: widget.group.id,
       targetUserId: member.userId,
+      from: ref.read(authStateProvider).user?.name ?? '',
     );
 
     // The repository answers false instead of throwing, so the old code showed
@@ -280,7 +282,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       SnackBar(
         content: Text(sent
             ? '${t.tr("shake_sent_to", fallback: "Chacoalhada enviada para")} ${member.name}! 🔔'
-            : t.tr('shake_failed', fallback: 'Não foi possível enviar a cutucada.')),
+            : '${t.tr('shake_failed', fallback: 'Could not send the nudge.')}'
+                '${GroupRepository.lastShakeError == null ? '' : '\n${GroupRepository.lastShakeError}'}'),
         backgroundColor: sent ? context.appPrimary : AppColors.error,
       ),
     );
@@ -605,6 +608,10 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                         msg.stickerUrl!,
                                         height: 100,
                                         width: 100,
+                                        // Decode at display size: full-size
+                                        // bitmaps in a chat polled every 3 s
+                                        // could exhaust memory and crash.
+                                        cacheWidth: 200,
                                         fit: BoxFit.contain,
                                         errorBuilder: (_, __, ___) => const Icon(Icons.extension, color: Colors.white70),
                                       ),
@@ -617,6 +624,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                         child: Image.network(
                                           msg.imageUrl!,
                                           height: 180,
+                                          cacheHeight: 360,
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white70),
                                         ),
@@ -861,7 +869,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                               CircleAvatar(
                                 radius: 20,
                                 backgroundColor: palette.surface,
-                                backgroundImage: NetworkImage(member.avatarUrl),
+                                backgroundImage: ResizeImage(NetworkImage(member.avatarUrl), width: 128, height: 128),
                               ),
                             ],
                           ),
@@ -1020,7 +1028,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       pose = StudiconPose.normal1;
     }
 
-    return Container(
+    // Left click opens the member card: stats, weekly rank and Nudge.
+    return InkWell(
+      key: ValueKey('group-member-${member.userId}'),
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => MemberSheet.show(context, groupId: widget.group.id, member: member),
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: context.palette.card,
@@ -1041,12 +1054,15 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                   ? CircleAvatar(
                       radius: 28,
                       backgroundColor: context.appSurface,
-                      backgroundImage: NetworkImage(member.avatarUrl),
+                      backgroundImage: ResizeImage(NetworkImage(member.avatarUrl), width: 128, height: 128),
                     )
-                  : StudiconAvatar(
-                      studiconId: member.studiconId,
-                      pose: pose,
-                      size: 56,
+                  : Greyed(
+                      enabled: !isActivelyStudying,
+                      child: StudiconAvatar(
+                        studiconId: member.studiconId,
+                        pose: pose,
+                        size: 56,
+                      ),
                     ),
               if (isActivelyStudying)
                 Positioned(
@@ -1126,6 +1142,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           ],
         ],
       ),
+    ),
     );
   }
 }

@@ -105,7 +105,7 @@ class ProfileScreen extends ConsumerWidget {
                       content: Text(
                         success
                             ? t.tr('success', fallback: 'Apelido alterado com sucesso!')
-                            : t.tr('error', fallback: 'Falha ao alterar apelido no servidor'),
+                            : t.tr('error_nickname', fallback: 'Could not change your nickname on the server'),
                       ),
                       backgroundColor: success ? AppColors.success : AppColors.error,
                     ),
@@ -160,7 +160,7 @@ class ProfileScreen extends ConsumerWidget {
                     content: Text(
                       success
                           ? t.tr('success', fallback: 'Mensagem de status alterada!')
-                          : t.tr('error', fallback: 'Falha ao atualizar status no servidor'),
+                          : t.tr('error_status', fallback: 'Could not update your status on the server'),
                     ),
                     backgroundColor: success ? AppColors.success : AppColors.error,
                   ),
@@ -635,7 +635,7 @@ class ProfileScreen extends ConsumerWidget {
                 children: [
                   ListTile(
                     leading: Icon(Icons.lock_reset_rounded, color: context.appPrimary),
-                    title: Text(t.tr('drawer_settings_reset_password_title', fallback: 'Alterar Senha'),
+                    title: Text(t.tr('drawer_settings_reset_password_title', fallback: 'Change password'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('change_password_subtitle', fallback: 'Atualizar sua credencial de acesso'),
@@ -647,7 +647,7 @@ class ProfileScreen extends ConsumerWidget {
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
                     leading: const Icon(Icons.block_rounded, color: AppColors.error),
-                    title: Text(t.tr('drawer_settings_block_user_title', fallback: 'Usuários Bloqueados'),
+                    title: Text(t.tr('drawer_settings_block_user_title', fallback: 'Blocked users'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('blocked_users_subtitle', fallback: 'Gerenciar lista de usuários bloqueados'),
@@ -665,7 +665,7 @@ class ProfileScreen extends ConsumerWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '${t.tr('drawer_helps_title', fallback: 'Ajuda')} & ${t.tr('legal', fallback: 'Legal')}',
+                '${t.tr('drawer_helps_title', fallback: 'Help')} & ${t.tr('legal', fallback: 'Legal')}',
                 style: AppTextStyles.titleMedium,
               ),
             ),
@@ -706,7 +706,7 @@ class ProfileScreen extends ConsumerWidget {
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
                     leading: Icon(Icons.help_outline_rounded, color: context.appPrimary),
-                    title: Text('${t.tr('drawer_helps_title', fallback: 'Ajuda')} & FAQ',
+                    title: Text('${t.tr('drawer_helps_title', fallback: 'Help')} & FAQ',
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       t.tr('faq_subtitle', fallback: 'Dúvidas frequentes e canais de atendimento'),
@@ -730,7 +730,7 @@ class ProfileScreen extends ConsumerWidget {
                   Divider(color: context.appBorder, height: 1),
                   ListTile(
                     leading: Icon(Icons.info_outline_rounded, color: context.appPrimary),
-                    title: Text(t.tr('drawer_settings_pallo_app_version', fallback: 'Versão do app'),
+                    title: Text(t.tr('drawer_settings_pallo_app_version', fallback: 'App version'),
                         style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                       'Desky ${AppConstants.appVersion} • Build ${AppConstants.buildNumber}',

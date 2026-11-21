@@ -157,7 +157,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  t.tr('color', fallback: 'Cor'),
+                  t.tr('color', fallback: 'Color'),
                   style: TextStyle(color: context.appTextSecondary, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 10),
@@ -223,7 +223,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('${t.tr("edit", fallback: "Editar")}: ${subject.title}', style: const TextStyle(color: Colors.white)),
+          title: Text('${t.tr("edit", fallback: "Edit")}: ${subject.title}', style: const TextStyle(color: Colors.white)),
           content: SizedBox(
             width: 360,
             child: Column(
@@ -246,7 +246,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  t.tr('color', fallback: 'Cor'),
+                  t.tr('color', fallback: 'Color'),
                   style: TextStyle(color: context.appTextSecondary, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 10),

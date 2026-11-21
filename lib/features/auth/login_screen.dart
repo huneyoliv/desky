@@ -242,7 +242,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                       obscureText: true,
                       style: TextStyle(color: context.appTextPrimary),
                       decoration: InputDecoration(
-                        hintText: t.tr('new_password', fallback: 'Nova senha'),
+                        hintText: t.tr('new_password', fallback: 'New password'),
                         hintStyle: TextStyle(color: context.appTextMuted),
                         filled: true,
                         fillColor: context.appSurface,
@@ -648,7 +648,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 14),
                                     child: Text(
-                                      t.tr('or', fallback: 'ou').toUpperCase(),
+                                      t.tr('or', fallback: 'or').toUpperCase(),
                                       style: TextStyle(
                                         color: context.appTextMuted,
                                         fontSize: 12,

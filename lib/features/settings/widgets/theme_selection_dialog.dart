@@ -153,7 +153,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 child: Text(
-                  t.tr('close_btn', fallback: 'Concluir'),
+                  t.tr('close_btn', fallback: 'Done'),
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),

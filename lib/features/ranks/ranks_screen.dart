@@ -290,7 +290,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
     const othersColor = AppColors.error;
 
     String labelOf(String key) => key == RankRepository.unknownSubjectKey
-        ? t.tr('general', fallback: 'Geral')
+        ? t.tr('general', fallback: 'General')
         : key;
 
     var maxHours = 1.0;
@@ -354,7 +354,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              t.tr('analytics_stacked_bar_subject_name', fallback: 'Tempo de estudo por matéria'),
+              t.tr('analytics_stacked_bar_subject_name', fallback: 'Study time by subject'),
               style: AppTextStyles.titleMedium,
             ),
             const SizedBox(height: 10),
@@ -456,7 +456,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                     _seriesLegendItem(context, labelOf(subject), colorOf[subject]!),
                   if (hasOthers)
                     _seriesLegendItem(
-                        context, t.tr('others', fallback: 'Outros'), othersColor),
+                        context, t.tr('others', fallback: 'Others'), othersColor),
                 ],
               ),
             ],
@@ -507,13 +507,13 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   String _statsRangeLabel(_StatsRange range, AppTranslation t) {
     switch (range) {
       case _StatsRange.thisWeek:
-        return t.tr('analytics_stairs_info_this_week', fallback: 'Esta semana');
+        return t.tr('analytics_stairs_info_this_week', fallback: 'This week');
       case _StatsRange.lastWeek:
-        return t.tr('analytics_stairs_info_last_week', fallback: 'Semana passada');
+        return t.tr('analytics_stairs_info_last_week', fallback: 'Last week');
       case _StatsRange.thisMonth:
-        return t.tr('analytics_stairs_info_this_month', fallback: 'Este mês');
+        return t.tr('analytics_stairs_info_this_month', fallback: 'This month');
       case _StatsRange.lastMonth:
-        return t.tr('analytics_stairs_info_last_month', fallback: 'Mês passado');
+        return t.tr('analytics_stairs_info_last_month', fallback: 'Last month');
     }
   }
 

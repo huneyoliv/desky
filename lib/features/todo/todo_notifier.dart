@@ -111,7 +111,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
   }
 
   /// Creates a task on the active day. Returns false when the API rejects it.
-  Future<bool> add(String title) async {
+  Future<bool> add(String title, {int? subjectId}) async {
     final trimmed = title.trim();
     if (trimmed.isEmpty) return false;
 
@@ -120,6 +120,7 @@ class TodoNotifier extends StateNotifier<TodoState> {
       dateYmd: activeDay,
       gmtOffset: _gmtOffset,
       resetHour: _resetHour,
+      subjectId: subjectId,
     );
     if (created == null) {
       if (mounted) {

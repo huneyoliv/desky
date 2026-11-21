@@ -91,7 +91,7 @@ class StudyCalendar extends ConsumerWidget {
             IconButton(
               // Forward navigation stops at the current month: nobody studies tomorrow.
               onPressed: isCurrentMonth ? null : () => onMonthChanged(DateTime(shown.year, shown.month + 1)),
-              tooltip: t.tr('next', fallback: 'Próximo mês'),
+              tooltip: t.tr('next', fallback: 'Next month'),
               icon: Icon(Icons.chevron_right, color: context.appTextPrimary),
             ),
           ],

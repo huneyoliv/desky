@@ -37,6 +37,12 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final soundEffects = await _repository.getSoundEffects();
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
+      final obsOverlayMode = await _repository.getObsOverlayMode();
+      final classicYptLook = await _repository.getClassicYptLook();
+      final classicUiScale = await _repository.getClassicUiScale();
+      final miniOpacity = await _repository.getMiniOpacity();
+      final offlineMode = await _repository.getOfflineMode();
+      final dial = await _repository.getDialStyle();
       final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
@@ -49,6 +55,14 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         soundEffects: soundEffects,
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
         discordRpcEnabled: discordRpc,
+        obsOverlayMode: obsOverlayMode,
+        classicYptLook: classicYptLook,
+        classicUiScale: classicUiScale,
+        miniOpacity: miniOpacity,
+        offlineMode: offlineMode,
+        dialStudyColor: dial.study,
+        dialBreakColor: dial.rest,
+        showStopwatchDial: dial.show,
         betaChannel: betaChannel,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
@@ -135,6 +149,53 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleDiscordRpc(bool value) async {
     state = state.copyWith(discordRpcEnabled: value);
     await _repository.saveDiscordRpcEnabled(value);
+  }
+
+  /// Keeps the window rendering for OBS when the user minimizes it.
+  Future<void> toggleObsOverlayMode(bool value) async {
+    state = state.copyWith(obsOverlayMode: value);
+    await _repository.saveObsOverlayMode(value);
+  }
+
+  /// Switches between the sidebar layout and the Classic YPT top tabs.
+  Future<void> toggleClassicYptLook(bool value) async {
+    state = state.copyWith(classicYptLook: value);
+    await _repository.saveClassicYptLook(value);
+  }
+
+  static const double minUiScale = 0.7;
+  static const double maxUiScale = 1.8;
+
+  /// Sets the Classic look's zoom, clamped to [minUiScale]..[maxUiScale] and
+  /// rounded to 5 % steps so repeated presses land on clean values.
+  Future<void> setClassicUiScale(double value) async {
+    final clamped = (value.clamp(minUiScale, maxUiScale) * 20).round() / 20;
+    if (clamped == state.classicUiScale) return;
+    state = state.copyWith(classicUiScale: clamped);
+    await _repository.saveClassicUiScale(clamped);
+  }
+
+  /// Opacity of the mini player, 30 % to 100 %.
+  Future<void> setMiniOpacity(double value) async {
+    final clamped = value.clamp(0.3, 1.0).toDouble();
+    state = state.copyWith(miniOpacity: clamped);
+    await _repository.saveMiniOpacity(clamped);
+  }
+
+  /// Timer dial look: study and break colours, and whether the dial shows
+  /// outside Pomodoro.
+  Future<void> setDialStyle({int? study, int? rest, bool? show}) async {
+    state = state.copyWith(dialStudyColor: study, dialBreakColor: rest, showStopwatchDial: show);
+    await _repository.saveDialStyle(
+      study: state.dialStudyColor,
+      rest: state.dialBreakColor,
+      show: state.showStopwatchDial,
+    );
+  }
+
+  Future<void> toggleOfflineMode(bool value) async {
+    state = state.copyWith(offlineMode: value);
+    await _repository.saveOfflineMode(value);
   }
 
   /// Opts in or out of pre-release update checks.

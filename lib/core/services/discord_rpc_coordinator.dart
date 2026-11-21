@@ -16,29 +16,35 @@ class DiscordRpcCoordinator {
 
   void _init() {
     Future.microtask(() async {
-      await _rpcService.initialize();
+      if (_ref.read(settingsNotifierProvider).discordRpcEnabled) {
+        await _rpcService.initialize();
+      }
       _syncPresence();
     });
 
-    // Listen to changes in timer state
+    // Timer ticks: the service drops duplicates and rate limits updates.
     _ref.listen<TimerState>(timerNotifierProvider, (prev, next) {
       _syncPresence();
     });
 
-    // Listen to auth state changes (e.g. login, equip studicon)
+    // Login/logout, equipped studicon.
     _ref.listen<AuthState>(authStateProvider, (prev, next) {
       _syncPresence();
     });
 
-    // Listen to settings changes (e.g. toggle RPC, language change)
     _ref.listen<SettingsState>(settingsNotifierProvider, (prev, next) {
-      if (prev?.discordRpcEnabled != next.discordRpcEnabled ||
-          prev?.selectedLanguage != next.selectedLanguage) {
+      if (prev?.discordRpcEnabled != next.discordRpcEnabled) {
+        if (!next.discordRpcEnabled) {
+          // Off means off: close the connection so nothing lingers on Discord.
+          _rpcService.disconnect();
+          return;
+        }
+        _syncPresence();
+      } else if (prev?.selectedLanguage != next.selectedLanguage) {
         _syncPresence();
       }
     });
 
-    // Listen to translation changes
     _ref.listen<AppTranslation>(appTranslationProvider, (prev, next) {
       _syncPresence();
     });
@@ -46,38 +52,20 @@ class DiscordRpcCoordinator {
 
   void _syncPresence() {
     final settings = _ref.read(settingsNotifierProvider);
-    if (!settings.discordRpcEnabled) {
-      _rpcService.clearPresence();
-      return;
-    }
+    if (!settings.discordRpcEnabled) return;
 
     final authState = _ref.read(authStateProvider);
     final user = authState.user;
     if (!authState.isAuthenticated || user == null) {
-      _rpcService.clearPresence();
+      _rpcService.setPresence(null);
       return;
     }
 
-    final timerState = _ref.read(timerNotifierProvider);
-    if (!timerState.isRunning && !timerState.isPaused) {
-      _rpcService.clearPresence();
-      return;
-    }
-
-    final translation = _ref.read(appTranslationProvider);
-
-    final payload = DiscordRpcService.buildPayload(
-      timerState: timerState,
+    _rpcService.setPresence(DiscordRpcService.buildPayload(
+      timerState: _ref.read(timerNotifierProvider),
       user: user,
-      translation: translation,
-    );
-
-    if (payload == null) {
-      _rpcService.clearPresence();
-      return;
-    }
-
-    _rpcService.updatePresence(payload);
+      translation: _ref.read(appTranslationProvider),
+    ));
   }
 }
 

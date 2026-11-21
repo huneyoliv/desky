@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/json_utils.dart';
 import '../../core/utils/study_date_helper.dart';
 import '../../data/models/subject_model.dart';
@@ -172,6 +173,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
   /// first server reconciliation finished.
   late final Future<void> ready;
 
+  /// Offline mode: skip every server call, queue sessions locally.
+  final bool Function() _isOffline;
+  static bool _never() => false;
+
   TimerNotifier({
     required TimerRepository timerRepository,
     required SubjectRepository subjectRepository,
@@ -182,7 +187,9 @@ class TimerNotifier extends StateNotifier<TimerState> {
     String? initialSubjectTitle,
     String language = 'pt',
     String timezone = 'America/Sao_Paulo',
+    bool Function()? isOffline,
   })  : _timerRepository = timerRepository,
+        _isOffline = isOffline ?? _never,
         _subjectRepository = subjectRepository,
         _offlineSyncRepository = offlineSyncRepository,
         _sessionStore = sessionStore ?? TimerSessionStore(),
@@ -195,6 +202,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           lastStudyDate: StudyDateHelper.getStudyDateString(null, dayResetHour),
         )) {
     loadSubjects();
+    _loadDailyGoal();
     _dayResetTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       _checkStudyDateReset();
     });
@@ -269,7 +277,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   /// The daily log exposes `dl.is`; when the payload does not carry that flag
   /// the local state is left untouched instead of guessing.
   Future<void> reconcileWithServer() async {
-    if (_reconciling) return;
+    if (_reconciling || _isOffline()) return;
     _reconciling = true;
     try {
       final log = await _timerRepository.fetchDailyLog(DateTime.now());
@@ -431,10 +439,17 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   Future<void> loadSubjects() async {
     try {
-      final result = await _subjectRepository.fetchSubjectsData(
-        language: _language,
-        timezone: _timezone,
-      );
+      // Offline mode reads the last saved subject list straight away instead
+      // of waiting for the network to fail first.
+      final result = _isOffline()
+          ? SubjectFetchResult(
+              subjects: await _subjectRepository.getCachedSubjects(),
+              todayTotalMs: state.todayTotalMs,
+            )
+          : await _subjectRepository.fetchSubjectsData(
+              language: _language,
+              timezone: _timezone,
+            );
       if (!mounted) return;
       final subjects = result.subjects.isNotEmpty ? result.subjects : state.subjects;
       final current = subjects.isNotEmpty
@@ -491,8 +506,25 @@ class TimerNotifier extends StateNotifier<TimerState> {
     );
   }
 
-  void setDailyGoalMinutes(int minutes) {
-    state = state.copyWith(dailyGoalMinutes: minutes);
+  static const String dailyGoalKey = 'daily_goal_minutes';
+
+  /// Daily goal in minutes (15 min to 24 h), saved on this device: the YPT
+  /// API exposes no goal, so it used to reset to 6 h on every start.
+  Future<void> setDailyGoalMinutes(int minutes) async {
+    final clamped = minutes.clamp(15, 24 * 60);
+    state = state.copyWith(dailyGoalMinutes: clamped);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(dailyGoalKey, clamped);
+    } catch (_) {}
+  }
+
+  Future<void> _loadDailyGoal() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getInt(dailyGoalKey);
+      if (saved != null && saved >= 15 && mounted) state = state.copyWith(dailyGoalMinutes: saved);
+    } catch (_) {}
   }
 
   void configurePomodoro({
@@ -537,7 +569,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     if (state.currentSubject == null && state.pomodoroPhase == PomodoroPhase.focus) return;
     final now = DateTime.now();
 
-    if (state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
+    if (!_isOffline() && state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
       final rStart = state.restStartAt!;
       final rElapsed = state.sessionRestMs;
       _timerRepository.recordRest(
@@ -547,17 +579,22 @@ class TimerNotifier extends StateNotifier<TimerState> {
       );
     }
 
-    if (state.pomodoroPhase == PomodoroPhase.focus && state.currentSubject != null) {
-      try {
-        final accepted = await _timerRepository.startStudy(
-          subjectTitle: state.currentSubject!.title,
-          subjectId: state.currentSubject!.id,
-          startAt: now,
-        );
-        // Only trust the day log once the server accepted the start; otherwise
-        // a lagging log would stop the session on the next reconcile.
-        _serverConfirmedSession = accepted;
-      } catch (_) {}
+    _serverConfirmedSession = false;
+    if (!_isOffline() && state.pomodoroPhase == PomodoroPhase.focus && state.currentSubject != null) {
+      // Not awaited: the clock starts at once even on a slow or dead network
+      // (the request used to hold the start for up to the 15 s timeout).
+      // Only trust the day log once the server accepted this start; otherwise
+      // a lagging log would stop the session on the next reconcile.
+      _timerRepository
+          .startStudy(
+            subjectTitle: state.currentSubject!.title,
+            subjectId: state.currentSubject!.id,
+            startAt: now,
+          )
+          .timeout(const Duration(seconds: 8), onTimeout: () => false)
+          .then((accepted) {
+        if (mounted && state.isRunning && state.sessionStartAt == now) _serverConfirmedSession = accepted;
+      }).catchError((Object _) {});
     }
 
     _accumulatedSessionMs = state.sessionElapsedMs;
@@ -773,6 +810,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
       final startAt = state.sessionStartAt ?? now.subtract(Duration(milliseconds: safeElapsed));
       final stopAt = startAt.add(Duration(milliseconds: safeElapsed));
       try {
+        if (_isOffline()) throw const _OfflineSkip();
         final res = await _timerRepository.stopStudy(
           subjectTitle: currentSub.title,
           subjectId: currentSub.id,
@@ -852,7 +890,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     _cancelReconcileTimer();
     final now = DateTime.now();
 
-    if (state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
+    if (!_isOffline() && state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
       try {
         await _timerRepository.recordRest(
           startAt: state.restStartAt!,
@@ -1022,6 +1060,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
   }
 }
 
+/// Thrown inside the stop path to take the "queue it locally" branch.
+class _OfflineSkip implements Exception {
+  const _OfflineSkip();
+}
+
 final timerNotifierProvider =
     StateNotifierProvider<TimerNotifier, TimerState>((ref) {
   final timerRepo = ref.watch(timerRepositoryProvider);
@@ -1043,6 +1086,7 @@ final timerNotifierProvider =
     initialSubjectTitle: initialTranslation.tr('initial_subject', fallback: trMsg('initial_subject', fallback: 'Matéria Inicial')),
     language: settings.selectedLanguage,
     timezone: settings.selectedCountry.timezone,
+    isOffline: () => ref.read(settingsNotifierProvider).offlineMode,
   );
 
   // Daily logs are resolved with the country timezone, so keep it in sync when

@@ -16,6 +16,30 @@ class SettingsState {
   final bool soundEffects;
   final List<String> blockedUsers;
   final bool discordRpcEnabled;
+
+  /// Windows: minimizing sends the window behind the others instead of
+  /// really minimizing it, so an OBS Window Capture keeps receiving frames.
+  final bool obsOverlayMode;
+
+  /// Layout modelled on the YPT desktop app: top tabs instead of the sidebar.
+  final bool classicYptLook;
+
+  /// Zoom of the Classic look (1.0 = 100 %), changed with Ctrl +/- or Ctrl + wheel.
+  final double classicUiScale;
+
+  /// Opacity of the floating mini player (0.3 to 1.0).
+  final double miniOpacity;
+
+  /// Offline mode: no network calls from the timer; sessions are queued and
+  /// synced when it is turned off.
+  final bool offlineMode;
+
+  /// Timer dial colours (ARGB) for study and for breaks.
+  final int dialStudyColor;
+  final int dialBreakColor;
+
+  /// Show the filling dial outside Pomodoro too (the Pomodoro dial always shows).
+  final bool showStopwatchDial;
   final bool betaChannel;
 
   const SettingsState({
@@ -32,6 +56,14 @@ class SettingsState {
     this.soundEffects = true,
     this.blockedUsers = const [],
     this.discordRpcEnabled = true,
+    this.obsOverlayMode = false,
+    this.classicYptLook = false,
+    this.classicUiScale = 1.0,
+    this.miniOpacity = 0.95,
+    this.offlineMode = false,
+    this.dialStudyColor = 0xFFFF6B1A,
+    this.dialBreakColor = 0xFF2F7CF6,
+    this.showStopwatchDial = true,
     this.betaChannel = false,
   });
 
@@ -49,6 +81,14 @@ class SettingsState {
     bool? soundEffects,
     List<String>? blockedUsers,
     bool? discordRpcEnabled,
+    bool? obsOverlayMode,
+    bool? classicYptLook,
+    double? classicUiScale,
+    double? miniOpacity,
+    bool? offlineMode,
+    int? dialStudyColor,
+    int? dialBreakColor,
+    bool? showStopwatchDial,
     bool? betaChannel,
   }) {
     return SettingsState(
@@ -65,6 +105,14 @@ class SettingsState {
       soundEffects: soundEffects ?? this.soundEffects,
       blockedUsers: blockedUsers ?? this.blockedUsers,
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
+      obsOverlayMode: obsOverlayMode ?? this.obsOverlayMode,
+      classicYptLook: classicYptLook ?? this.classicYptLook,
+      classicUiScale: classicUiScale ?? this.classicUiScale,
+      miniOpacity: miniOpacity ?? this.miniOpacity,
+      offlineMode: offlineMode ?? this.offlineMode,
+      dialStudyColor: dialStudyColor ?? this.dialStudyColor,
+      dialBreakColor: dialBreakColor ?? this.dialBreakColor,
+      showStopwatchDial: showStopwatchDial ?? this.showStopwatchDial,
       betaChannel: betaChannel ?? this.betaChannel,
     );
   }

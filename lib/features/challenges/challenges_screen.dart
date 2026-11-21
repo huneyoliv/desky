@@ -61,7 +61,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: t.tr('refresh', fallback: 'Atualizar'),
+            tooltip: t.tr('refresh', fallback: 'Refresh'),
             onPressed: _loadChallenges,
           ),
         ],

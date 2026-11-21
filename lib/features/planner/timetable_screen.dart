@@ -65,7 +65,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
     if (_subjects.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(t.tr('alert_planner_add_study_log_error1', fallback: 'Nenhuma matéria cadastrada. Crie uma matéria primeiro!')),
+          content: Text(t.tr('alert_planner_add_study_log_error1', fallback: 'No subjects yet. Create a subject first!')),
           backgroundColor: AppColors.error,
         ),
       );
@@ -87,7 +87,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.tr('subject', fallback: 'Matéria:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
+              Text(t.tr('subject', fallback: 'Subject:'), style: TextStyle(color: context.appTextSecondary, fontSize: 13)),
               const SizedBox(height: 6),
               DropdownButtonFormField<SubjectModel>(
                 value: selectedSubject,

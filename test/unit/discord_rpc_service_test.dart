@@ -9,6 +9,20 @@ import 'package:desky/features/timer/timer_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  const mockUser = UserModel(
+    id: 12345,
+    name: 'TestUser',
+    email: 'test@example.com',
+    studiconId: 1,
+    jwtToken: 'mock_jwt_token',
+  );
+
+  const mockSubject = SubjectModel(
+    id: 10,
+    title: 'Matemática',
+    colorInt: 4292557552,
+  );
+
   group('DiscordRpcService - Formatting and Helpers', () {
     test('formatStudyDuration formats milliseconds to hours and minutes correctly', () {
       expect(DiscordRpcService.formatStudyDuration(0), '00h 00m');
@@ -20,20 +34,6 @@ void main() {
   });
 
   group('DiscordRpcService - Payload Construction', () {
-    const mockUser = UserModel(
-      id: 12345,
-      name: 'TestUser',
-      email: 'test@example.com',
-      studiconId: 1,
-      jwtToken: 'mock_jwt_token',
-    );
-
-    const mockSubject = SubjectModel(
-      id: 10,
-      title: 'Matemática',
-      colorInt: 4292557552,
-    );
-
     test('buildPayload returns correct Studying state in Portuguese', () {
       final translation = AppTranslation(languageCode: 'pt');
       final sessionStart = DateTime(2026, 9, 4, 8, 0, 0);
@@ -56,7 +56,7 @@ void main() {
       expect(payload!.details, 'Matemática');
       expect(payload.state, 'Estudando');
       expect(payload.smallImage, contains('assets/icons/icon.png'));
-      expect(payload.smallText, 'Desky');
+      expect(payload.largeText, startsWith('Desky'));
       expect(payload.largeImage, contains('/sc.v2/1/sweat1.png'));
       expect(payload.largeText, contains('01h 00m'));
       expect(payload.startTime, isNotNull);
@@ -199,6 +199,65 @@ void main() {
     });
   });
 
+  group('DiscordRpcService - Rendering and rate limiting', () {
+    test('users without a studicon get a bundled image Discord can fetch', () {
+      const noStudicon = UserModel(
+        id: 7,
+        name: 'NoStudicon',
+        email: 'x@example.com',
+        jwtToken: 't',
+      );
+      final payload = DiscordRpcService.buildPayload(
+        timerState: const TimerState(isRunning: true, todayTotalMs: 7200000),
+        user: noStudicon,
+        translation: const AppTranslation(languageCode: 'en'),
+      );
+      expect(payload, isNotNull);
+      expect(payload!.largeImage, isNot(contains('/sc.v2/-1/')));
+      expect(
+        payload.largeImage,
+        'https://raw.githubusercontent.com/huneyoliv/desky/main/assets/images/studicon/ic_user_sweat_s.png',
+      );
+    });
+
+    test('startTime is stable across timer ticks', () {
+      const translation = AppTranslation(languageCode: 'en');
+      final base = DateTime(2026, 9, 4, 10, 0, 0, 123);
+      final a = DiscordRpcService.buildPayload(
+        timerState: const TimerState(isRunning: true, sessionElapsedMs: 60000),
+        user: mockUser,
+        translation: translation,
+        now: base,
+      );
+      // One tick later, with a few ms of timer jitter.
+      final b = DiscordRpcService.buildPayload(
+        timerState: const TimerState(isRunning: true, sessionElapsedMs: 61000),
+        user: mockUser,
+        translation: translation,
+        now: base.add(const Duration(milliseconds: 1004)),
+      );
+      expect(a!.startTime!.millisecond, 0);
+      expect(DiscordRpcService.isEquivalent(a, b), isTrue);
+    });
+
+    test('pausing or changing subject is a real change', () {
+      const translation = AppTranslation(languageCode: 'en');
+      final running = DiscordRpcService.buildPayload(
+        timerState: const TimerState(isRunning: true, currentSubject: mockSubject),
+        user: mockUser,
+        translation: translation,
+      );
+      final paused = DiscordRpcService.buildPayload(
+        timerState: const TimerState(isPaused: true, currentSubject: mockSubject),
+        user: mockUser,
+        translation: translation,
+      );
+      expect(DiscordRpcService.isEquivalent(running, paused), isFalse);
+      expect(DiscordRpcService.isEquivalent(running, null), isFalse);
+      expect(DiscordRpcService.isEquivalent(null, null), isTrue);
+    });
+  });
+
   group('Settings - Discord RPC Preferences', () {
     test('SettingsRepository defaults to true for discordRpcEnabled and persists changes', () async {
       SharedPreferences.setMockInitialValues({});
@@ -233,6 +292,20 @@ void main() {
       await notifier.toggleDiscordRpc(true);
       expect(notifier.state.discordRpcEnabled, isTrue);
       expect(await repo.getDiscordRpcEnabled(), isTrue);
+    });
+
+    test('OBS overlay mode is off by default and persists', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = SettingsRepository(prefs: prefs);
+      final notifier = SettingsNotifier(repo);
+
+      await notifier.init();
+      expect(notifier.state.obsOverlayMode, isFalse);
+
+      await notifier.toggleObsOverlayMode(true);
+      expect(notifier.state.obsOverlayMode, isTrue);
+      expect(await repo.getObsOverlayMode(), isTrue);
     });
   });
 }

@@ -94,7 +94,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.check_rounded, color: Colors.white),
-                    label: Text(t.tr('done', fallback: 'Concluir'), style: const TextStyle(color: Colors.white)),
+                    label: Text(t.tr('done', fallback: 'Done'), style: const TextStyle(color: Colors.white)),
                   ),
                 ],
               ),

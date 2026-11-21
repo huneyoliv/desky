@@ -132,7 +132,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
               backgroundColor: context.appPrimary,
             )
           : SnackBar(
-              content: Text('${t.tr('save_fail', fallback: 'Falha ao salvar')}: ${failures.join(', ')}'),
+              content: Text('${t.tr('save_fail', fallback: 'Could not save')}: ${failures.join(', ')}'),
               backgroundColor: AppColors.error,
             ),
     );
@@ -296,7 +296,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
           unselectedLabelColor: AppColors.textSecondary,
           tabs: [
             Tab(text: t.tr('info', fallback: 'Informações')),
-            Tab(text: t.tr('members', fallback: 'Membros')),
+            Tab(text: t.tr('members', fallback: 'Members')),
             Tab(text: t.tr('requests', fallback: 'Solicitações')),
             Tab(text: t.tr('blacklist', fallback: 'Lista Negra')),
           ],
@@ -360,7 +360,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                         dropdownColor: context.appSurface,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(labelText: t.tr('member_capacity', fallback: 'Capacidade de Membros'), filled: true, fillColor: context.appCard),
-                        items: [5, 10, 20, 30, 50].map((c) => DropdownMenuItem(value: c, child: Text('$c ${t.tr("members", fallback: "membros")}'))).toList(),
+                        items: [5, 10, 20, 30, 50].map((c) => DropdownMenuItem(value: c, child: Text('$c ${t.tr("members_lower", fallback: "members")}'))).toList(),
                         onChanged: (val) { if (val != null) setState(() => _capacity = val); },
                       ),
                     ),
@@ -493,7 +493,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                                     _loadAdminData();
                                   },
                                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
-                                  child: Text(t.tr('approve', fallback: 'Aprovar'), style: const TextStyle(color: Colors.white)),
+                                  child: Text(t.tr('approve', fallback: 'Approve'), style: const TextStyle(color: Colors.white)),
                                 ),
                                 const SizedBox(width: 8),
                                 ElevatedButton(
@@ -503,7 +503,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                                     _loadAdminData();
                                   },
                                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-                                  child: Text(t.tr('reject', fallback: 'Rejeitar'), style: const TextStyle(color: Colors.white)),
+                                  child: Text(t.tr('reject', fallback: 'Reject'), style: const TextStyle(color: Colors.white)),
                                 ),
                               ],
                             ),

@@ -7,6 +7,7 @@ import '../../data/models/category_model.dart';
 import '../../data/models/group_model.dart';
 import '../../data/repositories/group_repository.dart';
 import '../auth/auth_notifier.dart';
+import 'group_order.dart';
 import '../settings/settings_notifier.dart';
 import '../settings/widgets/select_country_dialog.dart';
 import 'group_detail_screen.dart';
@@ -38,7 +39,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
 
   List<Map<String, dynamic>> _getCategories(List<CategoryModel> countryCategories, AppTranslation t) {
     return [
-      {'id': 0, 'name': t.tr('all', fallback: 'Todos')},
+      {'id': 0, 'name': t.tr('all', fallback: 'All')},
       ...countryCategories.map((c) => {
             'id': c.id,
             'name': c.shortTitle.isNotEmpty ? c.shortTitle : c.title,
@@ -230,6 +231,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
   }
 
   Widget _buildGroupCard(GroupModel group, AppTranslation t, {bool isMyGroup = false}) {
+    if (isMyGroup && ref.read(settingsNotifierProvider).classicYptLook) {
+      return _buildClassicGroupRow(group, t);
+    }
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       color: context.palette.card,
@@ -276,7 +280,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${group.category} • ${group.membersCount}/${group.maxCapacity} ${t.tr("members", fallback: "membros")} • ${t.tr("goal", fallback: "Meta")}: ${group.dailyGoalHours}h/${t.tr("today", fallback: "dia")}',
+                '${group.category} • ${group.membersCount}/${group.maxCapacity} ${t.tr("members_lower", fallback: "members")} • ${t.tr("goal", fallback: "Meta")}: ${group.dailyGoalHours}h/${t.tr("today", fallback: "dia")}',
                 style: TextStyle(
                   color: context.appTextSecondary,
                   fontSize: 13,
@@ -327,9 +331,90 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
     );
   }
 
+  /// Classic YPT look: a flat row with the group's name, a muted summary and
+  /// a chat button, like the "My groups" list of the YPT desktop app.
+  Widget _buildClassicGroupRow(GroupModel group, AppTranslation t) {
+    final palette = context.palette;
+    Future<void> open() async {
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => GroupDetailScreen(group: group)),
+      );
+      if (mounted) ref.read(authStateProvider.notifier).refreshUserGroups();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: palette.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: open,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(group.category,
+                          style: const TextStyle(fontSize: 13, color: Color(0xFFFF6B1A), fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 4),
+                      Row(children: [
+                        Flexible(
+                          child: Text(group.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: palette.textPrimary)),
+                        ),
+                        if (group.isPrivate) ...[
+                          const SizedBox(width: 6),
+                          Icon(Icons.lock_outline_rounded, size: 15, color: palette.textMuted),
+                        ],
+                      ]),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${t.tr('goal', fallback: 'Goal')} ${group.dailyGoalHours}h   '
+                        '${t.tr('members', fallback: 'Members')} ${group.membersCount}/${group.maxCapacity}   '
+                        '${group.leaderName}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 13, color: palette.textSecondary),
+                      ),
+                      if ((group.notice ?? '').trim().isNotEmpty) ...[
+                        Divider(color: palette.border, height: 20),
+                        Text(group.notice!.trim(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 13, color: palette.textMuted)),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(color: palette.card, borderRadius: BorderRadius.circular(12)),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    tooltip: t.tr('open', fallback: 'Open'),
+                    icon: Icon(Icons.chat_bubble_rounded, size: 18, color: palette.textSecondary),
+                    onPressed: open,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final myGroups = ref.watch(authStateProvider).user?.userGroups ?? [];
+    final myGroups = ref.watch(orderedMyGroupsProvider);
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
 
@@ -347,7 +432,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: t.tr('refresh', fallback: 'Atualizar'),
+            tooltip: t.tr('refresh', fallback: 'Refresh'),
             onPressed: () {
               ref.read(authStateProvider.notifier).refreshUserGroups();
               if (_tabController.index == 1) {
@@ -372,7 +457,14 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
           ],
         ),
       ),
-      body: TabBarView(
+      body: Center(
+        child: ConstrainedBox(
+          // Classic look: a readable column instead of rows stretched across
+          // a wide window.
+          constraints: BoxConstraints(
+            maxWidth: ref.watch(settingsNotifierProvider.select((s) => s.classicYptLook)) ? 900 : double.infinity,
+          ),
+          child: TabBarView(
         controller: _tabController,
         children: [
           // Tab 1: My Groups
@@ -399,11 +491,36 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                   onRefresh: () async {
                     await ref.read(authStateProvider.notifier).refreshUserGroups();
                   },
-                  child: ListView.builder(
+                  // Drag a group to rearrange the list (saved on this device;
+                  // the timer's group panel follows the same order).
+                  child: ReorderableListView.builder(
+                    key: const ValueKey('my-groups-list'),
                     padding: const EdgeInsets.all(24),
                     itemCount: myGroups.length,
+                    buildDefaultDragHandles: false,
+                    proxyDecorator: (child, _, __) => Material(color: Colors.transparent, elevation: 8, child: child),
+                    onReorder: (from, to) => ref.read(groupOrderProvider.notifier).move(myGroups, from, to),
                     itemBuilder: (context, index) {
-                      return _buildGroupCard(myGroups[index], t, isMyGroup: true);
+                      final group = myGroups[index];
+                      return ReorderableDelayedDragStartListener(
+                        key: ValueKey('my-group-${group.id}'),
+                        index: index,
+                        child: Row(
+                          children: [
+                            ReorderableDragStartListener(
+                              index: index,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.grab,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 8, bottom: 12),
+                                  child: Icon(Icons.drag_indicator_rounded, color: palette.textMuted),
+                                ),
+                              ),
+                            ),
+                            Expanded(child: _buildGroupCard(group, t, isMyGroup: true)),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -555,7 +672,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                           ElevatedButton.icon(
                                             onPressed: () => SelectCountryDialog.show(context),
                                             icon: const Icon(Icons.public_rounded, size: 18),
-                                            label: Text(t.tr('view_other_region_groups', fallback: 'Ver grupos de outra região')),
+                                            label: Text(t.tr('view_other_region_groups', fallback: 'See groups from another region')),
                                             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                                           ),
                                         ],
@@ -575,6 +692,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }

@@ -5,7 +5,13 @@ import 'notifications_state.dart';
 final notificationsNotifierProvider =
     StateNotifierProvider<NotificationsNotifier, NotificationsState>((ref) {
   final repository = ref.watch(notificationRepositoryProvider);
-  return NotificationsNotifier(repository);
+  final notifier = NotificationsNotifier(repository);
+  // Reading notices here clears the tab badge right away instead of on the
+  // next periodic check.
+  notifier.addListener((state) {
+    if (ref.exists(unreadNotificationCountProvider)) ref.invalidate(unreadNotificationCountProvider);
+  }, fireImmediately: false);
+  return notifier;
 });
 
 class NotificationsNotifier extends StateNotifier<NotificationsState> {

@@ -26,10 +26,10 @@ class CumulativeSubjectCard extends ConsumerWidget {
     final subjects = series.subjects;
 
     return StatsCard(
-      title: t.tr('stats_cumulative_subject', fallback: 'Tempo acumulado por matéria'),
+      title: t.tr('stats_cumulative_subject', fallback: 'Cumulative time by subject'),
       isEmpty: !series.hasData,
       emptyMessage: t.tr('stats_no_cumulative',
-          fallback: 'Sem sessões no período para acumular por matéria.'),
+          fallback: 'No sessions in this period to add up by subject.'),
       trailing: Wrap(
         spacing: 10,
         children: [
@@ -48,7 +48,7 @@ class CumulativeSubjectCard extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Text(
                   subjects[i] == StatsDerivations.otherSubjectsKey
-                      ? t.tr('others', fallback: 'Outros')
+                      ? t.tr('others', fallback: 'Others')
                       : subjects[i],
                   style: TextStyle(color: context.appTextSecondary, fontSize: 10),
                 ),
@@ -157,10 +157,10 @@ class QuarterlyCalendar extends ConsumerWidget {
     final quarterStart = ((month.month - 1) ~/ 3) * 3 + 1;
 
     return StatsCard(
-      title: t.tr('stats_quarter', fallback: 'Calendário trimestral'),
+      title: t.tr('stats_quarter', fallback: 'Quarterly calendar'),
       isEmpty: !hasData,
       emptyMessage: t.tr('stats_no_quarter',
-          fallback: 'Nenhum dia com estudo neste trimestre.'),
+          fallback: 'No study days this quarter.'),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -168,7 +168,7 @@ class QuarterlyCalendar extends ConsumerWidget {
             iconSize: 18,
             onPressed: () => onMonthChanged(DateTime(month.year, month.month - 3)),
             icon: const Icon(Icons.chevron_left),
-            tooltip: t.tr('previous_quarter', fallback: 'Trimestre anterior'),
+            tooltip: t.tr('previous_quarter', fallback: 'Previous quarter'),
           ),
           Text(
             'T${((month.month - 1) ~/ 3) + 1} ${month.year}',
@@ -178,7 +178,7 @@ class QuarterlyCalendar extends ConsumerWidget {
             iconSize: 18,
             onPressed: () => onMonthChanged(DateTime(month.year, month.month + 3)),
             icon: const Icon(Icons.chevron_right),
-            tooltip: t.tr('next_quarter', fallback: 'Próximo trimestre'),
+            tooltip: t.tr('next_quarter', fallback: 'Next quarter'),
           ),
         ],
       ),

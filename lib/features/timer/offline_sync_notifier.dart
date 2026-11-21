@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/localization/app_translation.dart';
 import '../../data/models/offline_session_model.dart';
 import '../../data/repositories/offline_sync_repository.dart';
 import '../../data/repositories/timer_repository.dart';
+import '../settings/settings_notifier.dart';
+import 'timer_notifier.dart';
 
 final offlineSyncRepositoryProvider = Provider<OfflineSyncRepository>((ref) {
   return OfflineSyncRepository(timerRepository: TimerRepository());
@@ -105,4 +109,59 @@ final offlineSyncNotifierProvider =
     StateNotifierProvider<OfflineSyncNotifier, OfflineSyncState>((ref) {
   final repo = ref.watch(offlineSyncRepositoryProvider);
   return OfflineSyncNotifier(repository: repo, ref: ref);
+});
+
+/// Sends queued sessions without the user having to press "Sync":
+/// every 2 minutes while some are waiting, right after Offline mode is turned
+/// off, and when the app comes back to the foreground. Also refreshes the
+/// waiting count after a session stops or pauses (that is when the timer may
+/// have queued one). Does nothing while Offline mode is on.
+class OfflineAutoSync {
+  OfflineAutoSync(this._ref) {
+    _timer = Timer.periodic(const Duration(minutes: 2), (_) => trigger());
+    _ref.listen<bool>(settingsNotifierProvider.select((s) => s.offlineMode), (prev, next) {
+      if (prev == true && next == false) trigger();
+    });
+    _ref.listen<bool>(timerNotifierProvider.select((s) => s.isRunning), (prev, next) {
+      if (prev == true && next == false) {
+        // The stop path queues after its server attempt (up to ~3 s).
+        Future.delayed(const Duration(seconds: 4), _reload);
+      }
+    });
+    Future.microtask(trigger);
+  }
+
+  final Ref _ref;
+  Timer? _timer;
+  bool _running = false;
+
+  Future<void> _reload() async {
+    try {
+      await _ref.read(offlineSyncNotifierProvider.notifier).loadPending();
+    } catch (_) {}
+  }
+
+  Future<void> trigger() async {
+    if (_running) return;
+    _running = true;
+    try {
+      await _reload();
+      if (_ref.read(settingsNotifierProvider).offlineMode) return;
+      final notifier = _ref.read(offlineSyncNotifierProvider.notifier);
+      if (!_ref.read(offlineSyncNotifierProvider).hasPending) return;
+      if (_ref.read(offlineSyncNotifierProvider).isSyncing) return;
+      await notifier.syncNow();
+    } catch (_) {
+    } finally {
+      _running = false;
+    }
+  }
+
+  void dispose() => _timer?.cancel();
+}
+
+final offlineAutoSyncProvider = Provider<OfflineAutoSync>((ref) {
+  final sync = OfflineAutoSync(ref);
+  ref.onDispose(sync.dispose);
+  return sync;
 });

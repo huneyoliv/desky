@@ -62,7 +62,7 @@ class StatsCard extends ConsumerWidget {
                   Text(
                     emptyMessage ??
                         t.tr('stats_no_history',
-                            fallback: 'Sem histórico para calcular: registre algumas sessões de estudo.'),
+                            fallback: 'No history yet: log a few study sessions first.'),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: context.appTextSecondary, fontSize: 13),
                   ),
@@ -91,11 +91,11 @@ String formatDelta(PeriodComparison comparison, AppTranslation t) {
   final growth = comparison.growth;
   if (growth == null) {
     return comparison.currentMs > 0
-        ? t.tr('stats_new_period', fallback: 'sem base anterior')
+        ? t.tr('stats_new_period', fallback: 'no earlier data')
         : '—';
   }
   final percent = (growth * 100).round();
-  if (percent == 0) return t.tr('stats_same', fallback: 'igual');
+  if (percent == 0) return t.tr('stats_same', fallback: 'same');
   final sign = percent > 0 ? '+' : '';
   return '$sign$percent%';
 }
@@ -118,10 +118,10 @@ class StatsComparisonCard extends ConsumerWidget {
     final hasAny = comparisons.any((c) => c.hasAnyData);
 
     return StatsCard(
-      title: t.tr('stats_comparisons', fallback: 'Comparações'),
+      title: t.tr('stats_comparisons', fallback: 'Comparisons'),
       isEmpty: !hasAny,
       emptyMessage: t.tr('stats_no_comparison',
-          fallback: 'Sem dados nos períodos comparados.'),
+          fallback: 'No data in the compared periods.'),
       child: Column(
         children: [
           for (final comparison in comparisons) ...[
@@ -205,32 +205,32 @@ class StatsMaximaCard extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
 
     return StatsCard(
-      title: t.tr('stats_maxima', fallback: 'Recordes'),
+      title: t.tr('stats_maxima', fallback: 'Records'),
       isEmpty: !maxima.hasData,
       emptyMessage: t.tr('stats_no_maxima',
-          fallback: 'Ainda não há um dia com estudo para calcular recordes.'),
+          fallback: 'No study day yet to compute records.'),
       child: Column(
         children: [
           _MaximaRow(
-            label: t.tr('stats_best_day', fallback: 'Melhor dia'),
+            label: t.tr('stats_best_day', fallback: 'Best day'),
             value: formatDurationShort(maxima.bestDayMs, t),
             detail: maxima.bestDayKey,
           ),
           const SizedBox(height: 12),
           _MaximaRow(
-            label: t.tr('stats_best_week', fallback: 'Melhor semana'),
+            label: t.tr('stats_best_week', fallback: 'Best week'),
             value: formatDurationShort(maxima.bestWeekMs, t),
             detail: maxima.bestWeekKey,
           ),
           const SizedBox(height: 12),
           _MaximaRow(
-            label: t.tr('stats_best_month', fallback: 'Melhor mês'),
+            label: t.tr('stats_best_month', fallback: 'Best month'),
             value: formatDurationShort(maxima.bestMonthMs, t),
             detail: maxima.bestMonthKey,
           ),
           const SizedBox(height: 16),
           Text(
-            '${t.tr('stats_days_with_data', fallback: 'Dias com estudo no período')}'
+            '${t.tr('stats_days_with_data', fallback: 'Study days in the period')}'
             ': ${maxima.dayCount}',
             style: TextStyle(color: context.appTextMuted, fontSize: 11),
           ),

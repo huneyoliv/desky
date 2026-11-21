@@ -1,5 +1,6 @@
 import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/diagnostics/crash_log.dart';
 import '../../core/utils/study_date_helper.dart';
 import '../models/group_model.dart';
 import '../models/group_member_model.dart';
@@ -137,27 +138,45 @@ class GroupRepository {
   }) =>
       fetchGroupRanks(groupId, period: 'week', countryId: countryId, categoryId: categoryId);
 
-  Future<bool> shakeMember({required int groupId, required int targetUserId}) async {
+  /// Why the last [shakeMember] failed (HTTP status / server reply / exception),
+  /// so the UI can show it instead of a bare "could not send".
+  static String? lastShakeError;
+
+  /// [from] is the sender's display name, which the server puts in the push text.
+  Future<bool> shakeMember({
+    required int groupId,
+    required int targetUserId,
+    String from = '',
+  }) async {
+    lastShakeError = null;
     try {
       final response = await _apiClient.post(
         ApiConstants.groupShake,
+        // Same body the official app sends (snake_case keys; `groupID` and
+        // `targetUserID` are not read by the server).
         data: {
-          'groupID': groupId,
-          'targetUserID': targetUserId,
+          'user_id': targetUserId,
+          'group_id': groupId,
+          'from': from,
         },
       );
 
       final data = response.data;
-      return data is Map && data['s'] == true;
-    } catch (_) {}
+      if (data is Map && data['s'] == true) return true;
+      lastShakeError = 'HTTP ${response.statusCode}: $data';
+      CrashLog.record('shake', 'nudge failed: $lastShakeError', null);
+    } catch (e, st) {
+      lastShakeError = e.toString();
+      CrashLog.record('shake', 'nudge failed: $e', st);
+    }
     return false;
   }
 
-  Future<bool> shakeAllMembers(int groupId) async {
+  Future<bool> shakeAllMembers(int groupId, {String from = ''}) async {
     try {
       final response = await _apiClient.post(
         '/group/push/shake/all',
-        data: {'groupID': groupId},
+        data: {'groupID': groupId, 'from': from},
       );
       final data = response.data;
       return data is Map && data['s'] == true;
