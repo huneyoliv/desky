@@ -425,7 +425,5 @@ void main() {
       notifier.dispose();
       container.dispose();
     });
-
-  });
   });
 }
