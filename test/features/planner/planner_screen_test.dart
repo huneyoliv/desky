@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/core/localization/app_translation.dart';
@@ -27,6 +27,35 @@ class FakePlannerRepository extends PlannerRepository {
     int resetHour = StudyDayHelper.defaultResetHour,
   }) async =>
       mockTodos;
+
+  final List<String> createdTitles = [];
+  final List<DateTime> createdDates = [];
+  final List<int> deletedIds = [];
+  bool createReturnsNull = false;
+  bool deleteReturnsFalse = false;
+
+  @override
+  Future<DDayModel?> createDDay({
+    required String title,
+    required DateTime targetDate,
+    required int colorInt,
+  }) async {
+    createdTitles.add(title);
+    createdDates.add(targetDate);
+    if (createReturnsNull) return null;
+    return DDayModel(
+      id: 777,
+      title: title,
+      targetDate: targetDate,
+      colorInt: colorInt,
+    );
+  }
+
+  @override
+  Future<bool> deleteDDay(int ddayId) async {
+    deletedIds.add(ddayId);
+    return !deleteReturnsFalse;
+  }
 
   @override
   Future<bool> toggleTodo(
@@ -131,5 +160,146 @@ void main() {
     expect(sidebar!.top, closeTo(tabView.top, 1.0));
     expect(sidebar.height, closeTo(tabView.height, 1.0));
     expect(sidebar.bottom, closeTo(tabView.bottom, 1.0));
+  });
+
+  testWidgets('tapping Adicionar actually creates the D-Day', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final repo = FakePlannerRepository();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          plannerRepositoryProvider.overrideWithValue(repo),
+          appTranslationProvider.overrideWith(
+            (ref) => AppTranslationNotifier(ref)
+              ..state = const AppTranslation(languageCode: 'pt'),
+          ),
+        ],
+        child: MaterialApp(
+          theme: ThemeData(splashFactory: InkRipple.splashFactory),
+          home: const PlannerScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The old dialog only called pop(), so nothing was ever sent.
+    await tester.tap(find.byIcon(Icons.add_circle_outline).first);
+    await tester.pumpAndSettle();
+    final dialog = find.byType(AlertDialog);
+    expect(dialog, findsOneWidget);
+    await tester.enterText(
+      find.descendant(of: dialog, matching: find.byType(TextField)),
+      'Prova Final',
+    );
+    await tester.tap(
+      find.descendant(
+        of: dialog,
+        matching: find.widgetWithText(ElevatedButton, 'Adicionar'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(repo.createdTitles, equals(['Prova Final']));
+    expect(repo.createdDates, hasLength(1));
+    expect(repo.createdDates.first.year, greaterThanOrEqualTo(2020));
+  });
+
+  testWidgets('a refused D-Day creation is reported, not faked', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final repo = FakePlannerRepository()..createReturnsNull = true;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          plannerRepositoryProvider.overrideWithValue(repo),
+          appTranslationProvider.overrideWith(
+            (ref) => AppTranslationNotifier(ref)
+              ..state = const AppTranslation(languageCode: 'pt'),
+          ),
+        ],
+        child: MaterialApp(
+          theme: ThemeData(splashFactory: InkRipple.splashFactory),
+          home: const PlannerScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.add_circle_outline).first);
+    await tester.pumpAndSettle();
+    final dialog = find.byType(AlertDialog);
+    expect(dialog, findsOneWidget);
+    await tester.enterText(
+      find.descendant(of: dialog, matching: find.byType(TextField)),
+      'Vai falhar',
+    );
+    await tester.tap(
+      find.descendant(
+        of: dialog,
+        matching: find.widgetWithText(ElevatedButton, 'Adicionar'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(repo.createdTitles, equals(['Vai falhar']));
+    expect(
+      find.text('Não foi possível criar o D-Day'),
+      findsOneWidget,
+      reason: 'a falha precisa ser visível ao usuário',
+    );
+  });
+
+  testWidgets('long-press deletes a D-Day after confirmation', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final repo = FakePlannerRepository(
+      mockDDays: [
+        DDayModel(
+          id: 42,
+          title: 'Vestibular',
+          targetDate: DateTime.now().add(const Duration(days: 30)),
+          colorInt: 4294948685,
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          plannerRepositoryProvider.overrideWithValue(repo),
+          appTranslationProvider.overrideWith(
+            (ref) => AppTranslationNotifier(ref)
+              ..state = const AppTranslation(languageCode: 'pt'),
+          ),
+        ],
+        child: MaterialApp(
+          theme: ThemeData(splashFactory: InkRipple.splashFactory),
+          home: const PlannerScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Vestibular'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Excluir'));
+    await tester.pumpAndSettle();
+
+    expect(repo.deletedIds, equals([42]));
   });
 }
