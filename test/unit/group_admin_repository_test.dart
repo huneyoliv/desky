@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/repositories/group_admin_repository.dart';
@@ -41,7 +41,7 @@ void main() {
     test('every group setting update posts to /group/info/edit keyed by id', () async {
       await repository.updateGroupName(10, 'Novo Nome');
       expect(mockApiClient.lastPath, equals('/group/info/edit'));
-      expect(mockApiClient.lastData, equals({'id': 10, 't': 'Novo Nome'}));
+      expect(mockApiClient.lastData, equals({'id': 10, 'title': 'Novo Nome'}));
 
       await repository.updateGroupCategory(10, 7);
       expect(mockApiClient.lastPath, equals('/group/info/edit'));
