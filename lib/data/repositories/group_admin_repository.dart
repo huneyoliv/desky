@@ -21,7 +21,7 @@ class GroupAdminRepository {
   }
 
   Future<bool> updateGroupName(int groupId, String name) =>
-      _editGroup(groupId, {'t': name});
+      _editGroup(groupId, {'title': name});
 
   Future<bool> updateGroupCategory(int groupId, int categoryId) =>
       _editGroup(groupId, {'cid': categoryId});
