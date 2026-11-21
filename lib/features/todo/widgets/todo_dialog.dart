@@ -4,13 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/models/todo_item_model.dart';
+import '../../timer/timer_notifier.dart';
 import '../todo_notifier.dart';
 
-/// Creates a task, or renames an existing one.
-///
-/// The API keeps more fields (subject, recurrence, order) that the planner
-/// already manages; this dialog edits only what the standalone list exposes:
-/// the title.
+/// Creates a task or edits its title and explicit subject association.
 class TodoDialog extends ConsumerStatefulWidget {
   const TodoDialog({super.key, this.existing});
 
@@ -28,7 +25,10 @@ class TodoDialog extends ConsumerStatefulWidget {
 }
 
 class _TodoDialogState extends ConsumerState<TodoDialog> {
+  static const int _noSubject = -1;
+
   late final TextEditingController _controller;
+  late int _selectedSubjectId;
   bool _saving = false;
   String? _error;
 
@@ -36,6 +36,7 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.existing?.title ?? '');
+    _selectedSubjectId = widget.existing?.subjectId ?? _noSubject;
   }
 
   @override
@@ -54,10 +55,17 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
     });
     final notifier = ref.read(todoNotifierProvider.notifier);
     final existing = widget.existing;
+    final subjectId =
+        _selectedSubjectId == _noSubject ? null : _selectedSubjectId;
 
     final ok = existing == null
-        ? await notifier.add(title)
-        : await notifier.rename(existing, title);
+        ? await notifier.add(title, subjectId: subjectId)
+        : await notifier.rename(
+            existing,
+            title,
+            subjectId: subjectId,
+            updateSubject: true,
+          );
 
     if (!mounted) return;
     if (!ok) {
@@ -74,6 +82,42 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
   Widget build(BuildContext context) {
     final t = ref.watch(appTranslationProvider);
     final isEditing = widget.existing != null;
+    final subjects = ref.watch(
+      timerNotifierProvider.select((state) => state.subjects),
+    );
+    final items = <DropdownMenuItem<int>>[
+      DropdownMenuItem<int>(
+        value: _noSubject,
+        child: Text(t.tr('todo_no_subject', fallback: 'Sem matéria')),
+      ),
+      for (final subject in subjects)
+        if (!subject.isArchived)
+          DropdownMenuItem<int>(
+            value: subject.id,
+            child: Text(
+              subject.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+    ];
+
+    // Preserve an association whose subject was not returned by the current
+    // subject list, without crashing DropdownButton or silently changing it.
+    final existingId = widget.existing?.subjectId;
+    if (existingId != null && items.every((item) => item.value != existingId)) {
+      final fallbackTitle = widget.existing?.subjectTitle.trim() ?? '';
+      items.add(
+        DropdownMenuItem<int>(
+          value: existingId,
+          child: Text(
+            fallbackTitle.isEmpty || fallbackTitle == 'Geral'
+                ? '${t.tr('todo_subject', fallback: 'Matéria')} $existingId'
+                : fallbackTitle,
+          ),
+        ),
+      );
+    }
 
     return AlertDialog(
       backgroundColor: context.appCard,
@@ -81,7 +125,8 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
         isEditing
             ? t.tr('todo_edit', fallback: 'Editar tarefa')
             : t.tr('todo_new', fallback: 'Nova tarefa'),
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
       content: SizedBox(
         width: 420,
@@ -99,6 +144,24 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
                 labelStyle: TextStyle(color: context.appTextMuted),
               ),
               onSubmitted: (_) => _save(),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<int>(
+              value: _selectedSubjectId,
+              isExpanded: true,
+              dropdownColor: context.appCard,
+              decoration: InputDecoration(
+                labelText: t.tr('todo_subject', fallback: 'Matéria'),
+                labelStyle: TextStyle(color: context.appTextMuted),
+              ),
+              items: items,
+              onChanged: _saving
+                  ? null
+                  : (value) {
+                      if (value != null) {
+                        setState(() => _selectedSubjectId = value);
+                      }
+                    },
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),
@@ -124,7 +187,8 @@ class _TodoDialogState extends ConsumerState<TodoDialog> {
           style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
           child: Text(
             t.tr('save', fallback: 'Salvar'),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
       ],

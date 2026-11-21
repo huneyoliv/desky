@@ -3,11 +3,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desky/core/localization/app_translation.dart';
+import 'package:desky/data/models/subject_model.dart';
 import 'package:desky/data/models/todo_item_model.dart';
 import 'package:desky/data/repositories/planner_repository.dart';
+import 'package:desky/data/repositories/subject_repository.dart';
+import 'package:desky/data/repositories/timer_repository.dart';
+import 'package:desky/features/timer/timer_notifier.dart';
 import 'package:desky/features/planner/planner_screen.dart'
     show plannerRepositoryProvider;
 import 'package:desky/features/todo/todo_screen.dart';
+
+class _OfflineTimerNotifier extends TimerNotifier {
+  _OfflineTimerNotifier()
+      : super(
+          timerRepository: TimerRepository(),
+          subjectRepository: SubjectRepository(),
+        ) {
+    state = const TimerState(
+      subjects: [
+        SubjectModel(id: 1, title: 'Matemática', colorInt: 4292557552)
+      ],
+    );
+  }
+
+  @override
+  Future<void> loadSubjects() async {}
+
+  @override
+  Future<void> reconcileWithServer() async {}
+}
 
 /// Records the calls the screen makes, so the contract with the API layer is
 /// asserted rather than reimplemented.
@@ -115,6 +139,7 @@ Future<_FakePlannerRepository> _pump(
     ProviderScope(
       overrides: [
         plannerRepositoryProvider.overrideWithValue(repo),
+        timerNotifierProvider.overrideWith((ref) => _OfflineTimerNotifier()),
         appTranslationProvider.overrideWith(
           (ref) => AppTranslationNotifier(ref)
             ..state = const AppTranslation(languageCode: 'pt'),
@@ -237,13 +262,17 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       // O erro do dialogo e especifico, para nao casar com o aviso da tela.
-      expect(find.text('Não foi possível salvar. Tente novamente.'), findsOneWidget);
+      expect(find.text('Não foi possível salvar. Tente novamente.'),
+          findsOneWidget);
     });
 
     testWidgets('excluir chama a API', (tester) async {
       final repo = await _pump(tester, items: [_todo(7, 'Apagar')]);
 
       await tester.tap(find.byIcon(Icons.delete_outline).first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Excluir'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 

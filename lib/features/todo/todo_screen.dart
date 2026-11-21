@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/localization/app_translation.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../data/models/todo_item_model.dart';
+import '../timer/timer_notifier.dart';
 import 'todo_notifier.dart';
 import 'widgets/todo_dialog.dart';
 
@@ -49,7 +51,8 @@ class TodoScreen extends ConsumerWidget {
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text(
           t.tr('todo_add', fallback: 'Adicionar tarefa'),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -70,13 +73,15 @@ class TodoScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Text(
                 t.tr('todo_sync_failed',
-                    fallback: 'Não foi possível salvar no servidor. A lista foi recarregada.'),
+                    fallback:
+                        'Não foi possível salvar no servidor. A lista foi recarregada.'),
                 style: TextStyle(color: AppColors.error, fontSize: 12),
               ),
             ),
           Expanded(
             child: state.isLoading
-                ? Center(child: CircularProgressIndicator(color: context.appPrimary))
+                ? Center(
+                    child: CircularProgressIndicator(color: context.appPrimary))
                 : state.todos.isEmpty
                     ? _EmptyState(t: t)
                     : ListView.separated(
@@ -87,9 +92,14 @@ class TodoScreen extends ConsumerWidget {
                           final todo = state.todos[index];
                           return _TodoTile(
                             todo: todo,
+                            resolvedSubjectTitle:
+                                _resolveSubjectTitle(ref, todo),
+                            isStarting: state.isStarting,
                             onToggle: () => notifier.toggle(todo),
-                            onEdit: () => TodoDialog.show(context, existing: todo),
-                            onDelete: () => notifier.remove(todo),
+                            onEdit: () =>
+                                TodoDialog.show(context, existing: todo),
+                            onStart: () => _startTodo(context, ref, todo),
+                            onDelete: () => _deleteTodo(context, ref, todo),
                           );
                         },
                       ),
@@ -99,7 +109,114 @@ class TodoScreen extends ConsumerWidget {
     );
   }
 
-  static Future<void> _pickDay(BuildContext context, TodoNotifier notifier) async {
+  static String _resolveSubjectTitle(WidgetRef ref, TodoItemModel todo) {
+    final id = todo.subjectId;
+    if (id == null) return '';
+    final subjects = ref.watch(timerNotifierProvider.select((s) => s.subjects));
+    for (final subject in subjects) {
+      if (subject.id == id) return subject.title;
+    }
+    final fallback = todo.subjectTitle.trim();
+    return fallback == 'Geral' ? '' : fallback;
+  }
+
+  static Future<void> _startTodo(
+    BuildContext context,
+    WidgetRef ref,
+    TodoItemModel todo,
+  ) async {
+    final notifier = ref.read(todoNotifierProvider.notifier);
+    final ok = await notifier.startStudy(todo);
+    if (!context.mounted) return;
+    if (ok) {
+      context.go('/home');
+      return;
+    }
+    final t = ref.read(appTranslationProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(t.tr('todo_start_failed',
+            fallback: 'Não foi possível iniciar estudo para esta tarefa.')),
+        backgroundColor: AppColors.error,
+      ),
+    );
+  }
+
+  static Future<void> _deleteTodo(
+    BuildContext context,
+    WidgetRef ref,
+    TodoItemModel todo,
+  ) async {
+    final t = ref.read(appTranslationProvider);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: context.appCard,
+          title: Text(
+            t.tr('delete', fallback: 'Excluir'),
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                t.tr('delete_todo_confirm',
+                    fallback: 'Tem certeza que deseja excluir esta tarefa?'),
+                style: TextStyle(color: context.appTextSecondary),
+              ),
+              if (todo.isRecurring) ...[
+                const SizedBox(height: 16),
+                Text(
+                  t.tr('recurring_todo_desc',
+                      fallback: 'Esta tarefa se repete em vários dias:'),
+                  style: TextStyle(color: context.appTextMuted, fontSize: 12),
+                ),
+                Text(
+                  t.tr('delete_only_this_todo',
+                      fallback: 'Excluir apenas esta tarefa'),
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(t.tr('cancel', fallback: 'Cancelar')),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+              child: Text(
+                t.tr('delete', fallback: 'Excluir'),
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final ok = await ref
+        .read(todoNotifierProvider.notifier)
+        .remove(todo);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.tr('todo_sync_failed',
+              fallback:
+                  'Não foi possível salvar no servidor. A lista foi recarregada.')),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  static Future<void> _pickDay(
+      BuildContext context, TodoNotifier notifier) async {
     final parsed = DateTime.tryParse(notifier.activeDay) ?? DateTime.now();
     final picked = await showDatePicker(
       context: context,
@@ -161,7 +278,9 @@ class _DayHeader extends ConsumerWidget {
                 child: Column(
                   children: [
                     Text(
-                      isToday ? '${t.tr('today', fallback: 'Hoje')} · $label' : label,
+                      isToday
+                          ? '${t.tr('today', fallback: 'Hoje')} · $label'
+                          : label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -176,7 +295,8 @@ class _DayHeader extends ConsumerWidget {
                           ? t.tr('todo_no_tasks_day',
                               fallback: 'Nenhuma tarefa neste dia')
                           : '$done/$total ${t.tr('todo_done_of', fallback: 'concluídas')}',
-                      style: TextStyle(color: context.appTextMuted, fontSize: 11),
+                      style:
+                          TextStyle(color: context.appTextMuted, fontSize: 11),
                     ),
                   ],
                 ),
@@ -198,20 +318,26 @@ class _DayHeader extends ConsumerWidget {
 class _TodoTile extends ConsumerWidget {
   const _TodoTile({
     required this.todo,
+    required this.resolvedSubjectTitle,
+    required this.isStarting,
     required this.onToggle,
     required this.onEdit,
+    required this.onStart,
     required this.onDelete,
   });
 
   final TodoItemModel todo;
+  final String resolvedSubjectTitle;
+  final bool isStarting;
   final VoidCallback onToggle;
   final VoidCallback onEdit;
+  final VoidCallback onStart;
   final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(appTranslationProvider);
-    final subtitle = StringBuffer(todo.subjectTitle);
+    final subtitle = StringBuffer(resolvedSubjectTitle);
     if (todo.isRecurring) {
       if (subtitle.isNotEmpty) subtitle.write(' · ');
       subtitle.write(t.tr('todo_recurring', fallback: 'recorrente'));
@@ -246,8 +372,9 @@ class _TodoTile extends ConsumerWidget {
                             : context.appTextPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        decoration:
-                            todo.isCompleted ? TextDecoration.lineThrough : null,
+                        decoration: todo.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     if (subtitle.isNotEmpty) ...[
@@ -265,6 +392,19 @@ class _TodoTile extends ConsumerWidget {
                   ],
                 ),
               ),
+              if (!todo.isCompleted)
+                IconButton(
+                  tooltip: t.tr('todo_start_study', fallback: 'Iniciar estudo'),
+                  icon: isStarting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(Icons.play_arrow_rounded,
+                          size: 22, color: context.appPrimary),
+                  onPressed: isStarting ? null : onStart,
+                ),
               IconButton(
                 tooltip: t.tr('delete', fallback: 'Excluir'),
                 icon: Icon(Icons.delete_outline,
@@ -292,10 +432,12 @@ class _EmptyState extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.checklist_rounded, size: 64, color: context.appTextMuted),
+            Icon(Icons.checklist_rounded,
+                size: 64, color: context.appTextMuted),
             const SizedBox(height: 16),
             Text(
-              t.tr('todo_empty_title', fallback: 'Nenhuma tarefa para este dia'),
+              t.tr('todo_empty_title',
+                  fallback: 'Nenhuma tarefa para este dia'),
               style: TextStyle(color: context.appTextSecondary, fontSize: 14),
             ),
             const SizedBox(height: 8),

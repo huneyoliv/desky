@@ -223,12 +223,14 @@ class PlannerRepository {
     int resetHour = StudyDayHelper.defaultResetHour,
     RecurrenceRuleModel? recurrenceRule,
     bool applyToAll = false,
+    int? subjectId,
+    bool updateSubject = false,
   }) async {
     try {
       final payload = <String, dynamic>{
         'id': todo.id,
         'title': newTitle,
-        'subject_id': todo.subjectId,
+        'subject_id': updateSubject ? subjectId : todo.subjectId,
         'start_at': todo.startAtApiIso(gmtOffset: gmtOffset, resetHour: resetHour),
         'all_day': false,
         'order': 0,
@@ -255,9 +257,12 @@ class PlannerRepository {
 
   Future<bool> deleteTodo(int todoId, {bool deleteAllSeries = false}) async {
     try {
-      final query = deleteAllSeries ? '?id=$todoId&target=all' : '?id=$todoId';
       final response = await _apiClient.delete(
-        '/study/study-plan/rest$query',
+        '/study/study-plan/rest',
+        data: {
+          'id': todoId,
+          if (deleteAllSeries) 'target': 'all',
+        },
       );
       final data = response.data;
       return data is Map<String, dynamic> && data['s'] == true;

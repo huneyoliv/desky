@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desky/core/localization/app_translation.dart';
 import 'package:desky/core/utils/study_day_helper.dart';
 import 'package:desky/data/models/dday_model.dart';
+import 'package:desky/data/models/subject_model.dart';
 import 'package:desky/data/models/todo_item_model.dart';
 import 'package:desky/data/repositories/planner_repository.dart';
+import 'package:desky/data/repositories/subject_repository.dart';
+import 'package:desky/data/repositories/timer_repository.dart';
 import 'package:desky/features/planner/planner_screen.dart';
+import 'package:desky/features/timer/timer_notifier.dart';
+
+const _subjects = [
+  SubjectModel(id: 9, title: 'Física', colorInt: 4292557552),
+  SubjectModel(id: 10, title: 'Matemática', colorInt: 4292557552),
+];
 
 class FakePlannerRepository extends PlannerRepository {
   final List<DDayModel> mockDDays;
   final List<TodoItemModel> mockTodos;
 
+  /// Copia mutavel de [mockTodos]: as acoes de criar/excluir mexem nesta lista.
+  List<TodoItemModel> items;
+
   FakePlannerRepository({
     this.mockDDays = const [],
     this.mockTodos = const [],
-  });
+  }) : items = List.of(mockTodos);
 
   @override
   Future<List<DDayModel>> fetchDDays() async => mockDDays;
@@ -26,13 +40,70 @@ class FakePlannerRepository extends PlannerRepository {
     required Duration gmtOffset,
     int resetHour = StudyDayHelper.defaultResetHour,
   }) async =>
-      mockTodos;
+      items;
 
   final List<String> createdTitles = [];
   final List<DateTime> createdDates = [];
   final List<int> deletedIds = [];
   bool createReturnsNull = false;
   bool deleteReturnsFalse = false;
+
+  // Gravacoes feitas pelas acoes de tarefa, na ordem em que aconteceram.
+  final List<int?> createdSubjectIds = [];
+  final List<int?> editedSubjectIds = [];
+  final List<bool> updateSubjectFlags = [];
+  final List<bool> deleteScopes = [];
+  bool failCreate = false;
+  bool failEdit = false;
+  bool failDelete = false;
+
+  @override
+  Future<TodoItemModel?> createTodo({
+    required String title,
+    required String dateYmd,
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+    int? subjectId,
+    RecurrenceRuleModel? recurrenceRule,
+  }) async {
+    createdSubjectIds.add(subjectId);
+    if (failCreate) return null;
+    final created = TodoItemModel(
+      id: 100,
+      subjectId: subjectId,
+      subjectTitle: '',
+      subjectColorInt: 0,
+      title: title,
+      isCompleted: false,
+      dateYmd: dateYmd,
+    );
+    items = [...items, created];
+    return created;
+  }
+
+  @override
+  Future<bool> editTodo(
+    TodoItemModel todo,
+    String newTitle, {
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+    RecurrenceRuleModel? recurrenceRule,
+    bool applyToAll = false,
+    int? subjectId,
+    bool updateSubject = false,
+  }) async {
+    editedSubjectIds.add(subjectId);
+    updateSubjectFlags.add(updateSubject);
+    return !failEdit;
+  }
+
+  @override
+  Future<bool> deleteTodo(int todoId, {bool deleteAllSeries = false}) async {
+    deleteScopes.add(deleteAllSeries);
+    if (failDelete) return false;
+    items = items.where((todo) => todo.id != todoId).toList();
+    return true;
+  }
 
   @override
   Future<DDayModel?> createDDay({
@@ -64,6 +135,128 @@ class FakePlannerRepository extends PlannerRepository {
     int resetHour = StudyDayHelper.defaultResetHour,
   }) async =>
       true;
+}
+
+class _TestTimerNotifier extends TimerNotifier {
+  _TestTimerNotifier({
+    required super.timerRepository,
+    required super.subjectRepository,
+  });
+
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    super.dispose();
+  }
+}
+
+class _FakeTimerRepository extends TimerRepository {
+  final List<int?> taskIds = [];
+
+  @override
+  Future<bool> startStudy({
+    required String subjectTitle,
+    required int subjectId,
+    required DateTime startAt,
+    int? taskId,
+  }) async {
+    taskIds.add(taskId);
+    return true;
+  }
+
+  @override
+  Future<Map<String, dynamic>?> fetchDailyLog(DateTime date) async => null;
+}
+
+class _FakeSubjectRepository extends SubjectRepository {
+  @override
+  Future<SubjectFetchResult> fetchSubjectsData({
+    String language = 'pt',
+    String timezone = 'UTC',
+    int version = 1,
+  }) async {
+    return const SubjectFetchResult(subjects: _subjects, todayTotalMs: 0);
+  }
+}
+
+TodoItemModel _todo({
+  int id = 1,
+  int? subjectId,
+  bool recurring = false,
+  bool completed = false,
+}) {
+  return TodoItemModel(
+    id: id,
+    subjectId: subjectId,
+    subjectTitle: 'Geral',
+    subjectColorInt: 0,
+    title: 'Tarefa de teste',
+    isCompleted: completed,
+    dateYmd: '2026-11-20',
+    recurrenceRule: recurring ? const RecurrenceRuleModel() : null,
+  );
+}
+
+/// Desmonta a arvore e encerra o notifier antes do fim do teste.
+///
+/// O [TimerNotifier] agenda um [Timer.periodic] de 10s no construtor. O
+/// flutter_test verifica timers pendentes assim que o teste termina, antes dos
+/// tearDowns, entao precisamos cancelar aqui dentro.
+Future<void> _disposeTimer(WidgetTester tester, TimerNotifier timer) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump();
+  timer.dispose();
+}
+
+Future<(FakePlannerRepository, TimerNotifier, _FakeTimerRepository)> _pump(
+  WidgetTester tester, {
+  FakePlannerRepository? repository,
+}) async {
+  SharedPreferences.setMockInitialValues({});
+  final repo = repository ?? FakePlannerRepository();
+  final timerRepo = _FakeTimerRepository();
+  final timer = _TestTimerNotifier(
+    timerRepository: timerRepo,
+    subjectRepository: _FakeSubjectRepository(),
+  );
+  addTearDown(timer.dispose);
+  final router = GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => const PlannerScreen()),
+      GoRoute(
+        path: '/home',
+        builder: (_, __) => const Scaffold(body: Text('Timer home')),
+      ),
+    ],
+  );
+  addTearDown(router.dispose);
+  tester.view.physicalSize = const Size(1280, 900);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        plannerRepositoryProvider.overrideWithValue(repo),
+        timerNotifierProvider.overrideWith((ref) => timer),
+        appTranslationProvider.overrideWith(
+          (ref) => AppTranslationNotifier(ref)
+            ..state = const AppTranslation(languageCode: 'pt'),
+        ),
+      ],
+      child: MaterialApp.router(routerConfig: router),
+    ),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 300));
+  return (repo, timer, timerRepo);
 }
 
 void main() {
@@ -302,5 +495,186 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repo.deletedIds, equals([42]));
+  });
+
+  testWidgets('criar tarefa envia somente a materia escolhida explicitamente',
+      (tester) async {
+    final (repo, timer, _) = await _pump(tester);
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.byType(DropdownButtonFormField<int>));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.text('Física').last);
+    await tester.pump();
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      'Nova com matéria',
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Adicionar'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(repo.createdSubjectIds, equals([9]));
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('editar sem materia nao cria vinculo e ID ausente e preservado',
+      (tester) async {
+    final (repo, timer, _) = await _pump(
+      tester,
+      repository: FakePlannerRepository(mockTodos: [_todo(subjectId: null)]),
+    );
+
+    await tester.tap(find.byIcon(Icons.edit));
+    await tester.pump();
+    expect(find.text('Sem matéria'), findsWidgets);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Salvar'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(repo.editedSubjectIds, equals([null]));
+    expect(repo.updateSubjectFlags, equals([true]));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    final (_, secondTimer, _) = await _pump(
+      tester,
+      repository: FakePlannerRepository(mockTodos: [_todo(subjectId: 999)]),
+    );
+    await tester.tap(find.byIcon(Icons.edit));
+    await tester.pump();
+    // A materia 999 nao veio na lista atual: mesmo assim precisa aparecer
+    // selecionada, senao a edicao trocaria a associacao sem avisar.
+    expect(find.text('Matéria 999'), findsOneWidget);
+    await _disposeTimer(tester, secondTimer);
+    timer.dispose();
+  });
+
+  testWidgets('tarefa recorrente avisa que so esta ocorrencia sera excluida',
+      (tester) async {
+    final (repo, timer, _) = await _pump(
+      tester,
+      repository: FakePlannerRepository(mockTodos: [_todo(recurring: true)]),
+    );
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pump();
+    // A serie foi reexposta depois da prova live; a ocorrencia continua
+    // selecionada por padrao para evitar uma delecao ampliada acidental.
+    expect(find.text('Excluir todas as tarefas da série'), findsOneWidget);
+    expect(
+      find.textContaining('Apenas esta ocorrência será excluída'),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Excluir'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(repo.deleteScopes, equals([false]));
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('tarefa recorrente permite excluir a serie apos validacao live',
+      (tester) async {
+    final (repo, timer, _) = await _pump(
+      tester,
+      repository: FakePlannerRepository(mockTodos: [_todo(recurring: true)]),
+    );
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pump();
+    await tester.tap(find.text('Excluir todas as tarefas da série'));
+    await tester.pump();
+    expect(
+      find.textContaining('Esta ação não pode ser desfeita'),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Excluir'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(repo.deleteScopes, equals([true]));
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('falha ao excluir mantem o item e mostra erro', (tester) async {
+    final repo = FakePlannerRepository(mockTodos: [_todo(id: 2)])
+      ..failDelete = true;
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pump();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Excluir'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(repo.deleteScopes, equals([false]));
+    expect(find.textContaining('Não foi possível salvar'), findsWidgets);
+    expect(repo.items.map((todo) => todo.id), contains(2));
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('iniciar pela tarefa seleciona materia, envia id e navega',
+      (tester) async {
+    final (repo, timer, timerRepo) = await _pump(
+      tester,
+      repository: FakePlannerRepository(mockTodos: [_todo(subjectId: 9)]),
+    );
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(timerRepo.taskIds, equals([1]));
+    expect(timer.state.currentSubject?.id, 9);
+    expect(timer.state.isRunning, isTrue);
+    expect(find.text('Timer home'), findsOneWidget);
+    expect(repo.items, isNotEmpty);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('iniciar tarefa sem materia avisa em vez de abrir sessao',
+      (tester) async {
+    final (_, timer, timerRepo) = await _pump(
+      tester,
+      repository: FakePlannerRepository(mockTodos: [_todo()]),
+    );
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(timerRepo.taskIds, isEmpty);
+    expect(timer.state.isRunning, isFalse);
+    expect(
+      find.text('Não foi possível iniciar estudo para esta tarefa.'),
+      findsOneWidget,
+    );
+    await _disposeTimer(tester, timer);
   });
 }
