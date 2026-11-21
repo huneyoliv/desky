@@ -3,13 +3,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desky/core/localization/app_translation.dart';
+import 'package:desky/data/models/subject_model.dart';
+import 'package:desky/data/repositories/subject_repository.dart';
+import 'package:desky/data/repositories/timer_repository.dart';
+import 'package:desky/features/timer/timer_notifier.dart';
 import 'package:desky/features/timer/timer_screen.dart';
 import 'package:desky/features/timer/widgets/timer_display.dart';
+
+/// Keeps this geometry test offline while exercising the real mode/subject
+/// transitions on TimerNotifier.
+class _OfflineTimerNotifier extends TimerNotifier {
+  _OfflineTimerNotifier()
+      : super(
+          timerRepository: TimerRepository(),
+          subjectRepository: SubjectRepository(),
+        );
+
+  @override
+  Future<void> loadSubjects() async {}
+
+  @override
+  Future<void> reconcileWithServer() async {}
+}
 
 /// The Timer screen doubles as an OBS window-capture overlay: the window is
 /// cropped once and elements must not move afterwards. These tests measure the
 /// rendered geometry, because "it looks stable" is not evidence.
-Future<void> _pumpTimer(WidgetTester tester) async {
+Future<void> _pumpTimer(
+  WidgetTester tester, {
+  _OfflineTimerNotifier? notifier,
+}) async {
   SharedPreferences.setMockInitialValues({});
 
   tester.view.physicalSize = const Size(1280, 800);
@@ -22,6 +45,8 @@ Future<void> _pumpTimer(WidgetTester tester) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        if (notifier != null)
+          timerNotifierProvider.overrideWith((ref) => notifier),
         appTranslationProvider.overrideWith(
           (ref) => AppTranslationNotifier(ref)
             ..state = const AppTranslation(languageCode: 'pt'),
@@ -49,7 +74,7 @@ void main() {
           MaterialApp(
             theme: ThemeData(
               useMaterial3: false,
-              ),
+            ),
             home: Scaffold(body: Center(child: TimerDisplay(elapsedMs: ms))),
           ),
         );
@@ -83,7 +108,8 @@ void main() {
   });
 
   group('Timer screen', () {
-    testWidgets('o cabecalho ocupa a largura toda, entao nao e centralizado '
+    testWidgets(
+        'o cabecalho ocupa a largura toda, entao nao e centralizado '
         'pelo conteudo', (tester) async {
       await _pumpTimer(tester);
 
@@ -118,6 +144,54 @@ void main() {
       expect(after.left, closeTo(before.left, 0.5));
       expect(after.top, closeTo(before.top, 0.5));
       expect(after.width, closeTo(before.width, 0.5));
+    });
+
+    testWidgets('materia e modo preservam geometria do cabecalho e do timer',
+        (tester) async {
+      final notifier = _OfflineTimerNotifier();
+      await _pumpTimer(tester, notifier: notifier);
+
+      notifier.selectSubject(const SubjectModel(
+        id: 1,
+        title: 'Sociology',
+        colorInt: 4292557552,
+      ));
+      await tester.pump();
+
+      final header = tester.getRect(find.byKey(TimerScreen.headerKey));
+      final clock = tester.getRect(find.byType(TimerDisplay));
+      final startButton = tester.getSize(
+        find.widgetWithText(ElevatedButton, 'INICIAR'),
+      );
+
+      notifier.selectSubject(const SubjectModel(
+        id: 2,
+        title: 'GS4',
+        colorInt: 4292557552,
+      ));
+      await tester.pump();
+
+      expect(tester.getRect(find.byKey(TimerScreen.headerKey)), equals(header));
+      expect(tester.getRect(find.byType(TimerDisplay)), equals(clock));
+
+      notifier.setTimerMode(TimerMode.pomodoro);
+      await tester.pump();
+
+      expect(tester.getRect(find.byKey(TimerScreen.headerKey)), equals(header));
+      expect(tester.getRect(find.byType(TimerDisplay)), equals(clock));
+      expect(
+        tester.getSize(find.widgetWithText(ElevatedButton, 'INICIAR FOCO')),
+        equals(startButton),
+      );
+
+      notifier.setTimerMode(TimerMode.stopwatch);
+      await tester.pump();
+
+      expect(tester.getRect(find.byType(TimerDisplay)), equals(clock));
+      expect(
+        tester.getSize(find.widgetWithText(ElevatedButton, 'INICIAR')),
+        equals(startButton),
+      );
     });
   });
 }

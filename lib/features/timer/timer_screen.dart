@@ -465,10 +465,9 @@ class TimerScreen extends ConsumerWidget {
                               disabledBackgroundColor: AppColors.surfaceLight.withValues(alpha: 0.4),
                               disabledForegroundColor: AppColors.stopped,
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                              // Width does not depend on the label, so
-                              // "INICIAR" and "INICIAR FOCO" occupy the same box
-                              // and the button does not move between modes.
-                              minimumSize: const Size(240, 56),
+                              // Fixed width: minimumSize alone still lets the
+                              // longer Pomodoro label expand the button.
+                              fixedSize: const Size(296, 56),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: Icon(
