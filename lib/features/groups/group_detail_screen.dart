@@ -272,6 +272,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     final sent = await repo.shakeMember(
       groupId: widget.group.id,
       targetUserId: member.userId,
+      from: ref.read(authStateProvider).user?.name ?? '',
     );
 
     // The repository answers false instead of throwing, so the old code showed
@@ -281,7 +282,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       SnackBar(
         content: Text(sent
             ? '${t.tr("shake_sent_to", fallback: "Chacoalhada enviada para")} ${member.name}! 🔔'
-            : t.tr('shake_failed', fallback: 'Could not send the nudge.')),
+            : '${t.tr('shake_failed', fallback: 'Could not send the nudge.')}'
+                '${GroupRepository.lastShakeError == null ? '' : '\n${GroupRepository.lastShakeError}'}'),
         backgroundColor: sent ? context.appPrimary : AppColors.error,
       ),
     );
