@@ -20,6 +20,15 @@ class TimerScreen extends ConsumerWidget {
   /// bar cannot be centred by its own content.
   static const Key headerKey = ValueKey('timer-header');
 
+  /// The Timer/Pomodoro switcher, centred independently of the side content.
+  static const Key modeSwitcherKey = ValueKey('timer-mode-switcher');
+
+  /// The Pomodoro status strip and the cycle label inside it. Tests assert the
+  /// label is centred in the strip, so the label does not shift sideways when
+  /// the optional "Pular" button appears or disappears.
+  static const Key pomodoroBannerKey = ValueKey('timer-pomodoro-banner');
+  static const Key pomodoroStatusKey = ValueKey('timer-pomodoro-status');
+
   const TimerScreen({super.key});
 
   String _formatTotalTime(int ms) {
@@ -82,13 +91,16 @@ class TimerScreen extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               color: palette.surface,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
+              // Equal-width side slots keep the mode switcher at the exact
+              // window centre. Each side can scroll independently when the
+              // window is narrow instead of pushing the switcher sideways.
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                       children: [
                         // Total time: fixed width and tabular figures so 0s -> 1h 23m does not
 // push the mode switcher and the icons sideways.
@@ -117,12 +129,15 @@ class TimerScreen extends ConsumerWidget {
                           ],
                         ),
                       ],
+                      ),
                     ),
-                    const SizedBox(width: 24),
+                  ),
+                  const SizedBox(width: 24),
 
-                    // Mode Switcher Tabs
-                    Container(
-                      padding: const EdgeInsets.all(4),
+                  // Mode Switcher Tabs
+                  Container(
+                    key: TimerScreen.modeSwitcherKey,
+                    padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: palette.card,
                         borderRadius: BorderRadius.circular(24),
@@ -150,11 +165,15 @@ class TimerScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 24),
+                  const SizedBox(width: 24),
 
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      reverse: true,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                         // Focus Mode Distraction-Free Toggle
                         IconButton(
                           tooltip: t.tr('focus', fallback: 'Modo Foco Sem Distrações'),
@@ -234,10 +253,11 @@ class TimerScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
@@ -246,17 +266,17 @@ class TimerScreen extends ConsumerWidget {
             // The slot keeps the same height in both modes, so switching to
             // Pomodoro does not push the timer block down. Only the content
             // toggles; the reserved space stays.
-            // Pomodoro Info Banner & Config Button
             //
-            // The slot keeps the same height in both modes, so switching to
-            // Pomodoro does not push the timer block down. Only the content
-            // toggles; the reserved space stays.
+            // The status text is centered in the banner regardless of how many
+            // action buttons the right side shows, so the label stays put when
+            // "Pular" appears or disappears during a cycle.
             SizedBox(
               height: 84,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: isPomodoro
                     ? Container(
+                        key: pomodoroBannerKey,
                         margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
@@ -266,54 +286,67 @@ class TimerScreen extends ConsumerWidget {
                           border: Border.all(
                               color: phaseColor.withValues(alpha: 0.4)),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: phaseColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${timerState.currentPomodoroCycle}/${timerState.totalPomodoroCycles} • $phaseLabel',
-                                  style: TextStyle(
-                                    color: phaseColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                if (timerState.isRunning || timerState.isPaused)
-                                  TextButton.icon(
-                                    onPressed: () => notifier.skipPomodoroPhase(),
-                                    icon: const Icon(Icons.skip_next,
-                                        size: 18, color: AppColors.textSecondary),
-                                    label: Text(
-                                      t.tr('skip', fallback: 'Pular'),
-                                      style: const TextStyle(
-                                          color: AppColors.textSecondary,
-                                          fontSize: 12),
+                            IgnorePointer(
+                              child: Row(
+                                key: pomodoroStatusKey,
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: phaseColor,
+                                      shape: BoxShape.circle,
                                     ),
                                   ),
-                                IconButton(
-                                  icon: const Icon(Icons.settings_outlined,
-                                      size: 20, color: AppColors.textSecondary),
-                                  onPressed: () => PomodoroConfigDialog.show(
-                                    context,
-                                    state: timerState,
-                                    onSave: notifier.configurePomodoro,
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${timerState.currentPomodoroCycle}/${timerState.totalPomodoroCycles} • $phaseLabel',
+                                    style: TextStyle(
+                                      color: phaseColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (timerState.isRunning ||
+                                      timerState.isPaused)
+                                    TextButton.icon(
+                                      onPressed: () =>
+                                          notifier.skipPomodoroPhase(),
+                                      icon: const Icon(Icons.skip_next,
+                                          size: 18,
+                                          color: AppColors.textSecondary),
+                                      label: Text(
+                                        t.tr('skip', fallback: 'Pular'),
+                                        style: const TextStyle(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 12),
+                                      ),
+                                    ),
+                                  IconButton(
+                                    icon: const Icon(Icons.settings_outlined,
+                                        size: 20,
+                                        color: AppColors.textSecondary),
+                                    onPressed: () => PomodoroConfigDialog.show(
+                                      context,
+                                      state: timerState,
+                                      onSave: notifier.configurePomodoro,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -465,10 +498,9 @@ class TimerScreen extends ConsumerWidget {
                               disabledBackgroundColor: AppColors.surfaceLight.withValues(alpha: 0.4),
                               disabledForegroundColor: AppColors.stopped,
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                              // Width does not depend on the label, so
-                              // "INICIAR" and "INICIAR FOCO" occupy the same box
-                              // and the button does not move between modes.
-                              minimumSize: const Size(240, 56),
+                              // Fixed width: minimumSize alone still lets the
+                              // longer Pomodoro label expand the button.
+                              fixedSize: const Size(296, 56),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: Icon(
