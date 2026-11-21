@@ -593,7 +593,12 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             unselectedLabelColor: palette.textSecondary,
             tabs: [
               Tab(text: t.tr('todo', fallback: 'Tarefas & D-Days')),
-              Tab(text: t.tr('timetable', fallback: 'Grade Horária')),
+              Tab(
+                text: t.tr(
+                  'planner_calendar_tab',
+                  fallback: 'Calendário',
+                ),
+              ),
             ],
           ),
         ),
