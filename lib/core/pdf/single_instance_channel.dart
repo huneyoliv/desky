@@ -1,8 +1,36 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+
+/// Resultado de [SingleInstanceChannel.startOrForward].
+///
+/// Distingue os tres desfechos possiveis, porque apenas um deles autoriza o
+/// processo a encerrar:
+///
+/// * [SingleInstanceOutcome.primary] -- este processo abriu a janela.
+/// * [SingleInstanceOutcome.forwarded] -- outra instancia recebeu o payload;
+///   este processo pode encerrar sem abrir janela.
+/// * [SingleInstanceOutcome.degraded] -- nao foi possivel virar primaria nem
+///   entregar a outra instancia. O app deve continuar abrindo, mesmo perdendo
+///   a garantia de instancia unica.
+class SingleInstanceResult {
+  const SingleInstanceResult._({this.channel, required this.outcome});
+
+  /// Canal primario, presente apenas em [SingleInstanceOutcome.primary].
+  final SingleInstanceChannel? channel;
+
+  final SingleInstanceOutcome outcome;
+
+  bool get isPrimary => channel != null;
+
+  /// Verdadeiro somente quando o payload ja foi entregue a outra instancia.
+  bool get shouldExit => outcome == SingleInstanceOutcome.forwarded;
+}
+
+/// Desfecho de [SingleInstanceChannel.startOrForward].
+enum SingleInstanceOutcome { primary, forwarded, degraded }
 
 /// Encaminha um arquivo (ou qualquer texto) para a instancia ja aberta.
 ///
@@ -142,24 +170,50 @@ class SingleInstanceChannel {
   /// Conveniencia: cria o canal e encaminha o argumento quando ja existe
   /// instancia aberta.
   ///
-  /// Retorna o canal primario, ou `null` quando o processo deve encerrar
-  /// porque a abertura foi encaminhada com sucesso.
-  static Future<SingleInstanceChannel?> startOrForward(String payload) async {
+  /// Nunca retorna nulo: consulte [SingleInstanceResult.shouldExit] para saber
+  /// se o processo deve encerrar. O retorno nulo anterior misturava
+  /// "encaminhado com sucesso" com "nao consegui nem a trava nem a entrega",
+  /// e o chamador encerrava o app nos dois casos -- sem janela e sem mensagem.
+  static Future<SingleInstanceResult> startOrForward(
+    String payload, {
+    Directory? directory,
+  }) async {
     if (!Platform.isWindows && !Platform.isLinux) {
       // macOS: o Launch Services impede a segunda instancia.
-      return SingleInstanceChannel._(defaultDirectory()).._lock = null;
+      return SingleInstanceResult._(
+        channel: SingleInstanceChannel._(directory ?? defaultDirectory())
+          .._lock = null,
+        outcome: SingleInstanceOutcome.primary,
+      );
     }
-    var channel = await acquire();
-    if (channel != null) return channel;
+    var channel = await acquire(directory: directory);
+    if (channel != null) {
+      return SingleInstanceResult._(
+        channel: channel,
+        outcome: SingleInstanceOutcome.primary,
+      );
+    }
 
-    final forwarded = await forwardToRunningInstance(payload);
+    final forwarded =
+        await forwardToRunningInstance(payload, directory: directory);
     if (forwarded) {
       debugPrint('[single-instance] arquivo encaminhado para a instancia aberta');
-      return null;
+      return const SingleInstanceResult._(
+        outcome: SingleInstanceOutcome.forwarded,
+      );
     }
     // A trava existia mas ninguem atendeu: provavel instancia morta. Tenta de
     // novo como primaria para nao deixar o usuario sem app.
-    channel = await acquire();
-    return channel;
+    channel = await acquire(directory: directory);
+    if (channel != null) {
+      return SingleInstanceResult._(
+        channel: channel,
+        outcome: SingleInstanceOutcome.primary,
+      );
+    }
+    // Sem trava e sem entrega (diretorio somente-leitura, por exemplo). Segue
+    // sem canal: instancia unica degradada e melhor que app que nao abre.
+    debugPrint('[single-instance] canal indisponivel; seguindo sem instancia unica');
+    return const SingleInstanceResult._(outcome: SingleInstanceOutcome.degraded);
   }
 }
