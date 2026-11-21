@@ -164,11 +164,11 @@ class GroupRepository {
       final data = response.data;
       if (data is Map && data['s'] == true) return true;
       lastShakeError = 'HTTP ${response.statusCode}: $data';
+      CrashLog.record('shake', 'nudge failed: $lastShakeError', null);
     } catch (e, st) {
       lastShakeError = e.toString();
-      CrashLog.record('shake', e.toString(), st);
+      CrashLog.record('shake', 'nudge failed: $e', st);
     }
-    CrashLog.record('shake', 'nudge failed: $lastShakeError', null);
     return false;
   }
 
