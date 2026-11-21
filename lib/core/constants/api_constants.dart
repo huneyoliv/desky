@@ -33,6 +33,10 @@ class ApiConstants {
   static const String ddayDelete = '/user/d-day/delete';
   static const String ddayEdit = '/user/d-day/edit';
 
+  // Timetable (live-verified)
+  static const String timetableList = '/timetable/timetables';
+  static const String timetableDetail = '/timetable/detail/v70630';
+
   // Timer & Study
   static const String studyStart = '/study/start';
   static const String studyStop = '/study/stop';

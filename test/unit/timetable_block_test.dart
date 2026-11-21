@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/timetable_model.dart';
@@ -11,6 +11,18 @@ class MockApiClient extends ApiClient {
   Map<String, dynamic>? postResponse;
   Map<String, dynamic>? deleteResponse;
 
+  final List<Map<String, dynamic>> calls = [];
+
+  Map<String, dynamic>? bodyOf(String method, String pathPart) {
+    for (final call in calls) {
+      if (call['method'] == method &&
+          (call['path'] as String).contains(pathPart)) {
+        return call['body'] as Map<String, dynamic>?;
+      }
+    }
+    return null;
+  }
+
   @override
   Future<Response<dynamic>> get(
     String path, {
@@ -18,6 +30,7 @@ class MockApiClient extends ApiClient {
     Options? options,
     String? baseUrl,
   }) async {
+    calls.add({'method': 'GET', 'path': path, 'body': null});
     return Response(
       requestOptions: RequestOptions(path: path),
       data: getResponse,
@@ -32,6 +45,11 @@ class MockApiClient extends ApiClient {
     Options? options,
     String? baseUrl,
   }) async {
+    calls.add({
+      'method': 'POST',
+      'path': path,
+      'body': data is Map<String, dynamic> ? data : null,
+    });
     return Response(
       requestOptions: RequestOptions(path: path),
       data: postResponse,
@@ -47,6 +65,11 @@ class MockApiClient extends ApiClient {
     Options? options,
     String? baseUrl,
   }) async {
+    calls.add({
+      'method': 'DELETE',
+      'path': path,
+      'body': data is Map<String, dynamic> ? data : null,
+    });
     return Response(
       requestOptions: RequestOptions(path: path),
       data: deleteResponse,
@@ -123,19 +146,12 @@ void main() {
       expect(blocks.last.startHour, equals(19));
     });
 
-    test('createBlock sends POST and parses returned TimetableBlock', () async {
-      mockApiClient.postResponse = {
+    test('createBlock posts to the detail route with compact keys', () async {
+      mockApiClient.getResponse = {
         's': true,
-        'timetable': {
-          'id': 99,
-          'subject_id': 12,
-          'subject_title': 'Química Geral',
-          'color': 4292557552,
-          'day_of_week': 4,
-          'start_hour': 10,
-          'end_hour': 12,
-        }
+        'rt': [{'id': 5323504, 't': 'teste'}],
       };
+      mockApiClient.postResponse = {'s': false};
 
       final block = await repository.createBlock(
         subjectId: 12,
@@ -146,16 +162,43 @@ void main() {
         endHour: 12,
       );
 
-      expect(block, isNotNull);
-      expect(block!.id, equals(99));
-      expect(block.subjectTitle, equals('Química Geral'));
-      expect(block.dayOfWeek, equals(4));
+      final body = mockApiClient.bodyOf('POST', '/timetable/detail/v70630');
+      expect(body, isNotNull);
+      expect(body!['ttid'], equals(5323504));
+      // The server validates the title as `t`; sending `title` is rejected
+      // with "title is required".
+      expect(body['t'], equals('Química Geral'));
+      expect(body['lw'], equals(4));
+      expect(body['st'], equals('10:00:00'));
+      expect(body['et'], equals('12:00:00'));
+      expect(body['scid'], equals(12));
+      expect(body.containsKey('title'), isFalse);
+      expect(body.containsKey('subject_title'), isFalse);
+      // Creation is unproven live, so the repository must not invent a block.
+      expect(block, isNull);
     });
 
-    test('deleteBlock sends DELETE request', () async {
+    test('createBlock returns null when no timetable exists', () async {
+      mockApiClient.getResponse = {'s': true, 'rt': []};
+      final block = await repository.createBlock(
+        subjectId: 12,
+        subjectTitle: 'Química Geral',
+        colorInt: 4292557552,
+        dayOfWeek: 4,
+        startHour: 10,
+        endHour: 12,
+      );
+      expect(block, isNull);
+      expect(mockApiClient.bodyOf('POST', '/timetable/detail/v70630'), isNull);
+    });
+
+    test('deleteBlock sends the id in the JSON body', () async {
       mockApiClient.deleteResponse = {'s': true};
       final success = await repository.deleteBlock(99);
       expect(success, isTrue);
+      final body = mockApiClient.bodyOf('DELETE', '/timetable/detail/v70630');
+      expect(body, isNotNull);
+      expect(body!['id'], equals(99));
     });
   });
 }

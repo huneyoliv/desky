@@ -24,6 +24,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
   List<TimetableBlock> _blocks = [];
   List<SubjectModel> _subjects = [];
   bool _isLoading = true;
+  String? _errorMessage;
 
   List<Map<String, dynamic>> _getDays(AppTranslation t) => [
     {'id': 1, 'name': t.tr('monday', fallback: 'Segunda-feira'), 'short': t.tr('monday_short', fallback: 'Seg')},
@@ -42,21 +43,33 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    final timetableRepo = ref.read(timetableRepositoryProvider);
-    final subjectRepo = ref.read(subjectRepositoryProvider);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      final timetableRepo = ref.read(timetableRepositoryProvider);
+      final subjectRepo = ref.read(subjectRepositoryProvider);
+      final results = await Future.wait([
+        timetableRepo.fetchTimetable(),
+        subjectRepo.fetchSubjects(),
+      ]);
 
-    final results = await Future.wait([
-      timetableRepo.fetchTimetable(),
-      subjectRepo.fetchSubjects(),
-    ]);
-
-    if (mounted) {
-      setState(() {
-        _blocks = results[0] as List<TimetableBlock>;
-        _subjects = results[1] as List<SubjectModel>;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _blocks = results[0] as List<TimetableBlock>;
+          _subjects = results[1] as List<SubjectModel>;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _blocks = [];
+          _errorMessage = 'load_failed';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -221,20 +234,11 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                   endHour: endHour,
                 );
 
-                if (block != null) {
-                  setState(() => _blocks = [..._blocks, block]);
-                } else {
-                  final fallbackBlock = TimetableBlock(
-                    id: DateTime.now().millisecondsSinceEpoch,
-                    subjectId: selectedSubject.id,
-                    subjectTitle: selectedSubject.title,
-                    colorInt: selectedSubject.color.toARGB32(),
-                    dayOfWeek: selectedDay,
-                    startHour: startHour,
-                    endHour: endHour,
-                  );
-                  setState(() => _blocks = [..._blocks, fallbackBlock]);
-                }
+                if (!mounted) return;
+                setState(() {
+                  _errorMessage = block == null ? 'save_failed' : null;
+                  if (block != null) _blocks = [..._blocks, block];
+                });
               },
               style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
               child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
@@ -271,11 +275,15 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
     );
 
     if (confirm == true) {
-      setState(() {
-        _blocks = _blocks.where((b) => b.id != block.id).toList();
-      });
       final repo = ref.read(timetableRepositoryProvider);
-      await repo.deleteBlock(block.id);
+      final deleted = await repo.deleteBlock(block.id);
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = deleted ? null : 'save_failed';
+        if (deleted) {
+          _blocks = _blocks.where((b) => b.id != block.id).toList();
+        }
+      });
     }
   }
 
@@ -328,6 +336,27 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
               ],
             ),
           ),
+
+          if (_errorMessage != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              color: AppColors.error.withValues(alpha: 0.15),
+              child: Text(
+                t.tr(
+                  _errorMessage == 'load_failed'
+                      ? 'timetable_load_failed'
+                      : 'timetable_save_failed',
+                  fallback: _errorMessage == 'load_failed'
+                      ? 'Não foi possível carregar o horário.'
+                      : 'Não foi possível salvar a alteração no horário.',
+                ),
+                style: TextStyle(color: AppColors.error),
+              ),
+            ),
 
           // Days Header
           Container(
