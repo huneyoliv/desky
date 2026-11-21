@@ -75,6 +75,9 @@ Before creating and pushing any release tag, the version string and build number
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-21
+
+
 ### Added
 
 - **Classic YPT Look (Settings → Classic YPT look)**: An optional layout modelled on the YPT
@@ -111,6 +114,15 @@ Before creating and pushing any release tag, the version string and build number
   minimizing it, so an OBS Window Capture keeps receiving frames.
 
 ### Fixed
+
+- **Group nudges never sent**: the nudge request used `groupID`/`targetUserID`, which the
+  server ignores, so every nudge failed. It now sends `user_id`, `group_id` and `from` like
+  the official app, and a failed nudge shows the server's reason.
+- **Single-instance check on Linux**: a second lock from the same process is now refused, so
+  Linux behaves like Windows (the lock file is per process there).
+- Merged upstream fixes: real server time for the timer, group search keeps the selected
+  region, group rename uses the verified title field, and the app stays open when the
+  single-instance channel cannot start.
 
 - **One OBS Crop for Every Timer State (Classic look)**: The header and the timer box have a fixed
   size and position whether idle, in Pomodoro, studying or on a break; a test checks the box's
