@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/data/models/timetable_model.dart';
 
 void main() {
@@ -21,6 +21,30 @@ void main() {
       expect(block.subjectTitle, 'Raciocínio Lógico');
       expect(block.colorInt, 4293227379);
       expect(block.dayOfWeek, 1);
+      expect(block.startHour, 8);
+      expect(block.endHour, 10);
+    });
+
+    test('fromJson parses the compact rt API schema', () {
+      final block = TimetableBlock.fromJson({
+        'id': 7,
+        't': 'Teste',
+        'no': false,
+        'sd': '2026-01-01',
+        'ed': '2026-12-31',
+        'st': '08:00:00',
+        'rt': null,
+        'lw': 5,
+        'et': '10:00:00',
+        'ca': '2026-01-01T00:00:00.000Z',
+        'scid': null,
+      });
+
+      expect(block.id, 7);
+      expect(block.subjectId, 0);
+      expect(block.subjectTitle, 'Teste');
+      expect(block.colorInt, 0xFFA78BFA);
+      expect(block.dayOfWeek, 5);
       expect(block.startHour, 8);
       expect(block.endHour, 10);
     });
