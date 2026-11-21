@@ -1,10 +1,55 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/timer_appearance.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/utils/package_helper.dart';
 import '../settings_notifier.dart';
+
+Future<void> _pickTimerBackgroundImage(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final t = ref.read(appTranslationProvider);
+  try {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'webp'],
+      allowMultiple: false,
+      withData: false,
+    );
+    if (result == null || result.files.isEmpty) return;
+    final path = result.files.single.path;
+    if (path == null) return;
+
+    final valid = await isValidTimerBackgroundImageFile(path);
+    if (!valid) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(t.tr('timer_background_file_error',
+                fallback: 'Não foi possível usar essa imagem.')),
+          ),
+        );
+      }
+      return;
+    }
+    await ref
+        .read(settingsNotifierProvider.notifier)
+        .setTimerBackgroundImage(path);
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.tr('timer_background_file_error',
+              fallback: 'Não foi possível usar essa imagem.')),
+        ),
+      );
+    }
+  }
+}
 
 class StudyPreferencesDialog extends ConsumerWidget {
   const StudyPreferencesDialog({super.key});
@@ -154,6 +199,85 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       ),
                       value: settings.discordRpcEnabled,
                       onChanged: (val) => notifier.toggleDiscordRpc(val),
+                    ),
+
+                    Divider(color: context.appBorder, height: 16),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.wallpaper_rounded, color: context.appPrimary),
+                      title: Text(
+                        t.tr('timer_background', fallback: 'Fundo do Timer'),
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(
+                        t.tr('timer_background_image_desc',
+                            fallback: 'PNG/JPEG/WebP até 20 MB; vídeo não incluído'),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      ),
+                      trailing: DropdownButton<String>(
+                        value: settings.timerBackground,
+                        dropdownColor: context.appSurface,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        underline: const SizedBox(),
+                        items: [
+                          DropdownMenuItem(
+                            value: timerBackgroundTheme,
+                            child: Text(t.tr('timer_background_theme', fallback: 'Tema padrão')),
+                          ),
+                          const DropdownMenuItem(
+                            value: timerBackgroundAurora,
+                            child: Text('Aurora'),
+                          ),
+                          const DropdownMenuItem(
+                            value: timerBackgroundSunset,
+                            child: Text('Sunset'),
+                          ),
+                          DropdownMenuItem(
+                            value: timerBackgroundCustomImage,
+                            child: Text(t.tr('timer_background_image', fallback: 'Imagem local')),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value == null) return;
+                          if (value == timerBackgroundCustomImage) {
+                            _pickTimerBackgroundImage(context, ref);
+                          } else {
+                            notifier.setTimerBackground(value);
+                          }
+                        },
+                      ),
+                    ),
+                    if (settings.timerBackground == timerBackgroundCustomImage)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () => _pickTimerBackgroundImage(context, ref),
+                          icon: const Icon(Icons.folder_open_rounded, size: 18),
+                          label: Text(t.tr('timer_choose_image', fallback: 'Escolher imagem')),
+                        ),
+                      ),
+                    Divider(color: context.appBorder, height: 16),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.font_download_rounded, color: context.appPrimary),
+                      title: Text(
+                        t.tr('timer_font', fallback: 'Fonte do Timer'),
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      trailing: DropdownButton<String>(
+                        value: settings.timerFont,
+                        dropdownColor: context.appSurface,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        underline: const SizedBox(),
+                        items: const [
+                          DropdownMenuItem(value: timerFontDigital, child: Text('Digital')),
+                          DropdownMenuItem(value: timerFontSfPro, child: Text('SF Pro')),
+                          DropdownMenuItem(value: timerFontPretendard, child: Text('Pretendard')),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) notifier.setTimerFont(value);
+                        },
+                      ),
                     ),
 
                     // Beta updates. Hidden in the Store/MSIX build: the packaged

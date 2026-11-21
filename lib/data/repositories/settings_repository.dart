@@ -3,6 +3,7 @@ import '../../core/api/api_client.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/constants/app_constants.dart';
 import '../../features/updates/update_channel.dart';
+import '../../core/theme/timer_appearance.dart';
 import '../models/category_model.dart';
 import '../models/country_model.dart';
 
@@ -31,6 +32,9 @@ class SettingsRepository {
   static const String keyDiscordRpc = 'discord_rpc_enabled';
   static const String keyThemePreset = 'selected_theme_preset';
   static const String keyBetaChannel = 'beta_update_channel';
+  static const String keyTimerBackground = 'timer_background_style';
+  static const String keyTimerBackgroundImagePath = 'timer_background_image_path';
+  static const String keyTimerFont = 'timer_font_family';
 
   static const CountryModel defaultCountry = CountryModel(
     id: 23,
@@ -356,6 +360,59 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setBool(keyDiscordRpc, value);
+    } catch (_) {}
+  }
+
+  Future<String> getTimerBackground() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return normalizeTimerBackground(prefs.getString(keyTimerBackground));
+    } catch (_) {
+      return timerBackgroundTheme;
+    }
+  }
+
+  Future<void> saveTimerBackground(String value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setString(keyTimerBackground, normalizeTimerBackground(value));
+    } catch (_) {}
+  }
+
+  Future<String?> getTimerBackgroundImagePath() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      final path = prefs.getString(keyTimerBackgroundImagePath)?.trim();
+      return path == null || path.isEmpty ? null : path;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveTimerBackgroundImagePath(String? path) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      if (path == null || path.trim().isEmpty) {
+        await prefs.remove(keyTimerBackgroundImagePath);
+      } else {
+        await prefs.setString(keyTimerBackgroundImagePath, path.trim());
+      }
+    } catch (_) {}
+  }
+
+  Future<String> getTimerFont() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return normalizeTimerFont(prefs.getString(keyTimerFont));
+    } catch (_) {
+      return timerFontDigital;
+    }
+  }
+
+  Future<void> saveTimerFont(String value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setString(keyTimerFont, normalizeTimerFont(value));
     } catch (_) {}
   }
 

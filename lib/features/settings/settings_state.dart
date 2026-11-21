@@ -1,6 +1,7 @@
 import '../../data/models/category_model.dart';
 import '../../data/models/country_model.dart';
 import '../../data/repositories/settings_repository.dart';
+import '../../core/theme/timer_appearance.dart';
 
 class SettingsState {
   final CountryModel selectedCountry;
@@ -17,6 +18,9 @@ class SettingsState {
   final List<String> blockedUsers;
   final bool discordRpcEnabled;
   final bool betaChannel;
+  final String timerBackground;
+  final String? timerBackgroundImagePath;
+  final String timerFont;
 
   const SettingsState({
     this.selectedCountry = SettingsRepository.defaultCountry,
@@ -33,6 +37,9 @@ class SettingsState {
     this.blockedUsers = const [],
     this.discordRpcEnabled = true,
     this.betaChannel = false,
+    this.timerBackground = timerBackgroundTheme,
+    this.timerBackgroundImagePath,
+    this.timerFont = timerFontDigital,
   });
 
   SettingsState copyWith({
@@ -50,6 +57,10 @@ class SettingsState {
     List<String>? blockedUsers,
     bool? discordRpcEnabled,
     bool? betaChannel,
+    String? timerBackground,
+    String? timerBackgroundImagePath,
+    bool clearTimerBackgroundImagePath = false,
+    String? timerFont,
   }) {
     return SettingsState(
       selectedCountry: selectedCountry ?? this.selectedCountry,
@@ -66,6 +77,13 @@ class SettingsState {
       blockedUsers: blockedUsers ?? this.blockedUsers,
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
       betaChannel: betaChannel ?? this.betaChannel,
+      timerBackground: normalizeTimerBackground(
+        timerBackground ?? this.timerBackground,
+      ),
+      timerBackgroundImagePath: clearTimerBackgroundImagePath
+          ? null
+          : (timerBackgroundImagePath ?? this.timerBackgroundImagePath),
+      timerFont: normalizeTimerFont(timerFont ?? this.timerFont),
     );
   }
 }
