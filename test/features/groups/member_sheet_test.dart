@@ -17,7 +17,7 @@ class _Repo extends GroupRepository {
       [GroupMemberModel.fromJson({'ud': 7, 'n': 'Top', 'sm': 9000000, 'sd': 5}), member];
 
   @override
-  Future<bool> shakeMember({required int groupId, required int targetUserId}) async {
+  Future<bool> shakeMember({required int groupId, required int targetUserId, String from = ''}) async {
     shakes++;
     return true;
   }

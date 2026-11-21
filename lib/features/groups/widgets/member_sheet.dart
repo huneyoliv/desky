@@ -49,7 +49,11 @@ class _MemberSheetState extends ConsumerState<MemberSheet> {
     setState(() => _sending = true);
     final ok = await ref
         .read(groupRepositoryProvider)
-        .shakeMember(groupId: widget.groupId, targetUserId: widget.member.userId);
+        .shakeMember(
+          groupId: widget.groupId,
+          targetUserId: widget.member.userId,
+          from: ref.read(authStateProvider).user?.name ?? '',
+        );
     if (mounted) {
       setState(() {
         _sending = false;
