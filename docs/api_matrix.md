@@ -5,7 +5,7 @@ O status distingue **validado ao vivo** (resposta real observada na conta de tes
 **não confirmado** (rota existe, contrato desconhecido) e **bloqueado** (rota responde erro
 que impede o uso).
 
-> Última revisão: **1.2.0** (2026-11-19). As linhas marcadas com ⚠️ mudaram nesta versão.
+> Última revisão de contratos: **2026-11-20**, em alterações pendentes. A versão do Desky permanece **1.2.1**; linhas marcadas com ⚠️ mudaram na 1.2.0.
 
 ---
 
@@ -24,8 +24,8 @@ que impede o uso).
 
 | Funcionalidade | Endpoint | Host | Status |
 |---|---|---|---|
-| Iniciar estudo | `POST /study/start` | `pi.tgclab.com` | **Validado ao vivo** — corpo real do app: `{subject, deviceModel}`; devolve `st` e **`sp`** |
-| Encerrar estudo | `POST /study/stop` | `pi.tgclab.com` | **Validado ao vivo** — o **Desky envia campos extras** (`subject_id`, `startedAt`, `study_ms`, `taskId`); o servidor tolera |
+| Iniciar estudo | `POST /study/start` | `pi.tgclab.com` | **Validado ao vivo** — o Desky envia `{subject, subject_id, deviceModel, taskId}`; `taskId` foi aceito, mas nenhuma associação à tarefa foi observada na resposta ou no log |
+| Encerrar estudo | `POST /study/stop` | `pi.tgclab.com` | **Validado ao vivo** — o Desky envia `{subject, subject_id, startedAt, study_ms, deviceModel}` |
 | Registrar pausa (WearOS) | `POST /rest/record` | `pi.tgclab.com` | ⚠️ **Divergente** — espera **`{tag}`**; o Desky envia timestamps e recebe **HTTP 500** |
 | Pausa pelo planner | `POST /study/study-plan/rest` | `pi.tgclab.com` | ⚠️ **Recusado** — existe, mas devolve `s: false` com o payload do Desky; corpo real não recuperável (só Dart) |
 | Tempo de cam study | `POST /study/cam-ms` | `pi.tgclab.com` | ⚠️ **Não confiável** — devolve `{s: true}` até com corpo vazio, portanto não valida nada |
@@ -37,23 +37,35 @@ rotas entrega o contrato, e `rs`/`as` em `/logs/day` nunca vieram populados.
 
 | Funcionalidade | Endpoint | Host | Status |
 |---|---|---|---|
-| **Tarefas de um dia** | `GET /study/study-plan/get-by-date` com `start_at`, `end_at`, `is_unscheduled` | `pi.tgclab.com` | ⚠️ **Validado ao vivo** — é o contrato real do To-Do; a lista vem em `r` |
+| **Tarefas de um dia** | `GET /study/study-plan/get-by-date` com `start_at`, `end_at`, `is_unscheduled` | `pi.tgclab.com` | ⚠️ **Validado ao vivo** — é o contrato real das tarefas do Planner; a lista vem em `r` |
 | Conteúdo do planner | `GET /planner/stuff` | `pi.tgclab.com` | Não reconfirmado na 1.2.0 |
-| Criar tarefa | `POST /study/study-plan/rest` | `pi.tgclab.com` | **Validado ao vivo** — `{title, subject_id, start_at, all_day, order, score, duration}` |
-| Atualizar / concluir tarefa | `PUT /study/study-plan/rest` | `pi.tgclab.com` | **Validado ao vivo** — `score: 1` marca concluída, `null` desmarca |
-| Excluir tarefa | `DELETE /study/study-plan/rest?id=` (ou `&target=all`) | `pi.tgclab.com` | **Validado ao vivo** |
+| Criar tarefa | `POST /study/study-plan/rest` | `pi.tgclab.com` | **Revalidado ao vivo em 2026-11-20** — `{title, subject_id, start_at, all_day, order, score, duration}`; matéria e objeto confirmados por releitura |
+| Atualizar / concluir tarefa | `PUT /study/study-plan/rest` | `pi.tgclab.com` | **Revalidado ao vivo em 2026-11-20** — título e `subject_id` persistiram; `score: 1` conclui e `null` reabre |
+| Excluir tarefa | `DELETE /study/study-plan/rest` | `pi.tgclab.com` | **Revalidado ao vivo em 2026-11-20** — exige corpo JSON `{id}`; query-only falhou. Uma ocorrência foi removida individualmente e `target:"all"` removeu a série restante, com zero itens ao final |
 | Reordenar plano | `/study/study-plan/update-order` | `pi.tgclab.com` | Não confirmado |
-| D-days | `GET /planner/ddays` | `pi.tgclab.com` | **Validado ao vivo** |
+| D-days (listar) | `GET /user/d-day/get` | `pi.tgclab.com` | **Validado ao vivo** — responde `{"s": true}` e **não expõe chave de lista** em nenhuma variação testada (`?date=`, `?year=`, `?all=1`, `?include_past=true`, `?id=`). `GET /planner/ddays` responde **404** |
+| D-days (criar) | `POST /user/d-day/create` | `pi.tgclab.com` | **Validado ao vivo** — exige `title` **e** `date` (não `targetDate`); `{}`, `{title}` e `{title,targetDate}` devolvem HTML 500. Resposta: `{"s": true, "d": {id, tt, dt, st}}` |
+| D-days (excluir) | `POST /user/d-day/delete` com `{id}` | `pi.tgclab.com` | **Validado ao vivo** — `200 {"s": true}`; o `DELETE /planner/dday/:id` do código antigo não existe |
+| D-days (editar) | `POST /user/d-day/edit` | `pi.tgclab.com` | **Não confirmado** — `{}` devolve HTML 500 e as chaves obrigatórias são desconhecidas |
 | Temas do planner | `GET /planner/themes` | `pi.tgclab.com` | **Validado ao vivo** |
-| Grade de horários | `GET /timetable/timetables` | `pi.tgclab.com` | **Validado ao vivo** |
+| Grade de horários (listar) | `GET /timetable/timetables` | `pi.tgclab.com` | **Validado ao vivo** — a lista vem em `rt` (não `timetables`), com as chaves compactas `id, t, sd, ed, st, et, lw, scid` |
+| Grade de horários (detalhe) | `GET /timetable/detail/v70630?id=<ttid>` | `pi.tgclab.com` | **Validado ao vivo** — devolve `{"s": true, "sb": []}` |
+| Grade de horários (excluir bloco) | `DELETE /timetable/detail/v70630` com `{id}` no corpo | `pi.tgclab.com` | **Validado ao vivo** — `{"s": true}`; id inexistente devolve `{"s": false, "m": "already removed"}`. Enviar o id na query string produz HTML 500 |
+| Grade de horários (criar bloco) | `POST /timetable/detail/v70630` | `pi.tgclab.com` | **Validado ao vivo em 2026-11-21** — `{ttid,t,lw,st,et,scid,sd,ed,c}`; `c` é a cor ARGB e `sd/ed` vêm do container. Resposta `s:true` com `rs`; bloco confirmado em `sb` e limpo pelo DELETE |
 | Scheduler (dia letivo/folga) | `/scheduler/v2/day-on` e `day-off` | `pi.tgclab.com` | **Validado ao vivo** |
 | ⚠️ To-do do calendário | `GET /logs/calendar/todos?startDate&endDate` | `pi.tgclab.com` | **Validado, mas vazio** — aceita só camelCase; nunca devolveu um elemento |
 | ⚠️ Resumo do calendário | `GET /logs/calendar/home?startDate&endDate` | `pi.tgclab.com` | **Validado ao vivo** — devolve `{ds, ss, ts}` |
 | ⚠️ Criar tarefa (legado) | `POST /study/task/make` | `pi.tgclab.com` | **Quebrado** — página HTML de erro 500 para todo método e payload testado (13 combinações) |
 | ⚠️ Estatísticas de tarefas | `/study/todo/statistics/main` | `pi.tgclab.com` | **404 em GET** |
 
-**Consequência conhecida:** a seção To-Do do Desky usa o contrato do planner
-(`/study/study-plan/*`), e **não** `/logs/calendar/todos` nem `/study/task/make`.
+**Consequência conhecida:** as tarefas do Planner usam o contrato
+`/study/study-plan/*`, e **não** `/logs/calendar/todos` nem `/study/task/make`. A edição segue
+limitada à ocorrência. A exclusão oferece ocorrência (padrão) ou série inteira após nova prova
+live de `target:"all"` com releitura e limpeza; `applyToAll` permanece fora da UI.
+O HAR `firestore.googleapis.com_2026_11_19_21_18_13.har` contém apenas `Listen` e
+`RunAggregationQuery` sobre `userbooks`; ele não documenta as escritas REST de To-Do
+nem a criação/edição de grupos. A ação de iniciar estudo pela tarefa envia `taskId`,
+mas a associação persistente dessa sessão à tarefa **não foi comprovada**.
 
 ## 4. Logs, estatísticas e rankings
 
@@ -75,18 +87,18 @@ rotas entrega o contrato, e `rs`/`as` em `/logs/day` nunca vieram populados.
 
 | Funcionalidade | Endpoint | Host | Status |
 |---|---|---|---|
-| Busca de grupos | `GET /group/list-new-2` | `pi.tgclab.com` | **Validado ao vivo** — honra `country_id` |
+| Busca de grupos | `GET /group/list-new-2` | `pi.tgclab.com` | **Validado ao vivo** — honra `country_id`; a listagem e a pesquisa textual do Desky propagam o país selecionado |
 | Detalhes / entrada | `GET /group/search-info/v2` | `pi.tgclab.com` | **Validado ao vivo** |
 | Membros do grupo | `GET /logs/group/members/v2` | `pi.tgclab.com` | **Validado ao vivo** — `dl.is`, `dl.st`, `dl.sp` em UTC; **sem campo de fuso por membro** |
 | Chat — ler | `GET /chat/group/messages?group_id=` | `pi.tgclab.com` | **Validado ao vivo** |
 | Chat — enviar | `POST /chat/group/message` | `pi.tgclab.com` | **Validado ao vivo** — `{group_id, message}` |
 | Figurinhas | `GET /chat/sticker/sets` | `pi.tgclab.com` | **Validado ao vivo** |
-| Editar configurações do grupo | `POST /group/info/edit` | `pi.tgclab.com` | **Validado ao vivo** — chave `id`, edição parcial |
+| Editar configurações do grupo | `POST /group/info/edit` | `pi.tgclab.com` | **Nome validado ao vivo** — `{id, title}` alterou e restaurou; `t`, `n` e `name` foram aceitos sem efeito. Demais campos não foram comprovados; `s:true` não basta |
 | Validar nome do grupo | `POST /group/make/title/validate` | `pi.tgclab.com` | **Validado ao vivo** — `{title}` |
-| **Criar grupo** | `POST /group/make/v2` | `pi.tgclab.com` | ⚠️ **Bloqueado** — `title` e `goalTime` confirmados; o servidor responde erro genérico e **não cria** (~380 sondagens) |
+| **Criar grupo** | `POST /group/make/v2` | `pi.tgclab.com` | ⚠️ **Bloqueado** — `title` e `goalTime` confirmados; sondagens anteriores não criaram grupo. O HAR de 2026-11-19 **não contém esta rota** e o APK só comprova o literal, não o payload completo |
 | ⚠️ Desafios de grupo | `/group/challenge/list`, `/detail`, `/make` | `pi.tgclab.com` | **Rotas existem no APK**; o 404 anterior era parâmetro errado, não rota ausente |
 | Cutucar (nudge) — enviar | `POST /group/push/shake` | `pi.tgclab.com` | **Validado ao vivo** |
-| Cutucar — receber | — | — | ⚠️ **Impossível no desktop** — não existe tipo de notificação para cutucada; o app oficial usa push FCM |
+| Cutucar — receber | — | — | ⚠️ **Não implementado** — as notificações REST conhecidas não têm tipo de cutucada; o app oficial usa push FCM e o Desky não possui esse canal |
 | Publicações | `POST /group/legacy/post` | `pi.tgclab.com` | **Validado ao vivo** |
 
 ## 6. Missões e desafios de estudo
