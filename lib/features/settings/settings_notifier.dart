@@ -38,13 +38,19 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final soundEffects = await _repository.getSoundEffects();
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
-      final classicYptLook = await _repository.getClassicYptLook();
-      final classicUiScale = await _repository.getClassicUiScale();
       final betaChannel = await _repository.getBetaChannel();
       final timerBackground = await _repository.getTimerBackground();
       final timerBackgroundImagePath =
           await _repository.getTimerBackgroundImagePath();
       final timerFont = await _repository.getTimerFont();
+      if (!mounted) return;
+      state = state.copyWith(
+        timerBackground: timerBackground,
+        timerBackgroundImagePath: timerBackgroundImagePath,
+        timerFont: timerFont,
+      );
+      final classicYptLook = await _repository.getClassicYptLook();
+      final classicUiScale = await _repository.getClassicUiScale();
 
       if (!mounted) return;
       state = state.copyWith(
