@@ -26,6 +26,7 @@ import 'core/localization/app_translation.dart';
 import 'features/auth/auth_notifier.dart';
 import 'features/settings/settings_notifier.dart';
 import 'features/settings/theme_notifier.dart';
+import 'features/timer/focus_mode_notifier.dart';
 import 'features/timer/timer_notifier.dart';
 import 'shared/widgets/app_title_bar.dart';
 
