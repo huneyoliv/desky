@@ -607,6 +607,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                         msg.stickerUrl!,
                                         height: 100,
                                         width: 100,
+                                        cacheWidth: 200,
                                         fit: BoxFit.contain,
                                         errorBuilder: (_, __, ___) => const Icon(Icons.extension, color: Colors.white70),
                                       ),
@@ -619,6 +620,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                         child: Image.network(
                                           msg.imageUrl!,
                                           height: 180,
+                                          cacheHeight: 360,
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white70),
                                         ),
@@ -863,7 +865,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                               CircleAvatar(
                                 radius: 20,
                                 backgroundColor: palette.surface,
-                                backgroundImage: NetworkImage(member.avatarUrl),
+                                backgroundImage: ResizeImage(NetworkImage(member.avatarUrl), width: 128, height: 128),
                               ),
                             ],
                           ),
@@ -1047,7 +1049,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                   ? CircleAvatar(
                       radius: 28,
                       backgroundColor: context.appSurface,
-                      backgroundImage: NetworkImage(member.avatarUrl),
+                      backgroundImage: ResizeImage(NetworkImage(member.avatarUrl), width: 128, height: 128),
                     )
                   : StudiconAvatar(
                       studiconId: member.studiconId,
