@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/timer_appearance.dart';
 import '../../core/localization/app_translation.dart';
 import 'timer_notifier.dart';
 import 'widgets/timer_display.dart';
@@ -11,12 +14,22 @@ import 'widgets/manual_study_log_dialog.dart';
 import 'offline_sync_notifier.dart';
 import 'focus_mode_notifier.dart';
 import '../settings/widgets/app_settings_dialog.dart';
+import '../settings/settings_notifier.dart';
 
 class TimerScreen extends ConsumerWidget {
   /// Identifies the top bar in tests, which assert it spans the window so the
   /// bar cannot be centred by its own content.
   static const Key headerKey = ValueKey('timer-header');
   static const settingsButtonKey = ValueKey('timer-settings-button');
+
+  /// The Timer/Pomodoro switcher, centred independently of the side content.
+  static const Key modeSwitcherKey = ValueKey('timer-mode-switcher');
+
+  /// The Pomodoro status strip and the cycle label inside it. Tests assert the
+  /// label is centred in the strip, so the label does not shift sideways when
+  /// the optional "Pular" button appears or disappears.
+  static const Key pomodoroBannerKey = ValueKey('timer-pomodoro-banner');
+  static const Key pomodoroStatusKey = ValueKey('timer-pomodoro-status');
 
   const TimerScreen({super.key});
 
@@ -59,8 +72,13 @@ class TimerScreen extends ConsumerWidget {
       PomodoroPhase.longBreak => AppColors.warning,
     };
 
-    return Scaffold(
-      backgroundColor: palette.background,
+    final appearance = ref.watch(settingsNotifierProvider);
+
+    return _TimerBackground(
+      child: Scaffold(
+      backgroundColor: appearance.timerBackground == timerBackgroundTheme
+          ? palette.background
+          : Colors.transparent,
       body: SafeArea(
         child: Column(
           children: [
@@ -75,16 +93,16 @@ class TimerScreen extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               color: palette.surface,
+              // Equal-width side slots keep the mode switcher at the exact
+              // window centre. Each side can scroll independently when the
+              // window is narrow instead of pushing the switcher sideways.
               child: Row(
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                       children: [
                         // Total time: fixed width and tabular figures so 0s -> 1h 23m does not
 // push the mode switcher and the icons sideways.
@@ -113,12 +131,15 @@ class TimerScreen extends ConsumerWidget {
                           ],
                         ),
                       ],
+                      ),
                     ),
-                    const SizedBox(width: 24),
+                  ),
+                  const SizedBox(width: 24),
 
-                    // Mode Switcher Tabs
-                    Container(
-                      padding: const EdgeInsets.all(4),
+                  // Mode Switcher Tabs
+                  Container(
+                    key: TimerScreen.modeSwitcherKey,
+                    padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: palette.card,
                         borderRadius: BorderRadius.circular(24),
@@ -146,11 +167,15 @@ class TimerScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 24),
+                  const SizedBox(width: 24),
 
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      reverse: true,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                         // Focus Mode Distraction-Free Toggle
                         IconButton(
                           tooltip: t.tr('focus', fallback: 'Modo Foco Sem Distrações'),
@@ -230,18 +255,17 @@ class TimerScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                      ],
+                        // App settings: Discord, OBS overlay, look. Kept
+                        // inside the right slot so the switcher stays centred.
+                        IconButton(
+                          key: TimerScreen.settingsButtonKey,
+                          tooltip: t.tr('settings', fallback: 'Settings'),
+                          icon: Icon(Icons.settings_outlined, color: palette.textSecondary),
+                          onPressed: () => AppSettingsDialog.show(context),
+                        ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-                  ),
-                  // App settings: Discord, OBS overlay, look.
-                  IconButton(
-                    key: TimerScreen.settingsButtonKey,
-                    tooltip: t.tr('settings', fallback: 'Settings'),
-                    icon: Icon(Icons.settings_outlined, color: palette.textSecondary),
-                    onPressed: () => AppSettingsDialog.show(context),
                   ),
                 ],
               ),
@@ -252,17 +276,17 @@ class TimerScreen extends ConsumerWidget {
             // The slot keeps the same height in both modes, so switching to
             // Pomodoro does not push the timer block down. Only the content
             // toggles; the reserved space stays.
-            // Pomodoro Info Banner & Config Button
             //
-            // The slot keeps the same height in both modes, so switching to
-            // Pomodoro does not push the timer block down. Only the content
-            // toggles; the reserved space stays.
+            // The status text is centered in the banner regardless of how many
+            // action buttons the right side shows, so the label stays put when
+            // "Pular" appears or disappears during a cycle.
             SizedBox(
               height: 84,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: isPomodoro
                     ? Container(
+                        key: pomodoroBannerKey,
                         margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
@@ -272,54 +296,67 @@ class TimerScreen extends ConsumerWidget {
                           border: Border.all(
                               color: phaseColor.withValues(alpha: 0.4)),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: phaseColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${timerState.currentPomodoroCycle}/${timerState.totalPomodoroCycles} • $phaseLabel',
-                                  style: TextStyle(
-                                    color: phaseColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                if (timerState.isRunning || timerState.isPaused)
-                                  TextButton.icon(
-                                    onPressed: () => notifier.skipPomodoroPhase(),
-                                    icon: const Icon(Icons.skip_next,
-                                        size: 18, color: AppColors.textSecondary),
-                                    label: Text(
-                                      t.tr('skip', fallback: 'Pular'),
-                                      style: const TextStyle(
-                                          color: AppColors.textSecondary,
-                                          fontSize: 12),
+                            IgnorePointer(
+                              child: Row(
+                                key: pomodoroStatusKey,
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: phaseColor,
+                                      shape: BoxShape.circle,
                                     ),
                                   ),
-                                IconButton(
-                                  icon: const Icon(Icons.settings_outlined,
-                                      size: 20, color: AppColors.textSecondary),
-                                  onPressed: () => PomodoroConfigDialog.show(
-                                    context,
-                                    state: timerState,
-                                    onSave: notifier.configurePomodoro,
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${timerState.currentPomodoroCycle}/${timerState.totalPomodoroCycles} • $phaseLabel',
+                                    style: TextStyle(
+                                      color: phaseColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (timerState.isRunning ||
+                                      timerState.isPaused)
+                                    TextButton.icon(
+                                      onPressed: () =>
+                                          notifier.skipPomodoroPhase(),
+                                      icon: Icon(Icons.skip_next,
+                                          size: 18,
+                                          color: context.appTextSecondary),
+                                      label: Text(
+                                        t.tr('skip', fallback: 'Pular'),
+                                        style: TextStyle(
+                                            color: context.appTextSecondary,
+                                            fontSize: 12),
+                                      ),
+                                    ),
+                                  IconButton(
+                                    icon: Icon(Icons.settings_outlined,
+                                        size: 20,
+                                        color: context.appTextSecondary),
+                                    onPressed: () => PomodoroConfigDialog.show(
+                                      context,
+                                      state: timerState,
+                                      onSave: notifier.configurePomodoro,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -402,6 +439,7 @@ class TimerScreen extends ConsumerWidget {
                         TimerDisplay(
                           elapsedMs: timerState.isPaused ? timerState.sessionRestMs : displayMs,
                           fontSize: 64,
+                          fontFamily: timerFontFamilyName(appearance.timerFont),
                         ),
                         // Fixed-height slot: the paused chip and the subject
                         // name have different heights, and without a reserved
@@ -424,7 +462,7 @@ class TimerScreen extends ConsumerWidget {
                                         const SizedBox(width: 6),
                                         Text(
                                           t.tr("study_rest_label", fallback: "Em Descanso"),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             color: AppColors.resting,
                                             fontWeight: FontWeight.w700,
                                             fontSize: 14,
@@ -467,18 +505,17 @@ class TimerScreen extends ConsumerWidget {
                                 : () => notifier.startStudy(),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: phaseColor,
-                              disabledBackgroundColor: AppColors.surfaceLight.withValues(alpha: 0.4),
-                              disabledForegroundColor: AppColors.stopped,
+                              disabledBackgroundColor: context.appSurfaceLight.withValues(alpha: 0.4),
+                              disabledForegroundColor: context.appTextMuted,
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                              // Width does not depend on the label, so
-                              // "INICIAR" and "INICIAR FOCO" occupy the same box
-                              // and the button does not move between modes.
-                              minimumSize: const Size(240, 56),
+                              // Fixed width: minimumSize alone still lets the
+                              // longer Pomodoro label expand the button.
+                              fixedSize: const Size(296, 56),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
                             icon: Icon(
                               Icons.play_arrow_rounded,
-                              color: timerState.currentSubject == null ? AppColors.stopped : Colors.white,
+                              color: timerState.currentSubject == null ? context.appTextMuted : Theme.of(context).colorScheme.onPrimary,
                               size: 28,
                             ),
                             label: Text(
@@ -488,7 +525,7 @@ class TimerScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
-                                color: timerState.currentSubject == null ? AppColors.stopped : Colors.white,
+                                color: timerState.currentSubject == null ? context.appTextMuted : Theme.of(context).colorScheme.onPrimary,
                               ),
                             ),
                           ),
@@ -550,6 +587,7 @@ class TimerScreen extends ConsumerWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -572,12 +610,60 @@ class TimerScreen extends ConsumerWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : palette.textMuted,
+            color: isSelected ? Theme.of(context).colorScheme.onPrimary : palette.textMuted,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 13,
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TimerBackground extends ConsumerWidget {
+  const _TimerBackground({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsNotifierProvider);
+    final style = settings.timerBackground;
+    final imagePath = settings.timerBackgroundImagePath;
+    final gradient = switch (style) {
+      timerBackgroundAurora => const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+        ),
+      timerBackgroundSunset => const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2B1055), Color(0xFF7597DE)],
+        ),
+      _ => null,
+    };
+
+    return Stack(
+      key: ValueKey('timer-background-$style'),
+      fit: StackFit.expand,
+      children: [
+        ColoredBox(color: context.palette.background),
+        if (gradient != null)
+          DecoratedBox(decoration: BoxDecoration(gradient: gradient))
+        else if (style == timerBackgroundCustomImage &&
+            imagePath != null &&
+            imagePath.isNotEmpty)
+          Image.file(
+            File(imagePath),
+            fit: BoxFit.cover,
+            cacheWidth: 1920,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        if (style != timerBackgroundTheme)
+          ColoredBox(color: Colors.black.withValues(alpha: 0.45)),
+        child,
+      ],
     );
   }
 }

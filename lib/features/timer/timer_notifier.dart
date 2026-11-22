@@ -564,9 +564,12 @@ class TimerNotifier extends StateNotifier<TimerState> {
     );
   }
 
-  Future<void> startStudy() async {
+  Future<void> startStudy({int? taskId}) async {
     _checkStudyDateReset();
-    if (state.currentSubject == null && state.pomodoroPhase == PomodoroPhase.focus) return;
+    if (state.currentSubject == null &&
+        state.pomodoroPhase == PomodoroPhase.focus) {
+      return;
+    }
     final now = DateTime.now();
 
     if (!_isOffline() && state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
@@ -590,6 +593,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
             subjectTitle: state.currentSubject!.title,
             subjectId: state.currentSubject!.id,
             startAt: now,
+            taskId: taskId,
           )
           .timeout(const Duration(seconds: 8), onTimeout: () => false)
           .then((accepted) {

@@ -19,7 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class _Timer extends TimerRepository {
   @override
-  Future<bool> startStudy({required String subjectTitle, required int subjectId, required DateTime startAt}) async =>
+  Future<bool> startStudy({required String subjectTitle, required int subjectId, required DateTime startAt, int? taskId}) async =>
       true;
 }
 

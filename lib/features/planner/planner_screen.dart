@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -9,11 +10,15 @@ import '../../data/models/dday_model.dart';
 import '../../data/models/todo_item_model.dart';
 import '../../data/repositories/planner_repository.dart';
 import '../settings/settings_notifier.dart';
+import '../timer/timer_notifier.dart';
 import 'timetable_screen.dart';
 
 final plannerRepositoryProvider = Provider<PlannerRepository>((ref) {
   return PlannerRepository();
 });
+
+/// Valor sentinela do seletor de materia: nenhuma materia associada.
+const int _kNoSubject = -1;
 
 class PlannerScreen extends ConsumerStatefulWidget {
   const PlannerScreen({super.key});
@@ -104,10 +109,153 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     await repo.toggleTodo(todo, gmtOffset: _gmtOffset, resetHour: _resetHour);
   }
 
+  /// Inicia o cronometro para a materia da tarefa.
+  ///
+  /// Mesmas pre-condicoes que o To-Do antigo aplicava: a tarefa precisa estar
+  /// aberta, ter materia associada, essa materia precisa existir na lista atual
+  /// e o cronometro nao pode estar em andamento. Caso contrario avisamos em vez
+  /// de abrir uma sessao sem materia.
+  Future<void> _startTodoStudy(TodoItemModel todo) async {
+    final t = ref.read(appTranslationProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    final timerState = ref.read(timerNotifierProvider);
+    final matches = timerState.subjects
+        .where((subject) => subject.id == todo.subjectId)
+        .toList();
+
+    final blocked = todo.isCompleted ||
+        todo.subjectId == null ||
+        matches.isEmpty ||
+        timerState.isRunning ||
+        timerState.isPaused;
+
+    if (blocked) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            t.tr('todo_start_failed',
+                fallback: 'Não foi possível iniciar estudo para esta tarefa.'),
+          ),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final timer = ref.read(timerNotifierProvider.notifier);
+    timer.selectSubject(matches.first);
+    await timer.startStudy(taskId: todo.id);
+    if (!mounted) return;
+
+    if (!ref.read(timerNotifierProvider).isRunning) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            t.tr('todo_start_failed',
+                fallback: 'Não foi possível iniciar estudo para esta tarefa.'),
+          ),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+    context.go('/home');
+  }
+
+  /// Aviso unico para criacao/edicao/exclusao recusadas pela API.
+  ///
+  /// O To-Do antigo mostrava "Nao foi possivel salvar" e mantinha o item; o
+  /// Planner fechava o dialogo em silencio. Mantemos a mesma mensagem para o
+  /// usuario nao ficar sem retorno.
+  void _showSaveFailed(AppTranslation t) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          t.tr('todo_save_failed',
+              fallback: 'Não foi possível salvar. Tente novamente.'),
+        ),
+        backgroundColor: AppColors.error,
+      ),
+    );
+  }
+
+  /// Seletor de materia compartilhado por criacao e edicao de tarefa.
+  ///
+  /// Reaproveita o mesmo cuidado do dialogo antigo do To-Do: uma materia que
+  /// nao veio na lista atual (arquivada ou removida) continua selecionavel, em
+  /// vez de quebrar o `DropdownButtonFormField` ou trocar a associacao sozinha.
+  Widget _buildSubjectDropdown({
+    required AppTranslation t,
+    required int value,
+    required bool enabled,
+    required ValueChanged<int> onChanged,
+    TodoItemModel? existing,
+  }) {
+    final subjects =
+        ref.watch(timerNotifierProvider.select((state) => state.subjects));
+    final items = <DropdownMenuItem<int>>[
+      DropdownMenuItem<int>(
+        value: _kNoSubject,
+        child: Text(t.tr('todo_no_subject', fallback: 'Sem matéria')),
+      ),
+      for (final subject in subjects)
+        if (!subject.isArchived)
+          DropdownMenuItem<int>(
+            value: subject.id,
+            child: Text(
+              subject.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+    ];
+
+    final existingId = existing?.subjectId;
+    if (existingId != null &&
+        existingId != _kNoSubject &&
+        items.every((item) => item.value != existingId)) {
+      final fallbackTitle = existing?.subjectTitle.trim() ?? '';
+      items.add(
+        DropdownMenuItem<int>(
+          value: existingId,
+          child: Text(
+            fallbackTitle.isEmpty || fallbackTitle == 'Geral'
+                ? '${t.tr('todo_subject', fallback: 'Matéria')} $existingId'
+                : fallbackTitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      );
+    }
+
+    final hasValue = items.any((item) => item.value == value);
+    return DropdownButtonFormField<int>(
+      value: hasValue ? value : _kNoSubject,
+      isExpanded: true,
+      dropdownColor: context.appCard,
+      decoration: InputDecoration(
+        labelText: t.tr('todo_subject', fallback: 'Matéria'),
+        labelStyle: TextStyle(color: context.appTextMuted),
+        filled: true,
+        fillColor: context.appSurface,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      items: items,
+      onChanged: enabled
+          ? (selected) {
+              if (selected != null) onChanged(selected);
+            }
+          : null,
+    );
+  }
+
   void _showAddTodoDialog() {
     final t = ref.read(appTranslationProvider);
     bool isRecurring = false;
     Set<int> selectedDays = {1, 2, 3, 4, 5};
+    // -1 representa "sem materia", como no dialogo do To-Do.
+    int subjectChoice = _kNoSubject;
     DateTime endDate = _selectedDate.add(const Duration(days: 30));
 
     final weekdayNames = [
@@ -125,7 +273,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text(t.tr('alert_todo_add', fallback: 'New planner task'), style: const TextStyle(color: Colors.white)),
+          title: Text(t.tr('alert_todo_add', fallback: 'New planner task'), style: TextStyle(color: context.appTextPrimary)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -133,7 +281,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
               children: [
                 TextField(
                   controller: _todoTitleController,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     hintText: t.tr('todo_desc_hint', fallback: 'Descrição da tarefa...'),
                     hintStyle: TextStyle(color: context.appTextMuted),
@@ -144,9 +292,17 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+                _buildSubjectDropdown(
+                  t: t,
+                  value: subjectChoice,
+                  enabled: true,
+                  onChanged: (value) =>
+                      setDialogState(() => subjectChoice = value),
+                ),
                 const SizedBox(height: 16),
                 SwitchListTile(
-                  title: Text(t.tr('repeat_multiple_days', fallback: 'Repetir em vários dias'), style: const TextStyle(color: Colors.white, fontSize: 14)),
+                  title: Text(t.tr('repeat_multiple_days', fallback: 'Repetir em vários dias'), style: TextStyle(color: context.appTextPrimary, fontSize: 14)),
                   subtitle: Text(t.tr('repeat_multiple_days_desc', fallback: 'Criar em múltiplos dias consecutivamente'), style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                   value: isRecurring,
                   activeColor: context.appPrimary,
@@ -157,7 +313,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 ),
                 if (isRecurring) ...[
                   const SizedBox(height: 12),
-                  Text(t.tr('weekdays', fallback: 'Dias da Semana:'), style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                  Text(t.tr('weekdays', fallback: 'Dias da Semana:'), style: TextStyle(color: context.appTextPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 6,
@@ -166,7 +322,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                       final id = w['id'] as int;
                       final isSelected = selectedDays.contains(id);
                       return FilterChip(
-                        label: Text(w['label'] as String, style: TextStyle(color: isSelected ? Colors.white : context.appTextMuted, fontSize: 12)),
+                        label: Text(w['label'] as String, style: TextStyle(color: isSelected ? Theme.of(context).colorScheme.onPrimary : context.appTextMuted, fontSize: 12)),
                         selected: isSelected,
                         selectedColor: context.appPrimary,
                         backgroundColor: context.appSurface,
@@ -186,7 +342,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(t.tr('repeat_until', fallback: 'Repetir até:'), style: const TextStyle(color: Colors.white, fontSize: 13)),
+                      Text(t.tr('repeat_until', fallback: 'Repetir até:'), style: TextStyle(color: context.appTextPrimary, fontSize: 13)),
                       TextButton.icon(
                         icon: Icon(Icons.calendar_month, color: context.appPrimary, size: 18),
                         label: Text(DateFormat('dd/MM/yyyy').format(endDate), style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold)),
@@ -237,20 +393,27 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 });
 
                 final repo = ref.read(plannerRepositoryProvider);
-                await repo.createTodo(
+                final created = await repo.createTodo(
                   title: text,
                   dateYmd: dateStr,
                   gmtOffset: _gmtOffset,
                   resetHour: _resetHour,
+                  subjectId:
+                      subjectChoice == _kNoSubject ? null : subjectChoice,
                   recurrenceRule: rr,
                 );
 
-                if (mounted) {
-                  _loadData();
+                if (!mounted) return;
+                // Antes de portar o To-Do para o Planner, uma criacao recusada
+                // pela API fechava o dialogo e nao deixava rastro: a tarefa
+                // simplesmente nao aparecia. Avisamos e recarregamos.
+                if (created == null) {
+                  _showSaveFailed(t);
                 }
+                _loadData();
               },
               style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-              child: Text(t.tr('add', fallback: 'Adicionar'), style: const TextStyle(color: Colors.white)),
+              child: Text(t.tr('add', fallback: 'Adicionar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
             ),
           ],
         ),
@@ -267,7 +430,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
         backgroundColor: context.appCard,
         title: Text(
           t.tr('dday_delete_title', fallback: 'Excluir D-Day'),
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: context.appTextPrimary),
         ),
         content: Text(
           dday.title,
@@ -286,7 +449,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
             child: Text(
               t.tr('delete', fallback: 'Excluir'),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appTextPrimary),
             ),
           ),
         ],
@@ -339,14 +502,14 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             backgroundColor: context.appCard,
             title: Text(
               t.tr('dday', fallback: 'Novo D-Day'),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appTextPrimary),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: _ddayTitleController,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     hintText: t.tr('dday_title_hint', fallback: 'Título do D-Day...'),
                     hintStyle: TextStyle(color: context.appTextMuted),
@@ -360,7 +523,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
                   onPressed: pickDate,
-                  icon: const Icon(Icons.calendar_today, size: 16),
+                  icon: Icon(Icons.calendar_today, size: 16),
                   label: Text(
                     '${targetDate.day.toString().padLeft(2, '0')}/'
                     '${targetDate.month.toString().padLeft(2, '0')}/'
@@ -415,7 +578,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 ),
                 child: Text(
                   t.tr('add', fallback: 'Adicionar'),
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: context.appTextPrimary),
                 ),
               ),
             ],
@@ -428,21 +591,21 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
   Future<void> _showEditTodoDialog(TodoItemModel todo) async {
     final t = ref.read(appTranslationProvider);
     final controller = TextEditingController(text: todo.title);
-    bool applyToAllSeries = todo.isRecurring;
+    int subjectChoice = todo.subjectId ?? _kNoSubject;
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text(t.tr('edit', fallback: 'Editar Tarefa'), style: const TextStyle(color: Colors.white)),
+          title: Text(t.tr('edit', fallback: 'Editar Tarefa'), style: TextStyle(color: context.appTextPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
                 controller: controller,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   hintText: t.tr('todo_title', fallback: 'Título da tarefa'),
                   filled: true,
@@ -450,24 +613,41 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
+              const SizedBox(height: 12),
+              _buildSubjectDropdown(
+                t: t,
+                value: subjectChoice,
+                enabled: true,
+                existing: todo,
+                onChanged: (value) =>
+                    setDialogState(() => subjectChoice = value),
+              ),
               if (todo.isRecurring) ...[
                 const SizedBox(height: 16),
-                Text(t.tr('recurring_todo_desc', fallback: 'Esta tarefa se repete em vários dias:'), style: TextStyle(color: context.appTextMuted, fontSize: 12)),
-                RadioListTile<bool>(
-                  title: Text(t.tr('only_this_todo', fallback: 'Apenas esta tarefa'), style: const TextStyle(color: Colors.white, fontSize: 13)),
-                  value: false,
-                  groupValue: applyToAllSeries,
-                  activeColor: context.appPrimary,
-                  contentPadding: EdgeInsets.zero,
-                  onChanged: (val) => setDialogState(() => applyToAllSeries = val!),
-                ),
-                RadioListTile<bool>(
-                  title: Text(t.tr('all_series_todos', fallback: 'Esta e todas as tarefas da série'), style: const TextStyle(color: Colors.white, fontSize: 13)),
-                  value: true,
-                  groupValue: applyToAllSeries,
-                  activeColor: context.appPrimary,
-                  contentPadding: EdgeInsets.zero,
-                  onChanged: (val) => setDialogState(() => applyToAllSeries = val!),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: context.appSurface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: context.appBorder),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline_rounded,
+                          size: 16, color: context.appTextMuted),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          t.tr('edit_only_this_todo_desc',
+                              fallback:
+                                  'Esta tarefa se repete em vários dias. Apenas esta ocorrência será alterada; as demais permanecem.'),
+                          style: TextStyle(
+                              color: context.appTextMuted, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ],
@@ -486,20 +666,22 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                     _todos = _todos.map((t) => t.id == todo.id ? t.copyWith(title: text) : t).toList();
                   });
                   final repo = ref.read(plannerRepositoryProvider);
-                  await repo.editTodo(
+                  final edited = await repo.editTodo(
                     todo,
                     text,
                     gmtOffset: _gmtOffset,
                     resetHour: _resetHour,
-                    applyToAll: applyToAllSeries,
+                    subjectId:
+                        subjectChoice == _kNoSubject ? null : subjectChoice,
+                    updateSubject: true,
                   );
-                  if (mounted) {
-                    _loadData();
-                  }
+                  if (!mounted) return;
+                  if (!edited) _showSaveFailed(t);
+                  _loadData();
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-              child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
+              child: Text(t.tr('save', fallback: 'Salvar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
             ),
           ],
         ),
@@ -509,14 +691,16 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
 
   Future<void> _deleteTodo(TodoItemModel todo) async {
     final t = ref.read(appTranslationProvider);
-    bool deleteAllSeries = todo.isRecurring;
+    // A exclusao da serie so voltou a UI depois da prova live com target:all,
+    // releitura e limpeza. A ocorrencia continua sendo a opcao padrao.
+    var deleteAllSeries = false;
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text('${t.tr("delete", fallback: "Delete")} "${todo.title}"?', style: const TextStyle(color: Colors.white)),
+          title: Text('${t.tr("delete", fallback: "Delete")} "${todo.title}"?', style: TextStyle(color: context.appTextPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,22 +711,61 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
               ),
               if (todo.isRecurring) ...[
                 const SizedBox(height: 16),
-                Text(t.tr('recurring_todo_desc', fallback: 'Esta tarefa se repete em vários dias:'), style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                 RadioListTile<bool>(
-                  title: Text(t.tr('delete_only_this_todo', fallback: 'Excluir apenas esta tarefa'), style: const TextStyle(color: Colors.white, fontSize: 13)),
                   value: false,
                   groupValue: deleteAllSeries,
-                  activeColor: context.appPrimary,
                   contentPadding: EdgeInsets.zero,
-                  onChanged: (val) => setDialogState(() => deleteAllSeries = val!),
+                  activeColor: context.appPrimary,
+                  title: Text(
+                    t.tr('delete_only_this_todo', fallback: 'Excluir apenas esta tarefa'),
+                    style: TextStyle(color: context.appTextPrimary, fontSize: 13),
+                  ),
+                  onChanged: (value) => setDialogState(
+                    () => deleteAllSeries = value ?? false,
+                  ),
                 ),
                 RadioListTile<bool>(
-                  title: Text(t.tr('delete_all_series_todos', fallback: 'Excluir todas as tarefas da série'), style: const TextStyle(color: Colors.white, fontSize: 13)),
                   value: true,
                   groupValue: deleteAllSeries,
-                  activeColor: context.appPrimary,
                   contentPadding: EdgeInsets.zero,
-                  onChanged: (val) => setDialogState(() => deleteAllSeries = val!),
+                  activeColor: context.appPrimary,
+                  title: Text(
+                    t.tr('delete_all_series_todos', fallback: 'Excluir todas as tarefas da série'),
+                    style: TextStyle(color: context.appTextPrimary, fontSize: 13),
+                  ),
+                  onChanged: (value) => setDialogState(
+                    () => deleteAllSeries = value ?? true,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: context.appSurface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: context.appBorder),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline_rounded,
+                          size: 16, color: context.appTextMuted),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          t.tr(
+                            deleteAllSeries
+                                ? 'delete_all_series_todos_desc'
+                                : 'delete_only_this_todo_desc',
+                            fallback: deleteAllSeries
+                                ? 'Todas as ocorrências desta série serão excluídas. Esta ação não pode ser desfeita.'
+                                : 'Esta tarefa se repete em vários dias. Apenas esta ocorrência será excluída; as demais permanecem.',
+                          ),
+                          style: TextStyle(
+                              color: context.appTextMuted, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ],
@@ -559,13 +782,20 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   _todos = _todos.where((t) => t.id != todo.id).toList();
                 });
                 final repo = ref.read(plannerRepositoryProvider);
-                await repo.deleteTodo(todo.id, deleteAllSeries: deleteAllSeries);
-                if (mounted) {
-                  _loadData();
+                final deleted = await repo.deleteTodo(
+                  todo.id,
+                  deleteAllSeries: deleteAllSeries,
+                );
+                if (!mounted) return;
+                if (!deleted) {
+                  // A remocao local ja aconteceu; se a API recusou, recarregar
+                  // devolve o item em vez de deixar a lista mentindo.
+                  _showSaveFailed(t);
                 }
+                _loadData();
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: Text(t.tr('delete', fallback: 'Excluir'), style: const TextStyle(color: Colors.white)),
+              child: Text(t.tr('delete', fallback: 'Excluir'), style: TextStyle(color: Theme.of(context).colorScheme.onError)),
             ),
           ],
         ),
@@ -589,11 +819,16 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
           toolbarHeight: 0,
           bottom: TabBar(
             indicatorColor: palette.primary,
-            labelColor: Colors.white,
+            labelColor: palette.textPrimary,
             unselectedLabelColor: palette.textSecondary,
             tabs: [
               Tab(text: t.tr('todo', fallback: 'Tarefas & D-Days')),
-              Tab(text: t.tr('timetable', fallback: 'Grade Horária')),
+              Tab(
+                text: t.tr(
+                  'planner_calendar_tab',
+                  fallback: 'Calendário',
+                ),
+              ),
             ],
           ),
         ),
@@ -673,8 +908,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                             dday.title,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              color: Colors.white,
+                                            style: TextStyle(
+                                              color: context.appTextPrimary,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
                                             ),
@@ -775,15 +1010,15 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: context.appPrimary,
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                    horizontal: 12, vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              icon: const Icon(Icons.add, color: Colors.white, size: 18),
+                              icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary, size: 18),
                               label: Text(t.tr('add', fallback: 'Nova Tarefa'),
-                                  style: const TextStyle(
-                                      color: Colors.white,
+                                  style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onPrimary,
                                       fontWeight: FontWeight.w600)),
                             ),
                           ],
@@ -807,8 +1042,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                   Expanded(
                                     child: Text(
                                       '${t.tr("today", fallback: "Progresso")}: $completedCount / $totalCount ${t.tr("done_count", fallback: "done")}',
-                                      style: const TextStyle(
-                                          color: Colors.white,
+                                      style: TextStyle(
+                                          color: context.appTextPrimary,
                                           fontWeight: FontWeight.w600),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -861,7 +1096,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                             style: ElevatedButton.styleFrom(
                                                 backgroundColor: context.appPrimary),
                                             child: Text(t.tr('add', fallback: 'Adicionar Tarefa'),
-                                                style: const TextStyle(color: Colors.white)),
+                                                style: TextStyle(color: context.appTextPrimary)),
                                           ),
                                         ],
                                       ),
@@ -914,7 +1149,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                                             style: TextStyle(
                                                               color: todo.isCompleted
                                                                   ? context.appTextMuted
-                                                                  : Colors.white,
+                                                                  : context.appTextPrimary,
                                                               fontSize: 15,
                                                               fontWeight: FontWeight.w600,
                                                               decoration: todo.isCompleted
@@ -945,12 +1180,17 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   IconButton(
-                                                    icon: const Icon(Icons.edit, color: Colors.white70, size: 18),
+                                                    icon: Icon(Icons.play_arrow_rounded, color: context.appTextSecondary, size: 18),
+                                                    tooltip: t.tr('todo_start_study', fallback: 'Iniciar estudo'),
+                                                    onPressed: () => _startTodoStudy(todo),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(Icons.edit, color: context.appTextSecondary, size: 18),
                                                     tooltip: t.tr('edit', fallback: 'Editar Tarefa'),
                                                     onPressed: () => _showEditTodoDialog(todo),
                                                   ),
                                                   IconButton(
-                                                    icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 18),
+                                                    icon: Icon(Icons.delete_outline, color: AppColors.error, size: 18),
                                                     tooltip: t.tr('delete', fallback: 'Excluir Tarefa'),
                                                     onPressed: () => _deleteTodo(todo),
                                                   ),

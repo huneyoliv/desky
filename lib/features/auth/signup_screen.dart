@@ -345,7 +345,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                              icon: Icon(Icons.arrow_back, color: context.appTextPrimary),
                               onPressed: () {
                                 if (widget.oauthInfo != null || _currentStep == 1) {
                                   Navigator.of(context).pop();
@@ -377,7 +377,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   : _currentStep == 2
                                       ? t.tr('confirm_code', fallback: 'Confirme o código')
                                       : t.tr('profile_info', fallback: 'Informações do Perfil')),
-                          style: AppTextStyles.displayMedium,
+                          style: AppTextStyles.displayMedium.copyWith(color: context.appTextPrimary),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -388,7 +388,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   : _currentStep == 2
                                       ? '${t.tr("enter_code_sent_to", fallback: "Digite o código enviado para")} ${_emailController.text}'
                                       : t.tr('profile_setup_desc', fallback: 'Defina seu apelido, senha de acesso e categoria de estudos.')),
-                          style: AppTextStyles.bodyMedium,
+                          style: AppTextStyles.bodyMedium.copyWith(color: context.appTextSecondary),
                         ),
                         const SizedBox(height: 24),
 
@@ -406,7 +406,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   'assets/icons/google_icon.png',
                                   height: 18,
                                   width: 18,
-                                  errorBuilder: (_, __, ___) => const Icon(Icons.account_circle, size: 18, color: Colors.white),
+                                  errorBuilder: (_, __, ___) => Icon(Icons.account_circle, size: 18, color: context.appTextSecondary),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
@@ -437,7 +437,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 Expanded(
                                   child: Text(
                                     _errorMessage!,
-                                    style: const TextStyle(color: AppColors.error, fontSize: 13),
+                                    style: TextStyle(color: AppColors.error, fontSize: 13),
                                   ),
                                 ),
                               ],
@@ -450,12 +450,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: context.appTextPrimary),
                             decoration: InputDecoration(
                               labelText: t.tr('email', fallback: 'E-mail'),
                               labelStyle: TextStyle(color: context.appTextSecondary),
                               filled: true,
-                              fillColor: AppColors.surface,
+                              fillColor: context.appSurface,
                               prefixIcon: Icon(Icons.email_outlined, color: context.appTextSecondary),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -473,12 +473,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
                               child: _isLoading
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 24,
                                       height: 24,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                        color: Theme.of(context).colorScheme.onPrimary,
+                                        strokeWidth: 2,
+                                      ),
                                     )
-                                  : Text(t.tr('send_code', fallback: 'Enviar Código'), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                                  : Text(t.tr('send_code', fallback: 'Enviar Código'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
                             ),
                           ),
                         ] else if (_currentStep == 2) ...[
@@ -487,12 +490,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             keyboardType: TextInputType.number,
                             maxLength: 6,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.white, fontSize: 24, letterSpacing: 8),
+                            style: TextStyle(color: context.appTextPrimary, fontSize: 24, letterSpacing: 8),
                             decoration: InputDecoration(
                               hintText: '123456',
                               hintStyle: TextStyle(color: context.appTextMuted),
                               filled: true,
-                              fillColor: AppColors.surface,
+                              fillColor: context.appSurface,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(color: context.appBorder),
@@ -529,24 +532,27 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
                               child: _isLoading
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 24,
                                       height: 24,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                        color: Theme.of(context).colorScheme.onPrimary,
+                                        strokeWidth: 2,
+                                      ),
                                     )
-                                  : Text(t.tr('verify_code', fallback: 'Verificar Código'), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                                  : Text(t.tr('verify_code', fallback: 'Verificar Código'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
                             ),
                           ),
                         ] else ...[
                           // Nickname Field
                           TextFormField(
                             controller: _nicknameController,
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: context.appTextPrimary),
                             decoration: InputDecoration(
                               labelText: t.tr('nickname', fallback: 'Apelido (Nickname)'),
                               labelStyle: TextStyle(color: context.appTextSecondary),
                               filled: true,
-                              fillColor: AppColors.surface,
+                              fillColor: context.appSurface,
                               prefixIcon: Icon(Icons.person_outline, color: context.appTextSecondary),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -561,12 +567,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(color: context.appTextPrimary),
                               decoration: InputDecoration(
                                 labelText: t.tr('password', fallback: 'Senha (mínimo 8 caracteres)'),
                                 labelStyle: TextStyle(color: context.appTextSecondary),
                                 filled: true,
-                                fillColor: AppColors.surface,
+                                fillColor: context.appSurface,
                                 prefixIcon: Icon(Icons.lock_outline, color: context.appTextSecondary),
                                 suffixIcon: IconButton(
                                   icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: context.appTextSecondary),
@@ -584,12 +590,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirmPassword,
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(color: context.appTextPrimary),
                               decoration: InputDecoration(
                                 labelText: t.tr('confirm_password', fallback: 'Confirmar Senha'),
                                 labelStyle: TextStyle(color: context.appTextSecondary),
                                 filled: true,
-                                fillColor: AppColors.surface,
+                                fillColor: context.appSurface,
                                 prefixIcon: Icon(Icons.lock_outline, color: context.appTextSecondary),
                                 suffixIcon: IconButton(
                                   icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, color: context.appTextSecondary),
@@ -611,12 +617,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             DropdownButtonFormField<CategoryModel>(
                               value: _selectedCategory,
                               dropdownColor: context.appCard,
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(color: context.appTextPrimary),
                               decoration: InputDecoration(
                                 labelText: t.tr('category', fallback: 'Categoria de Estudo'),
                                 labelStyle: TextStyle(color: context.appTextSecondary),
                                 filled: true,
-                                fillColor: AppColors.surface,
+                                fillColor: context.appSurface,
                                 prefixIcon: Icon(Icons.school_outlined, color: context.appTextSecondary),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -626,7 +632,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               items: _categories.map((cat) {
                                 return DropdownMenuItem<CategoryModel>(
                                   value: cat,
-                                  child: Text(cat.title, style: const TextStyle(color: Colors.white)),
+                                  child: Text(cat.title, style: TextStyle(color: context.appTextPrimary)),
                                 );
                               }).toList(),
                               onChanged: (val) {
@@ -646,16 +652,19 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
                               child: _isLoading
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 24,
                                       height: 24,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                        color: Theme.of(context).colorScheme.onPrimary,
+                                        strokeWidth: 2,
+                                      ),
                                     )
                                   : Text(
                                       widget.oauthInfo != null
                                           ? t.tr('complete_registration', fallback: 'Concluir Cadastro')
                                           : t.tr('sign_up', fallback: 'Concluir Cadastro'),
-                                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 16, fontWeight: FontWeight.w600),
                                     ),
                             ),
                           ),
@@ -665,7 +674,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(t.tr('already_have_account', fallback: 'Já possui uma conta?'), style: const TextStyle(color: AppColors.textSecondary)),
+                            Text(t.tr('already_have_account', fallback: 'Já possui uma conta?'), style: TextStyle(color: context.appTextSecondary)),
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(),
                               child: Text(t.tr('login', fallback: 'Entrar'), style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold)),

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/core/theme/app_colors.dart';
+import 'package:desky/core/theme/app_theme.dart';
 
 /// WCAG 2.1 relative luminance.
 double _luminance(Color color) {
@@ -52,6 +53,33 @@ void main() {
             reason: '${palette.id}: textSecondary ficou em ${ratio.toStringAsFixed(2)}:1',
           );
         }
+      }
+    });
+
+    test('every theme keeps textPrimary readable on every surface', () {
+      for (final palette in DeskyThemePalette.presets) {
+        for (final surface in _surfaces(palette)) {
+          final ratio = _contrast(palette.textPrimary, surface);
+          expect(
+            ratio,
+            greaterThanOrEqualTo(_aa),
+            reason: '${palette.id}: textPrimary ficou em ${ratio.toStringAsFixed(2)}:1',
+          );
+        }
+      }
+    });
+
+    test('light themes keep onPrimary readable on primary buttons', () {
+      for (final palette in DeskyThemePalette.presets.where(
+        (palette) => palette.isLight,
+      )) {
+        final theme = AppTheme.buildTheme(palette);
+        final ratio = _contrast(
+          theme.colorScheme.onPrimary,
+          palette.primary,
+        );
+        expect(ratio, greaterThanOrEqualTo(_aa),
+            reason: '${palette.id}: onPrimary ficou em ${ratio.toStringAsFixed(2)}:1');
       }
     });
 

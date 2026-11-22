@@ -25,10 +25,6 @@ class ApiConstants {
 
   // Subjects
   static const String subjectCreate = '/user/subject/create';
-  /// Dead: `GET /user/subject/list` answers 404 in production. The subject
-  /// list is fetched from the reload payload instead. Kept only so existing
-  /// references keep compiling; prefer the reload contract.
-  @Deprecated('404 in production; use the reload payload instead')
   static const String subjectList = '/user/subject/list';
 
   // Planner: D-Day (live-verified). `/planner/dday` and `/planner/ddays` are 404.

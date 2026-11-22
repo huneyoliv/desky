@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/country_model.dart';
 import '../../data/repositories/settings_repository.dart';
+import '../../core/theme/timer_appearance.dart';
 import 'settings_state.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences?>((ref) {
@@ -37,13 +38,23 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final soundEffects = await _repository.getSoundEffects();
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
-      final obsOverlayMode = await _repository.getObsOverlayMode();
+      final betaChannel = await _repository.getBetaChannel();
+      final timerBackground = await _repository.getTimerBackground();
+      final timerBackgroundImagePath =
+          await _repository.getTimerBackgroundImagePath();
+      final timerFont = await _repository.getTimerFont();
+      if (!mounted) return;
+      state = state.copyWith(
+        timerBackground: timerBackground,
+        timerBackgroundImagePath: timerBackgroundImagePath,
+        timerFont: timerFont,
+      );
       final classicYptLook = await _repository.getClassicYptLook();
       final classicUiScale = await _repository.getClassicUiScale();
+      final obsOverlayMode = await _repository.getObsOverlayMode();
       final miniOpacity = await _repository.getMiniOpacity();
       final offlineMode = await _repository.getOfflineMode();
       final dial = await _repository.getDialStyle();
-      final betaChannel = await _repository.getBetaChannel();
 
       if (!mounted) return;
       state = state.copyWith(
@@ -64,6 +75,9 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         dialBreakColor: dial.rest,
         showStopwatchDial: dial.show,
         betaChannel: betaChannel,
+        timerBackground: timerBackground,
+        timerBackgroundImagePath: timerBackgroundImagePath,
+        timerFont: timerFont,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
       );
@@ -149,6 +163,27 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleDiscordRpc(bool value) async {
     state = state.copyWith(discordRpcEnabled: value);
     await _repository.saveDiscordRpcEnabled(value);
+  }
+
+  Future<void> setTimerBackground(String value) async {
+    final normalized = normalizeTimerBackground(value);
+    state = state.copyWith(timerBackground: normalized);
+    await _repository.saveTimerBackground(normalized);
+  }
+
+  Future<void> setTimerBackgroundImage(String path) async {
+    state = state.copyWith(
+      timerBackground: timerBackgroundCustomImage,
+      timerBackgroundImagePath: path,
+    );
+    await _repository.saveTimerBackgroundImagePath(path);
+    await _repository.saveTimerBackground(timerBackgroundCustomImage);
+  }
+
+  Future<void> setTimerFont(String value) async {
+    final normalized = normalizeTimerFont(value);
+    state = state.copyWith(timerFont: normalized);
+    await _repository.saveTimerFont(normalized);
   }
 
   /// Keeps the window rendering for OBS when the user minimizes it.

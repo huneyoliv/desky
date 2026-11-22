@@ -396,6 +396,12 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   }
 
   @override
+  void didChangePlatformBrightness() {
+    ref.read(themeNotifierProvider.notifier).updateSystemBrightness();
+    super.didChangePlatformBrightness();
+  }
+
+  @override
   Future<AppExitResponse> didRequestAppExit() async {
     await _handleAppExit();
     return AppExitResponse.exit;

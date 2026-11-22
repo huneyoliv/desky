@@ -15,6 +15,7 @@ class FakeTimerRepository extends TimerRepository {
     required String subjectTitle,
     required int subjectId,
     required DateTime startAt,
+    int? taskId,
   }) async => true;
 
   @override

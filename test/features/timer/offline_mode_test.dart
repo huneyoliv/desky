@@ -14,7 +14,7 @@ class _Timer extends TimerRepository {
   Completer<bool>? hangStart;
 
   @override
-  Future<bool> startStudy({required String subjectTitle, required int subjectId, required DateTime startAt}) {
+  Future<bool> startStudy({required String subjectTitle, required int subjectId, required DateTime startAt, int? taskId}) {
     starts++;
     return hangStart?.future ?? Future.value(true);
   }

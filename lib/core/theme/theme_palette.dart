@@ -21,6 +21,7 @@ class DeskyThemePalette {
   final Color heatmapL2;
   final Color heatmapL3;
   final Color heatmapL4;
+  final Brightness brightness;
 
   const DeskyThemePalette({
     required this.id,
@@ -43,7 +44,10 @@ class DeskyThemePalette {
     required this.heatmapL2,
     required this.heatmapL3,
     required this.heatmapL4,
+    this.brightness = Brightness.dark,
   });
+
+  bool get isLight => brightness == Brightness.light;
 
   // 1. AMOLED Lilac (Default Brand Theme)
   static const DeskyThemePalette amoledLilac = DeskyThemePalette(
@@ -210,6 +214,54 @@ class DeskyThemePalette {
     heatmapL4: Color(0xFF2DD4BF),
   );
 
+  static const DeskyThemePalette daylightLilac = DeskyThemePalette(
+    id: 'daylight_lilac',
+    nameKey: 'theme_daylight_lilac',
+    brightness: Brightness.light,
+    background: Color(0xFFF7F5FC),
+    surface: Color(0xFFFFFFFF),
+    surfaceLight: Color(0xFFF1EDF9),
+    card: Color(0xFFFFFFFF),
+    border: Color(0xFFD8D0E6),
+    primary: Color(0xFF6D4CA7),
+    primaryDark: Color(0xFF4C2F7A),
+    primaryLight: Color(0xFFE5DEF5),
+    accent: Color(0xFF526D94),
+    accentDark: Color(0xFF365374),
+    outline: Color(0xFFB8A9D4),
+    textPrimary: Color(0xFF211B2E),
+    textSecondary: Color(0xFF514765),
+    textMuted: Color(0xFF665A78),
+    heatmapL1: Color(0xFFE9E3F4),
+    heatmapL2: Color(0xFFC4B4DF),
+    heatmapL3: Color(0xFF967CC2),
+    heatmapL4: Color(0xFF6D4CA7),
+  );
+
+  static const DeskyThemePalette porcelainSky = DeskyThemePalette(
+    id: 'porcelain_sky',
+    nameKey: 'theme_porcelain_sky',
+    brightness: Brightness.light,
+    background: Color(0xFFF3F7FB),
+    surface: Color(0xFFFFFFFF),
+    surfaceLight: Color(0xFFE8F0F7),
+    card: Color(0xFFFFFFFF),
+    border: Color(0xFFC8D8E5),
+    primary: Color(0xFF0369A1),
+    primaryDark: Color(0xFF075985),
+    primaryLight: Color(0xFFD9EDF9),
+    accent: Color(0xFF2563EB),
+    accentDark: Color(0xFF1E40AF),
+    outline: Color(0xFFA7BCCF),
+    textPrimary: Color(0xFF102A3A),
+    textSecondary: Color(0xFF345166),
+    textMuted: Color(0xFF4B6475),
+    heatmapL1: Color(0xFFDCEAF4),
+    heatmapL2: Color(0xFFA8CBE2),
+    heatmapL3: Color(0xFF639FC4),
+    heatmapL4: Color(0xFF0369A1),
+  );
+
   static const List<DeskyThemePalette> presets = [
     amoledLilac,
     midnightNavy,
@@ -218,6 +270,8 @@ class DeskyThemePalette {
     sunsetAmber,
     sakuraPastel,
     nordicFrost,
+    daylightLilac,
+    porcelainSky,
   ];
 
   static DeskyThemePalette fromId(String? id) {

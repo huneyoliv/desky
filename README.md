@@ -177,6 +177,16 @@ lib/
 
 ---
 
+### Font and asset licenses
+
+Bundled font families and their redistribution terms are documented in [NOTICE.md](NOTICE.md).
+Pretendard and E1234 (Digital) use their respective SIL OFL 1.1 files in
+`assets/fonts/`. SF Pro Text/Display and AppleEmoji are Apple font assets included
+by maintainer decision; the authorization basis is left for the maintainer to
+complete in NOTICE.md.
+
+---
+
 ## 🛠️ Local Development
 
 ### Prerequisites

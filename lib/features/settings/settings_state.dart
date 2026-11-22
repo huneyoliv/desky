@@ -1,6 +1,7 @@
 import '../../data/models/category_model.dart';
 import '../../data/models/country_model.dart';
 import '../../data/repositories/settings_repository.dart';
+import '../../core/theme/timer_appearance.dart';
 
 class SettingsState {
   final CountryModel selectedCountry;
@@ -41,6 +42,9 @@ class SettingsState {
   /// Show the filling dial outside Pomodoro too (the Pomodoro dial always shows).
   final bool showStopwatchDial;
   final bool betaChannel;
+  final String timerBackground;
+  final String? timerBackgroundImagePath;
+  final String timerFont;
 
   const SettingsState({
     this.selectedCountry = SettingsRepository.defaultCountry,
@@ -65,6 +69,9 @@ class SettingsState {
     this.dialBreakColor = 0xFF2F7CF6,
     this.showStopwatchDial = true,
     this.betaChannel = false,
+    this.timerBackground = timerBackgroundTheme,
+    this.timerBackgroundImagePath,
+    this.timerFont = timerFontDigital,
   });
 
   SettingsState copyWith({
@@ -90,6 +97,10 @@ class SettingsState {
     int? dialBreakColor,
     bool? showStopwatchDial,
     bool? betaChannel,
+    String? timerBackground,
+    String? timerBackgroundImagePath,
+    bool clearTimerBackgroundImagePath = false,
+    String? timerFont,
   }) {
     return SettingsState(
       selectedCountry: selectedCountry ?? this.selectedCountry,
@@ -114,6 +125,13 @@ class SettingsState {
       dialBreakColor: dialBreakColor ?? this.dialBreakColor,
       showStopwatchDial: showStopwatchDial ?? this.showStopwatchDial,
       betaChannel: betaChannel ?? this.betaChannel,
+      timerBackground: normalizeTimerBackground(
+        timerBackground ?? this.timerBackground,
+      ),
+      timerBackgroundImagePath: clearTimerBackgroundImagePath
+          ? null
+          : (timerBackgroundImagePath ?? this.timerBackgroundImagePath),
+      timerFont: normalizeTimerFont(timerFont ?? this.timerFont),
     );
   }
 }

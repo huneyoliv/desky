@@ -24,6 +24,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
   List<TimetableBlock> _blocks = [];
   List<SubjectModel> _subjects = [];
   bool _isLoading = true;
+  String? _errorMessage;
 
   List<Map<String, dynamic>> _getDays(AppTranslation t) => [
     {'id': 1, 'name': t.tr('monday', fallback: 'Segunda-feira'), 'short': t.tr('monday_short', fallback: 'Seg')},
@@ -42,21 +43,33 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-    final timetableRepo = ref.read(timetableRepositoryProvider);
-    final subjectRepo = ref.read(subjectRepositoryProvider);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      final timetableRepo = ref.read(timetableRepositoryProvider);
+      final subjectRepo = ref.read(subjectRepositoryProvider);
+      final results = await Future.wait([
+        timetableRepo.fetchTimetable(),
+        subjectRepo.fetchSubjects(),
+      ]);
 
-    final results = await Future.wait([
-      timetableRepo.fetchTimetable(),
-      subjectRepo.fetchSubjects(),
-    ]);
-
-    if (mounted) {
-      setState(() {
-        _blocks = results[0] as List<TimetableBlock>;
-        _subjects = results[1] as List<SubjectModel>;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _blocks = results[0] as List<TimetableBlock>;
+          _subjects = results[1] as List<SubjectModel>;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _blocks = [];
+          _errorMessage = 'load_failed';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -82,7 +95,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text(t.tr('add_timetable', fallback: 'Adicionar Horário de Aula'), style: const TextStyle(color: Colors.white)),
+          title: Text(t.tr('add_timetable', fallback: 'Adicionar Horário de Aula'), style: TextStyle(color: context.appTextPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +105,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
               DropdownButtonFormField<SubjectModel>(
                 value: selectedSubject,
                 dropdownColor: context.appSurface,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: context.appSurface,
@@ -124,7 +137,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
               DropdownButtonFormField<int>(
                 value: selectedDay,
                 dropdownColor: context.appSurface,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: context.appSurface,
@@ -152,7 +165,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                         DropdownButtonFormField<int>(
                           value: startHour,
                           dropdownColor: context.appSurface,
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.appTextPrimary),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: context.appSurface,
@@ -183,7 +196,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                         DropdownButtonFormField<int>(
                           value: endHour,
                           dropdownColor: context.appSurface,
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.appTextPrimary),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: context.appSurface,
@@ -221,23 +234,14 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                   endHour: endHour,
                 );
 
-                if (block != null) {
-                  setState(() => _blocks = [..._blocks, block]);
-                } else {
-                  final fallbackBlock = TimetableBlock(
-                    id: DateTime.now().millisecondsSinceEpoch,
-                    subjectId: selectedSubject.id,
-                    subjectTitle: selectedSubject.title,
-                    colorInt: selectedSubject.color.toARGB32(),
-                    dayOfWeek: selectedDay,
-                    startHour: startHour,
-                    endHour: endHour,
-                  );
-                  setState(() => _blocks = [..._blocks, fallbackBlock]);
-                }
+                if (!mounted) return;
+                setState(() {
+                  _errorMessage = block == null ? 'save_failed' : null;
+                  if (block != null) _blocks = [..._blocks, block];
+                });
               },
               style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-              child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
+              child: Text(t.tr('save', fallback: 'Salvar'), style: TextStyle(color: context.appTextPrimary)),
             ),
           ],
         ),
@@ -251,7 +255,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text(t.tr('delete_timetable', fallback: 'Excluir Horário'), style: const TextStyle(color: Colors.white)),
+        title: Text(t.tr('delete_timetable', fallback: 'Excluir Horário'), style: TextStyle(color: context.appTextPrimary)),
         content: Text(
           '${t.tr("delete", fallback: "Excluir")} "${block.subjectTitle}"?',
           style: TextStyle(color: context.appTextSecondary),
@@ -264,18 +268,22 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: Text(t.tr('delete', fallback: 'Excluir'), style: const TextStyle(color: Colors.white)),
+            child: Text(t.tr('delete', fallback: 'Excluir'), style: TextStyle(color: context.appTextPrimary)),
           ),
         ],
       ),
     );
 
     if (confirm == true) {
-      setState(() {
-        _blocks = _blocks.where((b) => b.id != block.id).toList();
-      });
       final repo = ref.read(timetableRepositoryProvider);
-      await repo.deleteBlock(block.id);
+      final deleted = await repo.deleteBlock(block.id);
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = deleted ? null : 'save_failed';
+        if (deleted) {
+          _blocks = _blocks.where((b) => b.id != block.id).toList();
+        }
+      });
     }
   }
 
@@ -320,14 +328,35 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.add, color: Colors.white, size: 18),
-                  label: Text(t.tr('add_timetable', fallback: 'Novo Horário'), style: const TextStyle(color: Colors.white)),
+                  icon: Icon(Icons.add, color: context.appTextPrimary, size: 18),
+                  label: Text(t.tr('add_timetable', fallback: 'Novo Horário'), style: TextStyle(color: context.appTextPrimary)),
                   style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                   onPressed: () => _showAddBlockDialog(),
                 ),
               ],
             ),
           ),
+
+          if (_errorMessage != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              color: AppColors.error.withValues(alpha: 0.15),
+              child: Text(
+                t.tr(
+                  _errorMessage == 'load_failed'
+                      ? 'timetable_load_failed'
+                      : 'timetable_save_failed',
+                  fallback: _errorMessage == 'load_failed'
+                      ? 'Não foi possível carregar o horário.'
+                      : 'Não foi possível salvar a alteração no horário.',
+                ),
+                style: TextStyle(color: AppColors.error),
+              ),
+            ),
 
           // Days Header
           Container(
@@ -340,8 +369,8 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                       child: Center(
                         child: Text(
                           day['name'] as String,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.appTextPrimary,
                             fontWeight: FontWeight.w700,
                             fontSize: 13,
                           ),
@@ -452,8 +481,8 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                                                     block.subjectTitle,
                                                     maxLines: 1,
                                                     overflow: TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
+                                                    style: TextStyle(
+                                                      color: context.appTextPrimary,
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 12,
                                                     ),
@@ -461,8 +490,8 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                                                   const SizedBox(height: 2),
                                                   Text(
                                                     '${block.startHour.toString().padLeft(2, '0')}:00 - ${block.endHour.toString().padLeft(2, '0')}:00',
-                                                    style: const TextStyle(
-                                                      color: Colors.white70,
+                                                    style: TextStyle(
+                                                      color: context.appTextSecondary,
                                                       fontSize: 10,
                                                     ),
                                                   ),

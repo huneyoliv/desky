@@ -19,6 +19,19 @@ void main() {
       expect(result.maximized, isFalse);
     });
 
+    test('minimo permite usar o app em metade de uma tela 1080p', () {
+      final result = resolveWindowState(
+        storedSize: const Size(960, 540),
+        storedMaximized: false,
+        visibleArea: const Size(1920, 1080),
+      );
+
+      expect(kDefaultMinimumWindowSize, equals(const Size(640, 480)));
+      expect(result.size, equals(const Size(960, 540)));
+      expect(result.minimumSize.width, lessThanOrEqualTo(960));
+      expect(result.minimumSize.height, lessThanOrEqualTo(540));
+    });
+
     test('valor salvo valido e restaurado', () {
       final result = resolveWindowState(
         storedSize: const Size(1100, 760),

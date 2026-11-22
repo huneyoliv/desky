@@ -80,7 +80,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
       backgroundColor: context.appBackground,
       appBar: AppBar(
         backgroundColor: context.appSurface,
-        title: Text(t.tr('my_avatars', fallback: 'Meus Avatares'), style: AppTextStyles.titleLarge),
+        title: Text(t.tr('my_avatars', fallback: 'Meus Avatares'), style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -132,8 +132,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                               itemName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: context.appTextPrimary,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
                               ),
@@ -150,7 +150,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                               child: Center(
                                 child: Text(
                                   t.tr('equipped', fallback: 'EQUIPADO').toUpperCase(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppColors.success,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 12,
@@ -163,10 +163,13 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed: () => _equipItem(item),
-                                style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: context.appPrimary,
+                                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                ),
                                 child: Text(
                                   t.tr('equip', fallback: 'Equipar'),
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),

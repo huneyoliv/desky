@@ -43,7 +43,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
       backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(t.tr('new_flashcard', fallback: 'Novo Flashcard'),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+          style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 18)),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
         child: SingleChildScrollView(
@@ -55,7 +55,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
                 autofocus: true,
                 maxLines: 3,
                 minLines: 2,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   labelText: t.tr('card_front', fallback: 'Frente (Pergunta ou Termo)'),
                   labelStyle: TextStyle(color: context.appTextSecondary),
@@ -68,7 +68,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
                 controller: _backController,
                 maxLines: 3,
                 minLines: 2,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   labelText: t.tr('card_back', fallback: 'Verso (Resposta ou Definição)'),
                   labelStyle: TextStyle(color: context.appTextSecondary),
@@ -79,7 +79,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _hintController,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   labelText: t.tr('hint_optional', fallback: 'Dica (opcional)'),
                   labelStyle: TextStyle(color: context.appTextSecondary),
@@ -106,7 +106,7 @@ class _CreateCardDialogState extends ConsumerState<CreateCardDialog> {
             }
           },
           style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-          child: Text(t.tr('add', fallback: 'Adicionar'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: Text(t.tr('add', fallback: 'Adicionar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold)),
         ),
       ],
     );

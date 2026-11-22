@@ -5,7 +5,7 @@ import 'dart:ui';
 const Size kDefaultWindowSize = Size(1280, 800);
 
 /// Tamanho minimo desejado da janela.
-const Size kDefaultMinimumWindowSize = Size(1024, 700);
+const Size kDefaultMinimumWindowSize = Size(640, 480);
 
 /// Menor tamanho aceitavel como "estado salvo": abaixo disso consideramos o
 /// valor corrompido e voltamos ao padrao.

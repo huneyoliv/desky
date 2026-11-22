@@ -209,23 +209,99 @@ Authorization: JWT <TOKEN_JWT_SESSION>
 ### Módulo: Cronômetro e Controle de Estudo
 
 #### `POST https://pi.tgclab.com/study/start`
-- **Request Body**:
+- **Request Body enviado pelo Desky e aceito em 2026-11-20**:
 ```json
 {
+  "subject": "Nome da matéria",
   "subject_id": 119611290,
-  "start_at": "2026-08-10T00:15:00.000Z"
+  "deviceModel": "Desktop",
+  "taskId": null
 }
 ```
+- `taskId` pode conter o ID inteiro de uma tarefa ao iniciar pelo Planner. O servidor
+  aceitou esse campo, mas a resposta e `/logs/day` não expuseram um campo que comprovasse
+  a associação persistente da sessão à tarefa. Não documentar essa associação como fato.
+- O corpo WearOS recuperado no APK contém apenas `subject` e `deviceModel`; ele não prova
+  o contrato completo do fluxo Flutter e não deve ser usado para excluir `taskId`.
 
 #### `POST https://pi.tgclab.com/study/stop`
-- **Request Body**:
+- **Request Body enviado pelo Desky e aceito em 2026-11-20**:
 ```json
 {
+  "subject": "Nome da matéria",
   "subject_id": 119611290,
-  "stop_at": "2026-08-10T00:45:00.000Z",
-  "study_ms": 1800000
+  "startedAt": 1786645500000,
+  "study_ms": 1800000,
+  "deviceModel": "Desktop"
 }
 ```
+- `startedAt` é epoch em milissegundos. O Desky não envia `stop_at` nem `taskId` nesta rota.
+
+### Módulo: Planner e tarefas
+
+#### `GET https://pi.tgclab.com/study/study-plan/get-by-date`
+- **Parâmetros**: `start_at`, `end_at`, `is_unscheduled=true`.
+- A lista é retornada em `r`. O Desky calcula os limites pelo dia de estudo local
+  (`gmtOffset` + hora de reset), consulta uma margem de 12 horas e filtra os vizinhos.
+
+#### `POST https://pi.tgclab.com/study/study-plan/rest`
+```json
+{
+  "title": "Revisar capítulo",
+  "subject_id": 119611290,
+  "start_at": "2026-11-20T08:00:00.000Z",
+  "all_day": false,
+  "order": 0,
+  "score": null,
+  "duration": null
+}
+```
+- A criação com `subject_id` foi confirmada por releitura em 2026-11-20.
+
+#### `PUT https://pi.tgclab.com/study/study-plan/rest`
+- Além dos campos da criação, envia `id`. `score: 1` conclui e `score: null` reabre;
+  título e matéria atualizados foram confirmados por releitura em 2026-11-20.
+- A UI do Planner edita somente a ocorrência selecionada e informa esse escopo ao usuário.
+  `applyToAll` continua sendo apenas um parâmetro do repositório: o fluxo multi-step de
+  edição da série no aplicativo oficial não foi reconstruído e não é exposto como suportado.
+
+#### `DELETE https://pi.tgclab.com/study/study-plan/rest`
+- **Corpo JSON obrigatório na sondagem de 2026-11-20**:
+```json
+{ "id": 111625709 }
+```
+- Enviar apenas `?id=...` respondeu HTTP 200 com `s:false` e não removeu o item; o corpo
+  acima respondeu `s:true` e a remoção foi confirmada por releitura.
+- Em nova validação autorizada em 2026-11-21, uma série recorrente descartável foi criada,
+  `target:"all"` respondeu `s:true` e a releitura encontrou **zero ocorrências**. Por isso a
+  UI do Planner voltou a oferecer **esta ocorrência** (padrão) e **toda a série**, com aviso
+  irreversível. Isso não valida o fluxo de edição de toda a série, que segue fora da UI.
+- Criação, edição e exclusão recusadas mostram erro e recarregam a lista, revertendo também
+  qualquer alteração otimista local.
+
+---
+
+### Módulo: Grade Horária (Timetable)
+
+#### `GET https://pi.tgclab.com/timetable/timetables`
+- **Validado ao vivo**: a lista vem em `rt`, não em `timetables`, com as chaves compactas
+  `id, t, sd, ed, st, et, lw, scid`.
+
+#### `GET https://pi.tgclab.com/timetable/detail/v70630?id=<ttid>`
+- **Validado ao vivo**: retorna `{"s": true, "sb": [...]}`; na conta de teste, `sb` estava vazio.
+
+#### `DELETE https://pi.tgclab.com/timetable/detail/v70630`
+- **Corpo JSON obrigatório**: `{"id": <blockId>}`. Enviar o id somente na query produziu HTML 500.
+- Um id desconhecido respondeu `200 {"s": false, "m": "already removed"}`; por isso o
+  cliente exige `s:true` e informa falha em vez de remover um bloco apenas localmente.
+
+#### `POST https://pi.tgclab.com/timetable/detail/v70630`
+- **Validado ao vivo em 2026-11-21**: o título usa `t`; `ttid`, `sd` e `ed` vêm do
+  container retornado por `/timetable/timetables`; `c` é a cor ARGB inteira. Também são
+  enviados `lw`, `st`, `et` e `scid`. A primeira tentativa sem `sd/ed/c` e a segunda
+  sem `c` responderam `s:false`; a terceira, com todos os campos, respondeu `s:true` e `rs`.
+- O bloco foi confirmado em `sb` no detalhe e removido com o DELETE documentado; a releitura
+  final encontrou zero blocos de sondagem. Não foram necessárias mais de três tentativas.
 
 ---
 
@@ -242,23 +318,17 @@ Authorization: JWT <TOKEN_JWT_SESSION>
 - **Função**: Atualização **parcial** das configurações do grupo (líder).
 - **Chave do grupo**: `id`. Enviar `groupID` resulta em **HTTP 500**.
 - **Regra**: somente os campos enviados são alterados; os ausentes permanecem intactos.
-- **Campos aceitos** (verificados por escrita *no-op* na API real, comparando o objeto do
-  grupo antes e depois; nenhum campo mudou):
-
-| Chave | Significado | Tipo |
-| :--- | :--- | :--- |
-| `t` | Nome do grupo | String |
-| `cid` | ID da categoria | int |
-| `gt` | Meta diária (horas) | int |
-| `mc` | Capacidade de membros | int |
-| `nt` | Aviso (notice board) | String |
-| `pw` | Senha de acesso | String |
-| `il` | Introdução | String |
-| `ic` | Grupo Cam Study | bool |
+- **Campo de nome comprovado por alteração e restauração:** `title` (String). Em 2026-11-20,
+  `t`, `n` e `name` foram aceitos com `s:true`, mas não alteraram o nome; `title` alterou e foi
+  restaurado, confirmado pela recarga autenticada dos grupos.
+- **Demais campos não confirmados:** `cid`, `gt`, `mc`, `nt`, `pw`, `il` e `ic` continuam sem
+  evidência suficiente de aplicação. Uma resposta `s:true`, inclusive acompanhada de nenhuma
+  alteração visível, **não valida** o campo. Não usar o resultado antigo de sondagens *no-op*
+  como prova de que esses campos foram aplicados.
 
 - **Request Body**:
 ```json
-{ "id": 6487271, "t": "Nome do grupo" }
+{ "id": 6487271, "title": "Nome do grupo" }
 ```
 - **Response Body (200 OK)**:
 ```json
@@ -340,7 +410,9 @@ Authorization: JWT <TOKEN_JWT_SESSION>
 ### Módulo: Criação de Grupos (contrato NÃO confirmado)
 
 > **Status**: rota confirmada, contrato de payload **não confirmado**. Não implementar por
-> tentativa. Histórico completo em `.desky_apk_work/PR9_group_creation_investigation.md`.
+> tentativa. O HAR de 2026-11-19 não contém `/group/make/v2`; o APK 810.1.00 contém o
+> literal da rota e as telas do assistente, mas não o corpo completo da requisição.
+> Histórico anterior em `.desky_apk_work/PR9_group_creation_investigation.md`.
 
 #### `POST https://pi.tgclab.com/group/make/v2`
 - **Formato**: JSON plano (multipart, form-urlencoded e corpo aninhado falham).

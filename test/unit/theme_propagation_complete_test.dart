@@ -18,8 +18,8 @@ class _FakeNotificationRepository implements NotificationRepository {
 
 void main() {
   group('Theme Propagation Completeness Tests', () {
-    test('all 7 presets have valid, non-transparent core colors', () {
-      expect(DeskyThemePalette.presets.length, equals(7));
+    test('all 9 presets have valid, non-transparent core colors', () {
+      expect(DeskyThemePalette.presets.length, equals(9));
       for (final preset in DeskyThemePalette.presets) {
         expect(preset.primary.alpha, greaterThan(0));
         expect(preset.background.alpha, greaterThan(0));

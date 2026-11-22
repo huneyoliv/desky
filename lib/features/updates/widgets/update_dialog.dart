@@ -77,8 +77,8 @@ class UpdateDialog extends ConsumerWidget {
                 children: [
                   Text(
                     t.tr('update_available', fallback: 'Atualização Disponível'),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: context.appTextPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -115,7 +115,7 @@ class UpdateDialog extends ConsumerWidget {
                         ),
                         child: Text(
                           release.cleanVersion.isNotEmpty ? 'v${release.cleanVersion}' : release.tagName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.success,
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
@@ -149,8 +149,8 @@ class UpdateDialog extends ConsumerWidget {
             ],
             Text(
               t.tr('changelog', fallback: 'Novidades & Changelog'),
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: context.appTextPrimary,
                 fontWeight: FontWeight.w700,
                 fontSize: 13,
                 letterSpacing: 0.3,
@@ -183,14 +183,14 @@ class UpdateDialog extends ConsumerWidget {
                       fontSize: 13,
                       height: 1.45,
                     ),
-                    h1: const TextStyle(
-                      color: Colors.white,
+                    h1: TextStyle(
+                      color: context.appTextPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       height: 1.4,
                     ),
-                    h2: const TextStyle(
-                      color: Colors.white,
+                    h2: TextStyle(
+                      color: context.appTextPrimary,
                       fontSize: 14.5,
                       fontWeight: FontWeight.bold,
                       height: 1.4,
@@ -201,8 +201,8 @@ class UpdateDialog extends ConsumerWidget {
                       fontWeight: FontWeight.w700,
                       height: 1.4,
                     ),
-                    strong: const TextStyle(
-                      color: Colors.white,
+                    strong: TextStyle(
+                      color: context.appTextPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                     em: TextStyle(
@@ -252,10 +252,10 @@ class UpdateDialog extends ConsumerWidget {
           onPressed: release.htmlUrl.isNotEmpty
               ? () => _launchUrl(release.htmlUrl)
               : null,
-          icon: const Icon(Icons.open_in_new_rounded, size: 16),
+          icon: Icon(Icons.open_in_new_rounded, size: 16),
           label: Text(t.tr('view_on_github', fallback: 'Ver no GitHub')),
           style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.white70,
+            foregroundColor: context.appTextSecondary,
             side: BorderSide(color: context.appBorder),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -269,7 +269,7 @@ class UpdateDialog extends ConsumerWidget {
               _launchUrl(release.htmlUrl);
             }
           },
-          icon: const Icon(Icons.download_rounded, size: 18),
+          icon: Icon(Icons.download_rounded, size: 18),
           label: Text(
             platformAsset != null
                 ? '${t.tr('download_installer', fallback: 'Baixar Instalador')} (${platformAsset.name})'
@@ -277,7 +277,7 @@ class UpdateDialog extends ConsumerWidget {
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: context.appPrimary,
-            foregroundColor: Colors.white,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           ),

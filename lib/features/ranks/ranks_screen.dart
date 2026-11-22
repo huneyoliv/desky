@@ -15,6 +15,7 @@ import 'widgets/study_calendar.dart';
 import 'widgets/stats_summary_cards.dart';
 import 'widgets/cumulative_and_quarter.dart';
 import 'widgets/time_of_day_cards.dart';
+import 'widgets/timeline_tab.dart';
 import 'stats_derivations.dart';
 import 'session_derivations.dart';
 
@@ -62,7 +63,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadRanks();
     _loadUserStats();
     _loadCalendarMonth();
@@ -355,7 +356,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
           children: [
             Text(
               t.tr('analytics_stacked_bar_subject_name', fallback: 'Study time by subject'),
-              style: AppTextStyles.titleMedium,
+              style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary),
             ),
             const SizedBox(height: 10),
             // Period navigation: any week or month, including the past ones.
@@ -369,7 +370,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                     _statsRangeLabel(range, t),
                     style: TextStyle(
                       fontSize: 11,
-                      color: selected ? Colors.white : context.appTextMuted,
+                      color: selected
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : context.appTextMuted,
                     ),
                   ),
                   selected: selected,
@@ -631,8 +634,10 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
         value: e.value > 0 ? e.value : 1,
         title: '$percentage%',
         radius: 60,
-        titleStyle: const TextStyle(
-          color: Colors.white,
+        titleStyle: TextStyle(
+          color: ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+              ? Colors.white
+              : Colors.black,
           fontWeight: FontWeight.bold,
         ),
       );
@@ -640,20 +645,22 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
 
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
 
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
-        title: Text(t.tr('ranks', fallback: 'Rankings & Estatísticas'), style: AppTextStyles.titleLarge),
+        title: Text(t.tr('ranks', fallback: 'Rankings & Estatísticas'), style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: palette.primary,
-          labelColor: Colors.white,
+          labelColor: palette.textPrimary,
           unselectedLabelColor: palette.textSecondary,
           tabs: [
             Tab(text: t.tr('ranks', fallback: 'Rankings Globais')),
             Tab(text: t.tr('stats', fallback: 'Estatísticas & Mapa 24h')),
             Tab(text: t.tr('calendar', fallback: 'Calendário Mensal')),
+            Tab(text: t.tr('timeline_title', fallback: 'Linha do tempo')),
           ],
         ),
       ),
@@ -667,15 +674,16 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 color: context.appSurface,
-                child: Row(
-                  children: [
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final controls = <Widget>[
                     ChoiceChip(
                       label: Text(t.tr('today', fallback: 'Hoje')),
                       selected: _selectedPeriod == 'day',
                       selectedColor: context.appPrimary,
                       backgroundColor: context.appCard,
                       labelStyle: TextStyle(
-                          color: _selectedPeriod == 'day' ? Colors.white : context.appTextMuted),
+                          color: _selectedPeriod == 'day' ? onPrimary : context.appTextMuted),
                       onSelected: (_) {
                         setState(() => _selectedPeriod = 'day');
                         _loadRanks();
@@ -688,7 +696,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       selectedColor: context.appPrimary,
                       backgroundColor: context.appCard,
                       labelStyle: TextStyle(
-                          color: _selectedPeriod == 'week' ? Colors.white : context.appTextMuted),
+                          color: _selectedPeriod == 'week' ? onPrimary : context.appTextMuted),
                       onSelected: (_) {
                         setState(() => _selectedPeriod = 'week');
                         _loadRanks();
@@ -702,14 +710,14 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       backgroundColor: context.appCard,
                       labelStyle: TextStyle(
                           color: _selectedPeriod == 'month'
-                              ? Colors.white
+                              ? onPrimary
                               : context.appTextMuted),
                       onSelected: (_) {
                         setState(() => _selectedPeriod = 'month');
                         _loadRanks();
                       },
                     ),
-                    const Spacer(),
+                    if (constraints.maxWidth >= 720) const Spacer() else const SizedBox(width: 12),
                     _ScopeToggle(
                       scope: _rankScope,
                       categoryName: ref.watch(authStateProvider).user?.categoryName ?? '',
@@ -737,7 +745,18 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                           ),
                         ),
                       ),
-                  ],
+                    ];
+                    if (constraints.maxWidth < 720) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: controls,
+                        ),
+                      );
+                    }
+                    return Row(children: controls);
+                  },
                 ),
               ),
               Expanded(
@@ -783,7 +802,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                 ),
                               const SizedBox(height: 32),
 
-                              Text(t.tr('ranking', fallback: 'Top Estudantes'), style: AppTextStyles.titleMedium),
+                              Text(t.tr('ranking', fallback: 'Top Estudantes'), style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary)),
                               const SizedBox(height: 12),
 
                               ..._ranks.skip(3).map((rank) {
@@ -869,7 +888,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                   children: [
                                     Text(
                                       t.tr('subject_distribution', fallback: 'Distribuição por Matéria'),
-                                      style: AppTextStyles.titleMedium,
+                                      style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary),
                                     ),
                                     const SizedBox(height: 24),
                                     Expanded(
@@ -1032,6 +1051,10 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
               ),
             ),
           ),
+          TimelineTab(
+            repository: ref.watch(rankRepositoryProvider),
+            userId: ref.watch(authStateProvider).user?.id ?? 0,
+          ),
         ],
       ),
     );
@@ -1106,13 +1129,17 @@ class _ScopeToggle extends ConsumerWidget {
             Icon(
               icon,
               size: 15,
-              color: isSelected ? Colors.white : AppColors.textSecondary,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : context.appTextSecondary,
             ),
             const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : AppColors.textSecondary,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : context.appTextSecondary,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 fontSize: 12,
               ),

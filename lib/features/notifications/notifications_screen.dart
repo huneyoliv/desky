@@ -196,11 +196,11 @@ class NotificationsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () => notifier.loadNotifications(),
-            icon: const Icon(Icons.refresh_rounded, size: 16),
+            icon: Icon(Icons.refresh_rounded, size: 16),
             label: Text(tr.tr('retry', fallback: 'Tentar novamente')),
             style: ElevatedButton.styleFrom(
               backgroundColor: context.appPrimary,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
         ],
@@ -276,7 +276,7 @@ class NotificationsScreen extends ConsumerWidget {
     AppTranslation tr,
   ) {
     final iconData = _getNotificationIcon(notification.type);
-    final iconColor = _getNotificationColor(notification.type);
+    final iconColor = _getNotificationColor(context, notification.type);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -399,10 +399,10 @@ class NotificationsScreen extends ConsumerWidget {
     return Icons.info_outline_rounded;
   }
 
-  Color _getNotificationColor(String type) {
+  Color _getNotificationColor(BuildContext context, String type) {
     final upper = type.toUpperCase();
     if (upper.contains('SHAKE') || upper.contains('WAKE') || upper.contains('NUDGE')) {
-      return AppColors.accent;
+      return context.appAccent;
     }
     if (upper.contains('WARNING') || upper.contains('OUT') || upper.contains('EXPEL')) {
       return AppColors.error;
@@ -414,15 +414,15 @@ class NotificationsScreen extends ConsumerWidget {
       return AppColors.info;
     }
     if (upper.contains('ALARM') || upper.contains('TIMER') || upper.contains('STUDY')) {
-      return AppColors.primary;
+      return context.appPrimary;
     }
     if (upper.contains('ACHIEVEMENT') || upper.contains('RANK') || upper.contains('GOAL')) {
       return AppColors.warning;
     }
     if (upper.contains('SYSTEM') || upper.contains('NOTICE') || upper.contains('ANNOUNCEMENT')) {
-      return AppColors.primary;
+      return context.appPrimary;
     }
-    return AppColors.primary;
+    return context.appPrimary;
   }
 
   String _formatDate(DateTime dt) {
