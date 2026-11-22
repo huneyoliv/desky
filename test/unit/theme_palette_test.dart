@@ -11,11 +11,11 @@ import 'package:desky/features/settings/widgets/theme_selection_dialog.dart';
 
 void main() {
   group('DeskyThemePalette Model & Presets Tests', () {
-    test('all 7 curated presets are defined with unique ids', () {
-      expect(DeskyThemePalette.presets.length, equals(7));
+    test('all 9 curated presets are defined with unique ids', () {
+      expect(DeskyThemePalette.presets.length, equals(9));
 
       final ids = DeskyThemePalette.presets.map((p) => p.id).toSet();
-      expect(ids.length, equals(7));
+      expect(ids.length, equals(9));
       expect(ids, containsAll([
         'amoled_lilac',
         'midnight_navy',
@@ -24,6 +24,8 @@ void main() {
         'sunset_amber',
         'sakura_pastel',
         'nordic_frost',
+        'daylight_lilac',
+        'porcelain_sky',
       ]));
     });
 
@@ -87,6 +89,70 @@ void main() {
       expect(notifier.state.id, equals('cyberpunk'));
       expect(prefs.getString(SettingsRepository.keyThemePreset), equals('cyberpunk'));
     });
+
+    testWidgets('system mode follows and reacts to operating system brightness',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({
+        SettingsRepository.keyThemePreset: ThemeNotifier.systemThemeId,
+        SettingsRepository.keyDarkThemePreset: 'midnight_navy',
+        SettingsRepository.keyLightThemePreset: 'daylight_lilac',
+      });
+      // Recreate the repository after preparing values: the setUp repository
+      // was created with the previous empty mock and already read AMOLED.
+      prefs = await SharedPreferences.getInstance();
+      repository = SettingsRepository(prefs: prefs);
+      final notifier = ThemeNotifier(repository);
+      addTearDown(notifier.dispose);
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
+      await tester.pumpAndSettle();
+      expect(notifier.state.id, 'daylight_lilac');
+
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+      // DeskyApp invokes this same callback when the OS reports the change.
+      notifier.updateSystemBrightness();
+      await tester.pump();
+      expect(notifier.state.id, 'midnight_navy');
+
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
+      notifier.updateSystemBrightness();
+      await tester.pump();
+      expect(notifier.state.id, 'daylight_lilac');
+
+      // Rehydration keeps the System id and resolves the same persisted pair;
+      // reacting to the OS must not turn it into an explicit palette choice.
+      final restarted = ThemeNotifier(repository);
+      addTearDown(restarted.dispose);
+      await tester.pumpAndSettle();
+      expect(restarted.isSystemMode, isTrue);
+      expect(restarted.state.id, 'daylight_lilac');
+      expect(prefs.getString(SettingsRepository.keyThemePreset), 'system');
+      addTearDown(
+        tester.platformDispatcher.clearPlatformBrightnessTestValue,
+      );
+    });
+
+    test('explicit system choice persists the light/dark pair', () async {
+      final notifier = ThemeNotifier(repository);
+      await notifier.setTheme(DeskyThemePalette.porcelainSky);
+      await notifier.setSystemTheme();
+
+      expect(notifier.isSystemMode, isTrue);
+      expect(prefs.getString(SettingsRepository.keyThemePreset), 'system');
+      expect(prefs.getString(SettingsRepository.keyLightThemePreset),
+          'porcelain_sky');
+      expect(prefs.getString(SettingsRepository.keyDarkThemePreset),
+          'amoled_lilac');
+    });
+
+    test('existing explicit preference never migrates to system automatically',
+        () async {
+      await prefs.setString(SettingsRepository.keyThemePreset, 'forest_emerald');
+      final notifier = ThemeNotifier(repository);
+      expect(notifier.isSystemMode, isFalse);
+      expect(notifier.state.id, 'forest_emerald');
+      expect(prefs.getString(SettingsRepository.keyThemePreset),
+          'forest_emerald');
+    });
   });
 
   group('ThemeSelectionDialog Widget Tests', () {
@@ -116,17 +182,35 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify all 7 theme options are rendered
-      expect(find.byType(ThemeSelectionDialog), findsOneWidget);
-      expect(find.text('AMOLED Lilás (Padrão)'), findsOneWidget);
-      expect(find.text('Azul Meia-Noite'), findsOneWidget);
-      expect(find.text('Cyberpunk Neon'), findsOneWidget);
-      expect(find.text('Verde Esmeralda'), findsOneWidget);
-      expect(find.text('Âmbar Dourado'), findsOneWidget);
-      expect(find.text('Sakura Pastel'), findsOneWidget);
-      expect(find.text('Geada Nórdica'), findsOneWidget);
+      // Verify all 9 palettes and the System option by making every item
+      // visible before asserting or tapping it.
+      Future<void> expectVisibleText(String text) async {
+        await tester.dragUntilVisible(
+          find.text(text),
+          find.byType(ListView),
+          const Offset(0, -120),
+        );
+        expect(find.text(text), findsOneWidget);
+      }
 
-      // Tap on Midnight Navy theme
+      expect(find.byType(ThemeSelectionDialog), findsOneWidget);
+      await expectVisibleText('Sistema');
+      await expectVisibleText('AMOLED Lilás (Padrão)');
+      await expectVisibleText('Azul Meia-Noite');
+      await expectVisibleText('Cyberpunk Neon');
+      await expectVisibleText('Verde Esmeralda');
+      await expectVisibleText('Âmbar Dourado');
+      await expectVisibleText('Sakura Pastel');
+      await expectVisibleText('Geada Nórdica');
+      await expectVisibleText('Lilás Diurno');
+      await expectVisibleText('Céu Porcelana');
+
+      // Tap on Midnight Navy theme after returning it to the viewport.
+      await tester.dragUntilVisible(
+        find.text('Azul Meia-Noite'),
+        find.byType(ListView),
+        const Offset(0, 120),
+      );
       await tester.tap(find.text('Azul Meia-Noite'));
       await tester.pumpAndSettle();
 

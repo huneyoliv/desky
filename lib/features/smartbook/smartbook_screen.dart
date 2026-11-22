@@ -127,7 +127,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
             Expanded(
               child: Text(
                 _documentTitle ?? t.tr('pdf_reader_title', fallback: 'Leitor de PDF'),
-                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: context.appTextPrimary, fontSize: 16, fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -138,7 +138,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
             IconButton(
               icon: Icon(
                 _bookmarks.contains(_currentPage) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                color: _bookmarks.contains(_currentPage) ? Colors.amber : Colors.white70,
+                color: _bookmarks.contains(_currentPage) ? Colors.amber : context.appTextSecondary,
               ),
               tooltip: t.tr('smartbook_bookmark_page', fallback: 'Marcar Página'),
               onPressed: _toggleBookmark,
@@ -149,7 +149,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
               onPressed: _createFlashcardFromPage,
             ),
             IconButton(
-              icon: Icon(_isSearching ? Icons.close : Icons.search, color: Colors.white70),
+              icon: Icon(_isSearching ? Icons.close : Icons.search, color: context.appTextSecondary),
               tooltip: t.tr('smartbook_search_pdf', fallback: 'Buscar no PDF'),
               onPressed: () {
                 setState(() {
@@ -180,7 +180,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
+                          style: TextStyle(color: context.appTextPrimary, fontSize: 14),
                           decoration: InputDecoration(
                             hintText: t.tr('smartbook_search_hint', fallback: 'Digite o termo de busca...'),
                             hintStyle: TextStyle(color: context.appTextMuted),
@@ -197,14 +197,14 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
                       if (_searchResult != null && _searchResult!.hasResult) ...[
                         Text(
                           '${_searchResult!.currentInstanceIndex} / ${_searchResult!.totalInstanceCount}',
-                          style: const TextStyle(color: Colors.white70, fontSize: 12),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.navigate_before, color: Colors.white),
+                          icon: Icon(Icons.navigate_before, color: context.appTextPrimary),
                           onPressed: () => _searchResult?.previousInstance(),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.navigate_next, color: Colors.white),
+                          icon: Icon(Icons.navigate_next, color: context.appTextPrimary),
                           onPressed: () => _searchResult?.nextInstance(),
                         ),
                       ],
@@ -240,7 +240,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
           const SizedBox(height: 24),
           Text(
             t.tr('pdf_reader_empty_title', fallback: 'Leitor de PDF (Materiais e Apostilas)'),
-            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(color: context.appTextPrimary, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -254,8 +254,8 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: _pickPdfFile,
-            icon: const Icon(Icons.folder_open_rounded, color: Colors.white),
-            label: Text(t.tr('smartbook_select_pdf_btn', fallback: 'Selecionar Arquivo PDF'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            icon: Icon(Icons.folder_open_rounded, color: Theme.of(context).colorScheme.onPrimary),
+            label: Text(t.tr('smartbook_select_pdf_btn', fallback: 'Selecionar Arquivo PDF'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
               backgroundColor: context.appPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -298,15 +298,15 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.navigate_before_rounded, color: Colors.white),
+                icon: Icon(Icons.navigate_before_rounded, color: context.appTextPrimary),
                 onPressed: _currentPage > 1 ? () => _pdfViewerController.previousPage() : null,
               ),
               Text(
                 '${t.tr("page", fallback: "Página")} $_currentPage / $_pageCount',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.w600, fontSize: 13),
               ),
               IconButton(
-                icon: const Icon(Icons.navigate_next_rounded, color: Colors.white),
+                icon: Icon(Icons.navigate_next_rounded, color: context.appTextPrimary),
                 onPressed: _currentPage < _pageCount ? () => _pdfViewerController.nextPage() : null,
               ),
             ],
@@ -314,7 +314,7 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.zoom_out_rounded, color: Colors.white70),
+                icon: Icon(Icons.zoom_out_rounded, color: context.appTextSecondary),
                 tooltip: t.tr('smartbook_zoom_out', fallback: 'Reduzir Zoom'),
                 onPressed: () {
                   if (_pdfViewerController.zoomLevel > 1.0) {
@@ -323,14 +323,14 @@ class _SmartBookScreenState extends ConsumerState<SmartBookScreen> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.zoom_in_rounded, color: Colors.white70),
+                icon: Icon(Icons.zoom_in_rounded, color: context.appTextSecondary),
                 tooltip: t.tr('smartbook_zoom_in', fallback: 'Aumentar Zoom'),
                 onPressed: () {
                   _pdfViewerController.zoomLevel += 0.25;
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.restart_alt_rounded, color: Colors.white70),
+                icon: Icon(Icons.restart_alt_rounded, color: context.appTextSecondary),
                 tooltip: t.tr('smartbook_zoom_reset', fallback: 'Resetar Zoom'),
                 onPressed: () {
                   _pdfViewerController.zoomLevel = 1.0;

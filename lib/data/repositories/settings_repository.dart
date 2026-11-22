@@ -31,6 +31,8 @@ class SettingsRepository {
   static const String keyBlockedUsers = 'blocked_users_list';
   static const String keyDiscordRpc = 'discord_rpc_enabled';
   static const String keyThemePreset = 'selected_theme_preset';
+  static const String keyDarkThemePreset = 'selected_dark_theme_preset';
+  static const String keyLightThemePreset = 'selected_light_theme_preset';
   static const String keyBetaChannel = 'beta_update_channel';
   static const String keyTimerBackground = 'timer_background_style';
   static const String keyTimerBackgroundImagePath = 'timer_background_image_path';
@@ -438,5 +440,24 @@ class SettingsRepository {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setString(keyThemePreset, themeId);
     } catch (_) {}
+  }
+
+  Future<String> getDarkThemePresetId() async {
+    final prefs = _prefs ?? await SharedPreferences.getInstance();
+    return prefs.getString(keyDarkThemePreset) ?? 'amoled_lilac';
+  }
+
+  Future<String> getLightThemePresetId() async {
+    final prefs = _prefs ?? await SharedPreferences.getInstance();
+    return prefs.getString(keyLightThemePreset) ?? 'daylight_lilac';
+  }
+
+  Future<void> saveSystemThemePresetIds({
+    required String darkId,
+    required String lightId,
+  }) async {
+    final prefs = _prefs ?? await SharedPreferences.getInstance();
+    await prefs.setString(keyDarkThemePreset, darkId);
+    await prefs.setString(keyLightThemePreset, lightId);
   }
 }

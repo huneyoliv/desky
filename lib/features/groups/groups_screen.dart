@@ -154,7 +154,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text(t.tr('join_private_group', fallback: 'Grupo Privado'), style: const TextStyle(color: Colors.white)),
+          title: Text(t.tr('join_private_group', fallback: 'Grupo Privado'), style: TextStyle(color: context.appTextPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +167,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
               TextField(
                 controller: passController,
                 obscureText: true,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   hintText: t.tr('password', fallback: 'Senha do Grupo'),
                   hintStyle: TextStyle(color: context.appTextMuted),
@@ -185,8 +185,11 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
-              style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-              child: Text(t.tr('join', fallback: 'Entrar'), style: const TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.appPrimary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              ),
+              child: Text(t.tr('join', fallback: 'Entrar')),
             ),
           ],
         ),
@@ -255,8 +258,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
             Expanded(
               child: Text(
                 group.name,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: context.appTextPrimary,
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
                 ),
@@ -314,13 +317,15 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: isMyGroup ? context.appSurface : context.appPrimary,
+            foregroundColor: isMyGroup
+                ? context.appTextPrimary
+                : Theme.of(context).colorScheme.onPrimary,
             side: isMyGroup ? BorderSide(color: context.appBorder) : null,
           ),
           child: Text(
             isMyGroup
                 ? t.tr('open', fallback: 'Abrir')
                 : t.tr('join', fallback: 'Entrar'),
-            style: const TextStyle(color: Colors.white),
           ),
         ),
       ),
@@ -343,10 +348,13 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
-        title: Text(t.tr('groups', fallback: 'Grupos de Estudo'), style: AppTextStyles.titleLarge),
+        title: Text(
+          t.tr('groups', fallback: 'Grupos de Estudo'),
+          style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh),
             tooltip: t.tr('refresh', fallback: 'Atualizar'),
             onPressed: () {
               ref.read(authStateProvider.notifier).refreshUserGroups();
@@ -364,7 +372,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: palette.primary,
-          labelColor: Colors.white,
+          labelColor: palette.textPrimary,
           unselectedLabelColor: palette.textSecondary,
           tabs: [
             Tab(text: t.tr('my_groups', fallback: 'Meus Grupos')),
@@ -428,7 +436,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.appTextPrimary),
                           decoration: InputDecoration(
                             hintText: t.tr('search', fallback: 'Buscar grupos por nome ou palavra-chave...'),
                             hintStyle: TextStyle(color: context.appTextMuted),
@@ -457,11 +465,12 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                         onPressed: _performSearch,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: context.appPrimary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        icon: const Icon(Icons.search, size: 18, color: Colors.white),
-                        label: Text(t.tr('search', fallback: 'Buscar'), style: const TextStyle(color: Colors.white)),
+                        icon: Icon(Icons.search, size: 18),
+                        label: Text(t.tr('search', fallback: 'Buscar')),
                       ),
                     ],
                   ),
@@ -487,7 +496,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                 selectedColor: context.appPrimary,
                                 backgroundColor: context.appCard,
                                 labelStyle: TextStyle(
-                                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : context.appTextSecondary,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                 ),
                                 onSelected: (selected) {
@@ -554,7 +565,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                           // widening the search to another country.
                                           ElevatedButton.icon(
                                             onPressed: () => SelectCountryDialog.show(context),
-                                            icon: const Icon(Icons.public_rounded, size: 18),
+                                            icon: Icon(Icons.public_rounded, size: 18),
                                             label: Text(t.tr('view_other_region_groups', fallback: 'Ver grupos de outra região')),
                                             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                                           ),

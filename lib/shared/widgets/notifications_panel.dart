@@ -70,7 +70,7 @@ class _NotificationsPanelState extends ConsumerState<NotificationsPanel> {
               children: [
                 Icon(Icons.notifications_active_outlined, color: context.appPrimary, size: 20),
                 const SizedBox(width: 8),
-                Text(t.tr('notifications_center', fallback: 'Central de Notificações'), style: AppTextStyles.titleMedium),
+                Text(t.tr('notifications_center', fallback: 'Central de Notificações'), style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary)),
                 const Spacer(),
                 IconButton(
                   icon: Icon(Icons.refresh, size: 18, color: context.appTextMuted),

@@ -20,6 +20,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
     final activeTheme = ref.watch(themeNotifierProvider);
     final themeNotifier = ref.read(themeNotifierProvider.notifier);
+    final systemMode = ref.watch(themeNotifierProvider.notifier).isSystemMode;
 
     return Dialog(
       backgroundColor: activeTheme.card,
@@ -69,10 +70,20 @@ class ThemeSelectionDialog extends ConsumerWidget {
             Flexible(
               child: ListView.separated(
                 shrinkWrap: true,
-                itemCount: DeskyThemePalette.presets.length,
+                itemCount: DeskyThemePalette.presets.length + 1,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
-                  final preset = DeskyThemePalette.presets[index];
+                  if (index == 0) {
+                    return _SystemThemeTile(
+                      palette: activeTheme,
+                      selected: systemMode,
+                      title: t.tr('theme_system', fallback: 'Sistema'),
+                      subtitle: t.tr('theme_system_desc',
+                          fallback: 'Segue o tema claro ou escuro do sistema'),
+                      onTap: themeNotifier.setSystemTheme,
+                    );
+                  }
+                  final preset = DeskyThemePalette.presets[index - 1];
                   final isSelected = preset.id == activeTheme.id;
 
                   return InkWell(
@@ -104,7 +115,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
                               color: isSelected ? preset.primary : Colors.transparent,
                             ),
                             child: isSelected
-                                ? const Icon(Icons.check, size: 14, color: Colors.black)
+                                ? Icon(Icons.check, size: 14, color: Theme.of(context).colorScheme.onPrimary)
                                 : null,
                           ),
                           const SizedBox(width: 14),
@@ -126,13 +137,13 @@ class ThemeSelectionDialog extends ConsumerWidget {
                           // Color preview pills
                           Row(
                             children: [
-                              _buildColorSwatch(preset.background, 'BG'),
+                              _buildColorSwatch(context, preset.background, 'BG'),
                               const SizedBox(width: 4),
-                              _buildColorSwatch(preset.surfaceLight, 'Surface'),
+                              _buildColorSwatch(context, preset.surfaceLight, 'Surface'),
                               const SizedBox(width: 4),
-                              _buildColorSwatch(preset.primary, 'Primary', isPrimary: true),
+                              _buildColorSwatch(context, preset.primary, 'Primary', isPrimary: true),
                               const SizedBox(width: 4),
-                              _buildColorSwatch(preset.accent, 'Accent'),
+                              _buildColorSwatch(context, preset.accent, 'Accent'),
                             ],
                           ),
                         ],
@@ -154,7 +165,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
                 ),
                 child: Text(
                   t.tr('close_btn', fallback: 'Concluir'),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -164,14 +175,14 @@ class ThemeSelectionDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildColorSwatch(Color color, String tooltip, {bool isPrimary = false}) {
+  Widget _buildColorSwatch(BuildContext context, Color color, String tooltip, {bool isPrimary = false}) {
     return Container(
       width: isPrimary ? 24 : 18,
       height: isPrimary ? 24 : 18,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white24, width: 1),
+        border: Border.all(color: context.appBorder, width: 1),
         boxShadow: isPrimary
             ? [
                 BoxShadow(
@@ -185,3 +196,69 @@ class ThemeSelectionDialog extends ConsumerWidget {
     );
   }
 }
+
+class _SystemThemeTile extends StatelessWidget {
+  final DeskyThemePalette palette;
+  final bool selected;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _SystemThemeTile({
+    required this.palette,
+    required this.selected,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? palette.primary : palette.border,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              selected ? Icons.brightness_auto : Icons.brightness_auto_outlined,
+              color: palette.primary,
+              size: 22,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: palette.textPrimary,
+                      fontSize: 14,
+                      fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: palette.textSecondary, fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

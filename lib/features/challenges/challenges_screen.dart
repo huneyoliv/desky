@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
@@ -57,10 +57,10 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
       appBar: AppBar(
         backgroundColor: context.appSurface,
         title: Text(t.tr('challenges', fallback: 'Desafios & Metas'),
-            style: AppTextStyles.titleLarge),
+            style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh),
             tooltip: t.tr('refresh', fallback: 'Atualizar'),
             onPressed: _loadChallenges,
           ),
@@ -159,8 +159,8 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
                   challenge.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.appTextPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),

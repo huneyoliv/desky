@@ -130,7 +130,7 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
             _TitleBarButton(
               tooltip: t.tr('minimize', fallback: 'Minimizar'),
               onTap: () => windowManager.minimize(),
-              child: const _MinimizeIcon(color: Colors.white70),
+              child: _MinimizeIcon(color: palette.textSecondary),
             ),
             _TitleBarButton(
               tooltip: _isMaximized
@@ -139,14 +139,14 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
               onTap: _toggleMaximize,
               child: _MaximizeRestoreIcon(
                 isMaximized: _isMaximized,
-                color: Colors.white70,
+                color: palette.textSecondary,
               ),
             ),
             _TitleBarButton(
               tooltip: t.tr('close', fallback: 'Fechar'),
               hoverColor: const Color(0xFFE81123),
               onTap: () => windowManager.close(),
-              child: const _CloseIcon(color: Colors.white70),
+              child: _CloseIcon(color: palette.textSecondary),
             ),
           ] else
             const SizedBox(width: 8),
@@ -178,7 +178,7 @@ class _TitleBarButtonState extends State<_TitleBarButton> {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveHoverColor = widget.hoverColor ?? Colors.white.withValues(alpha: 0.08);
+    final effectiveHoverColor = widget.hoverColor ?? context.palette.textSecondary.withValues(alpha: 0.08);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
