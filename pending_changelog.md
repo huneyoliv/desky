@@ -26,6 +26,13 @@ in `CHANGELOG.md`). This file is intentionally gitignored.
   operating-system System mode with persisted light/dark preferences, and
   theme-token migrations for controls, dialogs, charts and narrow layouts.
 
+- Selected PR #9 contributions add English fallbacks while preserving Portuguese,
+  bounded avatar/chat/sticker image decoding, persistent custom group ordering,
+  opt-in Classic zoom shortcuts, and a member statistics/Nudge sheet.
+- Windows can restore the previous monitor and position, and an opt-in OBS
+  overlay mode sends minimize requests behind other windows. Prerelease CI no
+  longer attempts to upload an MSIX package that was intentionally not built.
+
 ## Fixed
 
 - The app no longer exits silently when the single-instance channel cannot be
@@ -85,7 +92,15 @@ in `CHANGELOG.md`). This file is intentionally gitignored.
   timestamp under `t`, but the client only read `timestamp`, so every sync
   silently fell back to the local clock. Both keys are now accepted.
 
+- PR #9 Nudge requests now use the verified snake_case body with sender name.
+  Invalid stored window sizes are normalized before placement so the restored
+  default window cannot be positioned off screen.
+
 ## Known Limitations
+
+- Full Classic navigation, mini player, offline sync, Discord IPC hardening and
+  crash logging are not included in the selected PR #9 integration. OBS focus/
+  z-order and real OS behavior still require manual native verification.
 
 - Group creation is not supported: the create contract is unconfirmed (three attempts failed).
 - Starting a session from a to-do sends taskId, but no association is observable on the API.
