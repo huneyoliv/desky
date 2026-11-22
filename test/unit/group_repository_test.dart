@@ -8,6 +8,7 @@ class MockApiClient extends ApiClient {
 
   Map<String, dynamic>? getResponse;
   Map<String, dynamic>? postResponse;
+  dynamic lastPostData;
 
   @override
   Future<Response<dynamic>> get(
@@ -30,6 +31,7 @@ class MockApiClient extends ApiClient {
     Options? options,
     String? baseUrl,
   }) async {
+    lastPostData = data;
     return Response(
       requestOptions: RequestOptions(path: path),
       data: postResponse,
@@ -67,10 +69,26 @@ void main() {
       expect(members.first.isStudying, isTrue);
     });
 
-    test('shakeMember sends POST and returns true on success', () async {
+    test('shakeMember sends the expected snake_case body', () async {
       mockApiClient.postResponse = {'s': true};
-      final result = await repository.shakeMember(groupId: 100, targetUserId: 1);
+      final result = await repository.shakeMember(
+        groupId: 100,
+        targetUserId: 1,
+        from: 'Me',
+      );
       expect(result, isTrue);
+      expect(mockApiClient.lastPostData, {
+        'user_id': 1,
+        'group_id': 100,
+        'from': 'Me',
+      });
+    });
+
+    test('shakeAllMembers includes the sender display name', () async {
+      mockApiClient.postResponse = {'s': true};
+      final result = await repository.shakeAllMembers(100, from: 'Me');
+      expect(result, isTrue);
+      expect(mockApiClient.lastPostData, {'groupID': 100, 'from': 'Me'});
     });
 
     test('fetchChatMessages parses messages list', () async {

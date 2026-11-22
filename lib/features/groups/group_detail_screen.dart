@@ -272,6 +272,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     final sent = await repo.shakeMember(
       groupId: widget.group.id,
       targetUserId: member.userId,
+      from: ref.read(authStateProvider).user?.name ?? '',
     );
 
     // The repository answers false instead of throwing, so the old code showed

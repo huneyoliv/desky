@@ -51,6 +51,7 @@ class _MemberSheetState extends ConsumerState<MemberSheet> {
         .shakeMember(
           groupId: widget.groupId,
           targetUserId: widget.member.userId,
+          from: ref.read(authStateProvider).user?.name ?? '',
         );
     if (mounted) {
       setState(() {
