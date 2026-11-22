@@ -141,6 +141,7 @@ class _StickerPickerPanelState extends ConsumerState<StickerPickerPanel> {
                                 child: Image.network(
                                   sticker.url,
                                   fit: BoxFit.contain,
+                                  cacheWidth: 160,
                                   errorBuilder: (_, __, ___) => Icon(
                                     Icons.extension_rounded,
                                     color: context.appPrimary,
