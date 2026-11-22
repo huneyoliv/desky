@@ -30,6 +30,7 @@ class SettingsRepository {
   static const String keySoundEffects = 'sound_effects';
   static const String keyBlockedUsers = 'blocked_users_list';
   static const String keyDiscordRpc = 'discord_rpc_enabled';
+  static const String keyObsOverlayMode = 'obs_overlay_mode';
   static const String keyClassicYptLook = 'classic_ypt_look';
   static const String keyClassicUiScale = 'classic_ui_scale';
   static const String keyThemePreset = 'selected_theme_preset';
@@ -417,6 +418,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setString(keyTimerFont, normalizeTimerFont(value));
+    } catch (_) {}
+  }
+
+  Future<bool> getObsOverlayMode() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getBool(keyObsOverlayMode) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> saveObsOverlayMode(bool value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setBool(keyObsOverlayMode, value);
     } catch (_) {}
   }
 
