@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../core/localization/app_translation.dart';
 import '../../core/theme/theme_palette.dart';
+import '../../core/window/overlay_window_channel.dart';
+import '../../features/settings/settings_notifier.dart';
 import '../../core/utils/package_helper.dart';
 import '../../features/updates/widgets/update_button.dart';
 
@@ -129,7 +131,9 @@ class _AppTitleBarState extends ConsumerState<AppTitleBar> with WindowListener {
           if (!Platform.isMacOS) ...[
             _TitleBarButton(
               tooltip: t.tr('minimize', fallback: 'Minimizar'),
-              onTap: () => windowManager.minimize(),
+              onTap: () => OverlayWindowChannel.minimize(
+                overlayMode: ref.read(settingsNotifierProvider).obsOverlayMode,
+              ),
               child: _MinimizeIcon(color: palette.textSecondary),
             ),
             _TitleBarButton(

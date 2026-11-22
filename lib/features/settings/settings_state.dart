@@ -17,6 +17,7 @@ class SettingsState {
   final bool soundEffects;
   final List<String> blockedUsers;
   final bool discordRpcEnabled;
+  final bool obsOverlayMode;
   final bool classicYptLook;
   final double classicUiScale;
   final bool betaChannel;
@@ -38,6 +39,7 @@ class SettingsState {
     this.soundEffects = true,
     this.blockedUsers = const [],
     this.discordRpcEnabled = true,
+    this.obsOverlayMode = false,
     this.classicYptLook = false,
     this.classicUiScale = 1.0,
     this.betaChannel = false,
@@ -60,6 +62,7 @@ class SettingsState {
     bool? soundEffects,
     List<String>? blockedUsers,
     bool? discordRpcEnabled,
+    bool? obsOverlayMode,
     bool? classicYptLook,
     double? classicUiScale,
     bool? betaChannel,
@@ -82,6 +85,7 @@ class SettingsState {
       soundEffects: soundEffects ?? this.soundEffects,
       blockedUsers: blockedUsers ?? this.blockedUsers,
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
+      obsOverlayMode: obsOverlayMode ?? this.obsOverlayMode,
       classicYptLook: classicYptLook ?? this.classicYptLook,
       classicUiScale: classicUiScale ?? this.classicUiScale,
       betaChannel: betaChannel ?? this.betaChannel,

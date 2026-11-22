@@ -49,6 +49,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         timerBackgroundImagePath: timerBackgroundImagePath,
         timerFont: timerFont,
       );
+      final obsOverlayMode = await _repository.getObsOverlayMode();
       final classicYptLook = await _repository.getClassicYptLook();
       final classicUiScale = await _repository.getClassicUiScale();
 
@@ -62,6 +63,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         soundEffects: soundEffects,
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
         discordRpcEnabled: discordRpc,
+        obsOverlayMode: obsOverlayMode,
         classicYptLook: classicYptLook,
         classicUiScale: classicUiScale,
         betaChannel: betaChannel,
@@ -174,6 +176,11 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     final normalized = normalizeTimerFont(value);
     state = state.copyWith(timerFont: normalized);
     await _repository.saveTimerFont(normalized);
+  }
+
+  Future<void> toggleObsOverlayMode(bool value) async {
+    state = state.copyWith(obsOverlayMode: value);
+    await _repository.saveObsOverlayMode(value);
   }
 
   Future<void> toggleClassicYptLook(bool value) async {

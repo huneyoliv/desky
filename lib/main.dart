@@ -14,6 +14,7 @@ import 'core/config/env_config.dart';
 import 'core/pdf/macos_document_channel.dart';
 import 'core/pdf/pdf_open_request.dart';
 import 'core/pdf/single_instance_channel.dart';
+import 'core/window/overlay_window_channel.dart';
 import 'core/window/window_state.dart';
 import 'core/window/window_state_store.dart';
 import 'core/services/discord_rpc_coordinator.dart';
@@ -182,6 +183,12 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
       }
     });
     _primeWindowState();
+    // OBS overlay mode lives in the native runner; keep it in sync.
+    ref.listenManual<bool>(
+      settingsNotifierProvider.select((s) => s.obsOverlayMode),
+      (_, enabled) => OverlayWindowChannel.setOverlayMode(enabled),
+      fireImmediately: true,
+    );
     windowManager.addListener(this);
     WidgetsBinding.instance.addObserver(this);
     _setupSignalHandlers();
