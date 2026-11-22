@@ -70,3 +70,23 @@ class StudiconAvatar extends StatelessWidget {
     );
   }
 }
+
+/// Shows [child] in greyscale and dimmed when [enabled]: members who are not
+/// studying keep their own avatar, just without colour.
+class Greyed extends StatelessWidget {
+  const Greyed({super.key, required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  static const ColorFilter _greyscale = ColorFilter.matrix(<double>[
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0, 0, 0, 0.55, 0,
+  ]);
+
+  @override
+  Widget build(BuildContext context) =>
+      enabled ? ColorFiltered(colorFilter: _greyscale, child: child) : child;
+}
