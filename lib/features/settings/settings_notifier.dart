@@ -49,9 +49,9 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         timerBackgroundImagePath: timerBackgroundImagePath,
         timerFont: timerFont,
       );
+      final obsOverlayMode = await _repository.getObsOverlayMode();
       final classicYptLook = await _repository.getClassicYptLook();
       final classicUiScale = await _repository.getClassicUiScale();
-      final obsOverlayMode = await _repository.getObsOverlayMode();
       final miniOpacity = await _repository.getMiniOpacity();
       final offlineMode = await _repository.getOfflineMode();
       final dial = await _repository.getDialStyle();

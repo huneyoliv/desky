@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/timer_appearance.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/utils/package_helper.dart';
+import '../../../core/window/overlay_window_channel.dart';
 import '../settings_notifier.dart';
 
 Future<void> _pickTimerBackgroundImage(
@@ -200,6 +201,25 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       value: settings.soundEffects,
                       onChanged: (val) => notifier.toggleSoundEffects(val),
                     ),
+
+                    if (OverlayWindowChannel.isSupported) ...[
+                      Divider(color: context.appBorder, height: 16),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: context.appPrimary,
+                        title: Text(
+                          t.tr('obs_overlay_title', fallback: 'OBS overlay mode'),
+                          style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          t.tr('obs_overlay_desc',
+                              fallback: 'Minimizing sends the window behind the others instead, so an OBS Window Capture keeps showing it'),
+                          style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                        ),
+                        value: settings.obsOverlayMode,
+                        onChanged: (val) => notifier.toggleObsOverlayMode(val),
+                      ),
+                    ],
 
                     Divider(color: context.appBorder, height: 16),
                     ListTile(

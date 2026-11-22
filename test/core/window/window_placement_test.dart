@@ -50,6 +50,22 @@ void main() {
     expect(state.size, const Size(2400, 1300));
   });
 
+  test('invalid stored size cannot push the default window off screen', () {
+    const display = Rect.fromLTWH(0, 0, 1280, 800);
+    final placement = resolveWindowPlacement(
+      storedPosition: const Offset(1000, 700),
+      size: const Size(1, 1),
+      displays: [display],
+    );
+    final restored = resolveWindowState(
+      storedSize: const Size(1, 1),
+      storedMaximized: false,
+      visibleArea: placement.display?.size,
+    );
+    expect(restored.size, kDefaultWindowSize);
+    expect(placement.position, Offset.zero);
+  });
+
   test('no saved position keeps the old behaviour', () {
     final r = resolveWindowPlacement(storedPosition: null, size: kDefaultWindowSize, displays: [primary]);
     expect(r.position, isNull);

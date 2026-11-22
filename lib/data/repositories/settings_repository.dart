@@ -373,22 +373,6 @@ class SettingsRepository {
     } catch (_) {}
   }
 
-  Future<bool> getObsOverlayMode() async {
-    try {
-      final prefs = _prefs ?? await SharedPreferences.getInstance();
-      return prefs.getBool(keyObsOverlayMode) ?? false;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<void> saveObsOverlayMode(bool value) async {
-    try {
-      final prefs = _prefs ?? await SharedPreferences.getInstance();
-      await prefs.setBool(keyObsOverlayMode, value);
-    } catch (_) {}
-  }
-
   Future<String> getTimerBackground() async {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
@@ -439,6 +423,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setString(keyTimerFont, normalizeTimerFont(value));
+    } catch (_) {}
+  }
+
+  Future<bool> getObsOverlayMode() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getBool(keyObsOverlayMode) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> saveObsOverlayMode(bool value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setBool(keyObsOverlayMode, value);
     } catch (_) {}
   }
 

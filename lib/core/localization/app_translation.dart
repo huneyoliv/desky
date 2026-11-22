@@ -2946,6 +2946,10 @@ class AppTranslation {
       'ja': 'OBSオーバーレイモード',
       'zh-cn': 'OBS 叠加模式',
       'zh-tw': 'OBS 疊加模式',
+      'fr': 'Mode superposition OBS',
+      'de': 'OBS-Overlay-Modus',
+      'it': 'Modalità overlay OBS',
+      'ru': 'Режим оверлея OBS',
     },
     'obs_overlay_desc': {
       'pt': 'Ao minimizar, envia a janela para trás das outras em vez de minimizar, para a captura do OBS continuar ativa',
@@ -2955,6 +2959,10 @@ class AppTranslation {
       'ja': '最小化の代わりにウィンドウを背面に送り、OBSのウィンドウキャプチャを維持します',
       'zh-cn': '最小化时将窗口移到其他窗口后面，使 OBS 窗口采集继续显示',
       'zh-tw': '最小化時將視窗移到其他視窗後面，使 OBS 視窗擷取持續顯示',
+      'fr': 'La réduction place la fenêtre derrière les autres pour que la capture OBS reste visible',
+      'de': 'Beim Minimieren wird das Fenster nach hinten gesetzt, damit die OBS-Aufnahme sichtbar bleibt',
+      'it': 'Riducendo a icona, la finestra va dietro le altre per mantenere visibile la cattura OBS',
+      'ru': 'При сворачивании окно уходит за другие, чтобы захват OBS продолжал отображаться',
     },
     'discord_rpc_desc': {
       'pt': 'Exibir matéria e tempo de estudo em tempo real no status do Discord',
