@@ -17,6 +17,8 @@ class SettingsState {
   final bool soundEffects;
   final List<String> blockedUsers;
   final bool discordRpcEnabled;
+  final bool classicYptLook;
+  final double classicUiScale;
   final bool betaChannel;
   final String timerBackground;
   final String? timerBackgroundImagePath;
@@ -36,6 +38,8 @@ class SettingsState {
     this.soundEffects = true,
     this.blockedUsers = const [],
     this.discordRpcEnabled = true,
+    this.classicYptLook = false,
+    this.classicUiScale = 1.0,
     this.betaChannel = false,
     this.timerBackground = timerBackgroundTheme,
     this.timerBackgroundImagePath,
@@ -56,6 +60,8 @@ class SettingsState {
     bool? soundEffects,
     List<String>? blockedUsers,
     bool? discordRpcEnabled,
+    bool? classicYptLook,
+    double? classicUiScale,
     bool? betaChannel,
     String? timerBackground,
     String? timerBackgroundImagePath,
@@ -76,6 +82,8 @@ class SettingsState {
       soundEffects: soundEffects ?? this.soundEffects,
       blockedUsers: blockedUsers ?? this.blockedUsers,
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
+      classicYptLook: classicYptLook ?? this.classicYptLook,
+      classicUiScale: classicUiScale ?? this.classicUiScale,
       betaChannel: betaChannel ?? this.betaChannel,
       timerBackground: normalizeTimerBackground(
         timerBackground ?? this.timerBackground,

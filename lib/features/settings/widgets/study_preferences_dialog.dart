@@ -151,6 +151,23 @@ class StudyPreferencesDialog extends ConsumerWidget {
                     ),
                     Divider(color: context.appBorder, height: 16),
 
+                    // Optional Classic zoom (no alternate navigation or offline mode).
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      activeColor: context.appPrimary,
+                      title: Text(
+                        t.tr('classic_zoom', fallback: 'Zoom clássico'),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(
+                        t.tr('classic_zoom_desc', fallback: 'Atalhos Ctrl +/-/0 e Ctrl + roda do mouse'),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      ),
+                      value: settings.classicYptLook,
+                      onChanged: (val) => notifier.toggleClassicYptLook(val),
+                    ),
+                    Divider(color: context.appBorder, height: 16),
+
                     // Nudge / Wake Notifications Toggle
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
