@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 /// Tamanho usado quando nao ha estado salvo (ou o salvo e invalido).
@@ -86,4 +87,35 @@ WindowStateSnapshot resolveWindowState({
     minimumSize: resolvedMinimum,
     maximized: storedMaximized,
   );
+}
+/// Picks the monitor a saved window belongs to and where to put it.
+///
+/// Returns the visible area of the display that holds the saved window's
+/// title bar, and the saved position clamped into that display. When no
+/// display holds it (monitor unplugged, layout changed) the result has a null
+/// position: the caller centres on the primary display as before.
+({Rect? display, Offset? position}) resolveWindowPlacement({
+  required Offset? storedPosition,
+  required Size size,
+  required List<Rect> displays,
+}) {
+  if (storedPosition == null || displays.isEmpty) return (display: null, position: null);
+  // Use the same fallback as resolveWindowState before computing bounds;
+  // otherwise a corrupt 1x1 size can place the later 1280x800 window off screen.
+  final effectiveSize = _isUsable(size) ? size : kDefaultWindowSize;
+  // The draggable title bar must be on a screen; probe a point inside it.
+  final probe = storedPosition + Offset(math.min(120, effectiveSize.width / 2), 16);
+  Rect? display;
+  for (final d in displays) {
+    if (d.contains(probe)) {
+      display = d;
+      break;
+    }
+  }
+  if (display == null) return (display: null, position: null);
+  final w = math.min(effectiveSize.width, display.width);
+  final h = math.min(effectiveSize.height, display.height);
+  final left = storedPosition.dx.clamp(display.left, display.right - w).toDouble();
+  final top = storedPosition.dy.clamp(display.top, display.bottom - h).toDouble();
+  return (display: display, position: Offset(left, top));
 }
