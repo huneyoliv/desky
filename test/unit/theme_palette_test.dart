@@ -97,6 +97,10 @@ void main() {
         SettingsRepository.keyDarkThemePreset: 'midnight_navy',
         SettingsRepository.keyLightThemePreset: 'daylight_lilac',
       });
+      // Recreate the repository after preparing values: the setUp repository
+      // was created with the previous empty mock and already read AMOLED.
+      prefs = await SharedPreferences.getInstance();
+      repository = SettingsRepository(prefs: prefs);
       final notifier = ThemeNotifier(repository);
       addTearDown(notifier.dispose);
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
@@ -104,10 +108,13 @@ void main() {
       expect(notifier.state.id, 'daylight_lilac');
 
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+      // DeskyApp invokes this same callback when the OS reports the change.
+      notifier.updateSystemBrightness();
       await tester.pump();
       expect(notifier.state.id, 'midnight_navy');
 
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
+      notifier.updateSystemBrightness();
       await tester.pump();
       expect(notifier.state.id, 'daylight_lilac');
       addTearDown(
@@ -166,34 +173,34 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify all 9 palettes and the System option are rendered.
+      // Verify all 9 palettes and the System option by making every item
+      // visible before asserting or tapping it.
+      Future<void> expectVisibleText(String text) async {
+        await tester.dragUntilVisible(
+          find.text(text),
+          find.byType(ListView),
+          const Offset(0, -120),
+        );
+        expect(find.text(text), findsOneWidget);
+      }
+
       expect(find.byType(ThemeSelectionDialog), findsOneWidget);
-      expect(find.text('Sistema'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.text('Lilás Diurno'),
-        100,
-        scrollable: find.byType(Scrollable).last,
-      );
-      expect(find.text('Lilás Diurno'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.text('Céu Porcelana'),
-        100,
-        scrollable: find.byType(Scrollable).last,
-      );
-      expect(find.text('Céu Porcelana'), findsOneWidget);
-      expect(find.text('AMOLED Lilás (Padrão)'), findsOneWidget);
-      expect(find.text('Azul Meia-Noite'), findsOneWidget);
-      expect(find.text('Cyberpunk Neon'), findsOneWidget);
-      expect(find.text('Verde Esmeralda'), findsOneWidget);
-      expect(find.text('Âmbar Dourado'), findsOneWidget);
-      expect(find.text('Sakura Pastel'), findsOneWidget);
-      expect(find.text('Geada Nórdica'), findsOneWidget);
+      await expectVisibleText('Sistema');
+      await expectVisibleText('AMOLED Lilás (Padrão)');
+      await expectVisibleText('Azul Meia-Noite');
+      await expectVisibleText('Cyberpunk Neon');
+      await expectVisibleText('Verde Esmeralda');
+      await expectVisibleText('Âmbar Dourado');
+      await expectVisibleText('Sakura Pastel');
+      await expectVisibleText('Geada Nórdica');
+      await expectVisibleText('Lilás Diurno');
+      await expectVisibleText('Céu Porcelana');
 
       // Tap on Midnight Navy theme after returning it to the viewport.
-      await tester.scrollUntilVisible(
+      await tester.dragUntilVisible(
         find.text('Azul Meia-Noite'),
-        -100,
-        scrollable: find.byType(Scrollable).last,
+        find.byType(ListView),
+        const Offset(0, 120),
       );
       await tester.tap(find.text('Azul Meia-Noite'));
       await tester.pumpAndSettle();
