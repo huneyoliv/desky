@@ -18,6 +18,10 @@ in `CHANGELOG.md`). This file is intentionally gitignored.
   selection. Missing/unreadable images fall back safely; no media is uploaded.
   Video backgrounds are not included (#10).
 
+- Study Timeline (Refs #11) adds day navigation, chronological sessions, subject
+  names, durations, daily totals, and clearly derived gaps between sessions.
+  It reuses the existing manual study flow with an initial date and save result.
+
 ## Fixed
 
 - The app no longer exits silently when the single-instance channel cannot be
@@ -85,6 +89,10 @@ in `CHANGELOG.md`). This file is intentionally gitignored.
 - Nudge reception on desktop is not possible yet (no nudge notification type; the official app uses FCM push).
 - Background videos (issue #10) are not implemented.
 - Study vs rest breakdown is not available (rest contract unknown).
+- Study vs rest data is not available from the API; gaps are derived from session times.
+- Light and system theme implementation is not merged: system-mode and dialog-scroll
+  tests failed after three validation attempts. Rendered appearance and real OS
+  system-theme behavior were not verified by screenshot or manual testing.
 - Joining challenges is not supported; the Challenges tab is read-only.
 
 ## Changed
@@ -101,3 +109,4 @@ in `CHANGELOG.md`). This file is intentionally gitignored.
   the complete group-creation payload.
 
 Refs #5, #7 and #10. Fixes #8.
+Refs #11 and #12.
