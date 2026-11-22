@@ -273,7 +273,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text(t.tr('alert_todo_add', fallback: 'Nova Tarefa do Planner'), style: const TextStyle(color: context.appTextPrimary)),
+          title: Text(t.tr('alert_todo_add', fallback: 'Nova Tarefa do Planner'), style: TextStyle(color: context.appTextPrimary)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -281,7 +281,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
               children: [
                 TextField(
                   controller: _todoTitleController,
-                  style: const TextStyle(color: context.appTextPrimary),
+                  style: TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     hintText: t.tr('todo_desc_hint', fallback: 'Descrição da tarefa...'),
                     hintStyle: TextStyle(color: context.appTextMuted),
@@ -302,7 +302,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
-                  title: Text(t.tr('repeat_multiple_days', fallback: 'Repetir em vários dias'), style: const TextStyle(color: context.appTextPrimary, fontSize: 14)),
+                  title: Text(t.tr('repeat_multiple_days', fallback: 'Repetir em vários dias'), style: TextStyle(color: context.appTextPrimary, fontSize: 14)),
                   subtitle: Text(t.tr('repeat_multiple_days_desc', fallback: 'Criar em múltiplos dias consecutivamente'), style: TextStyle(color: context.appTextMuted, fontSize: 12)),
                   value: isRecurring,
                   activeColor: context.appPrimary,
@@ -313,7 +313,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 ),
                 if (isRecurring) ...[
                   const SizedBox(height: 12),
-                  Text(t.tr('weekdays', fallback: 'Dias da Semana:'), style: const TextStyle(color: context.appTextPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
+                  Text(t.tr('weekdays', fallback: 'Dias da Semana:'), style: TextStyle(color: context.appTextPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 6,
@@ -342,7 +342,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(t.tr('repeat_until', fallback: 'Repetir até:'), style: const TextStyle(color: context.appTextPrimary, fontSize: 13)),
+                      Text(t.tr('repeat_until', fallback: 'Repetir até:'), style: TextStyle(color: context.appTextPrimary, fontSize: 13)),
                       TextButton.icon(
                         icon: Icon(Icons.calendar_month, color: context.appPrimary, size: 18),
                         label: Text(DateFormat('dd/MM/yyyy').format(endDate), style: TextStyle(color: context.appPrimary, fontWeight: FontWeight.bold)),
@@ -430,7 +430,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
         backgroundColor: context.appCard,
         title: Text(
           t.tr('dday_delete_title', fallback: 'Excluir D-Day'),
-          style: const TextStyle(color: context.appTextPrimary),
+          style: TextStyle(color: context.appTextPrimary),
         ),
         content: Text(
           dday.title,
@@ -449,7 +449,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
             child: Text(
               t.tr('delete', fallback: 'Excluir'),
-              style: const TextStyle(color: context.appTextPrimary),
+              style: TextStyle(color: context.appTextPrimary),
             ),
           ),
         ],
@@ -502,14 +502,14 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
             backgroundColor: context.appCard,
             title: Text(
               t.tr('dday', fallback: 'Novo D-Day'),
-              style: const TextStyle(color: context.appTextPrimary),
+              style: TextStyle(color: context.appTextPrimary),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: _ddayTitleController,
-                  style: const TextStyle(color: context.appTextPrimary),
+                  style: TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     hintText: t.tr('dday_title_hint', fallback: 'Título do D-Day...'),
                     hintStyle: TextStyle(color: context.appTextMuted),
@@ -523,7 +523,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
                   onPressed: pickDate,
-                  icon: const Icon(Icons.calendar_today, size: 16),
+                  icon: Icon(Icons.calendar_today, size: 16),
                   label: Text(
                     '${targetDate.day.toString().padLeft(2, '0')}/'
                     '${targetDate.month.toString().padLeft(2, '0')}/'
@@ -578,7 +578,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                 ),
                 child: Text(
                   t.tr('add', fallback: 'Adicionar'),
-                  style: const TextStyle(color: context.appTextPrimary),
+                  style: TextStyle(color: context.appTextPrimary),
                 ),
               ),
             ],
@@ -598,14 +598,14 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text(t.tr('edit', fallback: 'Editar Tarefa'), style: const TextStyle(color: context.appTextPrimary)),
+          title: Text(t.tr('edit', fallback: 'Editar Tarefa'), style: TextStyle(color: context.appTextPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
                 controller: controller,
-                style: const TextStyle(color: context.appTextPrimary),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   hintText: t.tr('todo_title', fallback: 'Título da tarefa'),
                   filled: true,
@@ -700,7 +700,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
-          title: Text('${t.tr("delete", fallback: "Excluir")} "${todo.title}"?', style: const TextStyle(color: context.appTextPrimary)),
+          title: Text('${t.tr("delete", fallback: "Excluir")} "${todo.title}"?', style: TextStyle(color: context.appTextPrimary)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -718,7 +718,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   activeColor: context.appPrimary,
                   title: Text(
                     t.tr('delete_only_this_todo', fallback: 'Excluir apenas esta tarefa'),
-                    style: const TextStyle(color: context.appTextPrimary, fontSize: 13),
+                    style: TextStyle(color: context.appTextPrimary, fontSize: 13),
                   ),
                   onChanged: (value) => setDialogState(
                     () => deleteAllSeries = value ?? false,
@@ -731,7 +731,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   activeColor: context.appPrimary,
                   title: Text(
                     t.tr('delete_all_series_todos', fallback: 'Excluir todas as tarefas da série'),
-                    style: const TextStyle(color: context.appTextPrimary, fontSize: 13),
+                    style: TextStyle(color: context.appTextPrimary, fontSize: 13),
                   ),
                   onChanged: (value) => setDialogState(
                     () => deleteAllSeries = value ?? true,
@@ -908,7 +908,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                             dday.title,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               color: context.appTextPrimary,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
@@ -1010,15 +1010,15 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: context.appPrimary,
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                    horizontal: 12, vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              icon: const Icon(Icons.add, color: context.appTextPrimary, size: 18),
+                              icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary, size: 18),
                               label: Text(t.tr('add', fallback: 'Nova Tarefa'),
-                                  style: const TextStyle(
-                                      color: context.appTextPrimary,
+                                  style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onPrimary,
                                       fontWeight: FontWeight.w600)),
                             ),
                           ],
@@ -1042,7 +1042,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                   Expanded(
                                     child: Text(
                                       '${t.tr("today", fallback: "Progresso")}: $completedCount / $totalCount ${t.tr("done", fallback: "concluídas")}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: context.appTextPrimary,
                                           fontWeight: FontWeight.w600),
                                       maxLines: 1,
@@ -1096,7 +1096,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                             style: ElevatedButton.styleFrom(
                                                 backgroundColor: context.appPrimary),
                                             child: Text(t.tr('add', fallback: 'Adicionar Tarefa'),
-                                                style: const TextStyle(color: context.appTextPrimary)),
+                                                style: TextStyle(color: context.appTextPrimary)),
                                           ),
                                         ],
                                       ),
@@ -1180,17 +1180,17 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   IconButton(
-                                                    icon: const Icon(Icons.play_arrow_rounded, color: context.appTextSecondary, size: 18),
+                                                    icon: Icon(Icons.play_arrow_rounded, color: context.appTextSecondary, size: 18),
                                                     tooltip: t.tr('todo_start_study', fallback: 'Iniciar estudo'),
                                                     onPressed: () => _startTodoStudy(todo),
                                                   ),
                                                   IconButton(
-                                                    icon: const Icon(Icons.edit, color: context.appTextSecondary, size: 18),
+                                                    icon: Icon(Icons.edit, color: context.appTextSecondary, size: 18),
                                                     tooltip: t.tr('edit', fallback: 'Editar Tarefa'),
                                                     onPressed: () => _showEditTodoDialog(todo),
                                                   ),
                                                   IconButton(
-                                                    icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 18),
+                                                    icon: Icon(Icons.delete_outline, color: AppColors.error, size: 18),
                                                     tooltip: t.tr('delete', fallback: 'Excluir Tarefa'),
                                                     onPressed: () => _deleteTodo(todo),
                                                   ),

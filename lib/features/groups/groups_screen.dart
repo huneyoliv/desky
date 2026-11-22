@@ -354,7 +354,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh),
             tooltip: t.tr('refresh', fallback: 'Atualizar'),
             onPressed: () {
               ref.read(authStateProvider.notifier).refreshUserGroups();
@@ -469,7 +469,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        icon: const Icon(Icons.search, size: 18),
+                        icon: Icon(Icons.search, size: 18),
                         label: Text(t.tr('search', fallback: 'Buscar')),
                       ),
                     ],
@@ -565,7 +565,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen>
                                           // widening the search to another country.
                                           ElevatedButton.icon(
                                             onPressed: () => SelectCountryDialog.show(context),
-                                            icon: const Icon(Icons.public_rounded, size: 18),
+                                            icon: Icon(Icons.public_rounded, size: 18),
                                             label: Text(t.tr('view_other_region_groups', fallback: 'Ver grupos de outra região')),
                                             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                                           ),

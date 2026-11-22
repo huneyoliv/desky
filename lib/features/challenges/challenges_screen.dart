@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
@@ -60,7 +60,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
             style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh),
             tooltip: t.tr('refresh', fallback: 'Atualizar'),
             onPressed: _loadChallenges,
           ),

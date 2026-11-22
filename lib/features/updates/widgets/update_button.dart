@@ -128,7 +128,7 @@ class _UpdateButtonState extends ConsumerState<UpdateButton>
                   const SizedBox(width: 5),
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.success,
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,

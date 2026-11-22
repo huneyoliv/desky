@@ -41,7 +41,7 @@ class SubjectSelector extends ConsumerWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text(
               isEditing ? t.tr('edit_subject', fallback: 'Editar Matéria') : t.tr('new_subject', fallback: 'Nova Matéria'),
-              style: const TextStyle(color: context.appTextPrimary),
+              style: TextStyle(color: context.appTextPrimary),
             ),
             content: SizedBox(
               width: 360,
@@ -51,7 +51,7 @@ class SubjectSelector extends ConsumerWidget {
                 children: [
                   TextField(
                     controller: titleController,
-                    style: const TextStyle(color: context.appTextPrimary),
+                    style: TextStyle(color: context.appTextPrimary),
                     decoration: InputDecoration(
                       hintText: t.tr('subject_title', fallback: 'Nome da matéria (ex: Matemática)'),
                       hintStyle: TextStyle(color: context.appTextMuted),
@@ -98,7 +98,7 @@ class SubjectSelector extends ConsumerWidget {
                                 ),
                               ),
                               child: isSelected
-                                  ? const Icon(Icons.check_rounded, color: context.appTextPrimary, size: 16)
+                                  ? Icon(Icons.check_rounded, color: context.appTextPrimary, size: 16)
                                   : null,
                             ),
                           );
@@ -135,7 +135,7 @@ class SubjectSelector extends ConsumerWidget {
                 ),
                 child: Text(
                   isEditing ? t.tr('save', fallback: 'Salvar') : t.tr('create', fallback: 'Criar'),
-                  style: const TextStyle(color: context.appTextPrimary),
+                  style: TextStyle(color: context.appTextPrimary),
                 ),
               ),
             ],
@@ -158,8 +158,8 @@ class SubjectSelector extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.edit, color: context.appTextPrimary),
-              title: Text(t.tr('edit_subject', fallback: 'Editar Matéria'), style: const TextStyle(color: context.appTextPrimary)),
+              leading: Icon(Icons.edit, color: context.appTextPrimary),
+              title: Text(t.tr('edit_subject', fallback: 'Editar Matéria'), style: TextStyle(color: context.appTextPrimary)),
               onTap: () {
                 Navigator.of(context).pop();
                 _showAddSubjectDialog(context, ref, editSubject: subject);
@@ -167,8 +167,8 @@ class SubjectSelector extends ConsumerWidget {
             ),
             if (onArchiveSubject != null)
               ListTile(
-                leading: const Icon(Icons.archive, color: AppColors.warning),
-                title: Text(t.tr('archive', fallback: 'Arquivar Matéria'), style: const TextStyle(color: AppColors.warning)),
+                leading: Icon(Icons.archive, color: AppColors.warning),
+                title: Text(t.tr('archive', fallback: 'Arquivar Matéria'), style: TextStyle(color: AppColors.warning)),
                 onTap: () {
                   Navigator.of(context).pop();
                   onArchiveSubject!(subject.id);
@@ -176,8 +176,8 @@ class SubjectSelector extends ConsumerWidget {
               ),
             if (onDeleteSubject != null)
               ListTile(
-                leading: const Icon(Icons.delete_forever, color: AppColors.error),
-                title: Text(t.tr('delete_subject', fallback: 'Excluir Matéria'), style: const TextStyle(color: AppColors.error)),
+                leading: Icon(Icons.delete_forever, color: AppColors.error),
+                title: Text(t.tr('delete_subject', fallback: 'Excluir Matéria'), style: TextStyle(color: AppColors.error)),
                 onTap: () {
                   Navigator.of(context).pop();
                   _showDeleteConfirmDialog(context, ref, subject);
@@ -196,7 +196,7 @@ class SubjectSelector extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text('${t.tr("delete", fallback: "Excluir")} "${subject.title}"?', style: const TextStyle(color: context.appTextPrimary)),
+        title: Text('${t.tr("delete", fallback: "Excluir")} "${subject.title}"?', style: TextStyle(color: context.appTextPrimary)),
         content: Text(
           t.tr('delete_confirm_desc', fallback: 'Tem certeza que deseja excluir esta matéria do servidor?'),
           style: TextStyle(color: context.appTextSecondary),
@@ -225,7 +225,7 @@ class SubjectSelector extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text(t.tr('manage_subjects', fallback: 'Gerenciar Matérias'), style: const TextStyle(color: context.appTextPrimary)),
+        title: Text(t.tr('manage_subjects', fallback: 'Gerenciar Matérias'), style: TextStyle(color: context.appTextPrimary)),
         content: SizedBox(
           width: 450,
           child: Column(
@@ -270,7 +270,7 @@ class SubjectSelector extends ConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.edit, color: context.appTextSecondary, size: 18),
+                              icon: Icon(Icons.edit, color: context.appTextSecondary, size: 18),
                               tooltip: t.tr('edit', fallback: 'Editar'),
                               onPressed: () {
                                 Navigator.of(context).pop();
@@ -292,7 +292,7 @@ class SubjectSelector extends ConsumerWidget {
                               ),
                             if (onDeleteSubject != null)
                               IconButton(
-                                icon: const Icon(Icons.delete_forever, color: AppColors.error, size: 18),
+                                icon: Icon(Icons.delete_forever, color: AppColors.error, size: 18),
                                 tooltip: t.tr('delete', fallback: 'Excluir'),
                                 onPressed: () {
                                   Navigator.of(context).pop();

@@ -83,7 +83,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
         title: Text(t.tr('my_avatars', fallback: 'Meus Avatares'), style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh),
             tooltip: t.tr('refresh', fallback: 'Atualizar'),
             onPressed: _loadMyStudicons,
           ),
@@ -150,7 +150,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                               child: Center(
                                 child: Text(
                                   t.tr('equipped', fallback: 'EQUIPADO').toUpperCase(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppColors.success,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 12,

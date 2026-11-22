@@ -672,8 +672,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 color: context.appSurface,
-                child: Row(
-                  children: [
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final controls = <Widget>[
                     ChoiceChip(
                       label: Text(t.tr('today', fallback: 'Hoje')),
                       selected: _selectedPeriod == 'day',
@@ -714,7 +715,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                         _loadRanks();
                       },
                     ),
-                    const Spacer(),
+                    if (constraints.maxWidth >= 720) const Spacer() else const SizedBox(width: 12),
                     _ScopeToggle(
                       scope: _rankScope,
                       categoryName: ref.watch(authStateProvider).user?.categoryName ?? '',
@@ -742,7 +743,18 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                           ),
                         ),
                       ),
-                  ],
+                    ];
+                    if (constraints.maxWidth < 720) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: controls,
+                        ),
+                      );
+                    }
+                    return Row(children: controls);
+                  },
                 ),
               ),
               Expanded(

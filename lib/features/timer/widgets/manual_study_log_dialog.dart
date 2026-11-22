@@ -127,7 +127,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
           const SizedBox(width: 10),
           Text(
             t.tr('manual_study_record', fallback: 'Registro Manual de Estudo'),
-            style: const TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ],
       ),
@@ -148,7 +148,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                   ),
                   child: Text(
                     _errorMessage!,
-                    style: const TextStyle(color: AppColors.error, fontSize: 13),
+                    style: TextStyle(color: AppColors.error, fontSize: 13),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -160,7 +160,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
               DropdownButtonFormField<SubjectModel>(
                 value: _selectedSubject,
                 dropdownColor: context.appSurface,
-                style: const TextStyle(color: context.appTextPrimary),
+                style: TextStyle(color: context.appTextPrimary),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: context.appSurface,
@@ -180,7 +180,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                           decoration: BoxDecoration(color: s.color, shape: BoxShape.circle),
                         ),
                         const SizedBox(width: 8),
-                        Text(s.title, style: const TextStyle(color: context.appTextPrimary)),
+                        Text(s.title, style: TextStyle(color: context.appTextPrimary)),
                       ],
                     ),
                   );
@@ -217,7 +217,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                     children: [
                       Text(
                         '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
-                        style: const TextStyle(color: context.appTextPrimary, fontSize: 14),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14),
                       ),
                       Icon(Icons.calendar_today, color: context.appPrimary, size: 18),
                     ],
@@ -258,7 +258,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                               children: [
                                 Text(
                                   '${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}',
-                                  style: const TextStyle(color: context.appTextPrimary, fontSize: 14),
+                                  style: TextStyle(color: context.appTextPrimary, fontSize: 14),
                                 ),
                                 Icon(Icons.access_time, color: context.appPrimary, size: 18),
                               ],
@@ -298,7 +298,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                               children: [
                                 Text(
                                   '${_stopTime.hour.toString().padLeft(2, '0')}:${_stopTime.minute.toString().padLeft(2, '0')}',
-                                  style: const TextStyle(color: context.appTextPrimary, fontSize: 14),
+                                  style: TextStyle(color: context.appTextPrimary, fontSize: 14),
                                 ),
                                 Icon(Icons.access_time, color: context.appPrimary, size: 18),
                               ],
@@ -323,10 +323,10 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(t.tr('calculated_duration', fallback: 'Duração calculada:'), style: const TextStyle(color: context.appPrimary, fontSize: 13)),
+                    Text(t.tr('calculated_duration', fallback: 'Duração calculada:'), style: TextStyle(color: context.appPrimary, fontSize: 13)),
                     Text(
                       _formatDuration(_calculatedDuration),
-                      style: const TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 15),
+                      style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                   ],
                 ),
@@ -344,7 +344,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
           onPressed: _isLoading ? null : _handleSave,
           style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2),

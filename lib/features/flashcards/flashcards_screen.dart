@@ -188,7 +188,7 @@ class FlashcardsScreen extends ConsumerWidget {
                       children: [
                         const Icon(Icons.delete_outline, color: AppColors.error, size: 18),
                         const SizedBox(width: 8),
-                        Text(t.tr('delete_deck', fallback: 'Excluir Baralho'), style: const TextStyle(color: AppColors.error)),
+                        Text(t.tr('delete_deck', fallback: 'Excluir Baralho'), style: TextStyle(color: AppColors.error)),
                       ],
                     ),
                   ),
@@ -222,9 +222,9 @@ class FlashcardsScreen extends ConsumerWidget {
                     );
                   }
                 },
-                icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
+                icon: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
                 label: Text(t.tr('study', fallback: 'Estudar'),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: deck.color,
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

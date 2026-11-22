@@ -51,7 +51,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back),
                 label: Text(t.tr('back', fallback: 'Voltar')),
                 style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
               ),
@@ -86,7 +86,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () => notifier.restartSession(),
-                    icon: const Icon(Icons.replay_rounded),
+                    icon: Icon(Icons.replay_rounded),
                     label: Text(t.tr('review_again', fallback: 'Revisar Novamente')),
                     style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
                   ),
@@ -245,10 +245,10 @@ class FlashcardStudyScreen extends ConsumerWidget {
                   height: 52,
                   child: ElevatedButton.icon(
                     onPressed: () => notifier.flipCard(),
-                    icon: const Icon(Icons.visibility_outlined, color: Colors.white),
+                    icon: Icon(Icons.visibility_outlined, color: Colors.white),
                     label: Text(
                       t.tr('show_answer', fallback: 'Mostrar Resposta'),
-                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: deck.color,

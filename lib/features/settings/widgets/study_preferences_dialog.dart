@@ -252,7 +252,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                         alignment: Alignment.centerRight,
                         child: TextButton.icon(
                           onPressed: () => _pickTimerBackgroundImage(context, ref),
-                          icon: const Icon(Icons.folder_open_rounded, size: 18),
+                          icon: Icon(Icons.folder_open_rounded, size: 18),
                           label: Text(t.tr('timer_choose_image', fallback: 'Escolher imagem')),
                         ),
                       ),

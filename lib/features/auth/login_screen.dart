@@ -135,7 +135,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             child: Text(
               t.tr('create_account', fallback: 'Criar Conta'),
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -182,7 +182,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       child: Text(
                         errorText!,
-                        style: const TextStyle(color: AppColors.error, fontSize: 13),
+                        style: TextStyle(color: AppColors.error, fontSize: 13),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -507,7 +507,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                       Expanded(
                                         child: Text(
                                           t.tr(authState.errorMessage!, fallback: authState.errorMessage!),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             color: AppColors.error,
                                             fontSize: 13,
                                           ),
@@ -696,7 +696,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                       const SizedBox(width: 12),
                                       Text(
                                         t.tr('continue_with_google', fallback: 'Continuar com o Google'),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: Color(0xFF191919),
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,

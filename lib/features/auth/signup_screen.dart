@@ -437,7 +437,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 Expanded(
                                   child: Text(
                                     _errorMessage!,
-                                    style: const TextStyle(color: AppColors.error, fontSize: 13),
+                                    style: TextStyle(color: AppColors.error, fontSize: 13),
                                   ),
                                 ),
                               ],

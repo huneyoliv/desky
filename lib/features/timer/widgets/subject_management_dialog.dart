@@ -112,7 +112,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                   ),
                 ),
                 child: isSel
-                    ? const Icon(Icons.check_rounded, color: context.appTextPrimary, size: 16)
+                    ? Icon(Icons.check_rounded, color: context.appTextPrimary, size: 16)
                     : null,
               ),
             );
@@ -133,7 +133,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(t.tr('new_subject', fallback: 'Nova Matéria'), style: const TextStyle(color: context.appTextPrimary)),
+          title: Text(t.tr('new_subject', fallback: 'Nova Matéria'), style: TextStyle(color: context.appTextPrimary)),
           content: SizedBox(
             width: 360,
             child: Column(
@@ -142,7 +142,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
               children: [
                 TextField(
                   controller: _titleController,
-                  style: const TextStyle(color: context.appTextPrimary),
+                  style: TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     labelText: t.tr('subject_title', fallback: 'Nome da Matéria'),
                     labelStyle: TextStyle(color: context.appTextSecondary),
@@ -223,7 +223,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('${t.tr("edit", fallback: "Editar")}: ${subject.title}', style: const TextStyle(color: context.appTextPrimary)),
+          title: Text('${t.tr("edit", fallback: "Editar")}: ${subject.title}', style: TextStyle(color: context.appTextPrimary)),
           content: SizedBox(
             width: 360,
             child: Column(
@@ -232,7 +232,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
               children: [
                 TextField(
                   controller: _titleController,
-                  style: const TextStyle(color: context.appTextPrimary),
+                  style: TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     labelText: t.tr('subject_title', fallback: 'Nome da Matéria'),
                     labelStyle: TextStyle(color: context.appTextSecondary),
@@ -435,7 +435,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.edit_outlined, size: 18, color: context.appTextSecondary),
+                                  icon: Icon(Icons.edit_outlined, size: 18, color: context.appTextSecondary),
                                   tooltip: t.tr('edit_subject', fallback: 'Editar Matéria'),
                                   onPressed: () => _showEditSubjectDialog(subject),
                                 ),
@@ -451,7 +451,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                                   onPressed: () => _handleArchive(subject.id, !_showArchived),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                                  icon: Icon(Icons.delete_outline, size: 18, color: AppColors.error),
                                   tooltip: t.tr('delete_subject', fallback: 'Excluir Matéria'),
                                   onPressed: () => _handleDelete(subject.id),
                                 ),

@@ -78,7 +78,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
           const SizedBox(width: 10),
           Text(
             t.tr('pomodoro_settings', fallback: 'Configurações do Pomodoro'),
-            style: const TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ],
       ),
@@ -126,14 +126,14 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
               const SizedBox(height: 16),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(t.tr('auto_start_breaks', fallback: 'Iniciar pausas automaticamente'), style: const TextStyle(color: context.appTextPrimary, fontSize: 14)),
+                title: Text(t.tr('auto_start_breaks', fallback: 'Iniciar pausas automaticamente'), style: TextStyle(color: context.appTextPrimary, fontSize: 14)),
                 value: _autoStartBreaks,
                 activeColor: context.appPrimary,
                 onChanged: (val) => setState(() => _autoStartBreaks = val),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(t.tr('auto_start_focus', fallback: 'Iniciar foco automaticamente'), style: const TextStyle(color: context.appTextPrimary, fontSize: 14)),
+                title: Text(t.tr('auto_start_focus', fallback: 'Iniciar foco automaticamente'), style: TextStyle(color: context.appTextPrimary, fontSize: 14)),
                 value: _autoStartFocus,
                 activeColor: context.appPrimary,
                 onChanged: (val) => setState(() => _autoStartFocus = val),
@@ -183,7 +183,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
             children: [
               Icon(icon, color: iconColor, size: 20),
               const SizedBox(width: 10),
-              Text(label, style: const TextStyle(color: context.appTextPrimary, fontSize: 14)),
+              Text(label, style: TextStyle(color: context.appTextPrimary, fontSize: 14)),
             ],
           ),
           Row(
@@ -197,7 +197,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 child: Text(
                   value,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
               IconButton(

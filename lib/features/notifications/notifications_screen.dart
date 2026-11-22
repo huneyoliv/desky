@@ -196,7 +196,7 @@ class NotificationsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () => notifier.loadNotifications(),
-            icon: const Icon(Icons.refresh_rounded, size: 16),
+            icon: Icon(Icons.refresh_rounded, size: 16),
             label: Text(tr.tr('retry', fallback: 'Tentar novamente')),
             style: ElevatedButton.styleFrom(
               backgroundColor: context.appPrimary,

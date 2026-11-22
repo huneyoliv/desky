@@ -115,7 +115,7 @@ class UpdateDialog extends ConsumerWidget {
                         ),
                         child: Text(
                           release.cleanVersion.isNotEmpty ? 'v${release.cleanVersion}' : release.tagName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.success,
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
@@ -252,7 +252,7 @@ class UpdateDialog extends ConsumerWidget {
           onPressed: release.htmlUrl.isNotEmpty
               ? () => _launchUrl(release.htmlUrl)
               : null,
-          icon: const Icon(Icons.open_in_new_rounded, size: 16),
+          icon: Icon(Icons.open_in_new_rounded, size: 16),
           label: Text(t.tr('view_on_github', fallback: 'Ver no GitHub')),
           style: OutlinedButton.styleFrom(
             foregroundColor: context.appTextSecondary,
@@ -269,7 +269,7 @@ class UpdateDialog extends ConsumerWidget {
               _launchUrl(release.htmlUrl);
             }
           },
-          icon: const Icon(Icons.download_rounded, size: 18),
+          icon: Icon(Icons.download_rounded, size: 18),
           label: Text(
             platformAsset != null
                 ? '${t.tr('download_installer', fallback: 'Baixar Instalador')} (${platformAsset.name})'
