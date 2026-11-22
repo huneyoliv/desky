@@ -38,6 +38,8 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final soundEffects = await _repository.getSoundEffects();
       final blockedUsers = await _repository.getBlockedUsers();
       final discordRpc = await _repository.getDiscordRpcEnabled();
+      final classicYptLook = await _repository.getClassicYptLook();
+      final classicUiScale = await _repository.getClassicUiScale();
       final betaChannel = await _repository.getBetaChannel();
       final timerBackground = await _repository.getTimerBackground();
       final timerBackgroundImagePath =
@@ -54,6 +56,8 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         soundEffects: soundEffects,
         blockedUsers: blockedUsers.isNotEmpty ? blockedUsers : state.blockedUsers,
         discordRpcEnabled: discordRpc,
+        classicYptLook: classicYptLook,
+        classicUiScale: classicUiScale,
         betaChannel: betaChannel,
         timerBackground: timerBackground,
         timerBackgroundImagePath: timerBackgroundImagePath,
@@ -164,6 +168,21 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     final normalized = normalizeTimerFont(value);
     state = state.copyWith(timerFont: normalized);
     await _repository.saveTimerFont(normalized);
+  }
+
+  Future<void> toggleClassicYptLook(bool value) async {
+    state = state.copyWith(classicYptLook: value);
+    await _repository.saveClassicYptLook(value);
+  }
+
+  static const double minUiScale = 0.7;
+  static const double maxUiScale = 1.8;
+
+  Future<void> setClassicUiScale(double value) async {
+    final clamped = (value.clamp(minUiScale, maxUiScale) * 20).round() / 20;
+    if (clamped == state.classicUiScale) return;
+    state = state.copyWith(classicUiScale: clamped);
+    await _repository.saveClassicUiScale(clamped);
   }
 
   /// Opts in or out of pre-release update checks.

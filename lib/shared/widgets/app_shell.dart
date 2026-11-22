@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/theme_palette.dart';
 import '../../core/localization/app_translation.dart';
 import '../../features/timer/focus_mode_notifier.dart';
+import '../../features/settings/settings_notifier.dart';
+import 'classic_zoom.dart';
 import 'sidebar_nav.dart';
 
 class AppShell extends ConsumerWidget {
@@ -19,6 +21,7 @@ class AppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final focusState = ref.watch(focusModeProvider);
     final isFocusActive = focusState.isStrictFocus || focusState.isMiniPlayer;
+    final classicZoom = ref.watch(settingsNotifierProvider).classicYptLook;
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
 
@@ -36,7 +39,7 @@ class AppShell extends ConsumerWidget {
                 ),
               ],
               Expanded(
-                child: child,
+                child: classicZoom ? ClassicZoom(child: child) : child,
               ),
             ],
           ),
