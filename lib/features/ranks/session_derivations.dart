@@ -10,11 +10,13 @@ class StudySession {
     required this.day,
     required this.startMinute,
     required this.durationMs,
+    this.subject = '',
   });
 
   final String day;
   final int startMinute;
   final int durationMs;
+  final String subject;
 
   /// Minute of the day when the session ended, as reported by the API.
   int get endMinute => startMinute + (durationMs / 60000).round();
@@ -51,6 +53,7 @@ class StudySessionParser {
           day: day,
           startMinute: start.hour * 60 + start.minute,
           durationMs: ms,
+          subject: (session['sb'] as String? ?? '').trim(),
         ));
       }
     }

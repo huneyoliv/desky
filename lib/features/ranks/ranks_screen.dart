@@ -15,6 +15,7 @@ import 'widgets/study_calendar.dart';
 import 'widgets/stats_summary_cards.dart';
 import 'widgets/cumulative_and_quarter.dart';
 import 'widgets/time_of_day_cards.dart';
+import 'widgets/timeline_tab.dart';
 import 'stats_derivations.dart';
 import 'session_derivations.dart';
 
@@ -62,7 +63,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadRanks();
     _loadUserStats();
     _loadCalendarMonth();
@@ -654,6 +655,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
             Tab(text: t.tr('ranks', fallback: 'Rankings Globais')),
             Tab(text: t.tr('stats', fallback: 'Estatísticas & Mapa 24h')),
             Tab(text: t.tr('calendar', fallback: 'Calendário Mensal')),
+            Tab(text: t.tr('timeline_title', fallback: 'Linha do tempo')),
           ],
         ),
       ),
@@ -1031,6 +1033,10 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                 },
               ),
             ),
+          ),
+          TimelineTab(
+            repository: ref.watch(rankRepositoryProvider),
+            userId: ref.watch(authStateProvider).user?.id ?? 0,
           ),
         ],
       ),

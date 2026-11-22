@@ -6,13 +6,16 @@ import '../../../data/models/subject_model.dart';
 import '../timer_notifier.dart';
 
 class ManualStudyLogDialog extends ConsumerStatefulWidget {
-  const ManualStudyLogDialog({super.key});
+  const ManualStudyLogDialog({super.key, this.initialDate});
 
-  static Future<void> show(BuildContext context) {
-    return showDialog(
+  final DateTime? initialDate;
+
+  static Future<bool> show(BuildContext context, {DateTime? initialDate}) async {
+    final saved = await showDialog<bool>(
       context: context,
-      builder: (_) => const ManualStudyLogDialog(),
+      builder: (_) => ManualStudyLogDialog(initialDate: initialDate),
     );
+    return saved ?? false;
   }
 
   @override
@@ -32,6 +35,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialDate != null) _selectedDate = widget.initialDate!;
     final timerState = ref.read(timerNotifierProvider);
     _selectedSubject = timerState.currentSubject ??
         (timerState.subjects.isNotEmpty ? timerState.subjects.first : null);
@@ -97,7 +101,7 @@ class _ManualStudyLogDialogState extends ConsumerState<ManualStudyLogDialog> {
     if (mounted) {
       setState(() => _isLoading = false);
       if (success) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${t.tr("study", fallback: "Estudo")} ${_selectedSubject!.title} ${t.tr("success", fallback: "registrado com sucesso!")}'),
