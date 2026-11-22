@@ -553,13 +553,8 @@ class TimerScreen extends ConsumerWidget {
                               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
-<<<<<<< HEAD
                             icon: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-                            label: Text(t.tr('restart', fallback: 'RETOMAR').toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-=======
-                            icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-                            label: Text(t.tr('restart', fallback: 'RESUME').toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
->>>>>>> 69bf9fd (fix(i18n): English defaults for untranslated text, Portuguese kept for pt)
+                            label: Text(t.tr('restart', fallback: 'RESUME').toUpperCase(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                           ),
                           const SizedBox(width: 16),
                           ElevatedButton.icon(
