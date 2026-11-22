@@ -41,7 +41,7 @@ class _NudgeRepository extends GroupRepository {
   Future<List<ChatMessageModel>> fetchChatMessages(int groupId) async => [];
 
   @override
-  Future<bool> shakeMember({required int groupId, required int targetUserId}) async {
+  Future<bool> shakeMember({required int groupId, required int targetUserId, String from = ''}) async {
     shakeCalls++;
     return accepted;
   }
