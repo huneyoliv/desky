@@ -127,7 +127,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: context.appPrimary,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -217,8 +217,8 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: codeController,
                       keyboardType: TextInputType.number,
                       maxLength: 6,
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 22, letterSpacing: 6),
+                      style: TextStyle(
+                          color: context.appTextPrimary, fontSize: 22, letterSpacing: 6),
                       textAlign: TextAlign.center,
                       decoration: InputDecoration(
                         hintText: '123456',
@@ -318,12 +318,18 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                           });
                         }
                       },
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: context.appPrimary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                ),
                 child: isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          strokeWidth: 2,
+                        ),
                       )
                     : Text(
                         step == 1
@@ -331,7 +337,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                             : step == 2
                                 ? t.tr('verify_code', fallback: 'Verificar')
                                 : t.tr('reset_password', fallback: 'Redefinir Senha'),
-                        style: TextStyle(color: context.appTextPrimary),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                       ),
               ),
             ],
@@ -408,7 +414,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 8),
                         Text(
                           t.tr('login_slogan', fallback: 'Foco, Disciplina & Comunidade no seu Desktop'),
-                          style: AppTextStyles.bodyMedium,
+                          style: AppTextStyles.bodyMedium.copyWith(color: context.appTextSecondary),
                         ),
                       ],
                     ),
@@ -475,12 +481,12 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                             children: [
                               Text(
                                 t.tr('login_title', fallback: 'Entrar na sua conta'),
-                                style: AppTextStyles.displayMedium,
+                                style: AppTextStyles.displayMedium.copyWith(color: context.appTextPrimary),
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 t.tr('login_subtitle', fallback: 'Insira suas credenciais para continuar'),
-                                style: AppTextStyles.bodyMedium,
+                                style: AppTextStyles.bodyMedium.copyWith(color: context.appTextSecondary),
                               ),
                               const SizedBox(height: 28),
 
@@ -616,25 +622,26 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                                   onPressed: authState.isLoading ? null : _submitLogin,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: context.appPrimary,
+                                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
                                   child: authState.isLoading
-                                      ? const SizedBox(
+                                      ? SizedBox(
                                           width: 24,
                                           height: 24,
                                           child: CircularProgressIndicator(
-                                            color: Colors.white,
+                                            color: Theme.of(context).colorScheme.onPrimary,
                                             strokeWidth: 2,
                                           ),
                                         )
                                       : Text(
                                           t.tr('login', fallback: 'Entrar'),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.white,
+                                            color: Theme.of(context).colorScheme.onPrimary,
                                           ),
                                         ),
                                 ),

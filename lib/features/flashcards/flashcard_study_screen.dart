@@ -19,7 +19,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
         backgroundColor: context.appBackground,
         appBar: AppBar(backgroundColor: context.appSurface),
         body: Center(
-          child: Text(t.tr('no_deck_selected', fallback: 'Nenhum baralho selecionado.'), style: const TextStyle(color: Colors.white)),
+          child: Text(t.tr('no_deck_selected', fallback: 'Nenhum baralho selecionado.'), style: TextStyle(color: context.appTextPrimary)),
         ),
       );
     }
@@ -47,7 +47,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
               Icon(Icons.style_outlined, size: 64, color: context.appTextMuted),
               const SizedBox(height: 16),
               Text(t.tr('deck_empty_cards', fallback: 'Este baralho ainda não tem cartões.'),
-                  style: const TextStyle(color: Colors.white, fontSize: 16)),
+                  style: TextStyle(color: context.appTextPrimary, fontSize: 16)),
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () => Navigator.of(context).pop(),
@@ -73,7 +73,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
               const SizedBox(height: 20),
               Text(
                 t.tr('session_completed', fallback: 'Sessão Concluída!'),
-                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(color: context.appTextPrimary, fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(
@@ -93,8 +93,8 @@ class FlashcardStudyScreen extends ConsumerWidget {
                   const SizedBox(width: 16),
                   OutlinedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.check_rounded, color: Colors.white),
-                    label: Text(t.tr('done', fallback: 'Concluir'), style: const TextStyle(color: Colors.white)),
+                    icon: Icon(Icons.check_rounded, color: context.appTextPrimary),
+                    label: Text(t.tr('done', fallback: 'Concluir'), style: TextStyle(color: context.appTextPrimary)),
                   ),
                 ],
               ),
@@ -112,7 +112,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: context.appBackground,
       appBar: AppBar(
-        title: Text(deck.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(deck.title, style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold)),
         backgroundColor: context.appSurface,
         elevation: 0,
         actions: [
@@ -189,8 +189,8 @@ class FlashcardStudyScreen extends ConsumerWidget {
                         Text(
                           state.isFlipped ? card.back : card.front,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              color: Colors.white,
+                          style: TextStyle(
+                              color: context.appTextPrimary,
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             height: 1.4,
@@ -273,6 +273,7 @@ class FlashcardStudyScreen extends ConsumerWidget {
                         label: t.tr('good', fallback: 'Bom'),
                         icon: Icons.thumb_up_alt_outlined,
                         color: context.appPrimary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         onTap: () => notifier.answerCard(2),
                       ),
                     ),
@@ -298,16 +299,17 @@ class FlashcardStudyScreen extends ConsumerWidget {
     required String label,
     required IconData icon,
     required Color color,
+    Color? foregroundColor,
     required VoidCallback onTap,
   }) {
     return SizedBox(
       height: 52,
       child: ElevatedButton.icon(
         onPressed: onTap,
-        icon: Icon(icon, color: Colors.white, size: 20),
+        icon: Icon(icon, color: foregroundColor ?? Colors.white, size: 20),
         label: Text(
           label,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+          style: TextStyle(color: foregroundColor ?? Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: color,

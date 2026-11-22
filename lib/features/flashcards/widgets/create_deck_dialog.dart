@@ -51,7 +51,7 @@ class _CreateDeckDialogState extends ConsumerState<CreateDeckDialog> {
       backgroundColor: context.appCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(t.tr('new_deck', fallback: 'Novo Baralho de Flashcards'),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+          style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 18)),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400),
         child: Column(
@@ -61,7 +61,7 @@ class _CreateDeckDialogState extends ConsumerState<CreateDeckDialog> {
             TextField(
               controller: _titleController,
               autofocus: true,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appTextPrimary),
               decoration: InputDecoration(
                 labelText: t.tr('deck_title', fallback: 'Título do Baralho'),
                 labelStyle: TextStyle(color: context.appTextSecondary),
@@ -72,7 +72,7 @@ class _CreateDeckDialogState extends ConsumerState<CreateDeckDialog> {
             const SizedBox(height: 16),
             TextField(
               controller: _descController,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appTextPrimary),
               decoration: InputDecoration(
                 labelText: t.tr('description_optional', fallback: 'Descrição (opcional)'),
                 labelStyle: TextStyle(color: context.appTextSecondary),
@@ -96,7 +96,7 @@ class _CreateDeckDialogState extends ConsumerState<CreateDeckDialog> {
                       color: Color(c),
                       shape: BoxShape.circle,
                       border: isSelected
-                          ? Border.all(color: Colors.white, width: 3)
+                          ? Border.all(color: context.appTextPrimary, width: 3)
                           : null,
                     ),
                     child: isSelected
@@ -123,7 +123,7 @@ class _CreateDeckDialogState extends ConsumerState<CreateDeckDialog> {
             }
           },
           style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-          child: Text(t.tr('create', fallback: 'Criar'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: Text(t.tr('create', fallback: 'Criar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold)),
         ),
       ],
     );

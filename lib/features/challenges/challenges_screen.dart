@@ -57,7 +57,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
       appBar: AppBar(
         backgroundColor: context.appSurface,
         title: Text(t.tr('challenges', fallback: 'Desafios & Metas'),
-            style: AppTextStyles.titleLarge),
+            style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -159,8 +159,8 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
                   challenge.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.appTextPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),

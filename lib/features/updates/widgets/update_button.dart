@@ -129,7 +129,7 @@ class _UpdateButtonState extends ConsumerState<UpdateButton>
                   Text(
                     label,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.success,
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.2,
