@@ -14,6 +14,7 @@ import 'lifecycle_poll_coordinator.dart';
 import 'widgets/sticker_picker_panel.dart';
 import 'widgets/group_studicon_picker_dialog.dart';
 import 'widgets/member_live_timer.dart';
+import 'widgets/member_sheet.dart';
 import '../../data/models/sticker_model.dart';
 import '../../shared/widgets/studicon_avatar.dart';
 import '../../core/cdn/cdn_resolver.dart';
@@ -271,6 +272,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
     final sent = await repo.shakeMember(
       groupId: widget.group.id,
       targetUserId: member.userId,
+      from: ref.read(authStateProvider).user?.name ?? '',
     );
 
     // The repository answers false instead of throwing, so the old code showed
@@ -1020,12 +1022,16 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       pose = StudiconPose.normal1;
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: context.palette.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
+    return InkWell(
+      key: ValueKey('group-member-${member.userId}'),
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => MemberSheet.show(context, groupId: widget.group.id, member: member),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: context.palette.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
           color: isActivelyStudying
               ? context.palette.primary.withValues(alpha: 0.6)
               : context.palette.border,
@@ -1126,6 +1132,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           ],
         ],
       ),
+    ),
     );
   }
 }

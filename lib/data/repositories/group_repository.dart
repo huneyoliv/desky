@@ -137,27 +137,31 @@ class GroupRepository {
   }) =>
       fetchGroupRanks(groupId, period: 'week', countryId: countryId, categoryId: categoryId);
 
-  Future<bool> shakeMember({required int groupId, required int targetUserId}) async {
+  Future<bool> shakeMember({
+    required int groupId,
+    required int targetUserId,
+    String from = '',
+  }) async {
     try {
       final response = await _apiClient.post(
         ApiConstants.groupShake,
         data: {
-          'groupID': groupId,
-          'targetUserID': targetUserId,
+          'user_id': targetUserId,
+          'group_id': groupId,
+          'from': from,
         },
       );
-
       final data = response.data;
       return data is Map && data['s'] == true;
     } catch (_) {}
     return false;
   }
 
-  Future<bool> shakeAllMembers(int groupId) async {
+  Future<bool> shakeAllMembers(int groupId, {String from = ''}) async {
     try {
       final response = await _apiClient.post(
         '/group/push/shake/all',
-        data: {'groupID': groupId},
+        data: {'groupID': groupId, 'from': from},
       );
       final data = response.data;
       return data is Map && data['s'] == true;
