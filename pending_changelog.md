@@ -22,6 +22,10 @@ in `CHANGELOG.md`). This file is intentionally gitignored.
   names, durations, daily totals, and clearly derived gaps between sessions.
   It reuses the existing manual study flow with an initial date and save result.
 
+- Light and adaptive theme support (Refs #12) adds two light palettes, an
+  operating-system System mode with persisted light/dark preferences, and
+  theme-token migrations for controls, dialogs, charts and narrow layouts.
+
 ## Fixed
 
 - The app no longer exits silently when the single-instance channel cannot be
@@ -90,9 +94,9 @@ in `CHANGELOG.md`). This file is intentionally gitignored.
 - Background videos (issue #10) are not implemented.
 - Study vs rest breakdown is not available (rest contract unknown).
 - Study vs rest data is not available from the API; gaps are derived from session times.
-- Light and system theme implementation is not merged: system-mode and dialog-scroll
-  tests failed after three validation attempts. Rendered appearance and real OS
-  system-theme behavior were not verified by screenshot or manual testing.
+- Rendered appearance and real operating-system theme switching were not verified
+  by screenshot or manual testing; validation used WCAG calculations and offline
+  widget geometry only.
 - Joining challenges is not supported; the Challenges tab is read-only.
 
 ## Changed
