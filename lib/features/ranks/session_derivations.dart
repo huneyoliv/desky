@@ -174,10 +174,17 @@ String formatMinuteOfDay(int minute) {
 }
 
 /// How regular the routine is, in words, from the start-time deviation.
-String regularityLabel(int? stdDevMinutes) {
+///
+/// [tr] translates the label (key, English fallback); without it the
+/// Portuguese wording is kept, as before.
+String regularityLabel(int? stdDevMinutes, {String Function(String key, String fallback)? tr}) {
   if (stdDevMinutes == null) return '—';
-  if (stdDevMinutes <= 30) return 'muito regular';
-  if (stdDevMinutes <= 90) return 'regular';
-  if (stdDevMinutes <= 180) return 'irregular';
-  return 'muito irregular';
+  final (key, en, pt) = stdDevMinutes <= 30
+      ? ('regularity_very_regular', 'very regular', 'muito regular')
+      : stdDevMinutes <= 90
+          ? ('regularity_regular', 'regular', 'regular')
+          : stdDevMinutes <= 180
+              ? ('regularity_irregular', 'irregular', 'irregular')
+              : ('regularity_very_irregular', 'very irregular', 'muito irregular');
+  return tr == null ? pt : tr(key, en);
 }

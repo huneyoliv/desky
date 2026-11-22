@@ -38,7 +38,7 @@ class TodoScreen extends ConsumerWidget {
             onPressed: notifier.isToday ? null : () => notifier.selectDay(null),
           ),
           IconButton(
-            tooltip: t.tr('refresh', fallback: 'Atualizar'),
+            tooltip: t.tr('refresh', fallback: 'Refresh'),
             icon: const Icon(Icons.refresh),
             onPressed: notifier.refresh,
           ),
@@ -73,8 +73,7 @@ class TodoScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Text(
                 t.tr('todo_sync_failed',
-                    fallback:
-                        'Não foi possível salvar no servidor. A lista foi recarregada.'),
+                    fallback: 'Could not save to the server. The list was reloaded.'),
                 style: TextStyle(color: AppColors.error, fontSize: 12),
               ),
             ),
@@ -294,7 +293,7 @@ class _DayHeader extends ConsumerWidget {
                       total == 0
                           ? t.tr('todo_no_tasks_day',
                               fallback: 'Nenhuma tarefa neste dia')
-                          : '$done/$total ${t.tr('todo_done_of', fallback: 'concluídas')}',
+                          : '$done/$total ${t.tr('todo_done_of', fallback: 'done')}',
                       style:
                           TextStyle(color: context.appTextMuted, fontSize: 11),
                     ),
@@ -340,7 +339,7 @@ class _TodoTile extends ConsumerWidget {
     final subtitle = StringBuffer(resolvedSubjectTitle);
     if (todo.isRecurring) {
       if (subtitle.isNotEmpty) subtitle.write(' · ');
-      subtitle.write(t.tr('todo_recurring', fallback: 'recorrente'));
+      subtitle.write(t.tr('todo_recurring', fallback: 'recurring'));
     }
 
     return Material(

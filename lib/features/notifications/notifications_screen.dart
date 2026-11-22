@@ -87,7 +87,7 @@ class NotificationsScreen extends ConsumerWidget {
                 ),
                 if (state.unreadCount > 0)
                   Text(
-                    '${state.unreadCount} ${tr.tr('unread', fallback: 'não lidas')}',
+                    '${state.unreadCount} ${tr.tr('unread', fallback: 'unread')}',
                     style: TextStyle(
                       color: context.appPrimary,
                       fontSize: 12,
@@ -125,7 +125,7 @@ class NotificationsScreen extends ConsumerWidget {
           ],
           const SizedBox(width: 4),
           IconButton(
-            tooltip: tr.tr('refresh', fallback: 'Atualizar'),
+            tooltip: tr.tr('refresh', fallback: 'Refresh'),
             onPressed: () => notifier.loadNotifications(),
             icon: Icon(Icons.refresh_rounded, size: 18, color: context.appTextSecondary),
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
@@ -242,7 +242,7 @@ class NotificationsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
         ],
         if (thisWeekItems.isNotEmpty) ...[
-          _buildSectionHeader(context, tr.tr('this_week', fallback: 'Esta semana')),
+          _buildSectionHeader(context, tr.tr('this_week', fallback: 'This week')),
           ...thisWeekItems.map((n) => _buildNotificationCard(context, n, notifier, tr)),
           const SizedBox(height: 16),
         ],

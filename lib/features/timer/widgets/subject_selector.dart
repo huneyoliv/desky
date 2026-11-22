@@ -65,7 +65,7 @@ class SubjectSelector extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    t.tr('color', fallback: 'Cor'),
+                    t.tr('color', fallback: 'Color'),
                     style: TextStyle(color: context.appTextSecondary, fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 10),
@@ -196,7 +196,7 @@ class SubjectSelector extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text('${t.tr("delete", fallback: "Excluir")} "${subject.title}"?', style: TextStyle(color: context.appTextPrimary)),
+        title: Text('${t.tr("delete", fallback: "Delete")} "${subject.title}"?', style: TextStyle(color: context.appTextPrimary)),
         content: Text(
           t.tr('delete_confirm_desc', fallback: 'Tem certeza que deseja excluir esta matéria do servidor?'),
           style: TextStyle(color: context.appTextSecondary),

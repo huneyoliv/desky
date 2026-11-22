@@ -96,7 +96,7 @@ class HeatmapGrid extends ConsumerWidget {
                       children: List.generate(24, (h) {
                         final mins = hours[h];
                         return Tooltip(
-                          message: '$dateStr ${t.tr("at", fallback: "às")} ${h.toString().padLeft(2, '0')}:00 — $mins min ${t.tr("studied", fallback: "estudados")}',
+                          message: '$dateStr ${t.tr("at", fallback: "at")} ${h.toString().padLeft(2, '0')}:00 — $mins min ${t.tr("studied", fallback: "studied")}',
                           child: Container(
                             width: 12,
                             height: 12,

@@ -280,7 +280,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       SnackBar(
         content: Text(sent
             ? '${t.tr("shake_sent_to", fallback: "Chacoalhada enviada para")} ${member.name}! 🔔'
-            : t.tr('shake_failed', fallback: 'Não foi possível enviar a cutucada.')),
+            : t.tr('shake_failed', fallback: 'Could not send the nudge.')),
         backgroundColor: sent ? context.appPrimary : AppColors.error,
       ),
     );
