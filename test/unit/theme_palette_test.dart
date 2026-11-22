@@ -117,6 +117,15 @@ void main() {
       notifier.updateSystemBrightness();
       await tester.pump();
       expect(notifier.state.id, 'daylight_lilac');
+
+      // Rehydration keeps the System id and resolves the same persisted pair;
+      // reacting to the OS must not turn it into an explicit palette choice.
+      final restarted = ThemeNotifier(repository);
+      addTearDown(restarted.dispose);
+      await tester.pumpAndSettle();
+      expect(restarted.isSystemMode, isTrue);
+      expect(restarted.state.id, 'daylight_lilac');
+      expect(prefs.getString(SettingsRepository.keyThemePreset), 'system');
       addTearDown(
         tester.platformDispatcher.clearPlatformBrightnessTestValue,
       );
