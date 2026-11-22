@@ -45,6 +45,7 @@ class StudyCalendar extends ConsumerWidget {
     final firstDayWeekday = DateTime(shown.year, shown.month, 1).weekday; // 1=Mon...7=Sun
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
+    final heatmapL4Foreground = Theme.of(context).colorScheme.onPrimary;
 
     final dayLabels = [
       t.tr('mon', fallback: 'Seg'),
@@ -177,7 +178,9 @@ class StudyCalendar extends ConsumerWidget {
                     Text(
                       '$dayNum',
                       style: TextStyle(
-                        color: color == palette.heatmapL4 ? Colors.black : palette.textPrimary,
+                        color: color == palette.heatmapL4
+                            ? heatmapL4Foreground
+                            : palette.textPrimary,
                         fontWeight: dayNum == now.day && isCurrentMonth ? FontWeight.bold : FontWeight.normal,
                         fontSize: 12,
                       ),
@@ -186,7 +189,9 @@ class StudyCalendar extends ConsumerWidget {
                       Text(
                         _formatMs(studyMs),
                         style: TextStyle(
-                          color: color == palette.heatmapL4 ? Colors.black87 : palette.textSecondary,
+                          color: color == palette.heatmapL4
+                              ? heatmapL4Foreground.withValues(alpha: 0.87)
+                              : palette.textSecondary,
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
                         ),
