@@ -10,29 +10,34 @@ class AppTheme {
   static ThemeData buildTheme(DeskyThemePalette palette) {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: palette.brightness,
       fontFamily: AppTextStyles.fontText,
       fontFamilyFallback: AppTextStyles.fontFallbacks,
-      textTheme: ThemeData.dark().textTheme.apply(
+      textTheme: (palette.isLight ? ThemeData.light() : ThemeData.dark())
+          .textTheme
+          .apply(
         fontFamily: AppTextStyles.fontText,
         fontFamilyFallback: AppTextStyles.fontFallbacks,
         bodyColor: palette.textPrimary,
         displayColor: palette.textPrimary,
       ),
-      primaryTextTheme: ThemeData.dark().primaryTextTheme.apply(
+      primaryTextTheme:
+          (palette.isLight ? ThemeData.light() : ThemeData.dark())
+              .primaryTextTheme
+              .apply(
         fontFamily: AppTextStyles.fontText,
         fontFamilyFallback: AppTextStyles.fontFallbacks,
         bodyColor: palette.textPrimary,
         displayColor: palette.textPrimary,
       ),
       scaffoldBackgroundColor: palette.background,
-      colorScheme: ColorScheme.dark(
+      colorScheme: (palette.isLight ? const ColorScheme.light() : const ColorScheme.dark()).copyWith(
         primary: palette.primary,
-        onPrimary: Colors.black,
+        onPrimary: palette.isLight ? Colors.white : Colors.black,
         primaryContainer: palette.primaryDark,
-        onPrimaryContainer: palette.primaryLight,
+        onPrimaryContainer: palette.isLight ? palette.textPrimary : palette.primaryLight,
         secondary: palette.accent,
-        onSecondary: Colors.black,
+        onSecondary: palette.isLight ? Colors.white : Colors.black,
         secondaryContainer: palette.accentDark,
         onSecondaryContainer: palette.textPrimary,
         surface: palette.surface,
@@ -42,7 +47,7 @@ class AppTheme {
         outline: palette.outline,
         outlineVariant: palette.border,
         error: AppColors.error,
-        onError: Colors.black,
+        onError: palette.isLight ? Colors.white : Colors.black,
       ),
       cardTheme: CardThemeData(
         color: palette.card,
@@ -98,7 +103,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: palette.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: palette.isLight ? Colors.white : Colors.black,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
