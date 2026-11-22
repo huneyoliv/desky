@@ -115,7 +115,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
                               color: isSelected ? preset.primary : Colors.transparent,
                             ),
                             child: isSelected
-                                ? const Icon(Icons.check, size: 14, color: Colors.black)
+                                ? Icon(Icons.check, size: 14, color: Theme.of(context).colorScheme.onPrimary)
                                 : null,
                           ),
                           const SizedBox(width: 14),
@@ -137,13 +137,13 @@ class ThemeSelectionDialog extends ConsumerWidget {
                           // Color preview pills
                           Row(
                             children: [
-                              _buildColorSwatch(preset.background, 'BG'),
+                              _buildColorSwatch(context, preset.background, 'BG'),
                               const SizedBox(width: 4),
-                              _buildColorSwatch(preset.surfaceLight, 'Surface'),
+                              _buildColorSwatch(context, preset.surfaceLight, 'Surface'),
                               const SizedBox(width: 4),
-                              _buildColorSwatch(preset.primary, 'Primary', isPrimary: true),
+                              _buildColorSwatch(context, preset.primary, 'Primary', isPrimary: true),
                               const SizedBox(width: 4),
-                              _buildColorSwatch(preset.accent, 'Accent'),
+                              _buildColorSwatch(context, preset.accent, 'Accent'),
                             ],
                           ),
                         ],
@@ -165,7 +165,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
                 ),
                 child: Text(
                   t.tr('close_btn', fallback: 'Concluir'),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -175,14 +175,14 @@ class ThemeSelectionDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildColorSwatch(Color color, String tooltip, {bool isPrimary = false}) {
+  Widget _buildColorSwatch(BuildContext context, Color color, String tooltip, {bool isPrimary = false}) {
     return Container(
       width: isPrimary ? 24 : 18,
       height: isPrimary ? 24 : 18,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white24, width: 1),
+        border: Border.all(color: context.appBorder, width: 1),
         boxShadow: isPrimary
             ? [
                 BoxShadow(

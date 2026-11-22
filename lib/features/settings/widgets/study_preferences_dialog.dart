@@ -85,7 +85,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     t.tr('study_preferences', fallback: 'Preferências de Estudo & Rotina'),
-                    style: AppTextStyles.titleMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary, fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
@@ -107,7 +107,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       leading: const Icon(Icons.access_time_filled, color: AppColors.warning, size: 22),
                       title: Text(
                         t.tr('day_start_hour', fallback: 'Início do Dia de Estudo (Reset)'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('day_start_hour_desc', fallback: 'Horário de virada do dia nos gráficos e diário'),
@@ -116,7 +116,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       trailing: DropdownButton<int>(
                         value: settings.dayResetHour,
                         dropdownColor: context.appSurface,
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14),
                         underline: const SizedBox(),
                         items: List.generate(7, (i) => i).map((h) {
                           final label = '${h.toString().padLeft(2, '0')}:00 AM';
@@ -140,7 +140,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       activeColor: context.appPrimary,
                       title: Text(
                         t.tr('drawer_settings_menu_show_rest', fallback: 'Exibir Tempo de Descanso'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('show_rest_desc', fallback: 'Exibir pausas e intervalos no registro diário'),
@@ -157,7 +157,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       activeColor: context.appPrimary,
                       title: Text(
                         t.tr('drawer_settings_menu_wake_notification', fallback: 'Notificações de Cutucada (Nudge)'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('wake_notif_desc', fallback: 'Receber alertas quando membros do grupo te cutucarem'),
@@ -174,7 +174,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       activeColor: context.appPrimary,
                       title: Text(
                         t.tr('sound_effects', fallback: 'Efeitos Sonoros do Cronômetro'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('sound_effects_desc', fallback: 'Sons de início, pausa e conclusão de ciclos Pomodoro'),
@@ -191,7 +191,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       activeColor: context.appPrimary,
                       title: Text(
                         t.tr('discord_rpc_title', fallback: 'Discord Rich Presence'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('discord_rpc_desc', fallback: 'Exibir matéria e tempo de estudo em tempo real no status do Discord'),
@@ -207,7 +207,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       leading: Icon(Icons.wallpaper_rounded, color: context.appPrimary),
                       title: Text(
                         t.tr('timer_background', fallback: 'Fundo do Timer'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       subtitle: Text(
                         t.tr('timer_background_image_desc',
@@ -217,7 +217,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       trailing: DropdownButton<String>(
                         value: settings.timerBackground,
                         dropdownColor: context.appSurface,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 13),
                         underline: const SizedBox(),
                         items: [
                           DropdownMenuItem(
@@ -262,12 +262,12 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       leading: Icon(Icons.font_download_rounded, color: context.appPrimary),
                       title: Text(
                         t.tr('timer_font', fallback: 'Fonte do Timer'),
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                       ),
                       trailing: DropdownButton<String>(
                         value: settings.timerFont,
                         dropdownColor: context.appSurface,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 13),
                         underline: const SizedBox(),
                         items: const [
                           DropdownMenuItem(value: timerFontDigital, child: Text('Digital')),
@@ -290,7 +290,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                         activeColor: context.appPrimary,
                         title: Text(
                           t.tr('beta_updates_title', fallback: 'Participar do beta'),
-                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(
                           t.tr('beta_updates_desc',
@@ -316,7 +316,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: Text(t.tr('close_btn', fallback: 'Concluir'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(t.tr('close_btn', fallback: 'Concluir'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
