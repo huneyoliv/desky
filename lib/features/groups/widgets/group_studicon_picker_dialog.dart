@@ -130,7 +130,7 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                     children: [
                       Text(
                         t.tr('group_avatar', fallback: 'Avatar do Grupo'),
-                        style: AppTextStyles.titleLarge,
+                        style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -182,10 +182,12 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : AppColors.card,
+                                  color: isSelected
+                                      ? context.appPrimary.withValues(alpha: 0.15)
+                                      : context.appCard,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: isSelected ? AppColors.primary : AppColors.border,
+                                    color: isSelected ? context.appPrimary : context.appBorder,
                                     width: isSelected ? 2 : 1,
                                   ),
                                 ),
@@ -204,7 +206,7 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: isSelected ? AppColors.primaryLight : Colors.white,
+                                          color: isSelected ? context.appPrimary : context.appTextPrimary,
                                           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                           fontSize: 12,
                                         ),
@@ -219,8 +221,8 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                                         ),
                                         child: Text(
                                           t.tr('selected', fallback: 'SELECIONADO').toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.onPrimary,
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -251,18 +253,22 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                   onPressed: _isSaving ? null : _saveGroupStudicon,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: context.appPrimary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            strokeWidth: 2,
+                          ),
                         )
                       : Text(
                           t.tr('apply', fallback: 'Definir para este Grupo'),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                 ),
               ],
