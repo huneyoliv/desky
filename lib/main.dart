@@ -12,6 +12,7 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/config/env_config.dart';
 import 'core/diagnostics/crash_log.dart';
+import 'core/storage/secure_storage.dart';
 import 'core/pdf/macos_document_channel.dart';
 import 'core/pdf/pdf_open_request.dart';
 import 'core/pdf/single_instance_channel.dart';
@@ -59,6 +60,8 @@ void main(List<String> args) async {
     instanceChannel = singleInstance.channel;
   }
   await EnvConfig.init();
+  // Linux without a keyring would abort inside the keyring plugin.
+  await initSecureStorage();
   await initializeDateFormatting();
 
   LicenseRegistry.addLicense(() async* {

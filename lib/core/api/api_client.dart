@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 import '../constants/api_constants.dart';
 import 'auth_interceptor.dart';
+import '../storage/secure_storage.dart';
 
 class ApiClient {
   final Dio dio;
@@ -18,7 +19,7 @@ class ApiClient {
               ),
             ) {
     if (customDio == null) {
-      dio.interceptors.add(AuthInterceptor(storage ?? const FlutterSecureStorage()));
+      dio.interceptors.add(AuthInterceptor(storage ?? appSecureStorage));
       dio.interceptors.add(
         LogInterceptor(
           requestHeader: false,

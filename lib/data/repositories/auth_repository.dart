@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_client.dart';
+import '../../core/storage/secure_storage.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/auth_interceptor.dart';
 import '../../core/constants/api_constants.dart';
@@ -22,7 +23,7 @@ class AuthRepository {
     ApiClient? apiClient,
     FlutterSecureStorage? storage,
   })  : _apiClient = apiClient ?? ApiClient(),
-        _storage = storage ?? const FlutterSecureStorage();
+        _storage = storage ?? appSecureStorage;
 
   Future<void> _saveToken(String token) async {
     try {
