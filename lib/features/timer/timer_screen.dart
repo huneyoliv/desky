@@ -327,18 +327,18 @@ class TimerScreen extends ConsumerWidget {
                                           notifier.skipPomodoroPhase(),
                                       icon: const Icon(Icons.skip_next,
                                           size: 18,
-                                          color: AppColors.textSecondary),
+                                          color: context.appTextSecondary),
                                       label: Text(
                                         t.tr('skip', fallback: 'Pular'),
                                         style: const TextStyle(
-                                            color: AppColors.textSecondary,
+                                            color: context.appTextSecondary,
                                             fontSize: 12),
                                       ),
                                     ),
                                   IconButton(
                                     icon: const Icon(Icons.settings_outlined,
                                         size: 20,
-                                        color: AppColors.textSecondary),
+                                        color: context.appTextSecondary),
                                     onPressed: () => PomodoroConfigDialog.show(
                                       context,
                                       state: timerState,
@@ -495,8 +495,8 @@ class TimerScreen extends ConsumerWidget {
                                 : () => notifier.startStudy(),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: phaseColor,
-                              disabledBackgroundColor: AppColors.surfaceLight.withValues(alpha: 0.4),
-                              disabledForegroundColor: AppColors.stopped,
+                              disabledBackgroundColor: context.appSurfaceLight.withValues(alpha: 0.4),
+                              disabledForegroundColor: context.appTextMuted,
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                               // Fixed width: minimumSize alone still lets the
                               // longer Pomodoro label expand the button.
@@ -505,7 +505,7 @@ class TimerScreen extends ConsumerWidget {
                             ),
                             icon: Icon(
                               Icons.play_arrow_rounded,
-                              color: timerState.currentSubject == null ? AppColors.stopped : Colors.white,
+                              color: timerState.currentSubject == null ? context.appTextMuted : Theme.of(context).colorScheme.onPrimary,
                               size: 28,
                             ),
                             label: Text(
@@ -515,7 +515,7 @@ class TimerScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w800,
-                                color: timerState.currentSubject == null ? AppColors.stopped : Colors.white,
+                                color: timerState.currentSubject == null ? context.appTextMuted : Theme.of(context).colorScheme.onPrimary,
                               ),
                             ),
                           ),
@@ -600,7 +600,7 @@ class TimerScreen extends ConsumerWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : palette.textMuted,
+            color: isSelected ? Theme.of(context).colorScheme.onPrimary : palette.textMuted,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 13,
           ),

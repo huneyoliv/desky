@@ -78,7 +78,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
           const SizedBox(width: 10),
           Text(
             t.tr('pomodoro_settings', fallback: 'Configurações do Pomodoro'),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+            style: const TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ],
       ),
@@ -92,7 +92,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 label: t.tr('focus_time', fallback: 'Tempo de Foco'),
                 value: '$_focusMinutes min',
                 icon: Icons.local_fire_department,
-                iconColor: AppColors.primary,
+                iconColor: context.appPrimary,
                 onDecrement: _focusMinutes > 5 ? () => setState(() => _focusMinutes -= 5) : null,
                 onIncrement: _focusMinutes < 120 ? () => setState(() => _focusMinutes += 5) : null,
               ),
@@ -119,21 +119,21 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 label: t.tr('cycles_to_long_break', fallback: 'Ciclos até Pausa Longa'),
                 value: '$_totalCycles ${t.tr("cycles", fallback: "ciclos")}',
                 icon: Icons.repeat,
-                iconColor: AppColors.textSecondary,
+                iconColor: context.appTextSecondary,
                 onDecrement: _totalCycles > 2 ? () => setState(() => _totalCycles -= 1) : null,
                 onIncrement: _totalCycles < 10 ? () => setState(() => _totalCycles += 1) : null,
               ),
               const SizedBox(height: 16),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(t.tr('auto_start_breaks', fallback: 'Iniciar pausas automaticamente'), style: const TextStyle(color: Colors.white, fontSize: 14)),
+                title: Text(t.tr('auto_start_breaks', fallback: 'Iniciar pausas automaticamente'), style: const TextStyle(color: context.appTextPrimary, fontSize: 14)),
                 value: _autoStartBreaks,
                 activeColor: context.appPrimary,
                 onChanged: (val) => setState(() => _autoStartBreaks = val),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(t.tr('auto_start_focus', fallback: 'Iniciar foco automaticamente'), style: const TextStyle(color: Colors.white, fontSize: 14)),
+                title: Text(t.tr('auto_start_focus', fallback: 'Iniciar foco automaticamente'), style: const TextStyle(color: context.appTextPrimary, fontSize: 14)),
                 value: _autoStartFocus,
                 activeColor: context.appPrimary,
                 onChanged: (val) => setState(() => _autoStartFocus = val),
@@ -160,7 +160,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
             Navigator.of(context).pop();
           },
           style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-          child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: Text(t.tr('save', fallback: 'Salvar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold)),
         ),
       ],
     );
@@ -183,7 +183,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
             children: [
               Icon(icon, color: iconColor, size: 20),
               const SizedBox(width: 10),
-              Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+              Text(label, style: const TextStyle(color: context.appTextPrimary, fontSize: 14)),
             ],
           ),
           Row(
@@ -197,7 +197,7 @@ class _PomodoroConfigDialogState extends ConsumerState<PomodoroConfigDialog> {
                 child: Text(
                   value,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: const TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
               IconButton(

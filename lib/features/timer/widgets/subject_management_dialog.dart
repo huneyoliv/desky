@@ -107,12 +107,12 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                   color: color,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isSel ? Colors.white : Colors.transparent,
+                    color: isSel ? Theme.of(context).colorScheme.onPrimary : Colors.transparent,
                     width: isSel ? 2.5 : 0,
                   ),
                 ),
                 child: isSel
-                    ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
+                    ? const Icon(Icons.check_rounded, color: context.appTextPrimary, size: 16)
                     : null,
               ),
             );
@@ -133,7 +133,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(t.tr('new_subject', fallback: 'Nova Matéria'), style: const TextStyle(color: Colors.white)),
+          title: Text(t.tr('new_subject', fallback: 'Nova Matéria'), style: const TextStyle(color: context.appTextPrimary)),
           content: SizedBox(
             width: 360,
             child: Column(
@@ -142,7 +142,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
               children: [
                 TextField(
                   controller: _titleController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     labelText: t.tr('subject_title', fallback: 'Nome da Matéria'),
                     labelStyle: TextStyle(color: context.appTextSecondary),
@@ -204,7 +204,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 backgroundColor: context.appPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              child: Text(t.tr('save', fallback: 'Criar'), style: const TextStyle(color: Colors.white)),
+              child: Text(t.tr('save', fallback: 'Criar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
             ),
           ],
         ),
@@ -223,7 +223,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.appCard,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('${t.tr("edit", fallback: "Editar")}: ${subject.title}', style: const TextStyle(color: Colors.white)),
+          title: Text('${t.tr("edit", fallback: "Editar")}: ${subject.title}', style: const TextStyle(color: context.appTextPrimary)),
           content: SizedBox(
             width: 360,
             child: Column(
@@ -232,7 +232,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
               children: [
                 TextField(
                   controller: _titleController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: context.appTextPrimary),
                   decoration: InputDecoration(
                     labelText: t.tr('subject_title', fallback: 'Nome da Matéria'),
                     labelStyle: TextStyle(color: context.appTextSecondary),
@@ -275,7 +275,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                 backgroundColor: context.appPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
+              child: Text(t.tr('save', fallback: 'Salvar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
             ),
           ],
         ),
@@ -347,7 +347,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                   selected: !_showArchived,
                   selectedColor: context.appPrimary,
                   backgroundColor: context.appSurface,
-                  labelStyle: TextStyle(color: !_showArchived ? Colors.white : context.appTextMuted),
+                  labelStyle: TextStyle(color: !_showArchived ? Theme.of(context).colorScheme.onPrimary : context.appTextMuted),
                   onSelected: (_) => setState(() => _showArchived = false),
                 ),
                 const SizedBox(width: 8),
@@ -356,7 +356,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                   selected: _showArchived,
                   selectedColor: context.appPrimary,
                   backgroundColor: context.appSurface,
-                  labelStyle: TextStyle(color: _showArchived ? Colors.white : context.appTextMuted),
+                  labelStyle: TextStyle(color: _showArchived ? Theme.of(context).colorScheme.onPrimary : context.appTextMuted),
                   onSelected: (_) => setState(() => _showArchived = true),
                 ),
               ],
@@ -397,10 +397,10 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? subject.color.withValues(alpha: 0.2)
-                                  : AppColors.surface.withValues(alpha: 0.6),
+                                  : context.appSurface.withValues(alpha: 0.6),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: isSelected ? subject.color : AppColors.border,
+                                color: isSelected ? subject.color : context.appBorder,
                                 width: isSelected ? 2 : 1,
                               ),
                             ),
@@ -435,7 +435,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.edit_outlined, size: 18, color: Colors.white70),
+                                  icon: const Icon(Icons.edit_outlined, size: 18, color: context.appTextSecondary),
                                   tooltip: t.tr('edit_subject', fallback: 'Editar Matéria'),
                                   onPressed: () => _showEditSubjectDialog(subject),
                                 ),
