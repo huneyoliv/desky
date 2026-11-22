@@ -73,23 +73,36 @@ void main(List<String> args) async {
   // moldura), ela abria fora da tela. O mesmo limite protege quem trocou de
   // monitor ou de resolucao desde a ultima execucao.
   final windowStateStore = WindowStateStore(prefs: prefs);
+  final storedSize = await windowStateStore.readSize();
   Size? visibleArea;
+  var displays = <Rect>[];
   try {
+    final all = await screenRetriever.getAllDisplays();
+    displays = [
+      for (final d in all) (d.visiblePosition ?? Offset.zero) & (d.visibleSize ?? d.size),
+    ];
     final display = await screenRetriever.getPrimaryDisplay();
     visibleArea = display.visibleSize ?? display.size;
   } catch (_) {
     // Sem informacao do monitor: resolveWindowState usa o tamanho padrao.
   }
+  // Reopen on the monitor it was closed on, at the same place; the size is
+  // limited by THAT monitor, not the primary one.
+  final placement = resolveWindowPlacement(
+    storedPosition: await windowStateStore.readPosition(),
+    size: storedSize ?? kDefaultWindowSize,
+    displays: displays,
+  );
   final restoredWindow = resolveWindowState(
-    storedSize: await windowStateStore.readSize(),
+    storedSize: storedSize,
     storedMaximized: await windowStateStore.readMaximized(),
-    visibleArea: visibleArea,
+    visibleArea: placement.display?.size ?? visibleArea,
   );
 
   final windowOptions = WindowOptions(
     size: restoredWindow.size,
     minimumSize: restoredWindow.minimumSize,
-    center: true,
+    center: placement.position == null,
     backgroundColor: Platform.isMacOS ? AppColors.background : Colors.transparent,
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
@@ -99,6 +112,11 @@ void main(List<String> args) async {
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     if (Platform.isWindows) {
       await windowManager.setAsFrameless();
+    }
+    if (placement.position != null) {
+      try {
+        await windowManager.setBounds(placement.position! & restoredWindow.size);
+      } catch (_) {}
     }
     await windowManager.show();
     await windowManager.focus();
@@ -151,6 +169,7 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
   Timer? _windowStateDebounce;
   WindowStateStore? _windowStateStore;
   Size _lastNormalSize = kDefaultWindowSize;
+  Offset? _lastNormalPosition;
   bool _lastMaximized = false;
 
   /// Abertura de PDF pendente: so navegamos depois de autenticado, porque o
@@ -298,21 +317,31 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
     try {
       _lastMaximized = await windowManager.isMaximized();
       if (!_lastMaximized) {
-        _lastNormalSize = await windowManager.getSize();
+        final b = await windowManager.getBounds();
+        _lastNormalSize = b.size;
+        _lastNormalPosition = b.topLeft;
       }
     } catch (_) {}
   }
 
   /// Grava o estado com o tamanho "normal": o de uma janela maximizada nunca e
   /// salvo como tamanho de restauracao.
+  ///
+  /// The position is saved too, so the window reopens on the same monitor and
+  /// spot. The mini player and full screen are temporary: their bounds are
+  /// never saved over the normal ones.
   Future<void> _saveWindowState() async {
     try {
+      final focus = ref.read(focusModeProvider);
+      if (focus.isMiniPlayer || focus.isFullscreen) return;
       final maximized = await windowManager.isMaximized();
       if (!maximized) {
-        _lastNormalSize = await windowManager.getSize();
+        final b = await windowManager.getBounds();
+        _lastNormalSize = b.size;
+        _lastNormalPosition = b.topLeft;
       }
       _lastMaximized = maximized;
-      await _windowStore.save(size: _lastNormalSize, maximized: maximized);
+      await _windowStore.save(size: _lastNormalSize, maximized: maximized, position: _lastNormalPosition);
     } catch (_) {}
   }
 
@@ -325,6 +354,11 @@ class _DeskyAppState extends ConsumerState<DeskyApp>
 
   @override
   void onWindowResize() {
+    _scheduleWindowStateSave();
+  }
+
+  @override
+  void onWindowMoved() {
     _scheduleWindowStateSave();
   }
 

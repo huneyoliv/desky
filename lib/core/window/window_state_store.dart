@@ -13,6 +13,8 @@ class WindowStateStore {
   static const String keyWidth = 'window_width';
   static const String keyHeight = 'window_height';
   static const String keyMaximized = 'window_maximized';
+  static const String keyLeft = 'window_left';
+  static const String keyTop = 'window_top';
 
   final SharedPreferences? _prefs;
 
@@ -37,18 +39,32 @@ class WindowStateStore {
     return Size(width, height);
   }
 
+  /// Top-left corner saved last time, or `null` when absent/invalid.
+  Future<Offset?> readPosition() async {
+    final prefs = await _resolvePrefs();
+    if (prefs == null) return null;
+    final left = prefs.getDouble(keyLeft);
+    final top = prefs.getDouble(keyTop);
+    if (left == null || top == null || !left.isFinite || !top.isFinite) return null;
+    return Offset(left, top);
+  }
+
   Future<bool> readMaximized() async {
     final prefs = await _resolvePrefs();
     return prefs?.getBool(keyMaximized) ?? false;
   }
 
-  Future<void> save({required Size size, required bool maximized}) async {
+  Future<void> save({required Size size, required bool maximized, Offset? position}) async {
     final prefs = await _resolvePrefs();
     if (prefs == null) return;
     try {
       if (size.width.isFinite && size.height.isFinite && size.width > 0 && size.height > 0) {
         await prefs.setDouble(keyWidth, size.width);
         await prefs.setDouble(keyHeight, size.height);
+      }
+      if (position != null && position.dx.isFinite && position.dy.isFinite) {
+        await prefs.setDouble(keyLeft, position.dx);
+        await prefs.setDouble(keyTop, position.dy);
       }
       await prefs.setBool(keyMaximized, maximized);
     } catch (_) {}
