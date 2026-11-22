@@ -82,7 +82,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
         } else {
           setState(() {
             _isLoading = false;
-            _errorMessage = t.tr('error', fallback: 'Falha ao alterar senha. Verifique a senha atual.');
+            _errorMessage = t.tr('error_password', fallback: 'Could not change the password. Check your current password.');
           });
         }
       }
@@ -116,7 +116,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    t.tr('drawer_settings_reset_password_title', fallback: 'Alterar Senha'),
+                    t.tr('drawer_settings_reset_password_title', fallback: 'Change password'),
                     style: AppTextStyles.titleMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -151,7 +151,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
 
             _buildPasswordField(
               controller: _currentPasswordController,
-              label: t.tr('drawer_settings_check_password_hint', fallback: 'Senha atual'),
+              label: t.tr('drawer_settings_check_password_hint', fallback: 'Current password'),
               obscure: _obscureCurrent,
               onToggleVisibility: () => setState(() => _obscureCurrent = !_obscureCurrent),
             ),
@@ -159,7 +159,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
 
             _buildPasswordField(
               controller: _newPasswordController,
-              label: t.tr('drawer_settings_reset_password_label1', fallback: 'Nova senha'),
+              label: t.tr('drawer_settings_reset_password_label1', fallback: 'New password'),
               obscure: _obscureNew,
               onToggleVisibility: () => setState(() => _obscureNew = !_obscureNew),
             ),
@@ -167,7 +167,7 @@ class _ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
 
             _buildPasswordField(
               controller: _confirmPasswordController,
-              label: t.tr('drawer_settings_reset_password_hint2', fallback: 'Confirmar nova senha'),
+              label: t.tr('drawer_settings_reset_password_hint2', fallback: 'Confirm new password'),
               obscure: _obscureConfirm,
               onToggleVisibility: () => setState(() => _obscureConfirm = !_obscureConfirm),
             ),

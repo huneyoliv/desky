@@ -267,7 +267,7 @@ class _GroupStudiconPickerDialogState extends ConsumerState<GroupStudiconPickerD
                           ),
                         )
                       : Text(
-                          t.tr('apply', fallback: 'Definir para este Grupo'),
+                          t.tr('apply', fallback: 'Set for this group'),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                 ),

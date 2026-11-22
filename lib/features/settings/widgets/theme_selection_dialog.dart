@@ -164,7 +164,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 child: Text(
-                  t.tr('close_btn', fallback: 'Concluir'),
+                  t.tr('close_btn', fallback: 'Done'),
                   style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
                 ),
               ),

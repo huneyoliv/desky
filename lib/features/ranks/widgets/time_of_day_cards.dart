@@ -16,36 +16,36 @@ class AvgTimesCard extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
 
     return _TimeCard(
-      title: t.tr('stats_avg_times', fallback: 'Horários médios'),
+      title: t.tr('stats_avg_times', fallback: 'Average times'),
       isEmpty: !stats.hasData,
       emptyMessage: t.tr('stats_no_time_of_day',
-          fallback: 'Sem sessões no período para calcular horários.'),
+          fallback: 'No sessions in this period to compute times.'),
       child: Column(
         children: [
           _TimeRow(
-            label: t.tr('stats_avg_start', fallback: 'Início médio'),
+            label: t.tr('stats_avg_start', fallback: 'Avg start'),
             value: stats.avgStartMinute == null
                 ? '—'
                 : formatMinuteOfDay(stats.avgStartMinute!),
           ),
           const SizedBox(height: 12),
           _TimeRow(
-            label: t.tr('stats_avg_end', fallback: 'Término médio'),
+            label: t.tr('stats_avg_end', fallback: 'Avg end'),
             value: stats.avgEndMinute == null
                 ? '—'
                 : formatMinuteOfDay(stats.avgEndMinute!),
           ),
           const SizedBox(height: 12),
           _TimeRow(
-            label: t.tr('stats_regularity', fallback: 'Regularidade'),
+            label: t.tr('stats_regularity', fallback: 'Regularity'),
             value: stats.startStdDevMinutes == null
                 ? '—'
                 : '±${stats.startStdDevMinutes}min',
-            hint: regularityLabel(stats.startStdDevMinutes),
+            hint: regularityLabel(stats.startStdDevMinutes, tr: (k, f) => t.tr(k, fallback: f)),
           ),
           const SizedBox(height: 16),
           Text(
-            '${t.tr('stats_sessions_counted', fallback: 'Sessões consideradas')}'
+            '${t.tr('stats_sessions_counted', fallback: 'Sessions counted')}'
             ': ${stats.sessionCount}',
             style: TextStyle(color: context.appTextMuted, fontSize: 11),
           ),
@@ -72,10 +72,10 @@ class SessionScatterCard extends ConsumerWidget {
     final axisMaxHours = ((maxMinute / 60).ceil() + 1).clamp(2, 30).toDouble();
 
     return _TimeCard(
-      title: t.tr('stats_start_end', fallback: 'Início × término das sessões'),
+      title: t.tr('stats_start_end', fallback: 'Session start × end'),
       isEmpty: points.isEmpty,
       emptyMessage: t.tr('stats_no_scatter',
-          fallback: 'Sem sessões no período para cruzar início e término.'),
+          fallback: 'No sessions in this period to compare start and end.'),
       child: SizedBox(
         height: 220,
         child: ScatterChart(
