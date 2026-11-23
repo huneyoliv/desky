@@ -32,6 +32,7 @@ class SettingsRepository {
   static const String keyDiscordRpc = 'discord_rpc_enabled';
   static const String keyObsOverlayMode = 'obs_overlay_mode';
   static const String keyClassicYptLook = 'classic_ypt_look';
+  static const String keyClassicTopTabs = 'classic_top_tabs';
   static const String keyClassicUiScale = 'classic_ui_scale';
   static const String keyThemePreset = 'selected_theme_preset';
   static const String keyDarkThemePreset = 'selected_dark_theme_preset';
@@ -450,6 +451,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setBool(keyClassicYptLook, value);
+    } catch (_) {}
+  }
+
+  Future<bool> getClassicTopTabs() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getBool(keyClassicTopTabs) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> saveClassicTopTabs(bool value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setBool(keyClassicTopTabs, value);
     } catch (_) {}
   }
 
