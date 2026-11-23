@@ -10,7 +10,6 @@ import '../../features/ranks/ranks_screen.dart';
 import '../../features/store/store_screen.dart';
 import '../../features/flashcards/flashcards_screen.dart';
 import '../../features/smartbook/smartbook_screen.dart';
-import '../../features/todo/todo_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/challenges/challenges_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
@@ -66,7 +65,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/todo',
-            builder: (context, state) => const TodoScreen(),
+            redirect: (context, state) => '/planner',
           ),
           GoRoute(
             path: '/planner',
