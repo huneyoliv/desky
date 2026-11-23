@@ -19,6 +19,7 @@ import 'core/window/window_state.dart';
 import 'core/window/window_state_store.dart';
 import 'core/services/discord_rpc_coordinator.dart';
 import 'core/services/discord_rpc_service.dart';
+import 'core/storage/secure_storage.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
@@ -55,6 +56,8 @@ void main(List<String> args) async {
     instanceChannel = singleInstance.channel;
   }
   await EnvConfig.init();
+  // Linux without a keyring would abort inside the keyring plugin.
+  await initSecureStorage();
   await initializeDateFormatting();
 
   LicenseRegistry.addLicense(() async* {
