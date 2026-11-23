@@ -51,6 +51,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       );
       final obsOverlayMode = await _repository.getObsOverlayMode();
       final classicYptLook = await _repository.getClassicYptLook();
+      final classicTopTabs = await _repository.getClassicTopTabs();
       final classicUiScale = await _repository.getClassicUiScale();
 
       if (!mounted) return;
@@ -65,6 +66,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         discordRpcEnabled: discordRpc,
         obsOverlayMode: obsOverlayMode,
         classicYptLook: classicYptLook,
+        classicTopTabs: classicTopTabs,
         classicUiScale: classicUiScale,
         betaChannel: betaChannel,
         timerBackground: timerBackground,
@@ -181,6 +183,12 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleObsOverlayMode(bool value) async {
     state = state.copyWith(obsOverlayMode: value);
     await _repository.saveObsOverlayMode(value);
+  }
+
+  /// Shows the sidebar destinations as top tabs (Classic YPT layout).
+  Future<void> toggleClassicTopTabs(bool value) async {
+    state = state.copyWith(classicTopTabs: value);
+    await _repository.saveClassicTopTabs(value);
   }
 
   Future<void> toggleClassicYptLook(bool value) async {
