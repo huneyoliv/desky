@@ -331,7 +331,7 @@ class _SubjectManagementDialogState extends ConsumerState<SubjectManagementDialo
               children: [
                 Icon(Icons.bookmark_outline_rounded, color: context.appPrimary, size: 24),
                 const SizedBox(width: 10),
-                Text(t.tr('manage_subjects', fallback: 'Gerenciar Matérias'), style: AppTextStyles.titleMedium),
+                Text(t.tr('manage_subjects', fallback: 'Gerenciar Matérias'), style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary)),
                 const Spacer(),
                 IconButton(
                   icon: Icon(Icons.close, color: context.appTextMuted),

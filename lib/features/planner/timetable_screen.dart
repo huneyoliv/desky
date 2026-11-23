@@ -312,7 +312,7 @@ class _TimetableScreenState extends ConsumerState<TimetableScreen> {
                     children: [
                       Text(
                         t.tr('timetable', fallback: 'Grade Horária Semanal'),
-                        style: AppTextStyles.titleMedium,
+                        style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

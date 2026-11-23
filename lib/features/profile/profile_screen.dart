@@ -72,10 +72,10 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text(t.tr('edit_nickname', fallback: 'Alterar Apelido'), style: const TextStyle(color: Colors.white)),
+        title: Text(t.tr('edit_nickname', fallback: 'Alterar Apelido'), style: TextStyle(color: context.appTextPrimary)),
         content: TextField(
           controller: controller,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: context.appTextPrimary),
           decoration: InputDecoration(
             hintText: t.tr('nickname', fallback: 'Digite seu novo apelido'),
             hintStyle: TextStyle(color: context.appTextMuted),
@@ -114,7 +114,7 @@ class ProfileScreen extends ConsumerWidget {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-            child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
+            child: Text(t.tr('save', fallback: 'Salvar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
           ),
         ],
       ),
@@ -128,10 +128,10 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text(t.tr('edit_status_msg', fallback: 'Alterar Mensagem de Status'), style: const TextStyle(color: Colors.white)),
+        title: Text(t.tr('edit_status_msg', fallback: 'Alterar Mensagem de Status'), style: TextStyle(color: context.appTextPrimary)),
         content: TextField(
           controller: controller,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: context.appTextPrimary),
           decoration: InputDecoration(
             hintText: t.tr('status_msg_hint', fallback: 'Digite sua mensagem de status...'),
             hintStyle: TextStyle(color: context.appTextMuted),
@@ -168,7 +168,7 @@ class ProfileScreen extends ConsumerWidget {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-            child: Text(t.tr('save', fallback: 'Salvar'), style: const TextStyle(color: Colors.white)),
+            child: Text(t.tr('save', fallback: 'Salvar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
           ),
         ],
       ),
@@ -182,11 +182,15 @@ class ProfileScreen extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
     final user = authState.user;
     final activeTheme = ref.watch(themeNotifierProvider);
+    final errorTextColor =
+        ThemeData.estimateBrightnessForColor(context.appCard) == Brightness.dark
+            ? AppColors.error
+            : const Color(0xFFB3261E);
 
     return Scaffold(
       backgroundColor: activeTheme.background,
       appBar: AppBar(
-        title: Text('${t.tr('profile', fallback: 'Perfil')} & ${t.tr('settings', fallback: 'Configurações')}', style: AppTextStyles.titleLarge),
+        title: Text('${t.tr('profile', fallback: 'Perfil')} & ${t.tr('settings', fallback: 'Configurações')}', style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
@@ -215,8 +219,8 @@ class ProfileScreen extends ConsumerWidget {
                           children: [
                             Text(
                               user?.name ?? 'Estudante YPT',
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: context.appTextPrimary,
                                 fontSize: 22,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -279,7 +283,7 @@ class ProfileScreen extends ConsumerWidget {
                               child: Text(
                                 'ID: ${user?.id ?? 0}',
                                 style: TextStyle(
-                                  color: context.appPrimary,
+                                  color: context.appTextPrimary,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -294,7 +298,7 @@ class ProfileScreen extends ConsumerWidget {
                                 user?.categoryName.isNotEmpty == true
                                     ? user!.categoryName
                                     : t.tr('graduation', fallback: 'Graduação'),
-                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(color: context.appTextPrimary, fontSize: 12),
                               ),
                               onPressed: () async {
                                 final settingsNotifier = ref.read(settingsNotifierProvider.notifier);
@@ -311,7 +315,7 @@ class ProfileScreen extends ConsumerWidget {
                                         backgroundColor: context.appCard,
                                         title: Text(
                                           t.tr('category', fallback: 'Selecionar Categoria / Objetivo'),
-                                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                          style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold),
                                         ),
                                         content: SizedBox(
                                           width: 420,
@@ -422,8 +426,8 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: 8),
                         Text(
                           _formatHours(timerState.todayTotalMs),
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: context.appTextPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(t.tr('today_total_study_time', fallback: 'Estudados Hoje'),
@@ -447,8 +451,8 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: 8),
                         Text(
                           '${timerState.subjects.length}',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: context.appTextPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(t.tr('subjects', fallback: 'Matérias'),
@@ -472,8 +476,8 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: 8),
                         Text(
                           '${user?.userGroups.length ?? 0}',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: context.appTextPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(t.tr('my_groups', fallback: 'Meus Grupos'),
@@ -489,7 +493,7 @@ class ProfileScreen extends ConsumerWidget {
             // Settings Section
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('${t.tr('settings', fallback: 'Configurações')} & ${t.tr('device', fallback: 'Dispositivo')}', style: AppTextStyles.titleMedium),
+              child: Text('${t.tr('settings', fallback: 'Configurações')} & ${t.tr('device', fallback: 'Dispositivo')}', style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary)),
             ),
             const SizedBox(height: 16),
 
@@ -519,7 +523,7 @@ class ProfileScreen extends ConsumerWidget {
                   children: [
                     ListTile(
                       leading: Icon(Icons.public, color: context.appPrimary),
-                      title: Text(t.tr('region', fallback: 'Região / País'), style: const TextStyle(color: Colors.white)),
+                      title: Text(t.tr('region', fallback: 'Região / País'), style: TextStyle(color: context.appTextPrimary)),
                       subtitle: Text(
                         '${country.formattedName} (${country.code})',
                         style: TextStyle(color: context.appTextSecondary),
@@ -530,7 +534,7 @@ class ProfileScreen extends ConsumerWidget {
                     Divider(color: context.appBorder, height: 1),
                     ListTile(
                       leading: Icon(Icons.language, color: context.appPrimary),
-                      title: Text(t.tr('language', fallback: 'Idioma do Aplicativo'), style: const TextStyle(color: Colors.white)),
+                      title: Text(t.tr('language', fallback: 'Idioma do Aplicativo'), style: TextStyle(color: context.appTextPrimary)),
                       subtitle: Text(
                         langLabel,
                         style: TextStyle(color: context.appTextSecondary),
@@ -541,7 +545,7 @@ class ProfileScreen extends ConsumerWidget {
                     Divider(color: context.appBorder, height: 1),
                     ListTile(
                       leading: Icon(Icons.access_time, color: context.appPrimary),
-                      title: Text(t.tr('timezone', fallback: 'Fuso Horário da Região'), style: const TextStyle(color: Colors.white)),
+                      title: Text(t.tr('timezone', fallback: 'Fuso Horário da Região'), style: TextStyle(color: context.appTextPrimary)),
                       subtitle: Text(
                         '${country.timezone} (${country.gmtDisplay})',
                         style: TextStyle(color: context.appTextSecondary),
@@ -550,14 +554,14 @@ class ProfileScreen extends ConsumerWidget {
                     Divider(color: context.appBorder, height: 1),
                     ListTile(
                       leading: Icon(_getPlatformIcon(), color: context.appPrimary),
-                      title: Text(t.tr('platform', fallback: 'Plataforma'), style: const TextStyle(color: Colors.white)),
+                      title: Text(t.tr('platform', fallback: 'Plataforma'), style: TextStyle(color: context.appTextPrimary)),
                       subtitle: Text(_getPlatformDisplay(),
                           style: TextStyle(color: context.appTextSecondary)),
                     ),
                     Divider(color: context.appBorder, height: 1),
                     ListTile(
                       leading: Icon(Icons.info_outline, color: context.appPrimary),
-                      title: Text(t.tr('version', fallback: 'Versão do Cliente API'), style: const TextStyle(color: Colors.white)),
+                      title: Text(t.tr('version', fallback: 'Versão do Cliente API'), style: TextStyle(color: context.appTextPrimary)),
                       subtitle: Text('v${AppConstants.appVersion} (API v8.1.0)',
                           style: TextStyle(color: context.appTextSecondary)),
                     ),
@@ -572,7 +576,7 @@ class ProfileScreen extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 t.tr('study_preferences', fallback: 'Preferências de Estudo & Rotina'),
-                style: AppTextStyles.titleMedium,
+                style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary),
               ),
             ),
             const SizedBox(height: 16),
@@ -589,7 +593,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.palette_outlined, color: context.appPrimary),
                     title: Text(t.tr('theme_appearance', fallback: 'Aparência & Tema'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       t.tr(activeTheme.nameKey, fallback: activeTheme.id),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -601,7 +605,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.tune_rounded, color: context.appPrimary),
                     title: Text(t.tr('study_preferences', fallback: 'Ajustes de Estudo e Alertas'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       t.tr('study_pref_subtitle', fallback: 'Horário de reset do dia, exibição de descanso e notificações'),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -619,7 +623,7 @@ class ProfileScreen extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 t.tr('account_security', fallback: 'Segurança da Conta'),
-                style: AppTextStyles.titleMedium,
+                style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary),
               ),
             ),
             const SizedBox(height: 16),
@@ -636,7 +640,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.lock_reset_rounded, color: context.appPrimary),
                     title: Text(t.tr('drawer_settings_reset_password_title', fallback: 'Change password'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       t.tr('change_password_subtitle', fallback: 'Atualizar sua credencial de acesso'),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -648,7 +652,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.block_rounded, color: AppColors.error),
                     title: Text(t.tr('drawer_settings_block_user_title', fallback: 'Blocked users'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       t.tr('blocked_users_subtitle', fallback: 'Gerenciar lista de usuários bloqueados'),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -666,7 +670,7 @@ class ProfileScreen extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 '${t.tr('drawer_helps_title', fallback: 'Help')} & ${t.tr('legal', fallback: 'Legal')}',
-                style: AppTextStyles.titleMedium,
+                style: AppTextStyles.titleMedium.copyWith(color: context.appTextPrimary),
               ),
             ),
             const SizedBox(height: 16),
@@ -683,7 +687,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.privacy_tip_outlined, color: context.appPrimary),
                     title: Text(t.tr('drawer_settings_pallo_privacy_title', fallback: 'Política de Privacidade'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       t.tr('privacy_subtitle', fallback: 'Como protegemos seus dados e logs de estudo'),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -695,7 +699,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.description_outlined, color: context.appPrimary),
                     title: Text(t.tr('drawer_settings_pallo_terms_title', fallback: 'Termos de Uso'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       t.tr('terms_subtitle', fallback: 'Condições de serviço e regras da comunidade'),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -707,7 +711,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.help_outline_rounded, color: context.appPrimary),
                     title: Text('${t.tr('drawer_helps_title', fallback: 'Help')} & FAQ',
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       t.tr('faq_subtitle', fallback: 'Dúvidas frequentes e canais de atendimento'),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -719,7 +723,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.open_in_new_rounded, color: context.appPrimary),
                     title: Text(t.tr('view_on_github', fallback: 'Ver no GitHub'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       _repositoryUrl.replaceFirst('https://', ''),
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -731,7 +735,7 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: Icon(Icons.info_outline_rounded, color: context.appPrimary),
                     title: Text(t.tr('drawer_settings_pallo_app_version', fallback: 'App version'),
-                        style: const TextStyle(color: Colors.white)),
+                        style: TextStyle(color: context.appTextPrimary)),
                     subtitle: Text(
                       'Desky ${AppConstants.appVersion} • Build ${AppConstants.buildNumber}',
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12),
@@ -757,7 +761,7 @@ class ProfileScreen extends ConsumerWidget {
                   Text(
                     t.tr('legal_disclaimer', fallback: 'O Desky é um cliente de terceiros independente e de código aberto, não sendo afiliado, endossado, patrocinado ou associado à Pallo Inc. ou ao Yeolpumta (YPT). Todas as marcas registradas pertencem aos seus respectivos proprietários.'),
                     style: TextStyle(
-                      color: context.appTextMuted.withValues(alpha: 0.8),
+                      color: context.appTextMuted,
                       fontSize: 11,
                       height: 1.4,
                     ),
@@ -772,8 +776,8 @@ class ProfileScreen extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 t.tr('danger_zone', fallback: 'Zona de Perigo'),
-                style: const TextStyle(
-                  color: AppColors.error,
+                style: TextStyle(
+                  color: errorTextColor,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -792,8 +796,8 @@ class ProfileScreen extends ConsumerWidget {
                 leading: const Icon(Icons.delete_forever, color: AppColors.error),
                 title: Text(
                   t.tr('delete_account', fallback: 'Excluir Minha Conta'),
-                  style: const TextStyle(
-                    color: AppColors.error,
+                  style: TextStyle(
+                    color: errorTextColor,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
