@@ -3,9 +3,15 @@ import '../../core/localization/app_translation.dart';
 import '../../data/models/offline_session_model.dart';
 import '../../data/repositories/offline_sync_repository.dart';
 import '../../data/repositories/timer_repository.dart';
+import '../auth/auth_notifier.dart';
 
 final offlineSyncRepositoryProvider = Provider<OfflineSyncRepository>((ref) {
-  return OfflineSyncRepository(timerRepository: TimerRepository());
+  return OfflineSyncRepository(
+    timerRepository: TimerRepository(),
+    // Read at each use (not watched): the queue outlives sign-in changes and
+    // must always ask who is signed in right now.
+    currentOwner: () => ref.read(authStateProvider).user?.id,
+  );
 });
 
 class OfflineSyncState {
@@ -50,7 +56,8 @@ class OfflineSyncNotifier extends StateNotifier<OfflineSyncState> {
 
   Future<void> loadPending() async {
     final pending = await _repository.getPendingSessions();
-    state = state.copyWith(pendingSessions: pending);
+    if (!mounted) return;
+    state = state.copyWith(pendingSessions: pending, isSyncing: _repository.isSyncing);
   }
 
   Future<void> enqueueSession({
@@ -74,6 +81,7 @@ class OfflineSyncNotifier extends StateNotifier<OfflineSyncState> {
     state = state.copyWith(isSyncing: true);
     final result = await _repository.syncAllPending();
     final pending = await _repository.getPendingSessions();
+    if (!mounted) return result;
 
     final t = _ref?.read(appTranslationProvider);
     String msg;
@@ -104,5 +112,11 @@ class OfflineSyncNotifier extends StateNotifier<OfflineSyncState> {
 final offlineSyncNotifierProvider =
     StateNotifierProvider<OfflineSyncNotifier, OfflineSyncState>((ref) {
   final repo = ref.watch(offlineSyncRepositoryProvider);
-  return OfflineSyncNotifier(repository: repo, ref: ref);
+  final notifier = OfflineSyncNotifier(repository: repo, ref: ref);
+  // Show the new account's queue (and hide the previous one's) on sign-in
+  // and sign-out.
+  ref.listen<int?>(authStateProvider.select((s) => s.user?.id), (prev, next) {
+    if (prev != next) notifier.loadPending();
+  });
+  return notifier;
 });

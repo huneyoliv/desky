@@ -9,6 +9,12 @@ class OfflineSessionModel {
   final int retryCount;
   final String? lastError;
 
+  /// Id of the account that recorded the session. Only that account may
+  /// submit or change it. Null for entries written before entries had an
+  /// owner: those are kept on disk but never sent, because nothing proves
+  /// which account they belong to.
+  final int? ownerId;
+
   const OfflineSessionModel({
     required this.id,
     required this.subjectId,
@@ -19,6 +25,7 @@ class OfflineSessionModel {
     required this.createdAt,
     this.retryCount = 0,
     this.lastError,
+    this.ownerId,
   });
 
   factory OfflineSessionModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +39,7 @@ class OfflineSessionModel {
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       retryCount: json['retryCount'] as int? ?? 0,
       lastError: json['lastError'] as String?,
+      ownerId: json['ownerId'] as int?,
     );
   }
 
@@ -46,6 +54,7 @@ class OfflineSessionModel {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'retryCount': retryCount,
       'lastError': lastError,
+      if (ownerId != null) 'ownerId': ownerId,
     };
   }
 
@@ -70,6 +79,7 @@ class OfflineSessionModel {
       createdAt: createdAt ?? this.createdAt,
       retryCount: retryCount ?? this.retryCount,
       lastError: lastError ?? this.lastError,
+      ownerId: ownerId,
     );
   }
 }
