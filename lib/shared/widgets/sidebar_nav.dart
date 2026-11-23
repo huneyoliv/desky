@@ -59,12 +59,6 @@ class SidebarNav extends ConsumerWidget {
       svgAsset: 'assets/icons/bottom_calendar.svg',
     ),
     SidebarNavItemData(
-      keyName: 'todo_tab_title',
-      defaultTitle: 'A fazer',
-      route: '/todo',
-      fallbackIcon: Icons.checklist_rounded,
-    ),
-    SidebarNavItemData(
       keyName: 'ranking',
       defaultTitle: 'Rankings',
       route: '/ranks',
