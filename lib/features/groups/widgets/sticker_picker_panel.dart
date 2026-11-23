@@ -71,8 +71,8 @@ class _StickerPickerPanelState extends ConsumerState<StickerPickerPanel> {
                     children: [
                       Text(
                         t.tr('ypt_stickers', fallback: 'Figurinhas YPT'),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.appTextPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -94,7 +94,7 @@ class _StickerPickerPanelState extends ConsumerState<StickerPickerPanel> {
                                 selectedColor: context.appPrimary,
                                 backgroundColor: context.appSurface,
                                 labelStyle: TextStyle(
-                                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                                  color: isSelected ? Theme.of(context).colorScheme.onPrimary : context.appTextSecondary,
                                   fontSize: 12,
                                 ),
                                 onSelected: (_) {

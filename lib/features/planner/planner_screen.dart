@@ -854,7 +854,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(t.tr('dday', fallback: 'Seus D-Days'), style: AppTextStyles.titleLarge),
+                            Text(t.tr('dday', fallback: 'Seus D-Days'), style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
                             IconButton(
                               icon: Icon(Icons.add_circle_outline,
                                   color: context.appPrimary),
@@ -923,7 +923,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         ),
                         const SizedBox(height: 32),
 
-                        Text(t.tr('calendar', fallback: 'Calendário de Estudos'), style: AppTextStyles.titleLarge),
+                        Text(t.tr('calendar', fallback: 'Calendário de Estudos'), style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
                         const SizedBox(height: 12),
 
                         // Mini Calendar View
@@ -957,7 +957,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                 children: [
                                   Text(
                                     t.tr('todo', fallback: 'Planner de Estudos (To-Do)'),
-                                    style: AppTextStyles.displayMedium,
+                                    style: AppTextStyles.displayMedium.copyWith(color: context.appTextPrimary),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
