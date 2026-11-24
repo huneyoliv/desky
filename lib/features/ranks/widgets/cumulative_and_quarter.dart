@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/theme/app_colors.dart';
 import '../stats_derivations.dart';
@@ -146,10 +147,16 @@ class QuarterlyCalendar extends ConsumerWidget {
   final ValueChanged<DateTime> onMonthChanged;
   final bool isLoading;
 
-  static const List<String> _monthNames = [
-    'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez',
-  ];
+  String _monthLabel(AppTranslation t, int monthNumber) {
+    final locale = t.languageCode == 'zh-cn'
+        ? 'zh_CN'
+        : (t.languageCode == 'zh-tw' ? 'zh_TW' : t.languageCode);
+    try {
+      return DateFormat('MMM', locale).format(DateTime(2026, monthNumber));
+    } catch (_) {
+      return DateFormat('MMM').format(DateTime(2026, monthNumber));
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -201,7 +208,7 @@ class QuarterlyCalendar extends ConsumerWidget {
               month: quarterStart + offset,
               quarterDays: quarterDays,
               peak: peak,
-              label: _monthNames[(quarterStart + offset - 1) % 12],
+              label: _monthLabel(t, quarterStart + offset),
             ),
         ],
       ),
