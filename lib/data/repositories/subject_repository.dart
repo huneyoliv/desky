@@ -15,10 +15,15 @@ class SubjectFetchResult {
   final int todayTotalMs;
   final int todayRestMs;
 
+  /// False when the server could not be reached and [todayTotalMs] is not a
+  /// real figure (cached subjects only). Callers keep their own total then.
+  final bool isFromServer;
+
   const SubjectFetchResult({
     required this.subjects,
     required this.todayTotalMs,
     this.todayRestMs = 0,
+    this.isFromServer = true,
   });
 }
 
@@ -175,7 +180,7 @@ class SubjectRepository {
 
     final cached = await getCachedSubjects();
     if (cached.isNotEmpty) {
-      return SubjectFetchResult(subjects: cached, todayTotalMs: 0, todayRestMs: 0);
+      return SubjectFetchResult(subjects: cached, todayTotalMs: 0, todayRestMs: 0, isFromServer: false);
     }
 
     return const SubjectFetchResult(subjects: [], todayTotalMs: 0, todayRestMs: 0);

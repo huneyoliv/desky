@@ -132,7 +132,7 @@ class _Header extends ConsumerWidget {
               decoration: BoxDecoration(color: Color(subject.colorInt), shape: BoxShape.circle),
             ),
             Flexible(
-              child: Text('${subject.title}  ${_clock(subject.studyMs)}',
+              child: Text(subject.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: palette.textPrimary)),
@@ -768,11 +768,6 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
     try {
       final members = await ref.read(groupRepositoryProvider).fetchMembers(group.id);
       if (!mounted || _loadedGroup != group.id) return;
-      members.sort((a, b) {
-        final sa = a.isStudying && !a.isPaused, sb = b.isStudying && !b.isPaused;
-        if (sa != sb) return sa ? -1 : 1;
-        return b.studyMs.compareTo(a.studyMs);
-      });
       setState(() {
         _members = members;
         _fetchedAt = DateTime.now();
@@ -817,6 +812,9 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
     final group = groups[_index % groups.length];
     final members = _loadedGroup == group.id ? _members : null;
     final studying = members?.where((m) => m.isStudying && !m.isPaused).length ?? 0;
+    // My own tile follows the local timer, so it always equals "Today".
+    final myToday = ref.watch(timerNotifierProvider.select((s) => s.todayTotalMs));
+    final meActive = ref.watch(timerNotifierProvider.select((s) => s.isRunning && !s.isPaused));
 
     return ClassicCard(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 8),
@@ -859,22 +857,41 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
           Expanded(
             child: members == null
                 ? const Center(child: CircularProgressIndicator(strokeWidth: 2, color: kStatOrange))
-                : GridView.builder(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 150,
-                      mainAxisExtent: 138,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: members.length,
-                    itemBuilder: (context, i) => _MemberTile(
-                      member: members[i],
-                      isMe: members[i].userId == myId,
-                      now: _now,
-                      fetchedAt: _fetchedAt,
-                      onTap: () => MemberSheet.show(context, groupId: group.id, member: members[i]),
-                    ),
+                : ValueListenableBuilder<DateTime>(
+                    valueListenable: _now,
+                    builder: (context, now, _) {
+                      // One ranking by today's total, studying or not.
+                      final ranked = [
+                        for (final m in members)
+                          (
+                            member: m,
+                            isMe: m.userId == myId,
+                            active: m.userId == myId ? meActive : m.isStudying && !m.isPaused,
+                            ms: m.userId == myId ? myToday : liveMemberStudyMs(m, now, _fetchedAt),
+                          ),
+                      ]..sort((a, b) {
+                          final c = b.ms.compareTo(a.ms);
+                          return c != 0 ? c : a.member.userId.compareTo(b.member.userId);
+                        });
+                      return GridView.builder(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 150,
+                          mainAxisExtent: 138,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        itemCount: ranked.length,
+                        itemBuilder: (context, i) => _MemberTile(
+                          key: ValueKey('classic-member-tile-${ranked[i].member.userId}'),
+                          member: ranked[i].member,
+                          isMe: ranked[i].isMe,
+                          active: ranked[i].active,
+                          studyMs: ranked[i].ms,
+                          onTap: () => MemberSheet.show(context, groupId: group.id, member: ranked[i].member),
+                        ),
+                      );
+                    },
                   ),
           ),
         ],
@@ -883,24 +900,36 @@ class _GroupPanelState extends ConsumerState<_GroupPanel> {
   }
 }
 
+/// Today's study time of a group member at [now].
+///
+/// The API's `sm` counts finished sessions only; a running session is added
+/// from its start `dl.st`. Without a usable start the time since the fetch is
+/// the best available estimate.
+int liveMemberStudyMs(GroupMemberModel m, DateTime now, DateTime fetchedAt) {
+  if (!m.isStudying || m.isPaused) return m.studyMs;
+  final start = m.sessionStartedAt;
+  final running = now.difference(start ?? fetchedAt).inMilliseconds;
+  return m.studyMs + math.max(0, running);
+}
+
 class _MemberTile extends StatelessWidget {
   const _MemberTile({
+    super.key,
     required this.member,
     required this.isMe,
-    required this.now,
-    required this.fetchedAt,
+    required this.active,
+    required this.studyMs,
     required this.onTap,
   });
   final GroupMemberModel member;
   final bool isMe;
-  final ValueNotifier<DateTime> now;
-  final DateTime fetchedAt;
+  final bool active;
+  final int studyMs;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final active = member.isStudying && !member.isPaused;
     final color = active ? kStatOrange : palette.textMuted;
     return Material(
       color: Colors.transparent,
@@ -924,7 +953,7 @@ class _MemberTile extends StatelessWidget {
                   enabled: !active,
                   child: StudiconAvatar(
                     studiconId: member.studiconId,
-                    pose: CdnResolver.resolvePose(isStudying: true, studyMs: member.studyMs),
+                    pose: CdnResolver.resolvePose(isStudying: true, studyMs: studyMs),
                     size: 64,
                   ),
                 ),
@@ -934,18 +963,12 @@ class _MemberTile extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 13, color: color)),
-              ValueListenableBuilder<DateTime>(
-                valueListenable: now,
-                builder: (context, t, _) {
-                  final ms = member.studyMs + (active ? t.difference(fetchedAt).inMilliseconds : 0);
-                  return Text(_clock(ms),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: color,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ));
-                },
-              ),
+              Text(_clock(studyMs),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: color,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  )),
             ],
           ),
         ),

@@ -158,6 +158,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
   int _segmentStartRemainingMs = 0;
   bool _reconciling = false;
 
+  /// Part of the unsynced session that belongs to the previous study day
+  /// (the session was running when the day reset). Excluded from today.
+  int _dayResetOffsetMs = 0;
+
   /// Whether the server has ever confirmed this session as running.
   ///
   /// The day log lags behind `/study/start`: right after a successful start the
@@ -238,6 +242,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
     _accumulatedSessionMs = 0;
     _accumulatedRestMs = 0;
+    _dayResetOffsetMs = 0;
     _segmentStartRemainingMs = state.pomodoroRemainingMs;
 
     state = state.copyWith(
@@ -246,7 +251,10 @@ class TimerNotifier extends StateNotifier<TimerState> {
       mode: TimerMode.stopwatch,
       sessionStartAt: startAt,
       sessionElapsedMs: elapsed > 0 ? elapsed : 0,
-      todayTotalMs: state.todayTotalMs > elapsed ? state.todayTotalMs : elapsed,
+      lastSyncedSessionElapsedMs: 0,
+      // The server's day total counts finished sessions only, so the running
+      // one is added on top (it used to be max(), which dropped it).
+      todayTotalMs: state.todayTotalMs + (elapsed > 0 ? elapsed : 0),
       currentSubject: subject ?? state.currentSubject,
     );
     _serverConfirmedSession = false;
@@ -324,6 +332,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
     _accumulatedSessionMs = 0;
     _accumulatedRestMs = 0;
+    _dayResetOffsetMs = 0;
     _segmentStartRemainingMs = state.pomodoroRemainingMs;
 
     state = state.copyWith(
@@ -332,7 +341,8 @@ class TimerNotifier extends StateNotifier<TimerState> {
       mode: TimerMode.stopwatch,
       sessionStartAt: startAt,
       sessionElapsedMs: elapsed > 0 ? elapsed : 0,
-      todayTotalMs: elapsed > state.todayTotalMs ? elapsed : state.todayTotalMs,
+      lastSyncedSessionElapsedMs: 0,
+      todayTotalMs: state.todayTotalMs + (elapsed > 0 ? elapsed : 0),
       currentSubject: subject ?? state.currentSubject,
     );
     _serverConfirmedSession = true;
@@ -344,6 +354,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   Future<void> _stopFromServer() async {
     _ticker?.cancel();
     _cancelReconcileTimer();
+    _dayResetOffsetMs = 0;
     _accumulatedSessionMs = 0;
     _accumulatedRestMs = 0;
     state = state.copyWith(
@@ -405,6 +416,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   void handleLogout() {
     _ticker?.cancel();
     _cancelReconcileTimer();
+    _dayResetOffsetMs = 0;
     _accumulatedSessionMs = 0;
     _accumulatedRestMs = 0;
     _segmentStartRemainingMs = 0;
@@ -424,6 +436,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   void _checkStudyDateReset() {
     final currentStudyDate = StudyDateHelper.getStudyDateString(null, _dayResetHour);
     if (state.lastStudyDate.isNotEmpty && state.lastStudyDate != currentStudyDate) {
+      _dayResetOffsetMs = state.isRunning ? state.sessionElapsedMs - state.lastSyncedSessionElapsedMs : 0;
       final resetSubjects = state.subjects.map((s) => s.copyWith(studyMs: 0)).toList();
       final resetCurrent = state.currentSubject?.copyWith(studyMs: 0);
       state = state.copyWith(
@@ -445,6 +458,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
           ? SubjectFetchResult(
               subjects: await _subjectRepository.getCachedSubjects(),
               todayTotalMs: state.todayTotalMs,
+              isFromServer: false,
             )
           : await _subjectRepository.fetchSubjectsData(
               language: _language,
@@ -458,9 +472,17 @@ class TimerNotifier extends StateNotifier<TimerState> {
               : subjects.first)
           : null;
 
-      final effectiveTodayTotal = state.isRunning
-          ? (state.todayTotalMs > result.todayTotalMs ? state.todayTotalMs : result.todayTotalMs)
-          : result.todayTotalMs;
+      // The server total covers finished sessions only; the part of the
+      // running session not yet sent with a stop is added locally.
+      final int effectiveTodayTotal;
+      if (!result.isFromServer) {
+        effectiveTodayTotal = state.todayTotalMs;
+      } else if (state.isRunning || state.isPaused) {
+        final withRunning = result.todayTotalMs + _unsyncedTodayMs;
+        effectiveTodayTotal = withRunning > state.todayTotalMs ? withRunning : state.todayTotalMs;
+      } else {
+        effectiveTodayTotal = result.todayTotalMs;
+      }
 
       state = state.copyWith(
         subjects: subjects,
@@ -483,6 +505,14 @@ class TimerNotifier extends StateNotifier<TimerState> {
         );
       }
     }
+  }
+
+  /// Study time of the current session that the server does not know yet
+  /// (not sent with a stop) and that belongs to today.
+  int get _unsyncedTodayMs {
+    if (!state.isRunning) return 0;
+    final ms = state.sessionElapsedMs - state.lastSyncedSessionElapsedMs - _dayResetOffsetMs;
+    return ms > 0 ? ms : 0;
   }
 
   void selectSubject(SubjectModel subject) {
@@ -810,6 +840,8 @@ class TimerNotifier extends StateNotifier<TimerState> {
     final currentSub = state.currentSubject;
 
     if (currentSub != null && (elapsed > 0 || state.isRunning)) {
+      // Everything unsynced is sent now, so nothing is left to carry over.
+      _dayResetOffsetMs = 0;
       final safeElapsed = elapsed > 0 ? elapsed : 0;
       final startAt = state.sessionStartAt ?? now.subtract(Duration(milliseconds: safeElapsed));
       final stopAt = startAt.add(Duration(milliseconds: safeElapsed));
@@ -892,6 +924,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   Future<void> stopStudy() async {
     _ticker?.cancel();
     _cancelReconcileTimer();
+    _dayResetOffsetMs = 0;
     final now = DateTime.now();
 
     if (!_isOffline() && state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
