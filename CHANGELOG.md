@@ -199,7 +199,7 @@ Before creating and pushing any release tag, the version string and build number
 - Break periods cannot be recorded with the current rest contract; timeline gaps are derived only (#11 R3).
 - Starting study from a completed task is intentionally disabled with a tooltip (#7 D23).
 - The live Sri Lanka server day assignment, mobile parity and the persistent To-Do/session association still require external confirmation; local tests and `s:true` do not prove those behaviors (#7, #10).
-- Native Win+Left snapping was observed on the secondary monitor, but primary-monitor half-screen, drag-to-edge and multi-DPI behavior remain unvalidated. The Desky window was kept on the secondary display as requested.
+- Win+Arrow gestures changed the monitor and window bounds, but exact half-screen placement was not established. Primary-monitor half-screen, drag-to-edge and multi-DPI behavior remain unvalidated. The Desky window was kept on the secondary display during the final gesture checks as requested.
 - Mobile parity was not exercised.
 
 ### Changed
