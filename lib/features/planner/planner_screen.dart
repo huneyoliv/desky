@@ -32,6 +32,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
   List<DDayModel> _ddays = [];
   List<TodoItemModel> _todos = [];
   bool _isLoading = true;
+  bool _hasLoadError = false;
+  String? _writeError;
 
   final _todoTitleController = TextEditingController();
   final _ddayTitleController = TextEditingController();
@@ -62,23 +64,30 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _hasLoadError = false;
+    });
     final repo = ref.read(plannerRepositoryProvider);
     final gmtOffset = _gmtOffset;
     final resetHour = _resetHour;
     final dateStr = StudyDayHelper.formatYmd(_selectedDate);
 
-    final results = await Future.wait([
-      repo.fetchDDays(),
-      repo.fetchTodos(dateStr, gmtOffset: gmtOffset, resetHour: resetHour),
-    ]);
-
-    if (mounted) {
-      setState(() {
-        _ddays = results[0] as List<DDayModel>;
-        _todos = results[1] as List<TodoItemModel>;
-        _isLoading = false;
-      });
+    try {
+      final results = await Future.wait([
+        repo.fetchDDays(),
+        repo.fetchTodos(dateStr, gmtOffset: gmtOffset, resetHour: resetHour),
+      ]);
+      if (mounted) {
+        setState(() {
+          _ddays = results[0] as List<DDayModel>;
+          _todos = results[1] as List<TodoItemModel>;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _hasLoadError = true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -106,7 +115,20 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     });
 
     final repo = ref.read(plannerRepositoryProvider);
-    await repo.toggleTodo(todo, gmtOffset: _gmtOffset, resetHour: _resetHour);
+    var accepted = false;
+    try {
+      accepted = await repo.toggleTodo(
+        todo,
+        gmtOffset: _gmtOffset,
+        resetHour: _resetHour,
+      );
+    } catch (_) {}
+    if (accepted || !mounted) return;
+
+    setState(() => _todos = _todos
+        .map((current) => current.id == todo.id ? todo : current)
+        .toList());
+    _showSaveFailed(ref.read(appTranslationProvider));
   }
 
   /// Inicia o cronometro para a materia da tarefa.
@@ -168,6 +190,10 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
   /// Planner fechava o dialogo em silencio. Mantemos a mesma mensagem para o
   /// usuario nao ficar sem retorno.
   void _showSaveFailed(AppTranslation t) {
+    setState(() {
+      _writeError = t.tr('todo_save_failed',
+          fallback: 'Não foi possível salvar. Tente novamente.');
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -257,6 +283,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     // -1 representa "sem materia", como no dialogo do To-Do.
     int subjectChoice = _kNoSubject;
     DateTime endDate = _selectedDate.add(const Duration(days: 30));
+    String? dialogError;
+    var isSaving = false;
 
     final weekdayNames = [
       {'id': 1, 'label': t.tr('day_mon_short', fallback: 'Seg')},
@@ -292,6 +320,15 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                     ),
                   ),
                 ),
+                if (dialogError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      dialogError!,
+                      key: const ValueKey('planner-write-error'),
+                      style: TextStyle(color: context.appTextPrimary),
+                    ),
+                  ),
                 const SizedBox(height: 12),
                 _buildSubjectDropdown(
                   t: t,
@@ -370,13 +407,15 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
               child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
-              onPressed: () async {
+              onPressed: isSaving ? null : () async {
                 final text = _todoTitleController.text.trim();
                 if (text.isEmpty) return;
+                setDialogState(() {
+                  isSaving = true;
+                  dialogError = null;
+                });
 
                 final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
-                _todoTitleController.clear();
-                Navigator.of(context).pop();
 
                 RecurrenceRuleModel? rr;
                 if (isRecurring && selectedDays.isNotEmpty) {
@@ -403,14 +442,19 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   recurrenceRule: rr,
                 );
 
-                if (!mounted) return;
-                // Antes de portar o To-Do para o Planner, uma criacao recusada
-                // pela API fechava o dialogo e nao deixava rastro: a tarefa
-                // simplesmente nao aparecia. Avisamos e recarregamos.
+                if (!context.mounted) return;
                 if (created == null) {
-                  _showSaveFailed(t);
+                  setDialogState(() {
+                    isSaving = false;
+                    dialogError = t.tr('todo_save_failed',
+                        fallback: 'Não foi possível salvar. Tente novamente.');
+                  });
+                  return;
                 }
-                _loadData();
+                _todoTitleController.clear();
+                Navigator.of(context).pop();
+                if (mounted) setState(() => _isLoading = true);
+                await _loadData();
               },
               style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
               child: Text(t.tr('add', fallback: 'Adicionar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
@@ -592,6 +636,8 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     final t = ref.read(appTranslationProvider);
     final controller = TextEditingController(text: todo.title);
     int subjectChoice = todo.subjectId ?? _kNoSubject;
+    String? dialogError;
+    var isSaving = false;
 
     showDialog(
       context: context,
@@ -613,6 +659,15 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
+              if (dialogError != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    dialogError!,
+                    key: const ValueKey('planner-write-error'),
+                    style: TextStyle(color: context.appTextPrimary),
+                  ),
+                ),
               const SizedBox(height: 12),
               _buildSubjectDropdown(
                 t: t,
@@ -658,12 +713,12 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
               child: Text(t.tr('cancel', fallback: 'Cancelar'), style: TextStyle(color: context.appTextMuted)),
             ),
             ElevatedButton(
-              onPressed: () async {
+              onPressed: isSaving ? null : () async {
                 final text = controller.text.trim();
                 if (text.isNotEmpty) {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    _todos = _todos.map((t) => t.id == todo.id ? t.copyWith(title: text) : t).toList();
+                  setDialogState(() {
+                    isSaving = true;
+                    dialogError = null;
                   });
                   final repo = ref.read(plannerRepositoryProvider);
                   final edited = await repo.editTodo(
@@ -675,9 +730,18 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         subjectChoice == _kNoSubject ? null : subjectChoice,
                     updateSubject: true,
                   );
-                  if (!mounted) return;
-                  if (!edited) _showSaveFailed(t);
-                  _loadData();
+                  if (!context.mounted) return;
+                  if (!edited) {
+                    setDialogState(() {
+                      isSaving = false;
+                      dialogError = t.tr('todo_save_failed',
+                          fallback: 'Não foi possível salvar. Tente novamente.');
+                    });
+                    return;
+                  }
+                  Navigator.of(context).pop();
+                  if (mounted) setState(() => _isLoading = true);
+                  await _loadData();
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
@@ -810,6 +874,11 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
     final progressPct = totalCount > 0 ? completedCount / totalCount : 0.0;
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
+    final todayYmd = StudyDayHelper.todayYmd(
+      gmtOffset: _gmtOffset,
+      resetHour: _resetHour,
+    );
+    final selectedYmd = StudyDayHelper.formatYmd(_selectedDate);
 
     return DefaultTabController(
       length: 2,
@@ -974,6 +1043,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                           },
                                         ),
                                         InkWell(
+                                          key: const ValueKey('planner-date-picker-button'),
                                           onTap: () async {
                                             final picked = await showDatePicker(
                                               context: context,
@@ -997,6 +1067,17 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                             setState(() => _selectedDate = _selectedDate.add(const Duration(days: 1)));
                                             _loadData();
                                           },
+                                        ),
+                                        IconButton(
+                                          key: const ValueKey('planner-today-button'),
+                                          icon: Icon(Icons.today_rounded, size: 18, color: context.appTextMuted),
+                                          tooltip: t.tr('today', fallback: 'Hoje'),
+                                          onPressed: selectedYmd == todayYmd
+                                              ? null
+                                              : () {
+                                                  setState(() => _selectedDate = DateTime.parse(todayYmd));
+                                                  _loadData();
+                                                },
                                         ),
                                       ],
                                     ),
@@ -1023,6 +1104,27 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                             ),
                           ],
                         ),
+                        if (_writeError != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: MaterialBanner(
+                              content: Text(_writeError!),
+                              contentTextStyle:
+                                  TextStyle(color: context.appTextPrimary),
+                              backgroundColor: context.appSurface,
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      setState(() => _writeError = null),
+                                  child: Text(
+                                    t.tr('dismiss', fallback: 'Dispensar'),
+                                    style: TextStyle(
+                                        color: context.appTextSecondary),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         const SizedBox(height: 24),
 
                         // Progress Bar Card
@@ -1041,7 +1143,7 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      '${t.tr("today", fallback: "Progresso")}: $completedCount / $totalCount ${t.tr("done_count", fallback: "done")}',
+                                      '$completedCount / $totalCount ${t.tr("done_count", fallback: "done")}',
                                       style: TextStyle(
                                           color: context.appTextPrimary,
                                           fontWeight: FontWeight.w600),
@@ -1078,7 +1180,30 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                         Expanded(
                           child: _isLoading
                               ? const Center(child: CircularProgressIndicator())
-                              : _todos.isEmpty
+                              : _hasLoadError
+                                  ? Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            t.tr('todo_load_failed',
+                                                fallback: 'Não foi possível carregar as tarefas.'),
+                                            style: TextStyle(
+                                                color: context.appTextPrimary),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          ElevatedButton.icon(
+                                            onPressed: _loadData,
+                                            icon: const Icon(Icons.refresh),
+                                            label: Text(
+                                              t.tr('retry',
+                                                  fallback: 'Tentar novamente'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : _todos.isEmpty
                                   ? Center(
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
@@ -1181,8 +1306,11 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
                                                 children: [
                                                   IconButton(
                                                     icon: Icon(Icons.play_arrow_rounded, color: context.appTextSecondary, size: 18),
-                                                    tooltip: t.tr('todo_start_study', fallback: 'Iniciar estudo'),
-                                                    onPressed: () => _startTodoStudy(todo),
+                                                    tooltip: todo.isCompleted
+                                                        ? t.tr('todo_completed_start_disabled',
+                                                            fallback: 'Tarefa concluída não pode iniciar estudo')
+                                                        : t.tr('todo_start_study', fallback: 'Iniciar estudo'),
+                                                    onPressed: todo.isCompleted ? null : () => _startTodoStudy(todo),
                                                   ),
                                                   IconButton(
                                                     icon: Icon(Icons.edit, color: context.appTextSecondary, size: 18),

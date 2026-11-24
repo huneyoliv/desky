@@ -87,13 +87,21 @@ class TodoNotifier extends StateNotifier<TodoState> {
   Future<void> refresh() async {
     final day = activeDay;
     state = state.copyWith(isLoading: true, clearError: true);
-    final todos = await _repository.fetchTodos(
-      day,
-      gmtOffset: _gmtOffset,
-      resetHour: _resetHour,
-    );
-    if (!mounted || activeDay != day) return;
-    state = state.copyWith(todos: todos, isLoading: false);
+    try {
+      final todos = await _repository.fetchTodos(
+        day,
+        gmtOffset: _gmtOffset,
+        resetHour: _resetHour,
+      );
+      if (!mounted || activeDay != day) return;
+      state = state.copyWith(todos: todos, isLoading: false);
+    } catch (_) {
+      if (!mounted || activeDay != day) return;
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'todo_sync_failed',
+      );
+    }
   }
 
   void selectDay(String? day) {
