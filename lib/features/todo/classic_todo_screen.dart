@@ -37,6 +37,9 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
   int? _addingTo;
   final _controller = TextEditingController();
 
+  /// Days expanded in "Earlier, not done"; every day starts collapsed.
+  final Set<String> _expandedDays = {};
+
   @override
   void dispose() {
     _controller.dispose();
@@ -138,6 +141,70 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
       );
     }
 
+    // Unticked tasks of past days, by day, each collapsed until opened.
+    List<Widget> earlier() {
+      final byDay = <String, List<TodoItemModel>>{};
+      for (final todo in state.openTodos) {
+        if (todo.dateYmd == notifier.todayKey) continue;
+        byDay.putIfAbsent(todo.dateYmd, () => []).add(todo);
+      }
+      if (byDay.isEmpty) return const [];
+      return [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
+          child: Text(t.tr('classic_todo_earlier', fallback: 'Earlier, not done'),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: palette.textSecondary)),
+        ),
+        for (final entry in byDay.entries)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: ClassicCard(
+              padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  InkWell(
+                    key: ValueKey('classic-todo-earlier-${entry.key}'),
+                    onTap: () => setState(() => _expandedDays.contains(entry.key)
+                        ? _expandedDays.remove(entry.key)
+                        : _expandedDays.add(entry.key)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(children: [
+                        Icon(
+                          _expandedDays.contains(entry.key) ? Icons.expand_more_rounded : Icons.chevron_right_rounded,
+                          size: 20,
+                          color: palette.textMuted,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            DateTime.tryParse(entry.key) == null
+                                ? entry.key
+                                : DateFormat('EEE, MMM d').format(DateTime.parse(entry.key)),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: palette.textPrimary),
+                          ),
+                        ),
+                        Text('${entry.value.length}', style: TextStyle(fontSize: 13, color: palette.textMuted)),
+                        const SizedBox(width: 8),
+                      ]),
+                    ),
+                  ),
+                  if (_expandedDays.contains(entry.key))
+                    for (final todo in entry.value)
+                      _TodoRow(
+                        todo: todo,
+                        onToggle: () => notifier.toggle(todo),
+                        onEdit: () => TodoDialog.show(context, existing: todo),
+                        onDelete: () => notifier.remove(todo),
+                      ),
+                ],
+              ),
+            ),
+          ),
+      ];
+    }
+
     return Scaffold(
       backgroundColor: palette.background,
       body: ClassicPage(
@@ -152,6 +219,15 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
                   Text(DateFormat('EEE, MMM d').format(active),
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: palette.textPrimary)),
                   const Spacer(),
+                  IconButton(
+                    key: const ValueKey('classic-todo-add-main'),
+                    tooltip: t.tr('classic_add', fallback: 'Add'),
+                    icon: const Icon(Icons.add_rounded, size: 22, color: Color(0xFFFF6B1A)),
+                    onPressed: () => setState(() {
+                      _addingTo = 0;
+                      _controller.clear();
+                    }),
+                  ),
                   IconButton(
                     visualDensity: VisualDensity.compact,
                     icon: Icon(Icons.chevron_left, size: 18, color: palette.textSecondary),
@@ -187,9 +263,12 @@ class _ClassicTodoScreenState extends ConsumerState<ClassicTodoScreen> {
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                       children: [
+                        if (_addingTo == 0 && !bySubject.containsKey(0))
+                          section(0, t.tr('classic_todo_general', fallback: 'General'), palette.textMuted),
                         for (final s in subjects) section(s.id, s.title, Color(s.colorInt)),
                         if (subjects.isEmpty || bySubject.containsKey(0))
                           section(0, t.tr('classic_todo_general', fallback: 'General'), palette.textMuted),
+                        if (notifier.isToday) ...earlier(),
                       ],
                     ),
             ),

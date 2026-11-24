@@ -134,6 +134,46 @@ class PlannerRepository {
     return [];
   }
 
+  /// Unticked tasks from [fromYmd] to [toYmd] (study days, inclusive), in one
+  /// range request. Past occurrences of recurring tasks are left out: every
+  /// missed repeat would otherwise pile up as a separate open task.
+  Future<List<TodoItemModel>> fetchOpenTodos(
+    String fromYmd,
+    String toYmd, {
+    required Duration gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+  }) async {
+    try {
+      final start = StudyDayHelper.startUtc(fromYmd, gmtOffset: gmtOffset, resetHour: resetHour);
+      final end = StudyDayHelper.endUtc(toYmd, gmtOffset: gmtOffset, resetHour: resetHour);
+      final response = await _apiClient.get(
+        '/study/study-plan/get-by-date',
+        queryParameters: {
+          'start_at': StudyDayHelper.toApiIso(start.subtract(const Duration(hours: 12))),
+          'end_at': StudyDayHelper.toApiIso(end.add(const Duration(hours: 12))),
+          'is_unscheduled': 'true',
+        },
+      );
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        final rawList = data['r'] ?? data['todos'];
+        if (rawList is List) {
+          return rawList
+              .whereType<Map<String, dynamic>>()
+              .map((item) => TodoItemModel.fromJson(item))
+              .map((item) => _alignToStudyDay(item, gmtOffset, resetHour))
+              .where((item) =>
+                  !item.isCompleted &&
+                  item.dateYmd.compareTo(fromYmd) >= 0 &&
+                  item.dateYmd.compareTo(toYmd) <= 0 &&
+                  (item.dateYmd == toYmd || !item.isRecurring))
+              .toList();
+        }
+      }
+    } catch (_) {}
+    return [];
+  }
+
   TodoItemModel _alignToStudyDay(
     TodoItemModel item,
     Duration gmtOffset,

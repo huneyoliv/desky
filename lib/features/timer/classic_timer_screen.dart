@@ -559,11 +559,8 @@ class _TodayPane extends ConsumerWidget {
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
     final timer = ref.watch(timerNotifierProvider);
-    final todos = ref.watch(todoNotifierProvider);
-    final todoNotifier = ref.read(todoNotifierProvider.notifier);
     final goal = math.max(1, timer.dailyGoalMinutes * 60000);
     final progress = (timer.todayTotalMs / goal).clamp(0.0, 1.0);
-    final done = todos.todos.where((d) => d.isCompleted).length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -618,49 +615,123 @@ class _TodayPane extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 14),
-        Expanded(
-          child: ClassicCard(
-            title: t.tr('classic_tab_todo', fallback: 'To-Do'),
-            trailing: Text('$done/${todos.todos.length}', style: TextStyle(fontSize: 13, color: palette.textMuted)),
-            child: todos.todos.isEmpty
-                ? Center(
-                    child: TextButton(
-                      onPressed: () => context.go('/todo'),
-                      child: Text(t.tr('classic_add_todo', fallback: 'Plan today in To-Do'),
-                          style: const TextStyle(color: kStatOrange)),
-                    ),
-                  )
-                : ListView(
-                    children: [
-                      for (final todo in todos.todos)
-                        InkWell(
-                          borderRadius: BorderRadius.circular(10),
-                          onTap: () => todoNotifier.toggle(todo),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                            child: Row(children: [
-                              Icon(
-                                todo.isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
-                                size: 20,
-                                color: todo.isCompleted ? Color(todo.subjectColorInt) : palette.textMuted,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(todo.title,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: todo.isCompleted ? palette.textMuted : palette.textPrimary,
-                                      decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
-                                    )),
-                              ),
-                            ]),
-                          ),
-                        ),
-                    ],
-                  ),
+        const Expanded(child: _HomeTodoCard()),
+      ],
+    );
+  }
+}
+
+/// Home To-Do: every unticked task from today and the last
+/// [TodoNotifier.carryOverDays] days. A task stays until it is ticked; ticked
+/// tasks leave this list but stay on their day in the To-Do tab.
+class _HomeTodoCard extends ConsumerStatefulWidget {
+  const _HomeTodoCard();
+
+  @override
+  ConsumerState<_HomeTodoCard> createState() => _HomeTodoCardState();
+}
+
+class _HomeTodoCardState extends ConsumerState<_HomeTodoCard> {
+  bool _adding = false;
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final title = _controller.text.trim();
+    setState(() => _adding = false);
+    _controller.clear();
+    if (title.isEmpty) return;
+    final notifier = ref.read(todoNotifierProvider.notifier);
+    await notifier.add(title, dateYmd: notifier.todayKey);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = ref.watch(appTranslationProvider);
+    final palette = context.palette;
+    final open = ref.watch(todoNotifierProvider.select((s) => s.openTodos));
+    final notifier = ref.read(todoNotifierProvider.notifier);
+    final today = notifier.todayKey;
+
+    final children = <Widget>[
+      if (_adding)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: TextField(
+            key: const ValueKey('classic-home-todo-field'),
+            controller: _controller,
+            autofocus: true,
+            style: TextStyle(fontSize: 14, color: palette.textPrimary),
+            decoration: InputDecoration(
+              isDense: true,
+              prefixIcon: Icon(Icons.radio_button_unchecked_rounded, size: 18, color: palette.textMuted),
+              hintText: t.tr('classic_enter_todo', fallback: 'Enter to-do'),
+              hintStyle: TextStyle(fontSize: 14, color: palette.textMuted),
+            ),
+            onSubmitted: (_) => _submit(),
+            onTapOutside: (_) => _submit(),
           ),
         ),
-      ],
+    ];
+    String? lastDay;
+    for (final todo in open) {
+      if (todo.dateYmd != lastDay) {
+        lastDay = todo.dateYmd;
+        if (todo.dateYmd != today) {
+          final d = DateTime.tryParse(todo.dateYmd);
+          children.add(Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 2, left: 4),
+            child: Text(d == null ? todo.dateYmd : DateFormat('EEE, MMM d').format(d),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: palette.textMuted)),
+          ));
+        }
+      }
+      children.add(InkWell(
+        key: ValueKey('classic-home-todo-${todo.id}-${todo.dateYmd}'),
+        borderRadius: BorderRadius.circular(10),
+        onTap: () => notifier.toggle(todo),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Row(children: [
+            Icon(Icons.circle_outlined, size: 20, color: palette.textMuted),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(todo.title, style: TextStyle(fontSize: 14, color: palette.textPrimary)),
+            ),
+          ]),
+        ),
+      ));
+    }
+
+    return ClassicCard(
+      title: t.tr('classic_tab_todo', fallback: 'To-Do'),
+      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+        Text('${open.length}', style: TextStyle(fontSize: 13, color: palette.textMuted)),
+        IconButton(
+          key: const ValueKey('classic-home-todo-add'),
+          tooltip: t.tr('classic_add', fallback: 'Add'),
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.add_rounded, size: 20, color: kStatOrange),
+          onPressed: () => setState(() {
+            _adding = true;
+            _controller.clear();
+          }),
+        ),
+      ]),
+      child: children.isEmpty
+          ? Center(
+              child: TextButton(
+                onPressed: () => setState(() => _adding = true),
+                child: Text(t.tr('classic_add_todo', fallback: 'Plan today in To-Do'),
+                    style: const TextStyle(color: kStatOrange)),
+              ),
+            )
+          : ListView(children: children),
     );
   }
 }

@@ -32,6 +32,11 @@ TodoItemModel _todo(int id, int subjectId, String title, bool done) => TodoItemM
 
 class _Planner extends PlannerRepository {
   @override
+  Future<List<TodoItemModel>> fetchOpenTodos(String fromYmd, String toYmd,
+          {required Duration gmtOffset, int resetHour = 5}) async =>
+      [_todo(7, 1, 'Unfinished from last week', false).copyWith(dateYmd: fromYmd)];
+
+  @override
   Future<List<TodoItemModel>> fetchTodos(String dateYmd, {required Duration gmtOffset, int resetHour = 5}) async => [
         _todo(1, 1, 'Read Ram Ahuja ch. 3', true),
         _todo(2, 1, 'Answer writing: 2 questions', false),
@@ -73,6 +78,20 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Answer writing: 2 questions'), findsOneWidget);
     expect(find.text('Sociology'), findsOneWidget);
+
+    // Earlier unticked tasks: grouped by day and collapsed until opened.
+    expect(find.text('Earlier, not done'), findsOneWidget);
+    expect(find.text('Unfinished from last week'), findsNothing);
+    await tester.tap(find.byWidgetPredicate(
+        (w) => w.key is ValueKey<String> && (w.key as ValueKey<String>).value.startsWith('classic-todo-earlier-')));
+    await tester.pump();
+    expect(find.text('Unfinished from last week'), findsOneWidget);
+
+    // The main + opens a new General task field.
+    await tester.tap(find.byKey(const ValueKey('classic-todo-add-main')));
+    await tester.pump();
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('General'), findsOneWidget);
 
     final dir = Platform.environment['DESKY_SCREENSHOTS'];
     if (dir != null) {

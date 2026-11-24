@@ -35,6 +35,11 @@ class _Timer extends TimerRepository {
 
 class _Planner extends PlannerRepository {
   @override
+  Future<List<TodoItemModel>> fetchOpenTodos(String fromYmd, String toYmd,
+          {required Duration gmtOffset, int resetHour = 5}) =>
+      fetchTodos(toYmd, gmtOffset: gmtOffset);
+
+  @override
   Future<List<TodoItemModel>> fetchTodos(String dateYmd, {required Duration gmtOffset, int resetHour = 5}) async => [
         TodoItemModel(
           id: 1,

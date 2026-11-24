@@ -146,6 +146,33 @@ void main() {
       expect(captured!['is_unscheduled'], 'true');
     });
 
+    test('fetchOpenTodos: one range request, unticked only, no past repeats', () async {
+      Map<String, dynamic>? sentQuery;
+      final repo = PlannerRepository(
+        apiClient: _FakeApiClient((path, query, body) async {
+          sentQuery = query;
+          return _json({
+            's': true,
+            'r': [
+              {'id': 1, 't': 'too old', 'sa': '2026-10-25T07:59:00.000Z'},
+              {'id': 2, 't': 'open old', 'sa': '2026-10-26T12:00:00.000Z'},
+              {'id': 3, 't': 'done old', 'sa': '2026-10-27T12:00:00.000Z', 's': 1},
+              {'id': 4, 't': 'missed repeat', 'sa': '2026-10-28T12:00:00.000Z', 'p': 9},
+              {'id': 5, 't': 'today repeat', 'sa': '2026-11-01T12:00:00.000Z', 'p': 9},
+              {'id': 6, 't': 'open today', 'sa': '2026-11-01T13:00:00.000Z'},
+              {'id': 7, 't': 'tomorrow', 'sa': '2026-11-02T08:00:00.000Z'},
+            ],
+          });
+        }),
+      );
+
+      final todos = await repo.fetchOpenTodos('2026-10-26', '2026-11-01', gmtOffset: brazil);
+
+      expect(todos.map((t) => t.id), equals([2, 5, 6]));
+      expect(sentQuery?['start_at'], '2026-10-25T20:00:00.000Z');
+      expect(sentQuery?['end_at'], '2026-11-02T20:00:00.000Z');
+    });
+
     test('keeps only todos that belong to the requested study day', () async {
       final repo = PlannerRepository(
         apiClient: _FakeApiClient((path, query, body) async {

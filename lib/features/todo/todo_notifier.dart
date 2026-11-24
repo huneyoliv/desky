@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/utils/study_day_helper.dart';
@@ -16,6 +18,7 @@ final todoNotifierProvider =
 class TodoState {
   const TodoState({
     this.todos = const [],
+    this.openTodos = const [],
     this.isLoading = true,
     this.selectedDay,
     this.errorMessage,
@@ -23,6 +26,10 @@ class TodoState {
   });
 
   final List<TodoItemModel> todos;
+
+  /// Unticked tasks from today and the previous [TodoNotifier.carryOverDays]
+  /// days, whatever day is selected. A task stays here until it is ticked.
+  final List<TodoItemModel> openTodos;
   final bool isLoading;
 
   /// Day being shown, 'yyyy-MM-dd'. Null means the current study day.
@@ -32,6 +39,7 @@ class TodoState {
 
   TodoState copyWith({
     List<TodoItemModel>? todos,
+    List<TodoItemModel>? openTodos,
     bool? isLoading,
     String? selectedDay,
     bool clearSelectedDay = false,
@@ -41,6 +49,7 @@ class TodoState {
   }) {
     return TodoState(
       todos: todos ?? this.todos,
+      openTodos: openTodos ?? this.openTodos,
       isLoading: isLoading ?? this.isLoading,
       selectedDay: clearSelectedDay ? null : (selectedDay ?? this.selectedDay),
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
@@ -84,16 +93,53 @@ class TodoNotifier extends StateNotifier<TodoState> {
 
   bool get isToday => activeDay == todayKey;
 
+  /// How far back unticked tasks are carried over.
+  static const int carryOverDays = 30;
+
   Future<void> refresh() async {
     final day = activeDay;
     state = state.copyWith(isLoading: true, clearError: true);
+    // Independent requests: a slow carry-over fetch never holds the day list.
+    unawaited(_refreshOpen());
     final todos = await _repository.fetchTodos(
       day,
       gmtOffset: _gmtOffset,
       resetHour: _resetHour,
     );
-    if (!mounted || activeDay != day) return;
-    state = state.copyWith(todos: todos, isLoading: false);
+    if (mounted && activeDay == day) {
+      state = state.copyWith(todos: todos, isLoading: false);
+    }
+  }
+
+  int _openGeneration = 0;
+
+  Future<void> _refreshOpen() async {
+    final generation = ++_openGeneration;
+    final open = await _fetchOpen();
+    // Only the latest request wins, so an older answer cannot undo a tick.
+    if (!mounted || generation != _openGeneration) return;
+    state = state.copyWith(openTodos: _sortOpen(open));
+  }
+
+  Future<List<TodoItemModel>> _fetchOpen() {
+    final today = todayKey;
+    final from = DateTime.tryParse(today)?.subtract(const Duration(days: carryOverDays));
+    return _repository.fetchOpenTodos(
+      from == null ? today : StudyDayHelper.formatYmd(from),
+      today,
+      gmtOffset: _gmtOffset,
+      resetHour: _resetHour,
+    );
+  }
+
+  /// Newest day first, keeping the server's order within a day.
+  static List<TodoItemModel> _sortOpen(List<TodoItemModel> open) {
+    final indexed = open.asMap().entries.toList()
+      ..sort((a, b) {
+        final c = b.value.dateYmd.compareTo(a.value.dateYmd);
+        return c != 0 ? c : a.key.compareTo(b.key);
+      });
+    return [for (final e in indexed) e.value];
   }
 
   void selectDay(String? day) {
@@ -113,14 +159,15 @@ class TodoNotifier extends StateNotifier<TodoState> {
     selectDay(ymd);
   }
 
-  /// Creates a task on the active day. Returns false when the API rejects it.
-  Future<bool> add(String title, {int? subjectId}) async {
+  /// Creates a task on [dateYmd] (default: the selected day). Returns false
+  /// when the API rejects it.
+  Future<bool> add(String title, {int? subjectId, String? dateYmd}) async {
     final trimmed = title.trim();
     if (trimmed.isEmpty) return false;
 
     final created = await _repository.createTodo(
       title: trimmed,
-      dateYmd: activeDay,
+      dateYmd: dateYmd ?? activeDay,
       gmtOffset: _gmtOffset,
       resetHour: _resetHour,
       subjectId: subjectId,
