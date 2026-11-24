@@ -63,6 +63,7 @@ class FakePlannerRepository extends PlannerRepository {
   // Gravacoes feitas pelas acoes de tarefa, na ordem em que aconteceram.
   final List<String> requestedDates = [];
   final List<int> resetHours = [];
+  final List<int> toggledIds = [];
   final List<Duration> gmtOffsets = [];
   bool failLoad = false;
   bool failToggle = false;
@@ -151,8 +152,18 @@ class FakePlannerRepository extends PlannerRepository {
     TodoItemModel todo, {
     required Duration gmtOffset,
     int resetHour = StudyDayHelper.defaultResetHour,
-  }) async =>
-      !failToggle;
+  }) async {
+    toggledIds.add(todo.id);
+    if (failToggle) return false;
+    items = items
+        .map(
+          (current) => current.id == todo.id
+              ? current.copyWith(isCompleted: !current.isCompleted)
+              : current,
+        )
+        .toList();
+    return true;
+  }
 }
 
 class _TestTimerNotifier extends TimerNotifier {
@@ -896,6 +907,22 @@ void main() {
     expect(button.onPressed, isNull);
     expect(button.tooltip, isNotNull);
     expect(timerRepo.taskIds, isEmpty);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('toggle success updates the completed counter', (tester) async {
+    final repo = FakePlannerRepository(
+      mockTodos: [_todo(id: 1, completed: true), _todo(id: 2)],
+    );
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    await tester.tap(find.byType(Checkbox).at(1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(repo.toggledIds, equals([2]));
+    expect(find.textContaining('2 / 2'), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
     await _disposeTimer(tester, timer);
   });
 
