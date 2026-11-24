@@ -68,6 +68,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    final savedScope =
+        ref.read(sharedPreferencesProvider)?.getString('rank_scope');
+    _rankScope = savedScope == 'region' ? _RankScope.region : _RankScope.category;
     _loadRanks();
     _loadUserStats();
     _loadCalendarMonth();
@@ -769,6 +772,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       scope: _rankScope,
                       categoryName: ref.watch(authStateProvider).user?.categoryName ?? '',
                       onChanged: (scope) {
+                        ref
+                            .read(sharedPreferencesProvider)
+                            ?.setString('rank_scope', scope.name);
                         setState(() => _rankScope = scope);
                         _loadRanks();
                       },
