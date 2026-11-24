@@ -10,12 +10,14 @@ class StudyCalendar extends ConsumerWidget {
   final Map<String, int> dailyStudyTimeMs; // Key: 'yyyy-MM-dd', Value: ms
   final DateTime month; // Any date inside the month being displayed.
   final ValueChanged<DateTime> onMonthChanged;
+  final bool isLoading;
 
   const StudyCalendar({
     super.key,
     required this.dailyStudyTimeMs,
     required this.month,
     required this.onMonthChanged,
+    this.isLoading = false,
   });
 
   Color _getDayColor(int ms, DeskyThemePalette palette) {
@@ -67,6 +69,17 @@ class StudyCalendar extends ConsumerWidget {
         return '${shown.month}/${shown.year}';
       }
     }();
+
+    if (isLoading) {
+      return const SizedBox(
+        height: 320,
+        child: Center(
+          child: CircularProgressIndicator(
+            key: ValueKey('stats-month-loading'),
+          ),
+        ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

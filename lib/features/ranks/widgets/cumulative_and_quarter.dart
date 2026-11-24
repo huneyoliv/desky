@@ -138,11 +138,13 @@ class QuarterlyCalendar extends ConsumerWidget {
     required this.quarterDays,
     required this.month,
     required this.onMonthChanged,
+    this.isLoading = false,
   });
 
   final Map<String, int> quarterDays;
   final DateTime month;
   final ValueChanged<DateTime> onMonthChanged;
+  final bool isLoading;
 
   static const List<String> _monthNames = [
     'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
@@ -158,7 +160,7 @@ class QuarterlyCalendar extends ConsumerWidget {
 
     return StatsCard(
       title: t.tr('stats_quarter', fallback: 'Quarterly calendar'),
-      isEmpty: !hasData,
+      isEmpty: !isLoading && !hasData,
       emptyMessage: t.tr('stats_no_quarter',
           fallback: 'No study days this quarter.'),
       trailing: Row(
@@ -182,7 +184,16 @@ class QuarterlyCalendar extends ConsumerWidget {
           ),
         ],
       ),
-      child: Column(
+      child: isLoading
+          ? const SizedBox(
+              height: 180,
+              child: Center(
+                child: CircularProgressIndicator(
+                  key: ValueKey('stats-quarter-loading'),
+                ),
+              ),
+            )
+          : Column(
         children: [
           for (var offset = 0; offset < 3; offset++)
             _MonthRow(
