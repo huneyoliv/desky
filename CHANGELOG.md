@@ -73,6 +73,152 @@ Before creating and pushing any release tag, the version string and build number
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- Planner tasks now offer an explicit subject selector, including **No subject**,
+  and resolve subject names from the same timer state used by study sessions.
+- Open Planner tasks can start the real timer with their subject. The action sends
+  the task id to `/study/start`; acceptance was verified live earlier, while
+  persistent task-session association remains unconfirmed and is not claimed.
+- Localized the new Planner subject/start/failure controls in the 11 languages exercised by the timer layout test.
+
+- Timer appearance now includes persisted Aurora and Sunset gradients, local
+  PNG/JPEG/WebP images up to 20 MB, and Digital, SF Pro or Pretendard font
+  selection. Missing/unreadable images fall back safely; no media is uploaded.
+  Video backgrounds are not included (#10).
+
+- Study Timeline (Refs #11) adds day navigation, chronological sessions, subject
+  names, durations, daily totals, and clearly derived gaps between sessions.
+  It reuses the existing manual study flow with an initial date and save result.
+
+- Light and adaptive theme support (Refs #12) adds two light palettes, an
+  operating-system System mode with persisted light/dark preferences, and
+  theme-token migrations for controls, dialogs, charts and narrow layouts.
+
+- Selected PR #9 contributions add English fallbacks while preserving Portuguese,
+  bounded avatar/chat/sticker image decoding, persistent custom group ordering,
+  opt-in Classic zoom shortcuts, and a member statistics/Nudge sheet.
+- Windows can restore the previous monitor and position, and an opt-in OBS
+  overlay mode sends minimize requests behind other windows. Prerelease CI no
+  longer attempts to upload an MSIX package that was intentionally not built.
+
+### Fixed
+
+- The app no longer exits silently when the single-instance channel cannot be
+  created. `startOrForward` used to return `null` both when a payload had been
+  forwarded to the running instance and when the lock could not be acquired at
+  all, and `main` treated every `null` as the first case. With a read-only or
+  redirected `%APPDATA%` the process died with no window and no message. The
+  result now distinguishes `primary`, `forwarded` and `degraded`; only a real
+  forward exits, and a degraded start still opens the window.
+
+- Planner D-Day creation and deletion now use the live-verified contracts:
+  `POST /user/d-day/create` requires `title` **and** `date` (not `targetDate`),
+  and `POST /user/d-day/delete` requires a JSON body with `id`. The previous
+  payloads were rejected by the server with HTTP 500. Both actions now surface a
+  localized failure message instead of failing silently.
+
+- Timetable block creation now uses the live-verified compact body
+  `{ttid,t,lw,st,et,scid,sd,ed,c}` and parses the `rs` response. The colour `c`
+  was the final missing field. A disposable block was created, reread through
+  `sb` and deleted, leaving no probe data. Loading now prefers actual detail
+  blocks over container summaries.
+
+- Deleting a To-Do item now sends the required JSON body (`{"id": ...}`) to
+  `DELETE /study/study-plan/rest`. The previous query-only request was rejected
+  and left the item on the server. Rejected deletions show an error.
+- Editing a task without a subject no longer risks silently associating one, and
+  an existing subject missing from the loaded list is preserved safely.
+- Planner task creation, editing and deletion now check the repository result.
+  Refused writes show a localized error and reload the server state, including
+  after an optimistic local edit or removal. Recurring editing remains limited
+  to the selected occurrence. Deletion offers either that occurrence (default)
+  or the whole series after a fresh `target:"all"` live proof and cleanup.
+- Text searches in Study Group discovery now propagate the selected country
+  instead of silently falling back to the repository's default country.
+- The Timer start button now has a fixed width in both Timer and Pomodoro modes.
+  `minimumSize` still allowed the longer Pomodoro label to widen it; a new
+  regression test measures both labels, subject changes and the timer geometry.
+
+- Window resizing now allows down to 640×480, so Desky can occupy half of a
+  1920×1080 display. The previous 1024×700 minimum blocked that layout. The
+  Timer was also exercised at 960×540 and 640×480 without layout overflow (#10).
+  Static gradient/image backgrounds and timer-font selection are included;
+  video backgrounds remain excluded from this change.
+
+- Renaming a group now sends `title` to `/group/info/edit`. The previous `t`
+  field returned `s:true` without changing the name; `title` was verified live
+  by editing and restoring it. Recurring To-Do deletion was also verified live:
+  one occurrence could be removed alone and `target:"all"` removed the remaining
+  series, with no probe items left.
+
+- Added NOTICE.md plus Pretendard/E1234 OFL and Material Icons Apache 2.0
+  license files, and declared Pretendard correctly in the font manifest.
+- Added button geometry coverage for the 11-language timer layout matrix. All 22
+  Timer/Pomodoro labels fit within the fixed 296 px button without clipping.
+
+- The Timer now syncs its clock with the server. `GET /time/` returns the
+  timestamp under `t`, but the client only read `timestamp`, so every sync
+  silently fell back to the local clock. Both keys are now accepted.
+
+- PR #9 Nudge requests now use the verified snake_case body with sender name.
+  Invalid stored window sizes are normalized before placement so the restored
+  default window cannot be positioned off screen.
+
+- Light palettes now keep profile, group chat, leader panel, selectors and shared text styles on palette-aware colors, with rendered WCAG AA assertions in both light themes (#12 R1, #5 R13).
+- Planner task writes now roll back rejected toggles, distinguish load failure from an empty day, offer retry, keep create/edit dialogs open with inline errors and expose a dismissible write-error banner. Explicit `/study/start` refusal no longer starts the timer or navigates (#7).
+- Derived statistics now load current and previous periods, reload with range changes, fetch all three months of a quarter, show loading instead of false zeroes and exclude zero-duration subjects from the pie (#5 R27, R28, R30, R20, R22).
+- Stats comparison labels and quarter month names now follow the selected locale, including the 11-language test matrix (#5 R18).
+- Group chat permission changes are saved with failure reporting, messages show full date and time, and ranking scope persists across screens (#5 R4, R7, R9).
+- Study-day boundaries now use the selected country's start hour when available and fixed GMT offset, with the manual reset preference preserved. Timer, Planner, Calendar and Timeline share the effective rule (#10 R4).
+
+### Known Limitations
+
+- Full Classic navigation, mini player, offline sync, Discord IPC hardening and
+  crash logging are not included in the selected PR #9 integration. OBS focus/
+  z-order and real OS behavior still require manual native verification.
+
+- Group creation is not supported: the create contract is unconfirmed (three attempts failed).
+- Starting a session from a to-do sends taskId, but no association is observable on the API.
+- Recurring tasks: editing affects only the selected occurrence; deleting offers one occurrence or the whole series.
+- Nudge reception on desktop is not possible yet (no nudge notification type; the official app uses FCM push).
+- Background videos (issue #10) are not implemented.
+- Study vs rest breakdown is not available (rest contract unknown).
+- Study vs rest data is not available from the API; gaps are derived from session times.
+- Rendered appearance and real operating-system theme switching were not verified
+  by screenshot or manual testing; validation used WCAG calculations and offline
+  widget geometry only.
+- Joining challenges is not supported; the Challenges tab is read-only.
+
+- Group member time zones are unavailable from the API, so per-member reset remains unimplemented (#5 R24).
+- Break periods cannot be recorded with the current rest contract; timeline gaps are derived only (#11 R3).
+- Starting study from a completed task is intentionally disabled with a tooltip (#7 D23).
+- System theme mode has not been observed switching with the real operating system; only notifier tests cover it.
+- Mobile parity was not exercised.
+
+### Changed
+
+- The Planner tab formerly labelled Grade Horária is now Calendário, with a new
+  `planner_calendar_tab` key translated in the 11-language test matrix. The
+  internal timetable title remains descriptive and unchanged.
+- The Timer/Pomodoro switcher is centred independently of the left/right header
+  content, with geometry tests at 1280, 960 and 640 px.
+
+- Updated the API documentation with the live-validated To-Do create/edit/delete
+  and start/stop contracts. Group creation remains documented as blocked because
+  the available HAR contains no group/todo REST writes and the APK does not expose
+  the complete group-creation payload.
+
+- Removed the unreachable standalone To-Do screen after porting behavior coverage to Planner, including successful toggles and the completed counter.
+- Language documentation now distinguishes **7 selectable UI languages**, **11 languages in the timer test matrix**, and **28 locale JSON files** as separate layers.
+
+Refs #5, #7 and #10. Fixes #8.
+Refs #11 and #12.
+
+---
+
 ## [1.2.1] - 2026-11-19
 
 ### Fixed
