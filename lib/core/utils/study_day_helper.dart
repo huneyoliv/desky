@@ -1,3 +1,5 @@
+import '../../data/models/country_model.dart';
+
 /// Study-day semantics shared with the YPT backend.
 ///
 /// YPT starts a new study day at a country-specific hour (5 AM for every
@@ -104,6 +106,20 @@ class StudyDayHelper {
     );
     return wallTime.subtract(gmtOffset);
   }
+
+  /// Country start hour wins on selection; otherwise the manual preference is used.
+  /// The preference itself is never overwritten by this resolution.
+  static int resetHourFor(CountryModel country, int manualResetHour) {
+    final hasCountryHour = country.startTime?.trim().isNotEmpty == true;
+    return hasCountryHour ? country.startHour : _clampHour(manualResetHour);
+  }
+
+  /// Country fixed offset wins; the device offset is only the fallback.
+  static Duration gmtOffsetFor(
+    CountryModel country, {
+    Duration? device,
+  }) =>
+      country.gmtOffsetDuration ?? device ?? DateTime.now().timeZoneOffset;
 
   static int _clampHour(int hour) => (hour >= 0 && hour <= 23) ? hour : defaultResetHour;
 }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/color_utils.dart';
+import '../../../core/utils/study_day_helper.dart';
 import '../../../data/repositories/rank_repository.dart';
 import '../../settings/settings_notifier.dart';
 import '../../timer/widgets/manual_study_log_dialog.dart';
@@ -25,7 +26,7 @@ class TimelineTab extends ConsumerStatefulWidget {
 }
 
 class _TimelineTabState extends ConsumerState<TimelineTab> {
-  DateTime _selectedDay = DateTime.now();
+  late DateTime _selectedDay;
   TimelineDaySummary _summary = const TimelineDaySummary(
     sessions: [],
     gaps: [],
@@ -36,9 +37,20 @@ class _TimelineTabState extends ConsumerState<TimelineTab> {
 
   String get _dayKey => DateFormat('yyyy-MM-dd').format(_selectedDay);
 
+  DateTime _currentStudyDay() {
+    final settings = ref.read(settingsNotifierProvider);
+    return DateTime.parse(
+      StudyDayHelper.todayYmd(
+        gmtOffset: StudyDayHelper.gmtOffsetFor(settings.selectedCountry),
+        resetHour: settings.dayResetHour,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
+    _selectedDay = _currentStudyDay();
     _loadDay();
   }
 
@@ -139,7 +151,7 @@ class _TimelineTabState extends ConsumerState<TimelineTab> {
               ),
               TextButton(
                 onPressed: () {
-                  setState(() => _selectedDay = DateTime.now());
+                  setState(() => _selectedDay = _currentStudyDay());
                   _loadDay();
                 },
                 child: Text(t.tr('today', fallback: 'Hoje')),
