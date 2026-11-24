@@ -279,7 +279,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
     if (_reconciling) return;
     _reconciling = true;
     try {
-      final log = await _timerRepository.fetchDailyLog(DateTime.now());
+      final log = await _timerRepository.fetchDailyLog(
+        DateTime.now(),
+        gmtOffset: _gmtOffset,
+        resetHour: _dayResetHour,
+      );
       if (!mounted) return;
       final dl = log?['dl'];
       if (dl is! Map) return;
