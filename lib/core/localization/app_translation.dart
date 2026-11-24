@@ -331,7 +331,6 @@ class AppTranslation {
     'stats_no_quarter': {'pt': "Nenhum dia com estudo neste trimestre."},
     'stats_no_scatter': {'pt': "Sem sessões no período para cruzar início e término."},
     'stats_no_time_of_day': {'pt': "Sem sessões no período para calcular horários."},
-    'todo_sync_failed': {'pt': "Não foi possível salvar no servidor. A lista foi recarregada."},
     'regularity_very_regular': {'pt': 'muito regular', 'en': 'very regular'},
     'regularity_regular': {'pt': 'regular', 'en': 'regular'},
     'regularity_irregular': {'pt': 'irregular', 'en': 'irregular'},
