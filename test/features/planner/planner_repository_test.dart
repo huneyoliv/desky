@@ -167,7 +167,8 @@ void main() {
       expect(todos.every((t) => t.dateYmd == '2026-11-01'), isTrue);
     });
 
-    test('aligns the payload date with the study day, not the UTC date', () async {
+    test('aligns the payload date with the study day, not the UTC date',
+        () async {
       final repo = PlannerRepository(
         apiClient: _FakeApiClient((path, query, body) async {
           return _json({
@@ -228,7 +229,8 @@ void main() {
       final ok = await repo.toggleTodo(todo, gmtOffset: brazil);
 
       expect(ok, isTrue);
-      expect((payload as Map<String, dynamic>)['start_at'], '2026-11-01T12:15:00.000Z');
+      expect((payload as Map<String, dynamic>)['start_at'],
+          '2026-11-01T12:15:00.000Z');
     });
 
     test('createTodo forwards the selected subject id', () async {
@@ -236,7 +238,10 @@ void main() {
       final repo = PlannerRepository(
         apiClient: _FakeApiClient((path, query, body) async {
           payload = body;
-          return _json({'s': true, 'r': {'id': 10, 't': 'nova', 'sd': 22}});
+          return _json({
+            's': true,
+            'r': {'id': 10, 't': 'nova', 'sd': 22}
+          });
         }),
       );
 
@@ -250,7 +255,8 @@ void main() {
       expect((payload as Map<String, dynamic>)['subject_id'], 22);
     });
 
-    test('editTodo changes, preserves, or explicitly clears the subject', () async {
+    test('editTodo changes, preserves, or explicitly clears the subject',
+        () async {
       final payloads = <Map<String, dynamic>>[];
       final repo = PlannerRepository(
         apiClient: _FakeApiClient((path, query, body) async {
@@ -288,7 +294,8 @@ void main() {
     });
 
     test('deleteTodo sends the id in the JSON body, not the query', () async {
-      final calls = <({String path, Map<String, dynamic>? query, Object? body})>[];
+      final calls =
+          <({String path, Map<String, dynamic>? query, Object? body})>[];
       final repo = PlannerRepository(
         apiClient: _FakeApiClient((path, query, body) async {
           calls.add((path: path, query: query, body: body));
@@ -299,14 +306,15 @@ void main() {
       expect(await repo.deleteTodo(7), isTrue);
       expect(await repo.deleteTodo(8, deleteAllSeries: true), isTrue);
 
-      expect(calls.map((c) => c.path),
-          everyElement('/study/study-plan/rest'));
+      expect(calls.map((c) => c.path), everyElement('/study/study-plan/rest'));
       expect(calls.map((c) => c.query), everyElement(isNull));
       expect(calls[0].body, equals({'id': 7}));
       expect(calls[1].body, equals({'id': 8, 'target': 'all'}));
     });
 
-    test('editTodo falls back to the study day start when the payload has no date', () async {
+    test(
+        'editTodo falls back to the study day start when the payload has no date',
+        () async {
       Object? payload;
       final repo = PlannerRepository(
         apiClient: _FakeApiClient((path, query, body) async {
@@ -326,7 +334,35 @@ void main() {
 
       await repo.editTodo(todo, 'renomeada', gmtOffset: brazil);
 
-      expect((payload as Map<String, dynamic>)['start_at'], '2026-11-01T08:00:00.000Z');
+      expect((payload as Map<String, dynamic>)['start_at'],
+          '2026-11-01T08:00:00.000Z');
+    });
+  });
+
+  group('PlannerRepository load errors', () {
+    test('fetchTodos propagates the load exception instead of returning empty',
+        () async {
+      final repo = PlannerRepository(
+        apiClient: _FakeApiClient((path, query, body) async {
+          throw StateError('offline');
+        }),
+      );
+
+      await expectLater(
+        repo.fetchTodos('2026-11-01', gmtOffset: brazil),
+        throwsStateError,
+      );
+    });
+
+    test('fetchDDays propagates the load exception instead of returning empty',
+        () async {
+      final repo = PlannerRepository(
+        apiClient: _FakeApiClient((path, query, body) async {
+          throw StateError('offline');
+        }),
+      );
+
+      await expectLater(repo.fetchDDays(), throwsStateError);
     });
   });
 }

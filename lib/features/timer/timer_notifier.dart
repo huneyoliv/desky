@@ -551,6 +551,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     }
 
     if (state.pomodoroPhase == PomodoroPhase.focus && state.currentSubject != null) {
+      _serverConfirmedSession = false;
       try {
         final accepted = await _timerRepository.startStudy(
           subjectTitle: state.currentSubject!.title,
@@ -558,10 +559,15 @@ class TimerNotifier extends StateNotifier<TimerState> {
           startAt: now,
           taskId: taskId,
         );
+        // An explicit refusal is not an offline start: do not run or navigate.
+        if (!accepted) return;
         // Only trust the day log once the server accepted the start; otherwise
         // a lagging log would stop the session on the next reconcile.
-        _serverConfirmedSession = accepted;
-      } catch (_) {}
+        _serverConfirmedSession = true;
+      } catch (_) {
+        // Transport failures retain the existing offline local-start behavior.
+        _serverConfirmedSession = false;
+      }
     }
 
     _accumulatedSessionMs = state.sessionElapsedMs;
