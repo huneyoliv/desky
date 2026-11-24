@@ -173,6 +173,7 @@ Before creating and pushing any release tag, the version string and build number
 - Stats comparison labels and quarter month names now follow the selected locale, including the 11-language test matrix (#5 R18).
 - Group chat permission changes are saved with failure reporting, messages show full date and time, and ranking scope persists across screens (#5 R4, R7, R9).
 - Study-day boundaries now use the selected country's start hour when available and fixed GMT offset, with the manual reset preference preserved. Timer, Planner, Calendar and Timeline share the effective rule (#10 R4).
+- Timer reconciliation now applies that same effective country offset and reset hour when choosing the `/logs/day` query date. Fixed-instant regression tests cover GMT+5:30 immediately before and at both 05:00 and midnight resets, with the device in a different timezone (#10).
 
 ### Known Limitations
 
@@ -184,18 +185,21 @@ Before creating and pushing any release tag, the version string and build number
 - Starting a session from a to-do sends taskId, but no association is observable on the API.
 - Recurring tasks: editing affects only the selected occurrence; deleting offers one occurrence or the whole series.
 - Nudge reception on desktop is not possible yet (no nudge notification type; the official app uses FCM push).
-- Background videos (issue #10) are not implemented.
+- Background videos (issue #10) were not implemented in this maintenance batch. They remain a separate multiplatform feature requiring product and media-stack decisions, lifecycle/resource validation and a static-image fallback.
 - Study vs rest breakdown is not available (rest contract unknown).
 - Study vs rest data is not available from the API; gaps are derived from session times.
-- Rendered appearance and real operating-system theme switching were not verified
-  by screenshot or manual testing; validation used WCAG calculations and offline
-  widget geometry only.
+- A Windows release was observed repainting from AMOLED Lilás to Lilás Diurno when
+  the real OS `AppsUseLightTheme` setting changed from 0 to 1 with System mode
+  selected; the app stayed open and the native frame also repainted. Complete visual
+  inspection of every affected screen in both light palettes remains incomplete.
+  WCAG/widget assertions are not being treated as substitutes for that inspection.
 - Joining challenges is not supported; the Challenges tab is read-only.
 
 - Group member time zones are unavailable from the API, so per-member reset remains unimplemented (#5 R24).
 - Break periods cannot be recorded with the current rest contract; timeline gaps are derived only (#11 R3).
 - Starting study from a completed task is intentionally disabled with a tooltip (#7 D23).
-- System theme mode has not been observed switching with the real operating system; only notifier tests cover it.
+- The live Sri Lanka server day assignment, mobile parity and the persistent To-Do/session association still require external confirmation; local tests and `s:true` do not prove those behaviors (#7, #10).
+- Win+Arrow gestures changed the monitor and window bounds, but exact half-screen placement was not established. Primary-monitor half-screen, drag-to-edge and multi-DPI behavior remain unvalidated. The Desky window was kept on the secondary display during the final gesture checks as requested.
 - Mobile parity was not exercised.
 
 ### Changed
