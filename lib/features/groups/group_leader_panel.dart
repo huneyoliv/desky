@@ -34,6 +34,7 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
   late int _capacity;
   late int _goalHours;
   bool _chatEnabled = true;
+  bool _chatDirty = false;
 
   List<Map<String, dynamic>> _bannedList = [];
   List<Map<String, dynamic>> _joinRequests = [];
@@ -123,7 +124,19 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
         failures.add(t.tr('group_password_hint', fallback: 'Senha de Acesso'));
       }
     }
+    if (_chatDirty) {
+      attempted++;
+      // 0 means this client does not impose a new daily message cap.
+      if (!await repo.updateChatPermissions(
+        widget.group.id,
+        _chatEnabled,
+        0,
+      )) {
+        failures.add(t.tr('enable_group_chat', fallback: 'Habilitar Chat do Grupo'));
+      }
+    }
 
+    if (failures.isEmpty) _chatDirty = false;
     if (!mounted || attempted == 0) return;
     ScaffoldMessenger.of(context).showSnackBar(
       failures.isEmpty
@@ -399,7 +412,10 @@ class _GroupLeaderPanelState extends ConsumerState<GroupLeaderPanel>
                   title: Text(t.tr('enable_group_chat', fallback: 'Habilitar Chat do Grupo'), style: TextStyle(color: context.appTextPrimary)),
                   value: _chatEnabled,
                   activeColor: context.appPrimary,
-                  onChanged: (val) => setState(() => _chatEnabled = val),
+                  onChanged: (val) => setState(() {
+                    _chatEnabled = val;
+                    _chatDirty = true;
+                  }),
                 ),
                 const SizedBox(height: 24),
 

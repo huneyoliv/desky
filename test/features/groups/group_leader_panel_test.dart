@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:desky/core/localization/app_translation.dart';
@@ -11,12 +11,24 @@ class _FakeAdminRepository extends GroupAdminRepository {
 
   final bool updateSucceeds;
   final List<String> updated = [];
+  final List<(bool, int)> chatUpdates = [];
 
   @override
   Future<List<Map<String, dynamic>>> fetchBannedList(int groupId) async => [];
 
   @override
   Future<List<Map<String, dynamic>>> fetchJoinRequests(int groupId) async => [];
+
+  @override
+  Future<bool> updateChatPermissions(
+    int groupId,
+    bool enabled,
+    int dailyLimit,
+  ) async {
+    updated.add('chat');
+    chatUpdates.add((enabled, dailyLimit));
+    return updateSucceeds;
+  }
 
   @override
   Future<bool> updateGroupName(int groupId, String name) async {
@@ -60,7 +72,8 @@ const _group = GroupModel(
   leaderName: 'Líder',
 );
 
-Future<void> _pumpPanel(WidgetTester tester, GroupAdminRepository repository) async {
+Future<void> _pumpPanel(
+    WidgetTester tester, GroupAdminRepository repository) async {
   tester.view.physicalSize = const Size(1200, 1600);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(() {
@@ -72,12 +85,14 @@ Future<void> _pumpPanel(WidgetTester tester, GroupAdminRepository repository) as
     ProviderScope(
       overrides: [
         appTranslationProvider.overrideWith(
-          (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'pt'),
+          (ref) => AppTranslationNotifier(ref)
+            ..state = const AppTranslation(languageCode: 'pt'),
         ),
         groupAdminRepoProvider.overrideWithValue(repository),
       ],
       child: MaterialApp(
-        home: Scaffold(body: GroupLeaderPanel(group: _group, members: const [])),
+        home:
+            Scaffold(body: GroupLeaderPanel(group: _group, members: const [])),
       ),
     ),
   );
@@ -86,7 +101,8 @@ Future<void> _pumpPanel(WidgetTester tester, GroupAdminRepository repository) as
 }
 
 Future<void> _saveWithNewName(WidgetTester tester) async {
-  await tester.enterText(find.widgetWithText(TextField, 'Nome do Grupo'), 'Novo Nome');
+  await tester.enterText(
+      find.widgetWithText(TextField, 'Nome do Grupo'), 'Novo Nome');
   await tester.pump();
   await tester.tap(find.widgetWithText(ElevatedButton, 'Salvar Alterações'));
   await tester.pump();
@@ -94,7 +110,8 @@ Future<void> _saveWithNewName(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('reports failure instead of success when a setting update fails', (tester) async {
+  testWidgets('reports failure instead of success when a setting update fails',
+      (tester) async {
     final repository = _FakeAdminRepository(updateSucceeds: false);
     await _pumpPanel(tester, repository);
 
@@ -102,17 +119,52 @@ void main() {
 
     expect(repository.updated, contains('name'));
     expect(find.textContaining('Falha ao salvar'), findsOneWidget);
-    expect(find.textContaining('Configurações atualizadas com sucesso'), findsNothing);
+    expect(find.textContaining('Configurações atualizadas com sucesso'),
+        findsNothing);
   });
 
-  testWidgets('reports success when every attempted update succeeds', (tester) async {
+  testWidgets('reports success when every attempted update succeeds',
+      (tester) async {
     final repository = _FakeAdminRepository(updateSucceeds: true);
     await _pumpPanel(tester, repository);
 
     await _saveWithNewName(tester);
 
     expect(repository.updated, contains('name'));
-    expect(find.textContaining('Configurações atualizadas com sucesso'), findsOneWidget);
+    expect(find.textContaining('Configurações atualizadas com sucesso'),
+        findsOneWidget);
     expect(find.textContaining('Falha ao salvar'), findsNothing);
+  });
+
+  testWidgets('chat toggle is saved with the other settings', (tester) async {
+    final repository = _FakeAdminRepository(updateSucceeds: true);
+    await _pumpPanel(tester, repository);
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Salvar Alterações'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(repository.chatUpdates, equals([(false, 0)]));
+    expect(find.textContaining('Configurações atualizadas com sucesso'),
+        findsOneWidget);
+  });
+
+  testWidgets('a rejected chat permission update is reported as failure',
+      (tester) async {
+    final repository = _FakeAdminRepository(updateSucceeds: false);
+    await _pumpPanel(tester, repository);
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Salvar Alterações'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(repository.chatUpdates, equals([(false, 0)]));
+    expect(find.textContaining('Falha ao salvar'), findsOneWidget);
+    expect(find.textContaining('Configurações atualizadas com sucesso'),
+        findsNothing);
   });
 }

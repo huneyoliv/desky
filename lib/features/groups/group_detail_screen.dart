@@ -640,7 +640,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Text(
-                              DateFormat('HH:mm').format(msg.sentAt),
+                              DateFormat('dd/MM/yyyy HH:mm').format(msg.sentAt),
                               style: TextStyle(color: context.appTextMuted, fontSize: 10),
                             ),
                           ),
