@@ -10,8 +10,12 @@ import 'package:desky/data/models/subject_model.dart';
 import 'package:desky/data/models/todo_item_model.dart';
 import 'package:desky/data/repositories/planner_repository.dart';
 import 'package:desky/data/repositories/subject_repository.dart';
+import 'package:desky/data/repositories/settings_repository.dart';
 import 'package:desky/data/repositories/timer_repository.dart';
 import 'package:desky/features/planner/planner_screen.dart';
+import 'package:desky/features/settings/settings_notifier.dart';
+import 'package:desky/features/settings/settings_state.dart';
+import 'package:desky/data/models/country_model.dart';
 import 'package:desky/features/timer/timer_notifier.dart';
 
 const _subjects = [
@@ -45,6 +49,8 @@ class FakePlannerRepository extends PlannerRepository {
   }) async {
     if (failLoad) throw StateError('load failed');
     requestedDates.add(dateYmd);
+    resetHours.add(resetHour);
+    gmtOffsets.add(gmtOffset);
     return items;
   }
 
@@ -56,6 +62,8 @@ class FakePlannerRepository extends PlannerRepository {
 
   // Gravacoes feitas pelas acoes de tarefa, na ordem em que aconteceram.
   final List<String> requestedDates = [];
+  final List<int> resetHours = [];
+  final List<Duration> gmtOffsets = [];
   bool failLoad = false;
   bool failToggle = false;
 
@@ -225,6 +233,7 @@ Future<void> _disposeTimer(WidgetTester tester, TimerNotifier timer) async {
 Future<(FakePlannerRepository, TimerNotifier, _FakeTimerRepository)> _pump(
   WidgetTester tester, {
   FakePlannerRepository? repository,
+  SettingsNotifier? settings,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final repo = repository ?? FakePlannerRepository();
@@ -261,6 +270,8 @@ Future<(FakePlannerRepository, TimerNotifier, _FakeTimerRepository)> _pump(
           (ref) => AppTranslationNotifier(ref)
             ..state = const AppTranslation(languageCode: 'pt'),
         ),
+        if (settings != null)
+          settingsNotifierProvider.overrideWith((ref) => settings),
       ],
       child: MaterialApp.router(routerConfig: router),
     ),
@@ -268,6 +279,13 @@ Future<(FakePlannerRepository, TimerNotifier, _FakeTimerRepository)> _pump(
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 300));
   return (repo, timer, timerRepo);
+}
+
+class _DaySettingsNotifier extends SettingsNotifier {
+  _DaySettingsNotifier(super.repository);
+
+  @override
+  Future<void> init() async {}
 }
 
 void main() {
@@ -878,6 +896,32 @@ void main() {
     expect(button.onPressed, isNull);
     expect(button.tooltip, isNotNull);
     expect(timerRepo.taskIds, isEmpty);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('planner uses the effective country day rule', (tester) async {
+    const country = CountryModel(
+      id: 144,
+      name: 'SRI LANKA',
+      code: 'LK',
+      timezone: 'Asia/Colombo',
+      continent: 'Asia',
+      gmtOffset: 5.5,
+    );
+    final settings = _DaySettingsNotifier(SettingsRepository())
+      ..state = const SettingsState(
+        selectedCountry: country,
+        dayResetHour: 7,
+      );
+    final repo = FakePlannerRepository();
+    final (_, timer, _) = await _pump(
+      tester,
+      repository: repo,
+      settings: settings,
+    );
+
+    expect(repo.resetHours.single, 7);
+    expect(repo.gmtOffsets.single, const Duration(hours: 5, minutes: 30));
     await _disposeTimer(tester, timer);
   });
 }

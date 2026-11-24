@@ -49,12 +49,12 @@ class _PlannerScreenState extends ConsumerState<PlannerScreen> {
 
   /// YPT closes the study day using the selected country's fixed GMT offset and
   /// start hour, which is also what the mobile app shows in the planner.
-  Duration get _gmtOffset =>
-      ref.read(settingsNotifierProvider).selectedCountry.gmtOffsetDuration ??
-      DateTime.now().timeZoneOffset;
+  Duration get _gmtOffset => StudyDayHelper.gmtOffsetFor(
+        ref.read(settingsNotifierProvider).selectedCountry,
+        device: DateTime.now().timeZoneOffset,
+      );
 
-  int get _resetHour =>
-      ref.read(settingsNotifierProvider).selectedCountry.startHour;
+  int get _resetHour => ref.read(settingsNotifierProvider).dayResetHour;
 
   @override
   void dispose() {
