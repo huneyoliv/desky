@@ -92,4 +92,30 @@ void main() {
       },
     );
   });
+
+  group('SingleInstanceChannel.acquire', () {
+    test('permite no maximo um primario em chamadas concorrentes', () async {
+      final dir = Directory('${temp.path}${Platform.pathSeparator}concorrente');
+      final results = await Future.wait([
+        SingleInstanceChannel.acquire(directory: dir),
+        SingleInstanceChannel.acquire(directory: dir),
+      ]);
+      final channels = results.whereType<SingleInstanceChannel>().toList();
+      abertos.addAll(channels);
+
+      expect(channels, hasLength(1));
+    });
+
+    test('dispose libera o caminho para uma nova aquisicao', () async {
+      final dir = Directory('${temp.path}${Platform.pathSeparator}reaquisicao');
+      final first = await SingleInstanceChannel.acquire(directory: dir);
+      expect(first, isNotNull);
+      abertos.add(first!);
+      await first.dispose();
+
+      final second = await SingleInstanceChannel.acquire(directory: dir);
+      expect(second, isNotNull);
+      abertos.add(second!);
+    });
+  });
 }

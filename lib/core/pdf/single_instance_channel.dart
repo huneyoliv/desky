@@ -42,13 +42,19 @@ enum SingleInstanceOutcome { primary, forwarded, degraded }
 /// Windows e Linux apenas: no macOS o Launch Services ja impede uma segunda
 /// copia e entrega o documento por Apple Event (ver `AppDelegate.swift`).
 class SingleInstanceChannel {
-  SingleInstanceChannel._(this._dir);
+  SingleInstanceChannel._(this._dir, this._key);
 
   /// Nome do arquivo de trava. Um por usuario, no diretorio de suporte do app.
   static const String _lockFileName = 'desky.instance.lock';
   static const String _portFileName = 'desky.instance.port';
 
+  /// Directories reserved by this isolate. The production app acquires the
+  /// channel on the main isolate. This set does not coordinate other isolates:
+  /// separate processes remain arbitrated by the operating system file lock.
+  static final Set<String> _held = <String>{};
+
   final Directory _dir;
+  final String _key;
   RandomAccessFile? _lock;
   ServerSocket? _server;
   StreamSubscription<Socket>? _subscription;
@@ -81,17 +87,23 @@ class SingleInstanceChannel {
       return null;
     }
 
-    final channel = SingleInstanceChannel._(dir);
+    final key = dir.absolute.path;
+    // Reserve before any suspension so overlapping calls cannot both pass.
+    if (!_held.add(key)) return null;
+
+    final channel = SingleInstanceChannel._(dir, key);
     final lockFile = File('${dir.path}${Platform.pathSeparator}$_lockFileName');
+    RandomAccessFile? handle;
     try {
-      final handle = await lockFile.open(mode: FileMode.write);
+      handle = await lockFile.open(mode: FileMode.write);
       // Trava exclusiva: falha se outra instancia ja a detem.
       await handle.lock(FileLock.exclusive);
       channel._lock = handle;
     } catch (_) {
       try {
-        await lockFile.open(mode: FileMode.write).then((f) => f.close());
+        await handle?.close();
       } catch (_) {}
+      _held.remove(key);
       return null;
     }
 
@@ -159,10 +171,19 @@ class SingleInstanceChannel {
       final portFile = File('${_dir.path}${Platform.pathSeparator}$_portFileName');
       if (await portFile.exists()) await portFile.delete();
     } catch (_) {}
-    try {
-      await _lock?.unlock();
-      await _lock?.close();
-    } catch (_) {}
+    final lock = _lock;
+    if (lock != null) {
+      try {
+        await lock.unlock();
+      } catch (_) {}
+      var closed = false;
+      try {
+        await lock.close();
+        closed = true;
+      } catch (_) {}
+      // A failed close may leave the OS lock held; keep the reservation then.
+      if (closed) _held.remove(_key);
+    }
     _lock = null;
     if (!_incoming.isClosed) await _incoming.close();
   }
@@ -180,9 +201,9 @@ class SingleInstanceChannel {
   }) async {
     if (!Platform.isWindows && !Platform.isLinux) {
       // macOS: o Launch Services impede a segunda instancia.
+      final dir = directory ?? defaultDirectory();
       return SingleInstanceResult._(
-        channel: SingleInstanceChannel._(directory ?? defaultDirectory())
-          .._lock = null,
+        channel: SingleInstanceChannel._(dir, dir.absolute.path).._lock = null,
         outcome: SingleInstanceOutcome.primary,
       );
     }
