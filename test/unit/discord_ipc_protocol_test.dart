@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -20,7 +21,10 @@ Uint8List _frame(int opcode, Object json) =>
 final Map<String, Object> _ready = {
   'cmd': 'DISPATCH',
   'evt': 'READY',
-  'data': {'v': 1, 'user': {'id': '1'}},
+  'data': {
+    'v': 1,
+    'user': {'id': '1'}
+  },
 };
 
 /// A scripted peer. [onWrite] can push replies in answer to what we send.
@@ -61,7 +65,8 @@ class _FakeTransport implements DiscordIpcTransport {
   void close() => closed = true;
 }
 
-DiscordPresencePayload _payload([String details = 'Math']) => DiscordPresencePayload(
+DiscordPresencePayload _payload([String details = 'Math']) =>
+    DiscordPresencePayload(
       details: details,
       state: 'Studying',
       largeImage: 'https://example.com/a.png',
@@ -94,8 +99,7 @@ void main() {
       final a = _frame(1, {'n': 1});
       final b = _frame(3, {'n': 2});
       final c = _frame(1, {'n': 3});
-      final d = DiscordIpcFrameDecoder()
-        ..add([...a, ...b, ...c.sublist(0, 5)]);
+      final d = DiscordIpcFrameDecoder()..add([...a, ...b, ...c.sublist(0, 5)]);
       expect(d.next()!.json!['n'], 1);
       expect(d.next()!.opcode, 3);
       expect(d.next(), isNull);
@@ -111,7 +115,8 @@ void main() {
       expect(f.json, isNull);
     });
 
-    test('rejects an oversized length from the header alone, before any body', () {
+    test('rejects an oversized length from the header alone, before any body',
+        () {
       final d = DiscordIpcFrameDecoder()..add(_header(1, 0xFFFFFFFF));
       expect(d.next, throwsA(isA<DiscordIpcProtocolException>()));
       expect(d.hasFailed, isTrue);
@@ -162,9 +167,12 @@ void main() {
 
   group('frame encoder', () {
     test('refuses oversized payloads and invalid opcodes', () {
-      expect(() => encodeDiscordIpcFrame(1, 'x' * (DiscordIpcLimits.maxFrameBytes + 1)),
+      expect(
+          () => encodeDiscordIpcFrame(
+              1, 'x' * (DiscordIpcLimits.maxFrameBytes + 1)),
           throwsA(isA<DiscordIpcProtocolException>()));
-      expect(() => encodeDiscordIpcFrame(9, '{}'), throwsA(isA<DiscordIpcProtocolException>()));
+      expect(() => encodeDiscordIpcFrame(9, '{}'),
+          throwsA(isA<DiscordIpcProtocolException>()));
     });
   });
 
@@ -178,14 +186,18 @@ void main() {
     test('rejects everything else', () {
       expect(isDiscordReadyFrame(null), isFalse);
       // Discord's answer for an unknown client id.
-      expect(isDiscordReadyFrame(f(2, '{"code":4000,"message":"Invalid Client ID"}')), isFalse);
+      expect(
+          isDiscordReadyFrame(
+              f(2, '{"code":4000,"message":"Invalid Client ID"}')),
+          isFalse);
       expect(
           isDiscordReadyFrame(
               f(1, '{"cmd":"DISPATCH","evt":"ERROR","data":{"code":4000}}')),
           isFalse);
       // READY but on the wrong opcode.
       expect(isDiscordReadyFrame(f(3, jsonEncode(_ready))), isFalse);
-      expect(isDiscordReadyFrame(f(1, '{"cmd":"DISPATCH","evt":"READY"}')), isFalse);
+      expect(isDiscordReadyFrame(f(1, '{"cmd":"DISPATCH","evt":"READY"}')),
+          isFalse);
       expect(isDiscordReadyFrame(f(1, '[]')), isFalse);
       expect(isDiscordReadyFrame(f(1, 'not json')), isFalse);
       expect(isDiscordReadyFrame(f(1, '')), isFalse);
@@ -211,11 +223,14 @@ void main() {
 
     void answerReady(_FakeTransport t) {
       t.onWrite = (t, frame) {
-        if (frame.opcode == DiscordIpcOpcode.handshake) t.push(_frame(1, _ready));
+        if (frame.opcode == DiscordIpcOpcode.handshake) {
+          t.push(_frame(1, _ready));
+        }
       };
     }
 
-    test('connects on a valid READY, sending the documented handshake', () async {
+    test('connects on a valid READY, sending the documented handshake',
+        () async {
       final s = service(answerReady);
       await s.connect();
       expect(s.isConnected, isTrue);
@@ -239,8 +254,10 @@ void main() {
     });
 
     for (final entry in <String, List<int> Function()>{
-      'CLOSE with an error': () => _frame(2, {'code': 4000, 'message': 'Invalid Client ID'}),
-      'ERROR event': () => _frame(1, {'cmd': 'DISPATCH', 'evt': 'ERROR', 'data': {}}),
+      'CLOSE with an error': () =>
+          _frame(2, {'code': 4000, 'message': 'Invalid Client ID'}),
+      'ERROR event': () =>
+          _frame(1, {'cmd': 'DISPATCH', 'evt': 'ERROR', 'data': {}}),
       'oversized header': () => _header(1, 0x7FFFFFFF),
       'unknown opcode': () => [..._header(42, 2), 0x7b, 0x7d],
       'invalid UTF-8': () => [..._header(1, 2), 0xFF, 0xFE],
@@ -257,7 +274,8 @@ void main() {
         expect(opened.single.closed, isTrue);
 
         await s.updatePresence(_payload());
-        expect(opened.every((t) => t.written.every((f) => f.opcode == 0)), isTrue,
+        expect(
+            opened.every((t) => t.written.every((f) => f.opcode == 0)), isTrue,
             reason: 'no SET_ACTIVITY is ever sent to an unverified peer');
       });
     }
@@ -276,7 +294,11 @@ void main() {
         t.onWrite = (t, frame) {
           if (frame.opcode == 0) t.push(_frame(1, _ready));
           if (frame.opcode == 1) {
-            t.push(_frame(1, {'cmd': 'SET_ACTIVITY', 'evt': null, 'nonce': frame.json!['nonce']}));
+            t.push(_frame(1, {
+              'cmd': 'SET_ACTIVITY',
+              'evt': null,
+              'nonce': frame.json!['nonce']
+            }));
           }
         };
       });
@@ -284,7 +306,8 @@ void main() {
       await s.updatePresence(_payload('B'));
       final t = opened.single;
       final cmds = t.written.where((f) => f.opcode == 1).toList();
-      expect(cmds.map((f) => f.json!['args']['activity']['details']), ['A', 'B']);
+      expect(
+          cmds.map((f) => f.json!['args']['activity']['details']), ['A', 'B']);
       expect(cmds.map((f) => f.json!['nonce']).toSet(), hasLength(2));
       expect(s.isConnected, isTrue);
     });
@@ -295,11 +318,13 @@ void main() {
       final t = opened.single;
       t.push(_frame(3, {'p': 7}));
       await s.updatePresence(_payload());
-      final pong = t.written.firstWhere((f) => f.opcode == DiscordIpcOpcode.pong);
+      final pong =
+          t.written.firstWhere((f) => f.opcode == DiscordIpcOpcode.pong);
       expect(pong.json, {'p': 7});
     });
 
-    test('a CLOSE mid-session drops the connection; the next update reconnects', () async {
+    test('a CLOSE mid-session drops the connection; the next update reconnects',
+        () async {
       final s = service(answerReady);
       await s.updatePresence(_payload('A'));
       opened.first.push(_frame(2, {'code': 1000}));
@@ -310,10 +335,14 @@ void main() {
       await s.updatePresence(_payload('B'));
       expect(opened, hasLength(2));
       expect(s.isConnected, isTrue);
-      expect(opened.last.written.where((f) => f.opcode == 1).single.json!['args']['activity']['details'], 'B');
+      expect(
+          opened.last.written.where((f) => f.opcode == 1).single.json!['args']
+              ['activity']['details'],
+          'B');
     });
 
-    test('garbage mid-session drops the connection instead of desyncing', () async {
+    test('garbage mid-session drops the connection instead of desyncing',
+        () async {
       final s = service(answerReady);
       await s.connect();
       opened.single.push(_header(1, 0xFFFFFF00));
@@ -322,7 +351,8 @@ void main() {
       expect(s.isConnected, isFalse);
     });
 
-    test('a flood of replies is drained in bounded steps without hanging', () async {
+    test('a flood of replies is drained in bounded steps without hanging',
+        () async {
       final s = service(answerReady);
       await s.connect();
       final t = opened.single;
@@ -342,12 +372,69 @@ void main() {
       expect(opened.single.closed, isTrue);
     });
 
-    test('an oversized outgoing activity is refused without killing the connection', () async {
+    test(
+        'an oversized outgoing activity is refused without killing the connection',
+        () async {
       final s = service(answerReady);
       await s.connect();
-      await s.updatePresence(_payload('x' * (DiscordIpcLimits.maxFrameBytes + 10)));
+      await s.updatePresence(
+          _payload('x' * (DiscordIpcLimits.maxFrameBytes + 10)));
       expect(opened.single.written.where((f) => f.opcode == 1), isEmpty);
       expect(s.isConnected, isTrue);
+    });
+
+    test('dispose closes a pending handshake and prevents a late connection',
+        () async {
+      final ready = Completer<void>();
+      final s = service((t) {
+        t.onWrite = (t, frame) {
+          if (frame.opcode == DiscordIpcOpcode.handshake) {
+            ready.future.then((_) => t.push(_frame(1, _ready)));
+          }
+        };
+      });
+      final connecting = s.connect();
+      await Future<void>.delayed(Duration.zero);
+      s.dispose();
+      ready.complete();
+      await connecting;
+      expect(s.isConnected, isFalse);
+      expect(opened.single.closed, isTrue);
+    });
+
+    test('concurrent connect calls share the in-flight attempt', () async {
+      final s = service(answerReady);
+      final first = s.connect();
+      final second = s.connect();
+      expect(identical(first, second), isTrue);
+      await Future.wait([first, second]);
+      expect(s.isConnected, isTrue);
+      expect(opened, hasLength(1));
+    });
+    test('parallel presence updates never duplicate nonces', () async {
+      final s = service(answerReady);
+      await s.connect();
+      await Future.wait([
+        for (var i = 0; i < 10; i++) s.updatePresence(_payload('$i')),
+      ]);
+      final nonces = opened.single.written
+          .where((f) => f.opcode == DiscordIpcOpcode.frame)
+          .map((f) => f.json!['nonce'])
+          .toList();
+      expect(nonces.toSet(), hasLength(nonces.length));
+    });
+
+    test('the latest presence or clear wins across the command queue',
+        () async {
+      final s = service(answerReady);
+      await s.updatePresence(_payload('initial'));
+      await Future.wait([
+        s.updatePresence(_payload('A')),
+        s.updatePresence(_payload('B')),
+        s.clearPresence(),
+      ]);
+      final last = opened.single.written.last;
+      expect(last.json!['args']['activity'], isNull);
     });
 
     test('no connector result means not connected, no crash', () async {
@@ -387,15 +474,20 @@ void main() {
 
     test('reassembles frames the peer writes in fragments', () async {
       server.listen((peer) async {
-        final bytes = [..._frame(1, _ready), ..._frame(1, {'n': 2})];
+        final bytes = [
+          ..._frame(1, _ready),
+          ..._frame(1, {'n': 2})
+        ];
         for (var i = 0; i < bytes.length; i += 7) {
-          peer.add(bytes.sublist(i, i + 7 > bytes.length ? bytes.length : i + 7));
+          peer.add(
+              bytes.sublist(i, i + 7 > bytes.length ? bytes.length : i + 7));
           await peer.flush();
           await Future<void>.delayed(const Duration(milliseconds: 2));
         }
       });
       final c = await connect();
-      expect(isDiscordReadyFrame(await c.readFrame(const Duration(seconds: 2))), isTrue);
+      expect(isDiscordReadyFrame(await c.readFrame(const Duration(seconds: 2))),
+          isTrue);
       expect((await c.readFrame(const Duration(seconds: 2)))!.json!['n'], 2);
       c.close();
     });
