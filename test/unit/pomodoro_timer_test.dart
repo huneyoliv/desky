@@ -1,4 +1,4 @@
-﻿import 'package:desky/core/api/api_client.dart';
+import 'package:desky/core/api/api_client.dart';
 import 'package:desky/data/models/subject_model.dart';
 import 'package:desky/data/repositories/subject_repository.dart';
 import 'package:desky/data/repositories/timer_repository.dart';
@@ -47,7 +47,7 @@ void main() {
             'data': '{"s":true,"dl":{"sm":1500000}}',
           };
         }
-        if (options.path.contains('/logs/v2/study/start')) {
+        if (options.path.contains('/study/start')) {
           return {'status': 200, 'data': '{"s":true}'};
         }
         if (options.path.contains('/category/subjects')) {

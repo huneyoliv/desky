@@ -94,12 +94,12 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
         ),
         title: Row(
           children: [
-            Text(_countryCodeToEmoji(country.code), style: const TextStyle(fontSize: 24)),
+            Text(_countryCodeToEmoji(country.code), style: TextStyle(fontSize: 24)),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 t.tr('region', fallback: 'Alterar Região / País'),
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -110,7 +110,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
           children: [
             Text(
               '${t.tr("change_region_confirm", fallback: "Deseja alterar sua região para")} ${country.formattedName} (${country.code})?',
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+              style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
             Container(
@@ -130,7 +130,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                       style: TextStyle(color: context.appTextSecondary, fontSize: 12)),
                   const SizedBox(height: 4),
                   Text('• ${t.tr("sync_region_desc", fallback: "As matérias e rankings serão sincronizados com esta região.")}',
-                      style: const TextStyle(color: AppColors.primaryLight, fontSize: 12)),
+                      style: TextStyle(color: context.appPrimary, fontSize: 12)),
                   const SizedBox(height: 4),
                   // Deixa explicito que nao existe etapa de senha: a troca e
                   // aplicada na hora, neste dispositivo, como no app oficial.
@@ -161,7 +161,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-            child: Text(t.tr('confirm', fallback: 'Confirmar'), style: const TextStyle(color: Colors.white)),
+            child: Text(t.tr('confirm', fallback: 'Confirmar'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
           ),
         ],
       ),
@@ -200,7 +200,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
         children: [
           Text(
             t.tr('region', fallback: 'Região & País'),
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -211,7 +211,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
             ),
             child: Text(
               '${allCountries.length} ${t.tr("countries", fallback: "Países")}',
-              style: const TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w700),
+              style: TextStyle(color: context.appPrimary, fontSize: 12, fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -232,7 +232,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
               ),
               child: Row(
                 children: [
-                  Text(_countryCodeToEmoji(selectedCountry.code), style: const TextStyle(fontSize: 28)),
+                  Text(_countryCodeToEmoji(selectedCountry.code), style: TextStyle(fontSize: 28)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -242,7 +242,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                           children: [
                             Text(
                               selectedCountry.formattedName,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(color: context.appTextPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                             const SizedBox(width: 8),
                             Container(
@@ -253,7 +253,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                               ),
                               child: Text(
                                 selectedCountry.code,
-                                style: const TextStyle(color: AppColors.primaryLight, fontSize: 11, fontWeight: FontWeight.bold),
+                                style: TextStyle(color: context.appPrimary, fontSize: 11, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
@@ -275,7 +275,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
             TextField(
               controller: _searchController,
               onChanged: (val) => setState(() => _query = val),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appTextPrimary),
               decoration: InputDecoration(
                 hintText: t.tr('search_country_hint', fallback: 'Pesquisar país, código (BR, US) ou fuso horário...'),
                 hintStyle: TextStyle(color: context.appTextMuted, fontSize: 13),
@@ -321,7 +321,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                     selectedColor: context.appPrimary,
                     backgroundColor: context.appSurface,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.textSecondary,
+                      color: isSelected ? Theme.of(context).colorScheme.onPrimary : context.appTextSecondary,
                       fontSize: 12,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -358,7 +358,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                               contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               leading: Text(
                                 _countryCodeToEmoji(country.code),
-                                style: const TextStyle(fontSize: 26),
+                                style: TextStyle(fontSize: 26),
                               ),
                               title: Row(
                                 children: [
@@ -366,7 +366,7 @@ class _SelectCountryDialogState extends ConsumerState<SelectCountryDialog> {
                                     child: Text(
                                       country.formattedName,
                                       style: TextStyle(
-                                        color: isSelected ? AppColors.primaryLight : Colors.white,
+                                        color: isSelected ? context.appPrimary : context.appTextPrimary,
                                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                                         fontSize: 14,
                                       ),

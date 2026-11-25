@@ -32,6 +32,7 @@ class SettingsRepository {
   static const String keyDiscordRpc = 'discord_rpc_enabled';
   static const String keyObsOverlayMode = 'obs_overlay_mode';
   static const String keyClassicYptLook = 'classic_ypt_look';
+  static const String keyClassicTopTabs = 'classic_top_tabs';
   static const String keyClassicUiScale = 'classic_ui_scale';
   static const String keyThemePreset = 'selected_theme_preset';
   static const String keyDarkThemePreset = 'selected_dark_theme_preset';
@@ -195,8 +196,10 @@ class SettingsRepository {
         code: prefs.getString(keyCountryCode) ?? defaultCountry.code,
         timezone: prefs.getString(keyTimezone) ?? defaultCountry.timezone,
         continent: '',
-        gmtOffset: prefs.getDouble(keyGmtOffset) ?? defaultCountry.gmtOffset,
-        startTime: prefs.getString(keyStartTime) ?? defaultCountry.startTime,
+        gmtOffset: prefs.getDouble(keyGmtOffset) ??
+            (id == defaultCountry.id ? defaultCountry.gmtOffset : null),
+        startTime: prefs.getString(keyStartTime) ??
+            (id == defaultCountry.id ? defaultCountry.startTime : null),
       );
     } catch (_) {
       return defaultCountry;
@@ -212,9 +215,13 @@ class SettingsRepository {
       await prefs.setString(keyTimezone, country.timezone);
       if (country.gmtOffset != null) {
         await prefs.setDouble(keyGmtOffset, country.gmtOffset!);
+      } else {
+        await prefs.remove(keyGmtOffset);
       }
       if (country.startTime != null) {
         await prefs.setString(keyStartTime, country.startTime!);
+      } else {
+        await prefs.remove(keyStartTime);
       }
     } catch (_) {}
   }
@@ -450,6 +457,22 @@ class SettingsRepository {
     try {
       final prefs = _prefs ?? await SharedPreferences.getInstance();
       await prefs.setBool(keyClassicYptLook, value);
+    } catch (_) {}
+  }
+
+  Future<bool> getClassicTopTabs() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      return prefs.getBool(keyClassicTopTabs) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> saveClassicTopTabs(bool value) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      await prefs.setBool(keyClassicTopTabs, value);
     } catch (_) {}
   }
 

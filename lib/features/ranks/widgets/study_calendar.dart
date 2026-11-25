@@ -3,19 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/app_translation.dart';
-import '../../../core/utils/study_date_helper.dart';
+import '../../../core/utils/study_day_helper.dart';
 import '../../settings/settings_notifier.dart';
 
 class StudyCalendar extends ConsumerWidget {
   final Map<String, int> dailyStudyTimeMs; // Key: 'yyyy-MM-dd', Value: ms
   final DateTime month; // Any date inside the month being displayed.
   final ValueChanged<DateTime> onMonthChanged;
+  final bool isLoading;
 
   const StudyCalendar({
     super.key,
     required this.dailyStudyTimeMs,
     required this.month,
     required this.onMonthChanged,
+    this.isLoading = false,
   });
 
   Color _getDayColor(int ms, DeskyThemePalette palette) {
@@ -37,8 +39,13 @@ class StudyCalendar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dayResetHour = ref.watch(settingsNotifierProvider.select((s) => s.dayResetHour));
-    final now = StudyDateHelper.getStudyDate(null, dayResetHour);
+    final settings = ref.watch(settingsNotifierProvider);
+    final now = DateTime.parse(
+      StudyDayHelper.todayYmd(
+        gmtOffset: StudyDayHelper.gmtOffsetFor(settings.selectedCountry),
+        resetHour: settings.dayResetHour,
+      ),
+    );
     final shown = DateTime(month.year, month.month);
     final isCurrentMonth = shown.year == now.year && shown.month == now.month;
     final daysInMonth = DateTime(shown.year, shown.month + 1, 0).day;
@@ -67,6 +74,17 @@ class StudyCalendar extends ConsumerWidget {
         return '${shown.month}/${shown.year}';
       }
     }();
+
+    if (isLoading) {
+      return const SizedBox(
+        height: 320,
+        child: Center(
+          child: CircularProgressIndicator(
+            key: ValueKey('stats-month-loading'),
+          ),
+        ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

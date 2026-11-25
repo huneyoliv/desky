@@ -37,7 +37,11 @@ class _FakeTimerRepository extends TimerRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> fetchDailyLog(DateTime date) async => dailyLog;
+  Future<Map<String, dynamic>?> fetchDailyLog(
+    DateTime date, {
+    Duration? gmtOffset,
+    int resetHour = 5,
+  }) async => dailyLog;
 }
 
 class _FakeSubjectRepository extends SubjectRepository {

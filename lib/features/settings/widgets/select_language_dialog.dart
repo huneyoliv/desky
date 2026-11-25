@@ -54,7 +54,7 @@ class SelectLanguageDialog extends ConsumerWidget {
       ),
       title: Text(
         t.tr('select_language', fallback: 'Selecionar Idioma'),
-        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        style: TextStyle(color: context.appTextPrimary, fontSize: 18, fontWeight: FontWeight.bold),
       ),
       content: SizedBox(
         width: 380,
@@ -71,7 +71,7 @@ class SelectLanguageDialog extends ConsumerWidget {
               title: Text(
                 t.tr(lang.nameKey, fallback: lang.name),
                 style: TextStyle(
-                  color: isSelected ? AppColors.primaryLight : Colors.white,
+                  color: isSelected ? context.appPrimary : context.appTextPrimary,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),

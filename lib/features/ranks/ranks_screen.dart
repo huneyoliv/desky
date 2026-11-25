@@ -53,6 +53,10 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   /// comparisons, the maxima and the cumulative card.
   Map<String, int> _rangeDailyMs = {};
   bool _isLoadingDerived = true;
+  DateTime? _recordStart;
+  DateTime? _recordEnd;
+  bool _isLoadingCalendar = true;
+  int _calendarRequest = 0;
   Map<String, List<int>> _hourlyLogs = {};
   /// Sessions of the visible range, used by the time-of-day cards.
   List<StudySession> _sessions = [];
@@ -64,6 +68,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    final savedScope =
+        ref.read(sharedPreferencesProvider)?.getString('rank_scope');
+    _rankScope = savedScope == 'region' ? _RankScope.region : _RankScope.category;
     _loadRanks();
     _loadUserStats();
     _loadCalendarMonth();
@@ -176,17 +183,34 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   }
 
   Future<void> _loadCalendarMonth() async {
+    final request = ++_calendarRequest;
+    setState(() => _isLoadingCalendar = true);
     final user = ref.read(authStateProvider).user;
-    if (user == null) return;
+    if (user == null) {
+      if (mounted) setState(() => _isLoadingCalendar = false);
+      return;
+    }
+    final month = _calendarMonth;
+    final firstQuarterMonth = ((month.month - 1) ~/ 3) * 3 + 1;
+    final firstDay = DateTime(month.year, firstQuarterMonth, 1);
+    final lastDay = DateTime(month.year, firstQuarterMonth + 3, 0);
     final repo = ref.read(rankRepositoryProvider);
-    final firstDay = DateTime(_calendarMonth.year, _calendarMonth.month, 1);
-    final lastDay = DateTime(_calendarMonth.year, _calendarMonth.month + 1, 0);
-    final byDay = await repo.fetchDailyStudyMs(
-      userId: user.id,
-      startDate: DateFormat('yyyy-MM-dd').format(firstDay),
-      endDate: DateFormat('yyyy-MM-dd').format(lastDay),
-    );
-    if (mounted) setState(() => _calendarStudyMs = byDay);
+    try {
+      final byDay = await repo.fetchDailyStudyMs(
+        userId: user.id,
+        startDate: DateFormat('yyyy-MM-dd').format(firstDay),
+        endDate: DateFormat('yyyy-MM-dd').format(lastDay),
+      );
+      if (mounted && request == _calendarRequest) {
+        setState(() => _calendarStudyMs = byDay);
+      }
+    } catch (_) {
+      // Keep the last confirmed map; loading must still terminate.
+    } finally {
+      if (mounted && request == _calendarRequest) {
+        setState(() => _isLoadingCalendar = false);
+      }
+    }
   }
 
   /// Real 24h x 30d map: the previous widget was drawn from a hardcoded day.
@@ -207,6 +231,16 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
   ///
   /// Uses the same range as the subject series so every card on the tab talks
   /// about the same window.
+  (DateTime, DateTime) _recordBounds() {
+    final (start, end) = _statsRangeBounds();
+    final isWeek = _statsRange == _StatsRange.thisWeek ||
+        _statsRange == _StatsRange.lastWeek;
+    final startWithPrevious = isWeek
+        ? start.subtract(const Duration(days: 7))
+        : DateTime(start.year, start.month - 1, 1);
+    return (startWithPrevious, end);
+  }
+
   Future<void> _loadDerivedRange() async {
     final user = ref.read(authStateProvider).user;
     if (user == null) {
@@ -214,16 +248,24 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
       return;
     }
     setState(() => _isLoadingDerived = true);
-    final (start, end) = _statsRangeBounds();
+    final (recordStart, recordEnd) = _recordBounds();
+    final now = DateTime.now();
+    final comparisonStart = DateTime(now.year, now.month - 1, 1);
+    final requestStart = recordStart.isBefore(comparisonStart)
+        ? recordStart
+        : comparisonStart;
+    final requestEnd = recordEnd.isAfter(now) ? recordEnd : now;
     final repo = ref.read(rankRepositoryProvider);
     final byDay = await repo.fetchDailyStudyMs(
       userId: user.id,
-      startDate: DateFormat('yyyy-MM-dd').format(start),
-      endDate: DateFormat('yyyy-MM-dd').format(end),
+      startDate: DateFormat('yyyy-MM-dd').format(requestStart),
+      endDate: DateFormat('yyyy-MM-dd').format(requestEnd),
     );
     if (mounted) {
       setState(() {
         _rangeDailyMs = byDay;
+        _recordStart = recordStart;
+        _recordEnd = recordEnd;
         _isLoadingDerived = false;
       });
     }
@@ -383,6 +425,8 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                     if (_statsRange == range) return;
                     setState(() => _statsRange = range);
                     _loadSubjectSeries();
+                    _loadDerivedRange();
+                    _loadTimeOfDay();
                   },
                 );
               }).toList(),
@@ -621,17 +665,23 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
       context.appAccent,
     ];
 
-    double totalSubjectHours = _subjectDistribution.values.fold(0.0, (a, b) => a + b);
+    final visibleSubjects = _subjectDistribution.entries
+        .where((entry) => entry.value > 0)
+        .toList();
+    double totalSubjectHours = visibleSubjects.fold(
+      0.0,
+      (total, entry) => total + entry.value,
+    );
     if (totalSubjectHours == 0) totalSubjectHours = 1.0;
 
     int colorIdx = 0;
-    final pieSections = _subjectDistribution.entries.map((e) {
+    final pieSections = visibleSubjects.map((e) {
       final percentage = (e.value / totalSubjectHours * 100).round();
       final color = colors[colorIdx % colors.length];
       colorIdx++;
       return PieChartSectionData(
         color: color,
-        value: e.value > 0 ? e.value : 1,
+        value: e.value,
         title: '$percentage%',
         radius: 60,
         titleStyle: TextStyle(
@@ -722,6 +772,9 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                       scope: _rankScope,
                       categoryName: ref.watch(authStateProvider).user?.categoryName ?? '',
                       onChanged: (scope) {
+                        ref
+                            .read(sharedPreferencesProvider)
+                            ?.setString('rank_scope', scope.name);
                         setState(() => _rankScope = scope);
                         _loadRanks();
                       },
@@ -935,7 +988,11 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                                 ),
                               ),
                               StatsMaximaCard(
-                                maxima: StatsDerivations.maxima(_rangeDailyMs),
+                                maxima: StatsDerivations.maxima(
+                                  _rangeDailyMs,
+                                  start: _recordStart,
+                                  end: _recordEnd,
+                                ),
                               ),
                             ];
                             if (!wide) {
@@ -971,6 +1028,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
                             month: _calendarMonth,
                           ),
                           month: _calendarMonth,
+                          isLoading: _isLoadingCalendar,
                           onMonthChanged: (month) {
                             setState(() => _calendarMonth = month);
                             _loadCalendarMonth();
@@ -1044,6 +1102,7 @@ class _RanksScreenState extends ConsumerState<RanksScreen>
               child: StudyCalendar(
                 dailyStudyTimeMs: _calendarStudyMs,
                 month: _calendarMonth,
+                isLoading: _isLoadingCalendar,
                 onMonthChanged: (month) {
                   setState(() => _calendarMonth = month);
                   _loadCalendarMonth();

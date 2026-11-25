@@ -6,16 +6,29 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  # Required to save and restore the Flutter/pub caches used below.
+  actions: write
+
+# A branch can trigger both push and pull_request. Keep only the newest run
+# for that repository/branch instead of building duplicate or obsolete SHAs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     name: Flutter Analyze & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
+          persist-credentials: false
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -36,3 +49,48 @@ jobs:
 
       - name: Run test suite
         run: flutter test
+
+  build:
+    name: Build (${{ matrix.os }})
+    needs: validate
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux desktop build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libsecret-1-dev libjsoncpp-dev
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Test native Windows named pipe
+        if: runner.os == 'Windows'
+        run: flutter test test/core/services/discord_windows_pipe_test.dart
+
+      - name: Build desktop app
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            Windows) flutter build windows --debug ;;
+            macOS)   flutter build macos --debug ;;
+            Linux)   flutter build linux --debug ;;
+          esac
