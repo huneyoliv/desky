@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// The secure storage the app uses for the login token.
 ///
@@ -11,13 +12,41 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// for the service first and, when it is missing, swaps in
 /// [KeyringlessSecureStorage]. The token is also kept in SharedPreferences,
 /// so login still survives a restart there.
+const String authJwtTokenKey = 'jwt_token';
+const String authLoggedOutKey = 'auth_logged_out';
+
+/// Reads the current token without allowing an older keyring entry to override
+/// a newer preference login or a completed logout. When no preference token
+/// exists, the keyring remains the legacy source of truth.
+Future<String?> readAuthToken(FlutterSecureStorage storage) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(authLoggedOutKey) == true) return null;
+    final token = prefs.getString(authJwtTokenKey);
+    if (token != null && token.isNotEmpty) return token;
+  } catch (_) {
+    // Failing closed avoids bypassing a logout tombstone during storage errors.
+    return null;
+  }
+
+  try {
+    final token = await storage
+        .read(key: authJwtTokenKey)
+        .timeout(const Duration(seconds: 2), onTimeout: () => null);
+    return token == null || token.isEmpty ? null : token;
+  } catch (_) {
+    return null;
+  }
+}
+
 FlutterSecureStorage appSecureStorage = const FlutterSecureStorage();
 
 /// Call once in `main` before anything reads the token.
 Future<void> initSecureStorage() async {
   if (kIsWeb || !Platform.isLinux) return;
   if (await linuxSecretServiceAvailable()) return;
-  debugPrint('[secure-storage] no Secret Service on D-Bus; using preferences only');
+  debugPrint(
+      '[secure-storage] no Secret Service on D-Bus; using preferences only');
   appSecureStorage = const KeyringlessSecureStorage();
 }
 
@@ -57,17 +86,23 @@ Future<String?> _busNames(
     (
       'gdbus',
       [
-        'call', '--session',
-        '--dest', 'org.freedesktop.DBus',
-        '--object-path', '/org/freedesktop/DBus',
-        '--method', 'org.freedesktop.DBus.$method',
+        'call',
+        '--session',
+        '--dest',
+        'org.freedesktop.DBus',
+        '--object-path',
+        '/org/freedesktop/DBus',
+        '--method',
+        'org.freedesktop.DBus.$method',
       ],
     ),
     (
       'dbus-send',
       [
-        '--session', '--print-reply',
-        '--dest=org.freedesktop.DBus', '/org/freedesktop/DBus',
+        '--session',
+        '--print-reply',
+        '--dest=org.freedesktop.DBus',
+        '/org/freedesktop/DBus',
         'org.freedesktop.DBus.$method',
       ],
     ),

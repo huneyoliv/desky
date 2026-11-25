@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
+import '../storage/secure_storage.dart';
 
 class AuthInterceptor extends Interceptor {
   final FlutterSecureStorage _storage;
@@ -19,15 +19,8 @@ class AuthInterceptor extends Interceptor {
 
     String? token;
     try {
-      token = await _storage.read(key: keyJwtToken);
+      token = await readAuthToken(_storage);
     } catch (_) {}
-
-    if (token == null || token.isEmpty) {
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        token = prefs.getString(keyJwtToken);
-      } catch (_) {}
-    }
 
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = '${ApiConstants.jwtPrefix}$token';
