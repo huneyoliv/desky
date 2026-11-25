@@ -82,6 +82,10 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      - name: Test native Windows named pipe
+        if: runner.os == 'Windows'
+        run: flutter test test/core/services/discord_windows_pipe_test.dart
+
       - name: Build desktop app
         shell: bash
         run: |

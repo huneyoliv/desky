@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
@@ -7,13 +8,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../cdn/cdn_resolver.dart';
 import '../config/env_config.dart';
 import '../constants/app_constants.dart';
+import 'discord_ipc_protocol.dart';
 import '../localization/app_translation.dart';
 import '../../data/models/user_model.dart';
 import '../../features/timer/timer_notifier.dart';
 
-final DynamicLibrary? _kernel32 = !kIsWeb && Platform.isWindows
-    ? DynamicLibrary.open('kernel32.dll')
-    : null;
+final DynamicLibrary? _kernel32 =
+    !kIsWeb && Platform.isWindows ? DynamicLibrary.open('kernel32.dll') : null;
 
 typedef _CreateFileC = IntPtr Function(
     Pointer<Utf16> lpFileName,
@@ -80,122 +81,93 @@ typedef _PeekNamedPipeDart = int Function(
 typedef _CloseHandleC = Int32 Function(IntPtr hObject);
 typedef _CloseHandleDart = int Function(int hObject);
 
-final _CreateFileDart? _createFile = _kernel32
-    ?.lookupFunction<_CreateFileC, _CreateFileDart>('CreateFileW');
+final _CreateFileDart? _createFile =
+    _kernel32?.lookupFunction<_CreateFileC, _CreateFileDart>('CreateFileW');
 
-final _WriteFileDart? _writeFile = _kernel32
-    ?.lookupFunction<_WriteFileC, _WriteFileDart>('WriteFile');
+final _WriteFileDart? _writeFile =
+    _kernel32?.lookupFunction<_WriteFileC, _WriteFileDart>('WriteFile');
 
-final _ReadFileDart? _readFile = _kernel32
-    ?.lookupFunction<_ReadFileC, _ReadFileDart>('ReadFile');
+final _ReadFileDart? _readFile =
+    _kernel32?.lookupFunction<_ReadFileC, _ReadFileDart>('ReadFile');
 
 final _PeekNamedPipeDart? _peekNamedPipe = _kernel32
     ?.lookupFunction<_PeekNamedPipeC, _PeekNamedPipeDart>('PeekNamedPipe');
 
-final _CloseHandleDart? _closeHandle = _kernel32
-    ?.lookupFunction<_CloseHandleC, _CloseHandleDart>('CloseHandle');
+final _CloseHandleDart? _closeHandle =
+    _kernel32?.lookupFunction<_CloseHandleC, _CloseHandleDart>('CloseHandle');
 
-class _DiscordPacket {
-  final int opcode;
-  final String body;
-  const _DiscordPacket(this.opcode, this.body);
-}
+/// Named pipe transport (Windows). Reads only what PeekNamedPipe reports as
+/// available, in bounded chunks, so a peer that announces a huge frame never
+/// makes us allocate for it: the frame decoder rejects the header first.
+class _WindowsNamedPipeTransport implements DiscordIpcTransport {
+  _WindowsNamedPipeTransport(this.handle);
 
-abstract class _DiscordIpcConnection {
-  Future<bool> writePacket(int opcode, String jsonString);
-  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(seconds: 3)});
-  void close();
-}
-
-class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
   final int handle;
-  _WindowsNamedPipeConnection(this.handle);
+  bool _closed = false;
+
+  static const int _chunkBytes = 16 * 1024;
+
+  bool get _usable =>
+      !_closed &&
+      _writeFile != null &&
+      _readFile != null &&
+      _peekNamedPipe != null &&
+      handle != 0 &&
+      handle != -1;
 
   @override
-  Future<bool> writePacket(int opcode, String jsonString) async {
-    if (_writeFile == null || handle == 0 || handle == -1) return false;
+  Future<bool> write(Uint8List bytes) async {
+    if (!_usable) return false;
+    final pBuffer = calloc<Uint8>(bytes.length);
+    final pWritten = calloc<Uint32>();
     try {
-      final payloadBytes = utf8.encode(jsonString);
-      final buffer = Uint8List(8 + payloadBytes.length);
-      final byteData = ByteData.sublistView(buffer);
-      byteData.setUint32(0, opcode, Endian.little);
-      byteData.setUint32(4, payloadBytes.length, Endian.little);
-      buffer.setRange(8, 8 + payloadBytes.length, payloadBytes);
-
-      final pBuffer = calloc<Uint8>(buffer.length);
-      final pWritten = calloc<Uint32>();
-      try {
-        pBuffer.asTypedList(buffer.length).setAll(0, buffer);
-        final result = _writeFile!(handle, pBuffer, buffer.length, pWritten, nullptr);
-        return result != 0;
-      } finally {
-        calloc.free(pBuffer);
-        calloc.free(pWritten);
-      }
+      pBuffer.asTypedList(bytes.length).setAll(0, bytes);
+      final ok = _writeFile!(handle, pBuffer, bytes.length, pWritten, nullptr);
+      return ok != 0 && pWritten.value == bytes.length;
     } catch (_) {
       return false;
+    } finally {
+      calloc.free(pBuffer);
+      calloc.free(pWritten);
     }
   }
 
   @override
-  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(seconds: 3)}) async {
-    if (_readFile == null || _peekNamedPipe == null || handle == 0 || handle == -1) return null;
-    final headerStopwatch = Stopwatch()..start();
-    final pTotalAvail = calloc<Uint32>();
-
+  Future<Uint8List?> read(Duration wait) async {
+    if (!_usable) return null;
+    final pAvail = calloc<Uint32>();
     try {
-      while (headerStopwatch.elapsed < timeout) {
-        final peekRes = _peekNamedPipe!(handle, nullptr, 0, nullptr, pTotalAvail, nullptr);
-        if (peekRes != 0 && pTotalAvail.value >= 8) {
-          break;
-        }
-        await Future.delayed(const Duration(milliseconds: 20));
+      final stopwatch = Stopwatch()..start();
+      while (true) {
+        final ok =
+            _peekNamedPipe!(handle, nullptr, 0, nullptr, pAvail, nullptr);
+        if (ok == 0) return null; // broken pipe: Discord went away
+        if (pAvail.value > 0) break;
+        if (stopwatch.elapsed >= wait) return Uint8List(0);
+        await Future<void>.delayed(const Duration(milliseconds: 20));
       }
-
-      if (pTotalAvail.value < 8) return null;
-
-      final headerBuffer = calloc<Uint8>(8);
-      final pBytesRead = calloc<Uint32>();
+      final toRead = pAvail.value < _chunkBytes ? pAvail.value : _chunkBytes;
+      final pBuffer = calloc<Uint8>(toRead);
+      final pRead = calloc<Uint32>();
       try {
-        final res = _readFile!(handle, headerBuffer, 8, pBytesRead, nullptr);
-        if (res == 0 || pBytesRead.value < 8) return null;
-        final headerData = ByteData.sublistView(headerBuffer.asTypedList(8));
-        final opcode = headerData.getUint32(0, Endian.little);
-        final length = headerData.getUint32(4, Endian.little);
-
-        if (length == 0) return _DiscordPacket(opcode, '');
-
-        final bodyStopwatch = Stopwatch()..start();
-        while (bodyStopwatch.elapsed < timeout) {
-          _peekNamedPipe!(handle, nullptr, 0, nullptr, pTotalAvail, nullptr);
-          if (pTotalAvail.value >= length) break;
-          await Future.delayed(const Duration(milliseconds: 20));
-        }
-
-        if (pTotalAvail.value < length) return null;
-
-        final bodyBuffer = calloc<Uint8>(length);
-        try {
-          final bodyRes = _readFile!(handle, bodyBuffer, length, pBytesRead, nullptr);
-          if (bodyRes == 0 || pBytesRead.value < length) return null;
-          final bodyString = utf8.decode(bodyBuffer.asTypedList(length));
-          return _DiscordPacket(opcode, bodyString);
-        } finally {
-          calloc.free(bodyBuffer);
-        }
+        final ok = _readFile!(handle, pBuffer, toRead, pRead, nullptr);
+        if (ok == 0) return null;
+        return Uint8List.fromList(pBuffer.asTypedList(pRead.value));
       } finally {
-        calloc.free(headerBuffer);
-        calloc.free(pBytesRead);
+        calloc.free(pBuffer);
+        calloc.free(pRead);
       }
     } catch (_) {
       return null;
     } finally {
-      calloc.free(pTotalAvail);
+      calloc.free(pAvail);
     }
   }
 
   @override
   void close() {
+    if (_closed) return;
+    _closed = true;
     if (_closeHandle != null && handle != 0 && handle != -1) {
       try {
         _closeHandle!(handle);
@@ -204,48 +176,47 @@ class _WindowsNamedPipeConnection implements _DiscordIpcConnection {
   }
 }
 
-class _UnixSocketConnection implements _DiscordIpcConnection {
-  final Socket socket;
-  _UnixSocketConnection(this.socket);
+/// Opens a byte stream to a running Discord client, or returns null.
+typedef DiscordIpcConnector = Future<DiscordIpcTransport?> Function();
 
-  @override
-  Future<bool> writePacket(int opcode, String jsonString) async {
-    try {
-      final payloadBytes = utf8.encode(jsonString);
-      final header = Uint8List(8);
-      final byteData = ByteData.sublistView(header);
-      byteData.setUint32(0, opcode, Endian.little);
-      byteData.setUint32(4, payloadBytes.length, Endian.little);
-      socket.add(header);
-      socket.add(payloadBytes);
-      await socket.flush();
-      return true;
-    } catch (_) {
-      return false;
+Future<DiscordIpcTransport?> _connectToDiscord() async {
+  if (Platform.isWindows && _createFile != null) {
+    const genericReadWrite = 0xC0000000;
+    const openExisting = 3;
+    for (int i = 0; i < 10; i++) {
+      final nativeName =
+          (r'\\.\pipe\discord-ipc-' + i.toString()).toNativeUtf16();
+      try {
+        final handle = _createFile!(
+            nativeName, genericReadWrite, 0, nullptr, openExisting, 0, 0);
+        if (handle != 0 && handle != -1) {
+          return _WindowsNamedPipeTransport(handle);
+        }
+      } finally {
+        calloc.free(nativeName);
+      }
+    }
+    return null;
+  }
+  if (Platform.isLinux || Platform.isMacOS) {
+    final tempDir = Platform.environment['XDG_RUNTIME_DIR'] ??
+        Platform.environment['TMPDIR'] ??
+        Platform.environment['TMP'] ??
+        Platform.environment['TEMP'] ??
+        '/tmp';
+    for (int i = 0; i < 10; i++) {
+      try {
+        final socket = await Socket.connect(
+          InternetAddress('$tempDir/discord-ipc-$i',
+              type: InternetAddressType.unix),
+          0,
+          timeout: const Duration(milliseconds: 300),
+        );
+        return DiscordSocketTransport(socket);
+      } catch (_) {}
     }
   }
-
-  @override
-  Future<_DiscordPacket?> readPacket({Duration timeout = const Duration(seconds: 3)}) async {
-    try {
-      final data = await socket.first.timeout(timeout);
-      if (data.length < 8) return null;
-      final byteData = ByteData.sublistView(Uint8List.fromList(data));
-      final opcode = byteData.getUint32(0, Endian.little);
-      final length = byteData.getUint32(4, Endian.little);
-      final body = utf8.decode(data.sublist(8, 8 + length));
-      return _DiscordPacket(opcode, body);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  void close() {
-    try {
-      socket.destroy();
-    } catch (_) {}
-  }
+  return null;
 }
 
 class DiscordPresencePayload {
@@ -302,15 +273,29 @@ class DiscordPresencePayload {
 
 class DiscordRpcService {
   final String _clientId;
-  _DiscordIpcConnection? _connection;
+  final DiscordIpcConnector _connector;
+  DiscordIpcConnection? _connection;
+  Future<void>? _connectFuture;
   bool _connected = false;
   DiscordPresencePayload? _lastPayload;
+  DiscordPresencePayload? _pendingPayload;
+  Future<void> _commandTail = Future<void>.value();
+  bool _presencePending = false;
+  bool _disposed = false;
   int _nonceCounter = 0;
 
   bool get isConnected => _connected;
 
-  DiscordRpcService({String? clientId})
-      : _clientId = clientId ?? EnvConfig.discordClientId;
+  /// [connector] is for tests: it replaces the real pipe/socket lookup.
+  DiscordRpcService({
+    String? clientId,
+    DiscordIpcConnector? connector,
+    this.handshakeTimeout = const Duration(seconds: 5),
+  })  : _clientId = clientId ?? EnvConfig.discordClientId,
+        _connector = connector ?? _connectToDiscord;
+
+  /// How long Discord gets to answer the handshake.
+  final Duration handshakeTimeout;
 
   static String formatStudyDuration(int ms) {
     final totalSeconds = (ms / 1000).floor();
@@ -333,7 +318,8 @@ class DiscordRpcService {
     }
 
     final studyMs = timerState.todayTotalMs;
-    final studiconId = user?.studiconId ?? (timerState.studiconId > 0 ? timerState.studiconId : -1);
+    final studiconId = user?.studiconId ??
+        (timerState.studiconId > 0 ? timerState.studiconId : -1);
     final hasCustomAvatar = user?.hasCustomAvatar ?? false;
     final userId = user?.id ?? 0;
     final dailyGoalMs = timerState.dailyGoalMinutes * 60 * 1000;
@@ -349,7 +335,8 @@ class DiscordRpcService {
     );
 
     final totalTimeFormatted = formatStudyDuration(studyMs);
-    final totalTimeLabel = translation.tr('today_study_time', fallback: 'Tempo Total');
+    final totalTimeLabel =
+        translation.tr('today_study_time', fallback: 'Tempo Total');
     final largeImageTooltip = '$totalTimeLabel: $totalTimeFormatted';
 
     String detailsText;
@@ -357,7 +344,8 @@ class DiscordRpcService {
     DateTime? startTime;
 
     if (isRunning) {
-      final studyingLabel = translation.tr('discord_studying', fallback: 'Estudando');
+      final studyingLabel =
+          translation.tr('discord_studying', fallback: 'Estudando');
       final subjectTitle = timerState.currentSubject?.title;
       detailsText = subjectTitle != null && subjectTitle.isNotEmpty
           ? subjectTitle
@@ -366,7 +354,8 @@ class DiscordRpcService {
       final elapsedMs = timerState.sessionElapsedMs;
       startTime = DateTime.now().subtract(Duration(milliseconds: elapsedMs));
     } else if (isPaused) {
-      final pausedLabel = translation.tr('discord_paused', fallback: 'Em pausa');
+      final pausedLabel =
+          translation.tr('discord_paused', fallback: 'Em pausa');
       final subjectTitle = timerState.currentSubject?.title;
       detailsText = subjectTitle != null && subjectTitle.isNotEmpty
           ? subjectTitle
@@ -394,95 +383,123 @@ class DiscordRpcService {
     await connect();
   }
 
-  Future<void> connect() async {
-    if (_connected && _connection != null) return;
-    if (kIsWeb || _clientId.isEmpty) return;
+  Future<void> connect() {
+    if (_disposed || kIsWeb || _clientId.isEmpty) return Future<void>.value();
+    if (_connected && _connection != null && !_connection!.isClosed) {
+      return Future<void>.value();
+    }
+    final existing = _connectFuture;
+    if (existing != null) return existing;
 
+    late final Future<void> attempt;
+    attempt = _connectOnce().whenComplete(() {
+      if (identical(_connectFuture, attempt)) _connectFuture = null;
+    });
+    _connectFuture = attempt;
+    return attempt;
+  }
+
+  Future<void> _connectOnce() async {
+    _drop();
+    DiscordIpcConnection? connection;
     try {
-      if (Platform.isWindows && _createFile != null) {
-        const genericReadWrite = 0xC0000000;
-        const openExisting = 3;
-
-        for (int i = 0; i < 10; i++) {
-          final pipeName = r'\\.\pipe\discord-ipc-' + i.toString();
-          final nativeName = pipeName.toNativeUtf16();
-          try {
-            final handle = _createFile!(
-              nativeName,
-              genericReadWrite,
-              0,
-              nullptr,
-              openExisting,
-              0,
-              0,
-            );
-            if (handle != 0 && handle != -1) {
-              _connection = _WindowsNamedPipeConnection(handle);
-              break;
-            }
-          } finally {
-            calloc.free(nativeName);
-          }
-        }
-      } else if (Platform.isLinux || Platform.isMacOS) {
-        final tempDir = Platform.environment['XDG_RUNTIME_DIR'] ??
-            Platform.environment['TMPDIR'] ??
-            Platform.environment['TMP'] ??
-            Platform.environment['TEMP'] ??
-            '/tmp';
-
-        for (int i = 0; i < 10; i++) {
-          try {
-            final socketPath = '$tempDir/discord-ipc-$i';
-            final socket = await Socket.connect(
-              InternetAddress(socketPath, type: InternetAddressType.unix),
-              0,
-              timeout: const Duration(milliseconds: 300),
-            );
-            _connection = _UnixSocketConnection(socket);
-            break;
-          } catch (_) {}
-        }
+      final transport = await _connector();
+      if (_disposed) {
+        transport?.close();
+        return;
       }
-
-      if (_connection != null) {
-        final handshakePayload = jsonEncode({
-          'v': 1,
-          'client_id': _clientId,
-        });
-        final ok = await _connection!.writePacket(0, handshakePayload);
-        if (ok) {
-          final resp = await _connection!.readPacket(timeout: const Duration(seconds: 5));
-          if (resp != null && resp.opcode == 1) {
-            _connected = true;
-          } else {
-            _connected = false;
-            _connection?.close();
-            _connection = null;
-          }
-        } else {
-          _connected = false;
-          _connection?.close();
-          _connection = null;
-        }
+      if (transport == null) return;
+      connection = DiscordIpcConnection(transport);
+      // Track the handshake too, so dispose can close its pending read.
+      _connection = connection;
+      final sent = await connection.writeFrame(
+        DiscordIpcOpcode.handshake,
+        jsonEncode({'v': 1, 'client_id': _clientId}),
+      );
+      final reply = sent ? await connection.readFrame(handshakeTimeout) : null;
+      // Only a READY dispatch proves a Discord client accepted this app; a
+      // CLOSE, an ERROR event or anything malformed is a failed handshake.
+      if (!_disposed &&
+          identical(_connection, connection) &&
+          isDiscordReadyFrame(reply)) {
+        _connected = true;
       } else {
-        _connected = false;
+        _drop(connection);
       }
     } catch (_) {
-      _connected = false;
-      _connection?.close();
-      _connection = null;
+      if (connection == null) {
+        if (!_disposed) _drop();
+      } else {
+        _drop(connection);
+      }
     }
   }
 
-  Future<void> updatePresence(DiscordPresencePayload payload) async {
-    if (_lastPayload == payload && _connected) return;
+  /// Sends one command and handles whatever Discord sent back so far.
+  Future<bool> _sendCommand(Map<String, dynamic> args) async {
+    final connection = _connection;
+    if (_disposed) return false;
+    if (connection == null || connection.isClosed) {
+      if (connection == null) {
+        _drop();
+      } else {
+        _drop(connection);
+      }
+      return false;
+    }
+    // Reserve and encode the nonce before the first await. Public commands are
+    // serialized below, and this also keeps concurrent callers collision-free.
+    final nonce = (++_nonceCounter).toString();
+    final payload =
+        jsonEncode({'cmd': 'SET_ACTIVITY', 'args': args, 'nonce': nonce});
+    final ok = await connection.drain() &&
+        await connection.writeFrame(DiscordIpcOpcode.frame, payload) &&
+        await connection.drain();
+    if (!ok && connection.isClosed) _drop(connection);
+    return ok;
+  }
+
+  Future<void> _enqueuePresence(DiscordPresencePayload? payload) {
+    if (_disposed) return Future<void>.value();
+    // One pending value is enough: intermediate states are superseded before
+    // they reach the wire, while an in-flight command finishes first.
+    _pendingPayload = payload;
+    _presencePending = true;
+    _commandTail = _commandTail.then((_) => _flushPresence());
+    return _commandTail;
+  }
+
+  Future<void> _flushPresence() async {
+    if (_disposed || !_presencePending) return;
+    final payload = _pendingPayload;
+    _pendingPayload = null;
+    _presencePending = false;
+    DiscordIpcConnection? connection;
 
     try {
-      if (!_connected || _connection == null) {
+      if (payload == null && (!_connected || _connection == null)) {
+        _lastPayload = null;
+        return;
+      }
+      if (!_connected || _connection == null || _connection!.isClosed) {
+        if (payload == null) {
+          _drop();
+          return;
+        }
         await connect();
       }
-      if (!_connected || _connection == null) return;
+      connection = _connection;
+      if (_disposed || !_connected || connection == null) return;
+      if (payload != null && _lastPayload == payload) return;
+
+      if (payload == null) {
+        if (await _sendCommand({'pid': pid, 'activity': null}) &&
+            !_disposed &&
+            identical(_connection, connection)) {
+          _lastPayload = null;
+        }
+        return;
+      }
 
       final assets = <String, dynamic>{
         'large_image': payload.largeImage,
@@ -520,60 +537,51 @@ class DiscordRpcService {
         ];
       }
 
-      _nonceCounter++;
-      final packetPayload = jsonEncode({
-        'cmd': 'SET_ACTIVITY',
-        'args': {
-          'pid': pid,
-          'activity': activity,
-        },
-        'nonce': _nonceCounter.toString(),
-      });
-
-      final success = await _connection!.writePacket(1, packetPayload);
-      if (success) {
+      if (await _sendCommand({'pid': pid, 'activity': activity}) &&
+          !_disposed &&
+          identical(_connection, connection)) {
         _lastPayload = payload;
+      }
+    } catch (_) {
+      if (connection == null) {
+        if (!_disposed) _drop();
       } else {
-        _connected = false;
-        _connection?.close();
-        _connection = null;
+        _drop(connection);
       }
-    } catch (_) {
-      _connected = false;
-      _connection?.close();
-      _connection = null;
     }
   }
 
-  Future<void> clearPresence() async {
-    _lastPayload = null;
-    if (!_connected || _connection == null) return;
-    try {
-      _nonceCounter++;
-      final packetPayload = jsonEncode({
-        'cmd': 'SET_ACTIVITY',
-        'args': {
-          'pid': pid,
-          'activity': null,
-        },
-        'nonce': _nonceCounter.toString(),
-      });
-      await _connection!.writePacket(1, packetPayload);
-    } catch (_) {
-      _connected = false;
-    }
-  }
+  Future<void> updatePresence(DiscordPresencePayload payload) =>
+      _enqueuePresence(payload);
 
-  void dispose() {
-    try {
-      if (_connected && _connection != null) {
-        _connection!.writePacket(2, '{}');
-      }
-      _connection?.close();
-    } catch (_) {}
+  Future<void> clearPresence() => _enqueuePresence(null);
+
+  void _drop([DiscordIpcConnection? expected]) {
+    final current = _connection;
+    if (expected != null && !identical(current, expected)) {
+      // An old transport must never tear down its replacement.
+      expected.close();
+      return;
+    }
+    (expected ?? current)?.close();
     _connection = null;
     _connected = false;
     _lastPayload = null;
+  }
+
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    _presencePending = false;
+    _pendingPayload = null;
+    final connection = _connection;
+    if (_connected && connection != null && !connection.isClosed) {
+      // Best effort goodbye; the transport is closed right after.
+      unawaited(connection
+          .writeFrame(DiscordIpcOpcode.close, '{}')
+          .catchError((_) => false));
+    }
+    _drop();
   }
 }
 
