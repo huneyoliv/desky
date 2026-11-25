@@ -105,7 +105,7 @@ int _createServer() {
         nullptr,
       );
       if (handle != 0 && handle != -1) return handle;
-      print(
+      stderr.writeln(
           'CreateNamedPipeW failed for index $index: handle=$handle error=${_Native.getLastError()}');
     } finally {
       calloc.free(path);
