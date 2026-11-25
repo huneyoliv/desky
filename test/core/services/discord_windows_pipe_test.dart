@@ -117,7 +117,7 @@ int _createServer() {
 Uint8List _readExact(int handle, int count) {
   final buffer = calloc<Uint8>(count);
   final read = calloc<Uint32>();
-  final builder = BytesBuilder(copy: false);
+  final builder = BytesBuilder();
   try {
     var offset = 0;
     while (offset < count) {
