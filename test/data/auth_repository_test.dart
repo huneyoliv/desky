@@ -131,12 +131,10 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
 
       expect(
-        () =>
-            repo.signInWithEmail(email: 'test@example.com', password: 'wrong'),
+        () => repo.signInWithEmail(email: 'test@example.com', password: 'wrong'),
         throwsA(predicate((e) => e.toString().contains('Senha incorreta'))),
       );
     });
@@ -156,19 +154,15 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
 
       expect(
-        () => repo.signInWithEmail(
-            email: 'notfound@example.com', password: 'pass'),
-        throwsA(
-            predicate((e) => e.toString().contains('E-mail não cadastrado'))),
+        () => repo.signInWithEmail(email: 'notfound@example.com', password: 'pass'),
+        throwsA(predicate((e) => e.toString().contains('E-mail não cadastrado'))),
       );
     });
 
-    test('signInWithEmail handles error code 114 (account suspended)',
-        () async {
+    test('signInWithEmail handles error code 114 (account suspended)', () async {
       final errorDio = Dio();
       errorDio.interceptors.add(
         InterceptorsWrapper(
@@ -183,12 +177,10 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
 
       expect(
-        () => repo.signInWithEmail(
-            email: 'suspended@example.com', password: 'pass'),
+        () => repo.signInWithEmail(email: 'suspended@example.com', password: 'pass'),
         throwsA(predicate((e) => e.toString().contains('Conta suspensa'))),
       );
     });
@@ -201,15 +193,13 @@ void main() {
       expect(storedToken, isNull);
     });
 
-    test('signInWithSocial sends password:null and returns user on success',
-        () async {
+    test('signInWithSocial sends password:null and returns user on success', () async {
       Map<String, dynamic>? capturedData;
       final socialDio = Dio();
       socialDio.interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) {
-            if (options.path.contains('/user/social/sign-up-jwt') ||
-                options.path.contains('/user/sign-in-jwt')) {
+            if (options.path.contains('/user/social/sign-up-jwt') || options.path.contains('/user/sign-in-jwt')) {
               capturedData = options.data as Map<String, dynamic>?;
               return handler.resolve(
                 Response(
@@ -228,18 +218,14 @@ void main() {
             }
             if (options.path.contains('/user/v2/splash-login')) {
               return handler.resolve(
-                Response(
-                    requestOptions: options,
-                    statusCode: 200,
-                    data: {'s': true}),
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
               );
             }
             return handler.next(options);
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
 
       final user = await repo.signInWithSocial(
         provider: 'Google',
@@ -256,9 +242,7 @@ void main() {
       expect(capturedData!['loginProvider'], equals('Google'));
     });
 
-    test(
-        'signInWithSocial throws SocialSignUpRequiredException on error c:111 (social id not found)',
-        () async {
+    test('signInWithSocial throws SocialSignUpRequiredException on error c:111 (social id not found)', () async {
       final errorDio = Dio();
       errorDio.interceptors.add(
         InterceptorsWrapper(
@@ -273,8 +257,7 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: errorDio), storage: mockStorage);
 
       expect(
         () => repo.signInWithSocial(
@@ -287,8 +270,7 @@ void main() {
       );
     });
 
-    test('signUpWithSocial completes registration and returns user model',
-        () async {
+    test('signUpWithSocial completes registration and returns user model', () async {
       Map<String, dynamic>? capturedData;
       final socialDio = Dio();
       socialDio.interceptors.add(
@@ -313,18 +295,14 @@ void main() {
             }
             if (options.path.contains('/user/v2/splash-login')) {
               return handler.resolve(
-                Response(
-                    requestOptions: options,
-                    statusCode: 200,
-                    data: {'s': true}),
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
               );
             }
             return handler.next(options);
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
 
       final user = await repo.signUpWithSocial(
         provider: 'Google',
@@ -344,9 +322,7 @@ void main() {
       expect(capturedData!['categoryId'], equals(10));
     });
 
-    test(
-        'signUpWithSocial assigns and caches nickname when server returns empty name',
-        () async {
+    test('signUpWithSocial assigns and caches nickname when server returns empty name', () async {
       final socialDio = Dio();
       socialDio.interceptors.add(
         InterceptorsWrapper(
@@ -369,26 +345,19 @@ void main() {
             }
             if (options.path.contains('/user/nickname/change')) {
               return handler.resolve(
-                Response(
-                    requestOptions: options,
-                    statusCode: 200,
-                    data: {'s': true}),
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
               );
             }
             if (options.path.contains('/user/v2/splash-login')) {
               return handler.resolve(
-                Response(
-                    requestOptions: options,
-                    statusCode: 200,
-                    data: {'s': true}),
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
               );
             }
             return handler.next(options);
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: socialDio), storage: mockStorage);
 
       final user = await repo.signUpWithSocial(
         provider: 'Google',
@@ -404,9 +373,7 @@ void main() {
       expect(user.name, equals('ExpectedNickname'));
     });
 
-    test(
-        'signInWithJwt saves token and returns user model on valid splashLogin',
-        () async {
+    test('signInWithJwt saves token and returns user model on valid splashLogin', () async {
       final jwtDio = Dio();
       jwtDio.interceptors.add(
         InterceptorsWrapper(
@@ -430,8 +397,7 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: jwtDio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: jwtDio), storage: mockStorage);
 
       final user = await repo.signInWithJwt('JWT valid_jwt_token_123');
 
@@ -443,10 +409,8 @@ void main() {
       expect(stored, equals('valid_jwt_token_123'));
     });
 
-    test('signInWithJwt throws ApiException on empty or invalid token',
-        () async {
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: mockDio), storage: mockStorage);
+    test('signInWithJwt throws ApiException on empty or invalid token', () async {
+      final repo = AuthRepository(apiClient: ApiClient(customDio: mockDio), storage: mockStorage);
 
       expect(
         () => repo.signInWithJwt(''),
@@ -454,9 +418,7 @@ void main() {
       );
     });
 
-    test(
-        'sendSignUpVerificationCode calls /user/v2/send-signup-code and handles success',
-        () async {
+    test('sendSignUpVerificationCode calls /user/v2/send-signup-code and handles success', () async {
       Map<String, dynamic>? requestData;
       String? requestPath;
       final dio = Dio();
@@ -475,20 +437,16 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
 
-      final result = await repo
-          .sendSignUpVerificationCode('newuser@example.com', language: 'pt');
+      final result = await repo.sendSignUpVerificationCode('newuser@example.com', language: 'pt');
       expect(result, isTrue);
       expect(requestPath, contains('/user/v2/send-signup-code'));
       expect(requestData?['email'], equals('newuser@example.com'));
       expect(requestData?['language'], equals('pt'));
     });
 
-    test(
-        'sendSignUpVerificationCode throws ApiException on error code 106 (already registered)',
-        () async {
+    test('sendSignUpVerificationCode throws ApiException on error code 106 (already registered)', () async {
       final dio = Dio();
       dio.interceptors.add(
         InterceptorsWrapper(
@@ -503,8 +461,7 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
 
       expect(
         () => repo.sendSignUpVerificationCode('registered@example.com'),
@@ -512,8 +469,7 @@ void main() {
       );
     });
 
-    test('verifySignUpCode calls /user/v2/verify-code and verifies valid code',
-        () async {
+    test('verifySignUpCode calls /user/v2/verify-code and verifies valid code', () async {
       Map<String, dynamic>? requestData;
       String? requestPath;
       final dio = Dio();
@@ -532,11 +488,9 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
 
-      final result =
-          await repo.verifySignUpCode('newuser@example.com', '628029');
+      final result = await repo.verifySignUpCode('newuser@example.com', '628029');
       expect(result, isTrue);
       expect(requestPath, contains('/user/v2/verify-code'));
       expect(requestData?['code'], equals('628029'));
@@ -557,8 +511,7 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
 
       expect(
         () => repo.verifySignUpCode('user@example.com', '000000'),
@@ -566,9 +519,7 @@ void main() {
       );
     });
 
-    test(
-        'signUp calls /user/v2/create-email-account, updates nickname and stores token',
-        () async {
+    test('signUp calls /user/v2/create-email-account, updates nickname and stores token', () async {
       final pathsCalled = <String>[];
       final dio = Dio();
       dio.interceptors.add(
@@ -593,34 +544,24 @@ void main() {
             }
             if (options.path.contains('/user/nickname/change')) {
               return handler.resolve(
-                Response(
-                    requestOptions: options,
-                    statusCode: 200,
-                    data: {'s': true, 'pv': 1}),
+                Response(requestOptions: options, statusCode: 200, data: {'s': true, 'pv': 1}),
               );
             }
             if (options.path.contains('/category/category-by-country')) {
               return handler.resolve(
-                Response(
-                    requestOptions: options,
-                    statusCode: 200,
-                    data: {'s': true, 'cid': 438}),
+                Response(requestOptions: options, statusCode: 200, data: {'s': true, 'cid': 438}),
               );
             }
             if (options.path.contains('/user/v2/splash-login')) {
               return handler.resolve(
-                Response(
-                    requestOptions: options,
-                    statusCode: 200,
-                    data: {'s': true}),
+                Response(requestOptions: options, statusCode: 200, data: {'s': true}),
               );
             }
             return handler.next(options);
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
 
       final user = await repo.signUp(
         email: 'socloud476@gmail.com',
@@ -641,9 +582,7 @@ void main() {
       expect(storedToken, equals('created_jwt_token_456'));
     });
 
-    test(
-        'deleteAccount calls GET /user/unregister and deletes token on success',
-        () async {
+    test('deleteAccount calls GET /user/unregister and deletes token on success', () async {
       String? calledMethod;
       String? calledPath;
       final dio = Dio();
@@ -662,8 +601,7 @@ void main() {
           },
         ),
       );
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
       await mockStorage.write(key: 'jwt_token', value: 'token_to_delete');
 
       final success = await repo.deleteAccount();
@@ -675,14 +613,11 @@ void main() {
       expect(stored, isNull);
     });
 
-    test(
-        'tryRestoreSession preserves locally saved studicon when server returns -1',
-        () async {
+    test('tryRestoreSession preserves locally saved studicon when server returns -1', () async {
       SharedPreferences.setMockInitialValues({
         'jwt_token': 'valid_token_789',
         AuthRepository.keyUserEquippedStudiconId: 354,
-        AuthRepository.keyCachedUser:
-            '{"id":16300695,"name":"User","email":"u@test.com","sd":354}',
+        AuthRepository.keyCachedUser: '{"id":16300695,"name":"User","email":"u@test.com","sd":354}',
       });
 
       final dio = Dio();
@@ -720,22 +655,18 @@ void main() {
         ),
       );
 
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
       final restored = await repo.tryRestoreSession();
 
       expect(restored, isNotNull);
       expect(restored!.studiconId, equals(354));
     });
 
-    test(
-        'tryRestoreSession updates studicon when server returns positive sd > 0',
-        () async {
+    test('tryRestoreSession updates studicon when server returns positive sd > 0', () async {
       SharedPreferences.setMockInitialValues({
         'jwt_token': 'valid_token_789',
         AuthRepository.keyUserEquippedStudiconId: 354,
-        AuthRepository.keyCachedUser:
-            '{"id":16300695,"name":"User","email":"u@test.com","sd":354}',
+        AuthRepository.keyCachedUser: '{"id":16300695,"name":"User","email":"u@test.com","sd":354}',
       });
 
       final dio = Dio();
@@ -773,23 +704,20 @@ void main() {
         ),
       );
 
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
       final restored = await repo.tryRestoreSession();
 
       expect(restored, isNotNull);
       expect(restored!.studiconId, equals(100));
     });
 
-    test('checkUsernameExists returns true when server responds with s: true',
-        () async {
+    test('checkUsernameExists returns true when server responds with s: true', () async {
       final dio = Dio();
       dio.interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) {
             if (options.path.contains(ApiConstants.existUsername)) {
-              expect(
-                  options.data['username'], equals('g105942101025713079965'));
+              expect(options.data['username'], equals('g105942101025713079965'));
               return handler.resolve(
                 Response(
                   requestOptions: options,
@@ -803,14 +731,12 @@ void main() {
         ),
       );
 
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
       final exists = await repo.checkUsernameExists('g105942101025713079965');
       expect(exists, isTrue);
     });
 
-    test('checkUsernameExists returns false when server responds with s: false',
-        () async {
+    test('checkUsernameExists returns false when server responds with s: false', () async {
       final dio = Dio();
       dio.interceptors.add(
         InterceptorsWrapper(
@@ -829,74 +755,67 @@ void main() {
         ),
       );
 
-      final repo = AuthRepository(
-          apiClient: ApiClient(customDio: dio), storage: mockStorage);
-      final exists =
-          await repo.checkUsernameExists('g999999999999999999999999');
+      final repo = AuthRepository(apiClient: ApiClient(customDio: dio), storage: mockStorage);
+      final exists = await repo.checkUsernameExists('g999999999999999999999999');
       expect(exists, isFalse);
     });
 
-    group('credential backend transitions', () {
-      late MockStorage storage;
-      late AuthRepository repository;
+  group('credential backend transitions', () {
+    late MockStorage storage;
+    late AuthRepository repository;
 
-      setUp(() {
-        SharedPreferences.setMockInitialValues({});
-        storage = MockStorage();
-        final dio = Dio();
-        dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-          if (options.path.contains('/user/sign-in-jwt')) {
-            return handler.resolve(Response(
-              requestOptions: options,
-              statusCode: 200,
-              data: {
-                's': true,
-                'jwt': 'new_account_token',
-                'id': 16300695,
-                'n': 'Test User',
-                'e': 'test@example.com',
-                'pv': 377,
-              },
-            ));
-          }
-          return handler.next(options);
-        }));
-        repository = AuthRepository(
-            apiClient: ApiClient(customDio: dio), storage: storage);
-      });
-
-      test('a newer preference token overrides the old keyring token',
-          () async {
-        await storage.write(key: 'jwt_token', value: 'old_keyring_token');
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('jwt_token', 'new_preference_token');
-
-        expect(await repository.getStoredToken(), 'new_preference_token');
-      });
-
-      test('logout tombstone prevents an old keyring token from returning',
-          () async {
-        await storage.write(key: 'jwt_token', value: 'old_keyring_token');
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('jwt_token', 'old_preference_token');
-        await repository.logout();
-
-        await storage.write(key: 'jwt_token', value: 'old_keyring_token');
-        await prefs.setString('jwt_token', 'old_preference_token');
-        expect(await repository.getStoredToken(), isNull);
-      });
-
-      test('successful login clears the tombstone only after saving the token',
-          () async {
-        await storage.write(key: 'jwt_token', value: 'old_keyring_token');
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('auth_logged_out', true);
-
-        await repository.signInWithEmail(
-            email: 'test@example.com', password: 'password');
-        expect(await repository.getStoredToken(), 'new_account_token');
-        expect(prefs.getBool('auth_logged_out'), isFalse);
-      });
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      storage = MockStorage();
+      final dio = Dio();
+      dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+        if (options.path.contains('/user/sign-in-jwt')) {
+          return handler.resolve(Response(
+            requestOptions: options,
+            statusCode: 200,
+            data: {
+              's': true,
+              'jwt': 'new_account_token',
+              'id': 16300695,
+              'n': 'Test User',
+              'e': 'test@example.com',
+              'pv': 377,
+            },
+          ));
+        }
+        return handler.next(options);
+      }));
+      repository = AuthRepository(apiClient: ApiClient(customDio: dio), storage: storage);
     });
+
+    test('a newer preference token overrides the old keyring token', () async {
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('jwt_token', 'new_preference_token');
+
+      expect(await repository.getStoredToken(), 'new_preference_token');
+    });
+
+    test('logout tombstone prevents an old keyring token from returning', () async {
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('jwt_token', 'old_preference_token');
+      await repository.logout();
+
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      await prefs.setString('jwt_token', 'old_preference_token');
+      expect(await repository.getStoredToken(), isNull);
+    });
+
+    test('successful login clears the tombstone only after saving the token', () async {
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('auth_logged_out', true);
+
+      await repository.signInWithEmail(email: 'test@example.com', password: 'password');
+      expect(await repository.getStoredToken(), 'new_account_token');
+      expect(prefs.getBool('auth_logged_out'), isFalse);
+    });
+  });
   });
 }
