@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_client.dart';
+import '../../core/storage/secure_storage.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/api/auth_interceptor.dart';
 import '../../core/constants/api_constants.dart';
@@ -22,24 +23,57 @@ class AuthRepository {
     ApiClient? apiClient,
     FlutterSecureStorage? storage,
   })  : _apiClient = apiClient ?? ApiClient(),
-        _storage = storage ?? const FlutterSecureStorage();
+        _storage = storage ?? appSecureStorage;
+
+  Future<SharedPreferences?> _preferencesOrNull() async {
+    try {
+      return await SharedPreferences.getInstance();
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<void> _saveToken(String token) async {
     try {
       await _storage.write(key: AuthInterceptor.keyJwtToken, value: token);
     } catch (_) {}
+    final prefs = await _preferencesOrNull();
+    if (prefs == null) {
+      final saved = await _storage.read(key: AuthInterceptor.keyJwtToken);
+      if (saved == null || saved.isEmpty) {
+        throw StateError('The new login token could not be persisted');
+      }
+      return;
+    }
     try {
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setString(AuthInterceptor.keyJwtToken, token);
     } catch (_) {}
+
+    final cleared = await prefs.setBool(authLoggedOutKey, false);
+    if (!cleared) {
+      throw StateError('The login tombstone could not be cleared');
+    }
+    final saved = await readAuthToken(_storage);
+    if (saved != token) {
+      await prefs.setBool(authLoggedOutKey, true);
+      throw StateError('The new login token could not be persisted');
+    }
   }
 
   Future<void> _deleteToken() async {
+    final prefs = await _preferencesOrNull();
+    if (prefs != null) {
+      final marked = await prefs.setBool(authLoggedOutKey, true);
+      if (!marked) {
+        throw StateError('The logout tombstone could not be persisted');
+      }
+    }
+
     try {
       await _storage.delete(key: AuthInterceptor.keyJwtToken);
     } catch (_) {}
+    if (prefs == null) return;
     try {
-      final prefs = await SharedPreferences.getInstance();
       await prefs.remove(AuthInterceptor.keyJwtToken);
       await prefs.remove(keyCachedUser);
       await prefs.remove(keyUserEquippedStudiconId);
@@ -733,19 +767,7 @@ class AuthRepository {
     return user;
   }
 
-  Future<String?> getStoredToken() async {
-    try {
-      final token = await _storage
-          .read(key: AuthInterceptor.keyJwtToken)
-          .timeout(const Duration(seconds: 2), onTimeout: () => null);
-      if (token != null && token.isNotEmpty) return token;
-    } catch (_) {}
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(AuthInterceptor.keyJwtToken);
-    } catch (_) {}
-    return null;
-  }
+  Future<String?> getStoredToken() => readAuthToken(_storage);
 
   Future<void> cacheUser(UserModel user) async {
     try {
@@ -827,7 +849,9 @@ class AuthRepository {
           resolvedOwnedIds = [];
           for (final item in rawScs) {
             final id = safeInt(item is Map ? (item['id'] ?? item['sc'] ?? item['sd'] ?? item['studiconId']) : item);
-            if (id > 0 && !resolvedOwnedIds.contains(id)) resolvedOwnedIds.add(id);
+            if (id > 0 && !resolvedOwnedIds.contains(id)) {
+              resolvedOwnedIds.add(id);
+            }
           }
         }
 
@@ -876,7 +900,9 @@ class AuthRepository {
             updatedOwnedIds = [];
             for (final item in reloadScs) {
               final id = safeInt(item is Map ? (item['id'] ?? item['sc'] ?? item['sd'] ?? item['studiconId']) : item);
-              if (id > 0 && !updatedOwnedIds.contains(id)) updatedOwnedIds.add(id);
+              if (id > 0 && !updatedOwnedIds.contains(id)) {
+                updatedOwnedIds.add(id);
+              }
             }
           }
 

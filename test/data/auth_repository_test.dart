@@ -53,6 +53,9 @@ class MockStorage extends FlutterSecureStorage {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues({});
+
   group('AuthRepository Tests', () {
     late AuthRepository repository;
     late MockStorage mockStorage;
@@ -756,5 +759,63 @@ void main() {
       final exists = await repo.checkUsernameExists('g999999999999999999999999');
       expect(exists, isFalse);
     });
+
+  group('credential backend transitions', () {
+    late MockStorage storage;
+    late AuthRepository repository;
+
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      storage = MockStorage();
+      final dio = Dio();
+      dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+        if (options.path.contains('/user/sign-in-jwt')) {
+          return handler.resolve(Response(
+            requestOptions: options,
+            statusCode: 200,
+            data: {
+              's': true,
+              'jwt': 'new_account_token',
+              'id': 16300695,
+              'n': 'Test User',
+              'e': 'test@example.com',
+              'pv': 377,
+            },
+          ));
+        }
+        return handler.next(options);
+      }));
+      repository = AuthRepository(apiClient: ApiClient(customDio: dio), storage: storage);
+    });
+
+    test('a newer preference token overrides the old keyring token', () async {
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('jwt_token', 'new_preference_token');
+
+      expect(await repository.getStoredToken(), 'new_preference_token');
+    });
+
+    test('logout tombstone prevents an old keyring token from returning', () async {
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('jwt_token', 'old_preference_token');
+      await repository.logout();
+
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      await prefs.setString('jwt_token', 'old_preference_token');
+      expect(await repository.getStoredToken(), isNull);
+    });
+
+    test('successful login clears the tombstone only after saving the token', () async {
+      await storage.write(key: 'jwt_token', value: 'old_keyring_token');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('auth_logged_out', true);
+
+      await repository.signInWithEmail(email: 'test@example.com', password: 'password');
+      expect(await repository.getStoredToken(), 'new_account_token');
+      expect(prefs.getBool('auth_logged_out'), isFalse);
+    });
+  });
   });
 }
