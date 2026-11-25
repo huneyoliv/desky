@@ -8,6 +8,10 @@ import 'package:desky/data/repositories/rank_repository.dart';
 import 'package:desky/features/ranks/session_derivations.dart';
 import 'package:desky/features/ranks/widgets/timeline_tab.dart';
 import 'package:desky/features/settings/settings_notifier.dart';
+import 'package:desky/features/settings/settings_state.dart';
+import 'package:desky/data/models/country_model.dart';
+import 'package:desky/data/repositories/settings_repository.dart';
+import 'package:desky/core/utils/study_day_helper.dart';
 
 class _FakeRankRepository extends RankRepository {
   final Map<String, List<StudySession>> responses;
@@ -35,10 +39,18 @@ StudySession _session(String day, int start, int minutes, String subject) {
   );
 }
 
+class _DaySettingsNotifier extends SettingsNotifier {
+  _DaySettingsNotifier(super.repository);
+
+  @override
+  Future<void> init() async {}
+}
+
 Future<void> _pump(
   WidgetTester tester,
-  _FakeRankRepository repository,
-) async {
+  _FakeRankRepository repository, {
+  SettingsNotifier? settings,
+}) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   await tester.pumpWidget(
@@ -49,6 +61,8 @@ Future<void> _pump(
           (ref) => AppTranslationNotifier(ref)
             ..state = const AppTranslation(languageCode: 'pt'),
         ),
+        if (settings != null)
+          settingsNotifierProvider.overrideWith((ref) => settings),
       ],
       child: MaterialApp(
         home: Scaffold(
@@ -62,9 +76,38 @@ Future<void> _pump(
 }
 
 void main() {
+  testWidgets('timeline starts on the effective country study day',
+      (tester) async {
+    const country = CountryModel(
+      id: 144,
+      name: 'SRI LANKA',
+      code: 'LK',
+      timezone: 'Asia/Colombo',
+      continent: 'Asia',
+      gmtOffset: 5.5,
+      startTime: '12 AM',
+    );
+    final settings = _DaySettingsNotifier(SettingsRepository())
+      ..state = const SettingsState(
+        selectedCountry: country,
+        dayResetHour: 0,
+      );
+    final repo = _FakeRankRepository(const {});
+    await _pump(tester, repo, settings: settings);
+
+    final expected = StudyDayHelper.todayYmd(
+      gmtOffset: const Duration(hours: 5, minutes: 30),
+      resetHour: 0,
+    );
+    expect(repo.calls.single['startDate'], expected);
+    expect(repo.calls.single['endDate'], expected);
+  });
   testWidgets('renders chronological sessions, total and derived gaps',
       (tester) async {
-    final day = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final day = StudyDayHelper.todayYmd(
+      gmtOffset: const Duration(hours: -3),
+      resetHour: 5,
+    );
     final repo = _FakeRankRepository({
       day: [
         _session(day, 9 * 60, 15, 'Física'),
@@ -95,7 +138,12 @@ void main() {
   });
 
   testWidgets('next day requests and shows an empty state', (tester) async {
-    final today = DateTime.now();
+    final today = DateTime.parse(
+      StudyDayHelper.todayYmd(
+        gmtOffset: const Duration(hours: -3),
+        resetHour: 5,
+      ),
+    );
     final day = DateFormat('yyyy-MM-dd').format(today);
     final tomorrow = DateFormat('yyyy-MM-dd').format(
       today.add(const Duration(days: 1)),

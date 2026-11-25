@@ -38,7 +38,9 @@ class PlannerRepository {
               .toList();
         }
       }
-    } catch (_) {}
+    } catch (_) {
+      rethrow;
+    }
     return [];
   }
 
@@ -130,7 +132,9 @@ class PlannerRepository {
           return items;
         }
       }
-    } catch (_) {}
+    } catch (_) {
+      rethrow;
+    }
     return [];
   }
 

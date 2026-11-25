@@ -4,6 +4,7 @@ import '../../core/theme/theme_palette.dart';
 import '../../core/localization/app_translation.dart';
 import '../../features/timer/focus_mode_notifier.dart';
 import '../../features/settings/settings_notifier.dart';
+import 'classic_top_tabs.dart';
 import 'classic_zoom.dart';
 import 'sidebar_nav.dart';
 
@@ -21,7 +22,8 @@ class AppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final focusState = ref.watch(focusModeProvider);
     final isFocusActive = focusState.isStrictFocus || focusState.isMiniPlayer;
-    final classicZoom = ref.watch(settingsNotifierProvider).classicYptLook;
+    final classicZoom = ref.watch(settingsNotifierProvider.select((s) => s.classicYptLook));
+    final topTabs = ref.watch(settingsNotifierProvider.select((s) => s.classicTopTabs));
     final t = ref.watch(appTranslationProvider);
     final palette = context.palette;
 
@@ -29,20 +31,30 @@ class AppShell extends ConsumerWidget {
       backgroundColor: palette.background,
       body: Stack(
         children: [
-          Row(
-            children: [
-              if (!isFocusActive) ...[
-                SidebarNav(currentRoute: currentRoute),
-                Container(
-                  width: 1,
-                  color: palette.border,
+          if (topTabs)
+            Column(
+              children: [
+                if (!isFocusActive) ClassicTopTabs(currentRoute: currentRoute),
+                Expanded(
+                  child: classicZoom ? ClassicZoom(child: child) : child,
                 ),
               ],
-              Expanded(
-                child: classicZoom ? ClassicZoom(child: child) : child,
-              ),
-            ],
-          ),
+            )
+          else
+            Row(
+              children: [
+                if (!isFocusActive) ...[
+                  SidebarNav(currentRoute: currentRoute),
+                  Container(
+                    width: 1,
+                    color: palette.border,
+                  ),
+                ],
+                Expanded(
+                  child: classicZoom ? ClassicZoom(child: child) : child,
+                ),
+              ],
+            ),
 
           // Floating Exit Focus Button when in Focus Mode
           if (isFocusActive)
