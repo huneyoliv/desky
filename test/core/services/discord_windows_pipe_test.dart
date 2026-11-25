@@ -35,6 +35,7 @@ typedef _DisconnectNamedPipeC = Int32 Function(IntPtr);
 typedef _DisconnectNamedPipeDart = int Function(int);
 typedef _CloseHandleC = Int32 Function(IntPtr);
 typedef _CloseHandleDart = int Function(int);
+typedef _GetLastErrorDart = int Function();
 typedef _WriteFileC = Int32 Function(
   IntPtr,
   Pointer<Uint8>,
@@ -81,6 +82,8 @@ class _Native {
   );
   static final closeHandle =
       _lib.lookupFunction<_CloseHandleC, _CloseHandleDart>('CloseHandle');
+  static final getLastError =
+      _lib.lookupFunction<Uint32 Function(), _GetLastErrorDart>('GetLastError');
   static final writeFile =
       _lib.lookupFunction<_WriteFileC, _WriteFileDart>('WriteFile');
   static final readFile =
@@ -102,6 +105,8 @@ int _createServer() {
         nullptr,
       );
       if (handle != 0 && handle != -1) return handle;
+      print(
+          'CreateNamedPipeW failed for index $index: handle=$handle error=${_Native.getLastError()}');
     } finally {
       calloc.free(path);
     }
