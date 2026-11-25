@@ -98,13 +98,11 @@ class AuthRepository {
           if (code == '112') {
             msg = 'Senha incorreta. Verifique sua senha e tente novamente.';
           } else if (code == '113') {
-            msg = trMsg('auth_email_not_registered',
-                fallback: 'E-mail não cadastrado no Yeolpumta.');
+            msg = trMsg('auth_email_not_registered', fallback: 'E-mail não cadastrado no Yeolpumta.');
           } else if (code == '114') {
             msg = 'Conta suspensa ou inativa.';
           } else {
-            msg = trMsg('auth_failed_code',
-                args: [code], fallback: 'Falha na autenticação (código $code)');
+            msg = trMsg('auth_failed_code', args: [code], fallback: 'Falha na autenticação (código $code)');
           }
         }
       }
@@ -113,8 +111,7 @@ class AuthRepository {
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw ApiException(trMsg('auth_missing_token',
-          fallback: 'Token JWT não foi retornado pelo servidor'));
+      throw ApiException(trMsg('auth_missing_token', fallback: 'Token JWT não foi retornado pelo servidor'));
     }
 
     await _saveToken(token);
@@ -142,9 +139,8 @@ class AuthRepository {
     if (user.studiconId <= 0 && user.id > 0) {
       try {
         final prefs = await SharedPreferences.getInstance();
-        final savedSd =
-            prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
-                prefs.getInt(keyUserEquippedStudiconId);
+        final savedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
+            prefs.getInt(keyUserEquippedStudiconId);
         if (savedSd != null && savedSd > 0) {
           user = user.copyWith(studiconId: savedSd);
           await cacheUser(user);
@@ -214,25 +210,15 @@ class AuthRepository {
         }
         final msg = data['m']?.toString() ??
             data['message']?.toString() ??
-            (code != null
-                ? trMsg('auth_error_code',
-                    args: [code], fallback: 'Erro de autenticação [$code]')
-                : trMsg('auth_failed_via_provider',
-                    args: [provider],
-                    fallback: 'Falha ao autenticar via $provider'));
+            (code != null ? trMsg('auth_error_code', args: [code], fallback: 'Erro de autenticação [$code]') : trMsg('auth_failed_via_provider', args: [provider], fallback: 'Falha ao autenticar via $provider'));
         throw ApiException(msg, statusCode: response.statusCode);
       }
-      throw ApiException(
-          trMsg('auth_failed_via_provider',
-              args: [provider], fallback: 'Falha ao autenticar via $provider'),
-          statusCode: response.statusCode);
+      throw ApiException(trMsg('auth_failed_via_provider', args: [provider], fallback: 'Falha ao autenticar via $provider'), statusCode: response.statusCode);
     }
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw ApiException(trMsg('auth_missing_provider_token',
-          args: [provider],
-          fallback: 'Token JWT via $provider não retornado pelo servidor'));
+      throw ApiException(trMsg('auth_missing_provider_token', args: [provider], fallback: 'Token JWT via $provider não retornado pelo servidor'));
     }
 
     await _saveToken(token);
@@ -241,8 +227,7 @@ class AuthRepository {
     try {
       final splashData = await splashLogin(language: language);
       if (splashData != null) {
-        if (splashData['n'] != null &&
-            (splashData['n'] as String).trim().isNotEmpty) {
+        if (splashData['n'] != null && (splashData['n'] as String).trim().isNotEmpty) {
           data['n'] = splashData['n'];
         }
         if (splashData['p'] != null) data['p'] = splashData['p'];
@@ -252,8 +237,7 @@ class AuthRepository {
         if (splashData['sd'] != null) data['sd'] = splashData['sd'];
         if (splashData['p'] is Map) {
           final p = splashData['p'] as Map;
-          if (p['n'] != null &&
-              (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
+          if (p['n'] != null && (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
             data['n'] = p['n'];
           }
           if (p['sd'] != null) data['sd'] = p['sd'];
@@ -263,8 +247,7 @@ class AuthRepository {
       }
     } catch (_) {}
 
-    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) &&
-        name.trim().isNotEmpty) {
+    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) && name.trim().isNotEmpty) {
       data['n'] = name.trim();
       data['name'] = name.trim();
     }
@@ -278,9 +261,8 @@ class AuthRepository {
     if (user.studiconId <= 0 && user.id > 0) {
       try {
         final prefs = await SharedPreferences.getInstance();
-        final savedSd =
-            prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
-                prefs.getInt(keyUserEquippedStudiconId);
+        final savedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
+            prefs.getInt(keyUserEquippedStudiconId);
         if (savedSd != null && savedSd > 0) {
           user = user.copyWith(studiconId: savedSd);
           await cacheUser(user);
@@ -332,40 +314,28 @@ class AuthRepository {
       if (data is Map) {
         final code = data['c']?.toString();
         if (code == '104') {
-          msg = trMsg('auth_nickname_in_use',
-              fallback: 'Este apelido já está em uso. Insira outro apelido.');
+          msg = trMsg('auth_nickname_in_use', fallback: 'Este apelido já está em uso. Insira outro apelido.');
         } else if (code == '103' || code == '116') {
-          msg = trMsg('auth_nickname_invalid',
-              fallback:
-                  'Não é possível usar este apelido. Insira outro apelido.');
+          msg = trMsg('auth_nickname_invalid', fallback: 'Não é possível usar este apelido. Insira outro apelido.');
         } else {
           msg = data['m']?.toString() ??
               data['message']?.toString() ??
-              (code != null
-                  ? trMsg('auth_signup_error_code',
-                      args: [code], fallback: 'Erro de cadastro [$code]')
-                  : trMsg('auth_signup_failed_via',
-                      args: [provider],
-                      fallback: 'Falha ao cadastrar via $provider'));
+              (code != null ? trMsg('auth_signup_error_code', args: [code], fallback: 'Erro de cadastro [$code]') : trMsg('auth_signup_failed_via', args: [provider], fallback: 'Falha ao cadastrar via $provider'));
         }
       } else {
-        msg = trMsg('auth_signup_failed_via',
-            args: [provider], fallback: 'Falha ao cadastrar via $provider');
+        msg = trMsg('auth_signup_failed_via', args: [provider], fallback: 'Falha ao cadastrar via $provider');
       }
       throw ApiException(msg, statusCode: response.statusCode);
     }
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw ApiException(trMsg('auth_missing_provider_token',
-          args: [provider],
-          fallback: 'Token JWT via $provider não retornado pelo servidor'));
+      throw ApiException(trMsg('auth_missing_provider_token', args: [provider], fallback: 'Token JWT via $provider não retornado pelo servidor'));
     }
 
     await _saveToken(token);
 
-    final chosenNickname =
-        nickname.trim().isNotEmpty ? nickname.trim() : name.trim();
+    final chosenNickname = nickname.trim().isNotEmpty ? nickname.trim() : name.trim();
     if (chosenNickname.isNotEmpty) {
       data['n'] = chosenNickname;
       data['name'] = chosenNickname;
@@ -381,13 +351,9 @@ class AuthRepository {
         if (nickData is Map && nickData['s'] == false) {
           final nc = nickData['c']?.toString();
           if (nc == '104') {
-            throw ApiException(trMsg('auth_nickname_in_use',
-                fallback:
-                    'Este apelido já está em uso. Insira outro apelido.'));
+            throw ApiException(trMsg('auth_nickname_in_use', fallback: 'Este apelido já está em uso. Insira outro apelido.'));
           } else if (nc == '103' || nc == '116') {
-            throw ApiException(trMsg('auth_nickname_invalid',
-                fallback:
-                    'Não é possível usar este apelido. Insira outro apelido.'));
+            throw ApiException(trMsg('auth_nickname_invalid', fallback: 'Não é possível usar este apelido. Insira outro apelido.'));
           }
         }
       } catch (e) {
@@ -407,8 +373,7 @@ class AuthRepository {
     try {
       final splashData = await splashLogin(language: language);
       if (splashData != null) {
-        if (splashData['n'] != null &&
-            (splashData['n'] as String).trim().isNotEmpty) {
+        if (splashData['n'] != null && (splashData['n'] as String).trim().isNotEmpty) {
           data['n'] = splashData['n'];
         }
         if (splashData['gs'] != null) data['gs'] = splashData['gs'];
@@ -417,8 +382,7 @@ class AuthRepository {
         if (splashData['sd'] != null) data['sd'] = splashData['sd'];
         if (splashData['p'] is Map) {
           final p = splashData['p'] as Map;
-          if (p['n'] != null &&
-              (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
+          if (p['n'] != null && (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
             data['n'] = p['n'];
           }
           if (p['sd'] != null) data['sd'] = p['sd'];
@@ -428,8 +392,7 @@ class AuthRepository {
       }
     } catch (_) {}
 
-    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) &&
-        chosenNickname.isNotEmpty) {
+    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) && chosenNickname.isNotEmpty) {
       data['n'] = chosenNickname;
       data['name'] = chosenNickname;
     }
@@ -443,13 +406,10 @@ class AuthRepository {
     return user;
   }
 
-  Future<UserModel> signInWithJwt(String token,
-      {String language = ApiConstants.defaultLanguage}) async {
-    final cleanToken =
-        token.trim().replaceAll('JWT ', '').replaceAll('Bearer ', '');
+  Future<UserModel> signInWithJwt(String token, {String language = ApiConstants.defaultLanguage}) async {
+    final cleanToken = token.trim().replaceAll('JWT ', '').replaceAll('Bearer ', '');
     if (cleanToken.isEmpty) {
-      throw ApiException(
-          trMsg('auth_no_token', fallback: 'Token JWT não fornecido.'));
+      throw ApiException(trMsg('auth_no_token', fallback: 'Token JWT não fornecido.'));
     }
 
     await _saveToken(cleanToken);
@@ -457,8 +417,7 @@ class AuthRepository {
     final splashData = await splashLogin(language: language);
     if (splashData == null || splashData['s'] != true) {
       await _deleteToken();
-      throw ApiException(trMsg('auth_session_expired',
-          fallback: 'Sessão inválida ou expirada no servidor.'));
+      throw ApiException(trMsg('auth_session_expired', fallback: 'Sessão inválida ou expirada no servidor.'));
     }
 
     await SubjectRepository.saveSubjectsFromRawData(splashData);
@@ -467,9 +426,8 @@ class AuthRepository {
     if (user.studiconId <= 0 && user.id > 0) {
       try {
         final prefs = await SharedPreferences.getInstance();
-        final savedSd =
-            prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
-                prefs.getInt(keyUserEquippedStudiconId);
+        final savedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}') ??
+            prefs.getInt(keyUserEquippedStudiconId);
         if (savedSd != null && savedSd > 0) {
           user = user.copyWith(studiconId: savedSd);
           await cacheUser(user);
@@ -592,8 +550,7 @@ class AuthRepository {
     );
     final data = response.data;
     if (data is! Map<String, dynamic> || data['s'] != true) {
-      throw ApiException(trMsg('auth_password_reset_failed',
-          fallback: 'Falha ao redefinir senha'));
+      throw ApiException(trMsg('auth_password_reset_failed', fallback: 'Falha ao redefinir senha'));
     }
     final token = (data['jwt'] ?? '').toString();
     if (token.isNotEmpty) {
@@ -642,19 +599,13 @@ class AuthRepository {
     final data = response.data;
     if (data is Map<String, dynamic> && data['s'] == false) {
       final code = data['c']?.toString();
-      String msg = data['m']?.toString() ??
-          data['message']?.toString() ??
-          trMsg('auth_send_code_failed', fallback: 'Falha ao enviar código');
+      String msg = data['m']?.toString() ?? data['message']?.toString() ?? trMsg('auth_send_code_failed', fallback: 'Falha ao enviar código');
       if (code == '106') {
-        msg = trMsg('auth_email_taken',
-            fallback:
-                'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.');
+        msg = trMsg('auth_email_taken', fallback: 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.');
       } else if (code == '107') {
-        msg = trMsg('auth_email_invalid_register',
-            fallback: 'Não é possível cadastrar este endereço de e-mail.');
+        msg = trMsg('auth_email_invalid_register', fallback: 'Não é possível cadastrar este endereço de e-mail.');
       } else if (code == '125') {
-        msg = trMsg('auth_email_invalid',
-            fallback: 'E-mail inválido. Tente com outro endereço de e-mail.');
+        msg = trMsg('auth_email_invalid', fallback: 'E-mail inválido. Tente com outro endereço de e-mail.');
       }
       throw ApiException(msg, statusCode: response.statusCode);
     }
@@ -672,11 +623,9 @@ class AuthRepository {
     final data = response.data;
     if (data is Map<String, dynamic> && data['s'] == false) {
       final c = data['c']?.toString();
-      String msg = trMsg('auth_wrong_verification_code',
-          fallback: 'Código de verificação incorreto');
+      String msg = trMsg('auth_wrong_verification_code', fallback: 'Código de verificação incorreto');
       if (c == 'invalid_auth_code_msg' || c == '108') {
-        msg = trMsg('auth_code_mismatch',
-            fallback: 'O código de autenticação não corresponde.');
+        msg = trMsg('auth_code_mismatch', fallback: 'O código de autenticação não corresponde.');
       } else if (data['m'] != null || data['message'] != null) {
         msg = (data['m'] ?? data['message']).toString();
       }
@@ -709,17 +658,13 @@ class AuthRepository {
 
     final data = response.data;
     if (data is! Map<String, dynamic> || data['s'] != true) {
-      String msg =
-          trMsg('auth_signup_failed', fallback: 'Erro ao realizar cadastro');
+      String msg = trMsg('auth_signup_failed', fallback: 'Erro ao realizar cadastro');
       if (data is Map) {
         final c = data['c']?.toString();
         if (c == '106') {
-          msg = trMsg('auth_email_taken',
-              fallback:
-                  'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.');
+          msg = trMsg('auth_email_taken', fallback: 'Este e-mail já está registrado. Volte e inicie a sessão ou use outro endereço de e-mail.');
         } else if (c == '112') {
-          msg = trMsg('auth_passwords_mismatch',
-              fallback: 'As senhas não coincidem. Tente novamente.');
+          msg = trMsg('auth_passwords_mismatch', fallback: 'As senhas não coincidem. Tente novamente.');
         } else if (data['m'] != null || data['message'] != null) {
           msg = (data['m'] ?? data['message']).toString();
         }
@@ -729,8 +674,7 @@ class AuthRepository {
 
     final token = (data['jwt'] ?? '').toString();
     if (token.isEmpty) {
-      throw ApiException(trMsg('auth_missing_token',
-          fallback: 'Token JWT não foi retornado pelo servidor'));
+      throw ApiException(trMsg('auth_missing_token', fallback: 'Token JWT não foi retornado pelo servidor'));
     }
 
     await _saveToken(token);
@@ -752,13 +696,9 @@ class AuthRepository {
         if (nickData is Map && nickData['s'] == false) {
           final nc = nickData['c']?.toString();
           if (nc == '104') {
-            throw ApiException(trMsg('auth_nickname_in_use',
-                fallback:
-                    'Este apelido já está em uso. Insira outro apelido.'));
+            throw ApiException(trMsg('auth_nickname_in_use', fallback: 'Este apelido já está em uso. Insira outro apelido.'));
           } else if (nc == '103' || nc == '116') {
-            throw ApiException(trMsg('auth_nickname_invalid',
-                fallback:
-                    'Não é possível usar este apelido. Insira outro apelido.'));
+            throw ApiException(trMsg('auth_nickname_invalid', fallback: 'Não é possível usar este apelido. Insira outro apelido.'));
           }
         }
       } catch (e) {
@@ -778,8 +718,7 @@ class AuthRepository {
     try {
       final splashData = await splashLogin(language: language);
       if (splashData != null) {
-        if (splashData['n'] != null &&
-            (splashData['n'] as String).trim().isNotEmpty) {
+        if (splashData['n'] != null && (splashData['n'] as String).trim().isNotEmpty) {
           data['n'] = splashData['n'];
         }
         if (splashData['gs'] != null) data['gs'] = splashData['gs'];
@@ -787,8 +726,7 @@ class AuthRepository {
           data['p'] = splashData['p'];
           if (splashData['p'] is Map) {
             final p = splashData['p'] as Map;
-            if (p['n'] != null &&
-                (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
+            if (p['n'] != null && (data['n'] == null || (data['n'] as String).trim().isEmpty)) {
               data['n'] = p['n'];
             }
           }
@@ -797,8 +735,7 @@ class AuthRepository {
       }
     } catch (_) {}
 
-    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) &&
-        chosenNickname.isNotEmpty) {
+    if ((data['n'] == null || (data['n'] as String).trim().isEmpty) && chosenNickname.isNotEmpty) {
       data['n'] = chosenNickname;
       data['name'] = chosenNickname;
     }
@@ -820,8 +757,7 @@ class AuthRepository {
       await prefs.setString(keyCachedUser, jsonEncode(user.toJson()));
       await prefs.setInt(keyUserEquippedStudiconId, user.studiconId);
       if (user.id > 0) {
-        await prefs.setInt(
-            '${keyUserEquippedStudiconId}_${user.id}', user.studiconId);
+        await prefs.setInt('${keyUserEquippedStudiconId}_${user.id}', user.studiconId);
       }
     } catch (_) {}
   }
@@ -830,9 +766,7 @@ class AuthRepository {
     try {
       final splashData = await splashLogin();
       if (splashData != null) {
-        final groupsRaw = splashData['gs'] ??
-            splashData['groups'] ??
-            splashData['userGroups'];
+        final groupsRaw = splashData['gs'] ?? splashData['groups'] ?? splashData['userGroups'];
         if (groupsRaw is List) {
           return groupsRaw
               .whereType<Map<String, dynamic>>()
@@ -870,12 +804,9 @@ class AuthRepository {
     } catch (_) {}
 
     try {
-      final splashData =
-          await splashLogin().timeout(const Duration(seconds: 4));
+      final splashData = await splashLogin().timeout(const Duration(seconds: 4));
       if (splashData != null) {
-        final groupsRaw = splashData['gs'] ??
-            splashData['groups'] ??
-            splashData['userGroups'];
+        final groupsRaw = splashData['gs'] ?? splashData['groups'] ?? splashData['userGroups'];
         List<GroupModel>? groups;
         if (groupsRaw is List) {
           groups = groupsRaw
@@ -884,9 +815,7 @@ class AuthRepository {
               .toList();
         }
 
-        final p = splashData['p'] is Map
-            ? splashData['p'] as Map<String, dynamic>
-            : null;
+        final p = splashData['p'] is Map ? splashData['p'] as Map<String, dynamic> : null;
         final serverSd = UserModel.extractStudiconId(p, splashData);
         final prefs = await SharedPreferences.getInstance();
         final userSavedSd = (user != null && user.id > 0)
@@ -894,21 +823,15 @@ class AuthRepository {
             : null;
         final resolvedStudiconId = (serverSd > 0)
             ? serverSd
-            : (userSavedSd ??
-                savedEquippedStudiconId ??
-                (user?.studiconId ?? -1));
+            : (userSavedSd ?? savedEquippedStudiconId ?? (user?.studiconId ?? -1));
 
         List<int>? resolvedOwnedIds;
         final rawScs = splashData['scs'];
         if (rawScs is List) {
           resolvedOwnedIds = [];
           for (final item in rawScs) {
-            final id = safeInt(item is Map
-                ? (item['id'] ?? item['sc'] ?? item['sd'] ?? item['studiconId'])
-                : item);
-            if (id > 0 && !resolvedOwnedIds.contains(id)) {
-              resolvedOwnedIds.add(id);
-            }
+            final id = safeInt(item is Map ? (item['id'] ?? item['sc'] ?? item['sd'] ?? item['studiconId']) : item);
+            if (id > 0 && !resolvedOwnedIds.contains(id)) resolvedOwnedIds.add(id);
           }
         }
 
@@ -943,8 +866,7 @@ class AuthRepository {
           int? serverReloadSd;
           String? updatedStm;
           if (p is Map) {
-            final pMap =
-                p is Map<String, dynamic> ? p : Map<String, dynamic>.from(p);
+            final pMap = p is Map<String, dynamic> ? p : Map<String, dynamic>.from(p);
             final extSd = UserModel.extractStudiconId(pMap, data);
             if (extSd > 0) {
               serverReloadSd = extSd;
@@ -957,27 +879,17 @@ class AuthRepository {
           if (reloadScs is List) {
             updatedOwnedIds = [];
             for (final item in reloadScs) {
-              final id = safeInt(item is Map
-                  ? (item['id'] ??
-                      item['sc'] ??
-                      item['sd'] ??
-                      item['studiconId'])
-                  : item);
-              if (id > 0 && !updatedOwnedIds.contains(id)) {
-                updatedOwnedIds.add(id);
-              }
+              final id = safeInt(item is Map ? (item['id'] ?? item['sc'] ?? item['sd'] ?? item['studiconId']) : item);
+              if (id > 0 && !updatedOwnedIds.contains(id)) updatedOwnedIds.add(id);
             }
           }
 
           final prefs = await SharedPreferences.getInstance();
-          final userSavedSd =
-              prefs.getInt('${keyUserEquippedStudiconId}_${user.id}');
+          final userSavedSd = prefs.getInt('${keyUserEquippedStudiconId}_${user.id}');
           final finalStudiconId = serverReloadSd ??
               (user.studiconId > 0
                   ? user.studiconId
-                  : (userSavedSd ??
-                      savedEquippedStudiconId ??
-                      user.studiconId));
+                  : (userSavedSd ?? savedEquippedStudiconId ?? user.studiconId));
 
           user = user.copyWith(
             statusMessage: updatedStm ?? user.statusMessage,
@@ -999,9 +911,7 @@ class AuthRepository {
     if (isSuccess) {
       await _deleteToken();
     } else if (data is Map && data['c'] == '115') {
-      throw ApiException(trMsg('auth_account_protected',
-          fallback:
-              'Esta conta está protegida contra exclusão devido a um problema em andamento.'));
+      throw ApiException(trMsg('auth_account_protected', fallback: 'Esta conta está protegida contra exclusão devido a um problema em andamento.'));
     }
     return isSuccess;
   }

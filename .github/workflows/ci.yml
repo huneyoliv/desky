@@ -82,6 +82,10 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      - name: Test native Linux secure storage fallback
+        if: runner.os == 'Linux'
+        run: flutter test test/core/storage/secure_storage_native_test.dart
+
       - name: Test native Windows named pipe
         if: runner.os == 'Windows'
         run: flutter test test/core/services/discord_windows_pipe_test.dart
