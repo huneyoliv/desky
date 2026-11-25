@@ -25,14 +25,11 @@ Future<String?> readAuthToken(FlutterSecureStorage storage) async {
     final token = prefs.getString(authJwtTokenKey);
     if (token != null && token.isNotEmpty) return token;
   } catch (_) {
-    // Failing closed avoids bypassing a logout tombstone during storage errors.
-    return null;
+    // Legacy environments without SharedPreferences still use the keyring.
   }
 
   try {
-    final token = await storage
-        .read(key: authJwtTokenKey)
-        .timeout(const Duration(seconds: 2), onTimeout: () => null);
+    final token = await storage.read(key: authJwtTokenKey);
     return token == null || token.isEmpty ? null : token;
   } catch (_) {
     return null;

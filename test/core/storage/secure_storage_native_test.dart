@@ -5,6 +5,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  tearDown(() {
+    appSecureStorage = const FlutterSecureStorage();
+  });
+
   test(
     'real Linux secure storage initializes and reads without aborting',
     () async {
