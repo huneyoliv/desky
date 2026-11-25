@@ -96,7 +96,7 @@ int _createServer() {
     try {
       final handle = _Native.createNamedPipe(
         path,
-        0, // PIPE_ACCESS_INBOUND
+        3, // PIPE_ACCESS_DUPLEX
         0, // PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT
         1,
         4096,
