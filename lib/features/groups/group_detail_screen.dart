@@ -133,7 +133,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text(t.tr('leave_group', fallback: 'Sair do Grupo'), style: const TextStyle(color: Colors.white)),
+        title: Text(t.tr('leave_group', fallback: 'Sair do Grupo'), style: TextStyle(color: context.appTextPrimary)),
         content: Text(
           t.tr('leave_group_confirm', fallback: 'Tem certeza que deseja sair deste grupo?'),
           style: TextStyle(color: context.appTextSecondary),
@@ -146,7 +146,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: Text(t.tr('leave', fallback: 'Sair'), style: const TextStyle(color: Colors.white)),
+            child: Text(t.tr('leave', fallback: 'Sair'), style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -370,7 +370,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                 borderRadius: BorderRadius.circular(24),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(emoji, style: const TextStyle(fontSize: 28)),
+                  child: Text(emoji, style: TextStyle(fontSize: 28)),
                 ),
               );
             }).toList(),
@@ -387,7 +387,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.appCard,
-        title: Text(t.tr('attach_image_chat', fallback: 'Anexar Imagem ao Chat'), style: const TextStyle(color: Colors.white)),
+        title: Text(t.tr('attach_image_chat', fallback: 'Anexar Imagem ao Chat'), style: TextStyle(color: context.appTextPrimary)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +399,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
             const SizedBox(height: 12),
             TextField(
               controller: controller,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: context.appTextPrimary),
               decoration: InputDecoration(
                 hintText: t.tr('image_url_hint', fallback: 'https://exemplo.com/estudo.jpg'),
                 hintStyle: TextStyle(color: context.appTextMuted),
@@ -417,7 +417,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
           ElevatedButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
             style: ElevatedButton.styleFrom(backgroundColor: context.appPrimary),
-            child: Text(t.tr('send_photo', fallback: 'Enviar Foto'), style: const TextStyle(color: Colors.white)),
+            child: Text(t.tr('send_photo', fallback: 'Enviar Foto'), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
           ),
         ],
       ),
@@ -472,7 +472,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.group.name, style: AppTextStyles.titleLarge),
+            Text(widget.group.name, style: AppTextStyles.titleLarge.copyWith(color: context.appTextPrimary)),
             Text(
               '${studyingMembers.length} ${t.tr("studying_now", fallback: "studying now")} • ${t.tr("today_total", fallback: "Total Hoje")}: ${_formatMs(todayTotalMs)} • ${t.tr("goal", fallback: "Goal")}: ${widget.group.dailyGoalHours}h/${t.tr("day", fallback: "day")}',
               style: TextStyle(fontSize: 12, color: context.appTextSecondary),
@@ -482,7 +482,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         actions: [
           if (isMember || isLeader)
             IconButton(
-              icon: const Icon(Icons.face_retouching_natural_outlined, color: AppColors.primaryLight),
+              icon: Icon(Icons.face_retouching_natural_outlined, color: context.appPrimary),
               tooltip: t.tr('group_avatar', fallback: 'Avatar do Grupo'),
               onPressed: () async {
                 final myMember = _members.firstWhere(
@@ -540,7 +540,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: palette.primary,
-          labelColor: Colors.white,
+          labelColor: context.appTextPrimary,
           unselectedLabelColor: palette.textSecondary,
           tabs: [
             Tab(text: t.tr('studying_now', fallback: 'Estudando Agora')),
@@ -594,8 +594,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                   if (!isMe)
                                     Text(
                                       msg.senderName,
-                                      style: const TextStyle(
-                                        color: AppColors.primaryLight,
+                                      style: TextStyle(
+                                        color: context.appPrimary,
                                         fontWeight: FontWeight.w700,
                                         fontSize: 12,
                                       ),
@@ -629,7 +629,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                   else
                                     Text(
                                       msg.message,
-                                      style: const TextStyle(color: Colors.white),
+                                      style: TextStyle(color: isMe ? Theme.of(context).colorScheme.onPrimary : context.appTextPrimary),
                                     ),
                                 ],
                               ),
@@ -640,7 +640,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Text(
-                              DateFormat('HH:mm').format(msg.sentAt),
+                              DateFormat('dd/MM/yyyy HH:mm').format(msg.sentAt),
                               style: TextStyle(color: context.appTextMuted, fontSize: 10),
                             ),
                           ),
@@ -669,7 +669,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                                       ),
                                       child: Text(
                                         '$emoji $count',
-                                        style: const TextStyle(fontSize: 11, color: Colors.white),
+                                        style: TextStyle(fontSize: 11, color: context.appTextPrimary),
                                       ),
                                     ),
                                   );
@@ -699,7 +699,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                     IconButton(
                       icon: Icon(
                         Icons.emoji_emotions_outlined,
-                        color: _showStickerPicker ? context.appPrimary : AppColors.textSecondary,
+                        color: _showStickerPicker ? context.appPrimary : context.appTextSecondary,
                       ),
                       tooltip: t.tr('stickers', fallback: 'Figurinhas'),
                       onPressed: () {
@@ -710,7 +710,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                     Expanded(
                       child: TextField(
                         controller: _chatInputController,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: context.appTextPrimary),
                         decoration: InputDecoration(
                           hintText: t.tr('type_message', fallback: 'Digite sua mensagem...'),
                           hintStyle: TextStyle(color: context.appTextMuted),
@@ -759,7 +759,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                         selected: _selectedGroupRankPeriod == 'day',
                         selectedColor: palette.primary,
                         backgroundColor: palette.card,
-                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'day' ? Colors.white : context.appTextMuted),
+                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'day' ? Theme.of(context).colorScheme.onPrimary : context.appTextMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'day');
                           _loadGroupRanksSilently();
@@ -771,7 +771,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                         selected: _selectedGroupRankPeriod == 'week',
                         selectedColor: palette.primary,
                         backgroundColor: palette.card,
-                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'week' ? Colors.white : context.appTextMuted),
+                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'week' ? Theme.of(context).colorScheme.onPrimary : context.appTextMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'week');
                           _loadGroupRanksSilently();
@@ -783,7 +783,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                         selected: _selectedGroupRankPeriod == 'month',
                         selectedColor: palette.primary,
                         backgroundColor: palette.card,
-                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'month' ? Colors.white : context.appTextMuted),
+                        labelStyle: TextStyle(color: _selectedGroupRankPeriod == 'month' ? Theme.of(context).colorScheme.onPrimary : context.appTextMuted),
                         onSelected: (_) {
                           setState(() => _selectedGroupRankPeriod = 'month');
                           _loadGroupRanksSilently();
@@ -940,8 +940,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
                   const SizedBox(width: 8),
                   Text(
                     '${t.tr("studying_now", fallback: "Estudando Agora")} (${studyingMembers.length})',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: context.appTextPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1077,8 +1077,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen>
             member.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.appTextPrimary,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),

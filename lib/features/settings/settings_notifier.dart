@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/country_model.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../../core/theme/timer_appearance.dart';
+import '../../core/utils/study_day_helper.dart';
 import 'settings_state.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences?>((ref) {
@@ -32,7 +33,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     try {
       final country = await _repository.getSavedCountry();
       final language = await _repository.getSavedLanguage();
-      final dayResetHour = await _repository.getDayResetHour();
+      final manualResetHour = await _repository.getDayResetHour();
       final showRestTime = await _repository.getShowRestTime();
       final wakeNotifications = await _repository.getWakeNotifications();
       final soundEffects = await _repository.getSoundEffects();
@@ -51,13 +52,14 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       );
       final obsOverlayMode = await _repository.getObsOverlayMode();
       final classicYptLook = await _repository.getClassicYptLook();
+      final classicTopTabs = await _repository.getClassicTopTabs();
       final classicUiScale = await _repository.getClassicUiScale();
 
       if (!mounted) return;
       state = state.copyWith(
         selectedCountry: country,
         selectedLanguage: language,
-        dayResetHour: dayResetHour,
+        dayResetHour: StudyDayHelper.resetHourFor(country, manualResetHour),
         showRestTime: showRestTime,
         wakeNotifications: wakeNotifications,
         soundEffects: soundEffects,
@@ -65,6 +67,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         discordRpcEnabled: discordRpc,
         obsOverlayMode: obsOverlayMode,
         classicYptLook: classicYptLook,
+        classicTopTabs: classicTopTabs,
         classicUiScale: classicUiScale,
         betaChannel: betaChannel,
         timerBackground: timerBackground,
@@ -119,9 +122,13 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   }
 
   Future<void> selectCountry(CountryModel country) async {
+    final manualResetHour = await _repository.getDayResetHour();
     await _repository.saveCountry(country);
     if (!mounted) return;
-    state = state.copyWith(selectedCountry: country);
+    state = state.copyWith(
+      selectedCountry: country,
+      dayResetHour: StudyDayHelper.resetHourFor(country, manualResetHour),
+    );
     await loadCategories(countryId: country.id);
   }
 
@@ -181,6 +188,12 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   Future<void> toggleObsOverlayMode(bool value) async {
     state = state.copyWith(obsOverlayMode: value);
     await _repository.saveObsOverlayMode(value);
+  }
+
+  /// Shows the sidebar destinations as top tabs (Classic YPT layout).
+  Future<void> toggleClassicTopTabs(bool value) async {
+    state = state.copyWith(classicTopTabs: value);
+    await _repository.saveClassicTopTabs(value);
   }
 
   Future<void> toggleClassicYptLook(bool value) async {

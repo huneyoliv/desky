@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/json_utils.dart';
-import '../../core/utils/study_date_helper.dart';
+import '../../core/utils/study_day_helper.dart';
 import '../../data/models/subject_model.dart';
 import '../../data/repositories/subject_repository.dart';
 import '../../data/repositories/timer_repository.dart';
@@ -167,6 +167,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   bool _serverConfirmedSession = false;
   String _language;
   String _timezone;
+  Duration _gmtOffset;
 
   /// Completes once the persisted session (if any) has been restored and the
   /// first server reconciliation finished.
@@ -182,6 +183,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     String? initialSubjectTitle,
     String language = 'pt',
     String timezone = 'America/Sao_Paulo',
+    Duration? gmtOffset,
   })  : _timerRepository = timerRepository,
         _subjectRepository = subjectRepository,
         _offlineSyncRepository = offlineSyncRepository,
@@ -190,9 +192,14 @@ class TimerNotifier extends StateNotifier<TimerState> {
         _initialSubjectTitle = initialSubjectTitle,
         _language = language,
         _timezone = timezone,
+        _gmtOffset = gmtOffset ?? DateTime.now().timeZoneOffset,
         super(TimerState(
           studiconId: userStudiconId,
-          lastStudyDate: StudyDateHelper.getStudyDateString(null, dayResetHour),
+          lastStudyDate: StudyDayHelper.studyDateYmd(
+            DateTime.now(),
+            gmtOffset: gmtOffset ?? DateTime.now().timeZoneOffset,
+            resetHour: dayResetHour,
+          ),
         )) {
     loadSubjects();
     _dayResetTimer = Timer.periodic(const Duration(seconds: 10), (_) {
@@ -272,7 +279,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
     if (_reconciling) return;
     _reconciling = true;
     try {
-      final log = await _timerRepository.fetchDailyLog(DateTime.now());
+      final log = await _timerRepository.fetchDailyLog(
+        DateTime.now(),
+        gmtOffset: _gmtOffset,
+        resetHour: _dayResetHour,
+      );
       if (!mounted) return;
       final dl = log?['dl'];
       if (dl is! Map) return;
@@ -379,12 +390,23 @@ class TimerNotifier extends StateNotifier<TimerState> {
     ));
   }
 
-  void setLocale({String? language, String? timezone}) {
+  void setLocale({
+    String? language,
+    String? timezone,
+    Duration? gmtOffset,
+  }) {
     final nextLanguage = language ?? _language;
     final nextTimezone = timezone ?? _timezone;
-    if (nextLanguage == _language && nextTimezone == _timezone) return;
+    final nextOffset = gmtOffset ?? _gmtOffset;
+    if (nextLanguage == _language &&
+        nextTimezone == _timezone &&
+        nextOffset == _gmtOffset) {
+      return;
+    }
     _language = nextLanguage;
     _timezone = nextTimezone;
+    _gmtOffset = nextOffset;
+    _checkStudyDateReset();
     loadSubjects();
   }
 
@@ -403,7 +425,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
     _sessionStore.clear();
     state = TimerState(
       studiconId: -1,
-      lastStudyDate: StudyDateHelper.getStudyDateString(null, _dayResetHour),
+      lastStudyDate: StudyDayHelper.studyDateYmd(
+      DateTime.now(),
+      gmtOffset: _gmtOffset,
+      resetHour: _dayResetHour,
+    ),
     );
   }
 
@@ -414,7 +440,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
   }
 
   void _checkStudyDateReset() {
-    final currentStudyDate = StudyDateHelper.getStudyDateString(null, _dayResetHour);
+    final currentStudyDate = StudyDayHelper.studyDateYmd(
+      DateTime.now(),
+      gmtOffset: _gmtOffset,
+      resetHour: _dayResetHour,
+    );
     if (state.lastStudyDate.isNotEmpty && state.lastStudyDate != currentStudyDate) {
       final resetSubjects = state.subjects.map((s) => s.copyWith(studyMs: 0)).toList();
       final resetCurrent = state.currentSubject?.copyWith(studyMs: 0);
@@ -452,7 +482,11 @@ class TimerNotifier extends StateNotifier<TimerState> {
         currentSubject: (state.isRunning && state.currentSubject != null) ? state.currentSubject : current,
         todayTotalMs: effectiveTodayTotal,
         todayRestMs: (state.isRunning && state.isPaused) ? state.todayRestMs : result.todayRestMs,
-        lastStudyDate: StudyDateHelper.getStudyDateString(null, _dayResetHour),
+        lastStudyDate: StudyDayHelper.studyDateYmd(
+      DateTime.now(),
+      gmtOffset: _gmtOffset,
+      resetHour: _dayResetHour,
+    ),
       );
     } catch (_) {
       if (!mounted) return;
@@ -551,6 +585,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
     }
 
     if (state.pomodoroPhase == PomodoroPhase.focus && state.currentSubject != null) {
+      _serverConfirmedSession = false;
       try {
         final accepted = await _timerRepository.startStudy(
           subjectTitle: state.currentSubject!.title,
@@ -558,10 +593,15 @@ class TimerNotifier extends StateNotifier<TimerState> {
           startAt: now,
           taskId: taskId,
         );
+        // An explicit refusal is not an offline start: do not run or navigate.
+        if (!accepted) return;
         // Only trust the day log once the server accepted the start; otherwise
         // a lagging log would stop the session on the next reconcile.
-        _serverConfirmedSession = accepted;
-      } catch (_) {}
+        _serverConfirmedSession = true;
+      } catch (_) {
+        // Transport failures retain the existing offline local-start behavior.
+        _serverConfirmedSession = false;
+      }
     }
 
     _accumulatedSessionMs = state.sessionElapsedMs;
@@ -1044,6 +1084,8 @@ final timerNotifierProvider =
     sessionStore: sessionStore,
     userStudiconId: initialUser?.studiconId ?? -1,
     dayResetHour: dayResetHour,
+    gmtOffset: settings.selectedCountry.gmtOffsetDuration ??
+        DateTime.now().timeZoneOffset,
     initialSubjectTitle: initialTranslation.tr('initial_subject', fallback: trMsg('initial_subject', fallback: 'Matéria Inicial')),
     language: settings.selectedLanguage,
     timezone: settings.selectedCountry.timezone,
@@ -1057,6 +1099,8 @@ final timerNotifierProvider =
       notifier.setLocale(
         language: next.selectedLanguage,
         timezone: next.selectedCountry.timezone,
+        gmtOffset: next.selectedCountry.gmtOffsetDuration ??
+            DateTime.now().timeZoneOffset,
       );
     }
   });

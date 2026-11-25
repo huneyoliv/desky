@@ -31,6 +31,8 @@ class _FakeApiClient extends ApiClient {
 
 class _FakeTimerRepository extends TimerRepository {
   int? receivedTaskId;
+  bool startResult = true;
+  Object? startError;
 
   @override
   Future<bool> startStudy({
@@ -40,11 +42,16 @@ class _FakeTimerRepository extends TimerRepository {
     int? taskId,
   }) async {
     receivedTaskId = taskId;
-    return true;
+    if (startError != null) throw startError!;
+    return startResult;
   }
 
   @override
-  Future<Map<String, dynamic>?> fetchDailyLog(DateTime date) async => null;
+  Future<Map<String, dynamic>?> fetchDailyLog(
+    DateTime date, {
+    Duration? gmtOffset,
+    int resetHour = 5,
+  }) async => null;
 }
 
 class _FakeSubjectRepository extends SubjectRepository {
@@ -101,5 +108,39 @@ void main() {
     expect(repo.receivedTaskId, 77);
     expect(notifier.state.isRunning, isTrue);
     expect(notifier.state.currentSubject?.id, 9);
+  });
+
+  test('rejected start does not mark the timer as running', () async {
+    SharedPreferences.setMockInitialValues({});
+    final repo = _FakeTimerRepository()..startResult = false;
+    final notifier = TimerNotifier(
+      timerRepository: repo,
+      subjectRepository: _FakeSubjectRepository(),
+    );
+    addTearDown(notifier.dispose);
+    await notifier.ready;
+
+    await notifier.startStudy(taskId: 77);
+
+    expect(repo.receivedTaskId, 77);
+    expect(notifier.state.isRunning, isFalse);
+    expect(notifier.state.sessionStartAt, isNull);
+  });
+
+  test('transport exception preserves the offline local start', () async {
+    SharedPreferences.setMockInitialValues({});
+    final repo = _FakeTimerRepository()..startError = StateError('offline');
+    final notifier = TimerNotifier(
+      timerRepository: repo,
+      subjectRepository: _FakeSubjectRepository(),
+    );
+    addTearDown(notifier.dispose);
+    await notifier.ready;
+
+    await notifier.startStudy(taskId: 77);
+
+    expect(repo.receivedTaskId, 77);
+    expect(notifier.state.isRunning, isTrue);
+    expect(notifier.state.sessionStartAt, isNotNull);
   });
 }

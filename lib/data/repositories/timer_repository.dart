@@ -2,6 +2,7 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_exception.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/utils/study_date_helper.dart';
+import '../../core/utils/study_day_helper.dart';
 import '../../core/localization/app_translation.dart';
 
 class TimerRepository {
@@ -114,9 +115,19 @@ class TimerRepository {
     throw ApiException(trMsg('timer_manual_log_failed', fallback: 'Falha ao registrar estudo manual'));
   }
 
-  Future<Map<String, dynamic>?> fetchDailyLog(DateTime date) async {
+  Future<Map<String, dynamic>?> fetchDailyLog(
+    DateTime date, {
+    Duration? gmtOffset,
+    int resetHour = StudyDayHelper.defaultResetHour,
+  }) async {
     try {
-      final dateStr = StudyDateHelper.getStudyDateString(date);
+      final dateStr = gmtOffset == null
+          ? StudyDateHelper.getStudyDateString(date, resetHour)
+          : StudyDayHelper.studyDateYmd(
+              date,
+              gmtOffset: gmtOffset,
+              resetHour: resetHour,
+            );
       final response = await _apiClient.get('/logs/day?date=$dateStr');
       final data = response.data;
       if (data is Map<String, dynamic> && data['s'] == true) {

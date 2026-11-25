@@ -10,8 +10,12 @@ import 'package:desky/data/models/subject_model.dart';
 import 'package:desky/data/models/todo_item_model.dart';
 import 'package:desky/data/repositories/planner_repository.dart';
 import 'package:desky/data/repositories/subject_repository.dart';
+import 'package:desky/data/repositories/settings_repository.dart';
 import 'package:desky/data/repositories/timer_repository.dart';
 import 'package:desky/features/planner/planner_screen.dart';
+import 'package:desky/features/settings/settings_notifier.dart';
+import 'package:desky/features/settings/settings_state.dart';
+import 'package:desky/data/models/country_model.dart';
 import 'package:desky/features/timer/timer_notifier.dart';
 
 const _subjects = [
@@ -32,15 +36,23 @@ class FakePlannerRepository extends PlannerRepository {
   }) : items = List.of(mockTodos);
 
   @override
-  Future<List<DDayModel>> fetchDDays() async => mockDDays;
+  Future<List<DDayModel>> fetchDDays() async {
+    if (failLoad) throw StateError('load failed');
+    return mockDDays;
+  }
 
   @override
   Future<List<TodoItemModel>> fetchTodos(
     String dateYmd, {
     required Duration gmtOffset,
     int resetHour = StudyDayHelper.defaultResetHour,
-  }) async =>
-      items;
+  }) async {
+    if (failLoad) throw StateError('load failed');
+    requestedDates.add(dateYmd);
+    resetHours.add(resetHour);
+    gmtOffsets.add(gmtOffset);
+    return items;
+  }
 
   final List<String> createdTitles = [];
   final List<DateTime> createdDates = [];
@@ -49,6 +61,13 @@ class FakePlannerRepository extends PlannerRepository {
   bool deleteReturnsFalse = false;
 
   // Gravacoes feitas pelas acoes de tarefa, na ordem em que aconteceram.
+  final List<String> requestedDates = [];
+  final List<int> resetHours = [];
+  final List<int> toggledIds = [];
+  final List<Duration> gmtOffsets = [];
+  bool failLoad = false;
+  bool failToggle = false;
+
   final List<int?> createdSubjectIds = [];
   final List<int?> editedSubjectIds = [];
   final List<bool> updateSubjectFlags = [];
@@ -133,8 +152,18 @@ class FakePlannerRepository extends PlannerRepository {
     TodoItemModel todo, {
     required Duration gmtOffset,
     int resetHour = StudyDayHelper.defaultResetHour,
-  }) async =>
-      true;
+  }) async {
+    toggledIds.add(todo.id);
+    if (failToggle) return false;
+    items = items
+        .map(
+          (current) => current.id == todo.id
+              ? current.copyWith(isCompleted: !current.isCompleted)
+              : current,
+        )
+        .toList();
+    return true;
+  }
 }
 
 class _TestTimerNotifier extends TimerNotifier {
@@ -155,6 +184,7 @@ class _TestTimerNotifier extends TimerNotifier {
 
 class _FakeTimerRepository extends TimerRepository {
   final List<int?> taskIds = [];
+  bool startAccepted = true;
 
   @override
   Future<bool> startStudy({
@@ -164,11 +194,15 @@ class _FakeTimerRepository extends TimerRepository {
     int? taskId,
   }) async {
     taskIds.add(taskId);
-    return true;
+    return startAccepted;
   }
 
   @override
-  Future<Map<String, dynamic>?> fetchDailyLog(DateTime date) async => null;
+  Future<Map<String, dynamic>?> fetchDailyLog(
+    DateTime date, {
+    Duration? gmtOffset,
+    int resetHour = 5,
+  }) async => null;
 }
 
 class _FakeSubjectRepository extends SubjectRepository {
@@ -214,6 +248,7 @@ Future<void> _disposeTimer(WidgetTester tester, TimerNotifier timer) async {
 Future<(FakePlannerRepository, TimerNotifier, _FakeTimerRepository)> _pump(
   WidgetTester tester, {
   FakePlannerRepository? repository,
+  SettingsNotifier? settings,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final repo = repository ?? FakePlannerRepository();
@@ -250,6 +285,8 @@ Future<(FakePlannerRepository, TimerNotifier, _FakeTimerRepository)> _pump(
           (ref) => AppTranslationNotifier(ref)
             ..state = const AppTranslation(languageCode: 'pt'),
         ),
+        if (settings != null)
+          settingsNotifierProvider.overrideWith((ref) => settings),
       ],
       child: MaterialApp.router(routerConfig: router),
     ),
@@ -259,8 +296,16 @@ Future<(FakePlannerRepository, TimerNotifier, _FakeTimerRepository)> _pump(
   return (repo, timer, timerRepo);
 }
 
+class _DaySettingsNotifier extends SettingsNotifier {
+  _DaySettingsNotifier(super.repository);
+
+  @override
+  Future<void> init() async {}
+}
+
 void main() {
-  testWidgets('PlannerScreen renders D-Days and To-Do list items', (tester) async {
+  testWidgets('PlannerScreen renders D-Days and To-Do list items',
+      (tester) async {
     tester.view.physicalSize = const Size(1280, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -295,7 +340,8 @@ void main() {
         overrides: [
           plannerRepositoryProvider.overrideWithValue(repo),
           appTranslationProvider.overrideWith(
-            (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'pt'),
+            (ref) => AppTranslationNotifier(ref)
+              ..state = const AppTranslation(languageCode: 'pt'),
           ),
         ],
         child: MaterialApp(
@@ -312,7 +358,8 @@ void main() {
     expect(find.text('Resolver 30 questões de Matemática'), findsOneWidget);
   });
 
-  testWidgets('o painel esquerdo preenche a altura da aba, sem faixa vazia', (tester) async {
+  testWidgets('o painel esquerdo preenche a altura da aba, sem faixa vazia',
+      (tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -325,7 +372,8 @@ void main() {
         overrides: [
           plannerRepositoryProvider.overrideWithValue(FakePlannerRepository()),
           appTranslationProvider.overrideWith(
-            (ref) => AppTranslationNotifier(ref)..state = const AppTranslation(languageCode: 'pt'),
+            (ref) => AppTranslationNotifier(ref)
+              ..state = const AppTranslation(languageCode: 'pt'),
           ),
         ],
         child: MaterialApp(
@@ -343,7 +391,9 @@ void main() {
     // do calendario.
     Rect? sidebar;
     for (final element in find
-        .ancestor(of: find.byType(CalendarDatePicker), matching: find.byType(Container))
+        .ancestor(
+            of: find.byType(CalendarDatePicker),
+            matching: find.byType(Container))
         .evaluate()) {
       final box = element.renderObject as RenderBox;
       final rect = box.localToGlobal(Offset.zero) & box.size;
@@ -404,7 +454,8 @@ void main() {
     expect(repo.createdDates.first.year, greaterThanOrEqualTo(2020));
   });
 
-  testWidgets('a refused D-Day creation is reported, not faked', (tester) async {
+  testWidgets('a refused D-Day creation is reported, not faked',
+      (tester) async {
     tester.view.physicalSize = const Size(1280, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -675,6 +726,233 @@ void main() {
       find.text('Não foi possível iniciar estudo para esta tarefa.'),
       findsOneWidget,
     );
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('falha ao concluir reverte checkbox e mostra erro',
+      (tester) async {
+    final repo = FakePlannerRepository(mockTodos: [_todo()])..failToggle = true;
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    await tester.tap(find.byType(Checkbox));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
+    expect(find.textContaining('Não foi possível salvar'), findsWidgets);
+    expect(find.byType(MaterialBanner), findsOneWidget);
+    await tester.tap(find.text('Dispensar'));
+    await tester.pump();
+    expect(find.byType(MaterialBanner), findsNothing);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('falha de carga mostra erro e permite tentar novamente',
+      (tester) async {
+    final repo = FakePlannerRepository()..failLoad = true;
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    expect(tester.takeException(), isNull);
+    expect(find.textContaining('Não foi possível carregar'), findsOneWidget);
+    expect(find.text('Tentar novamente'), findsOneWidget);
+
+    repo.failLoad = false;
+    repo.items = [_todo()];
+    await tester.tap(find.text('Tentar novamente'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Tarefa de teste'), findsOneWidget);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('inicio recusado nao ativa timer nem navega', (tester) async {
+    final repo = FakePlannerRepository(mockTodos: [_todo(subjectId: 9)]);
+    final (_, timer, timerRepo) = await _pump(tester, repository: repo);
+    timerRepo.startAccepted = false;
+
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(timerRepo.taskIds, equals([1]));
+    expect(timer.state.isRunning, isFalse);
+    expect(find.text('Timer home'), findsNothing);
+    expect(find.text('Não foi possível iniciar estudo para esta tarefa.'),
+        findsOneWidget);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('falha ao criar mantem dialogo, texto e erro visiveis',
+      (tester) async {
+    final repo = FakePlannerRepository()..failCreate = true;
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      'Não perder este texto',
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Adicionar'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Não perder este texto'), findsOneWidget);
+    expect(find.textContaining('Não foi possível salvar'), findsWidgets);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('falha ao editar mantem dialogo e edicao visiveis',
+      (tester) async {
+    final repo = FakePlannerRepository(mockTodos: [_todo()])..failEdit = true;
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    await tester.tap(find.byIcon(Icons.edit));
+    await tester.pump();
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      'Edição recusada',
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Salvar'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Edição recusada'), findsOneWidget);
+    expect(find.textContaining('Não foi possível salvar'), findsWidgets);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('setas e atalho Hoje restauram o dia de estudo atual',
+      (tester) async {
+    final repo = FakePlannerRepository();
+    final (_, timer, _) = await _pump(tester, repository: repo);
+    final initialDay = repo.requestedDates.single;
+
+    await tester.tap(find.byIcon(Icons.arrow_forward_ios_rounded));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(repo.requestedDates.last, isNot(initialDay));
+    await tester.tap(find.byIcon(Icons.arrow_back_ios_rounded));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(repo.requestedDates.last, initialDay);
+
+    await tester.tap(find.byIcon(Icons.arrow_forward_ios_rounded));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.byKey(const ValueKey('planner-today-button')));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(repo.requestedDates.last, initialDay);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('seletor de data do cabecalho recarrega o dia escolhido',
+      (tester) async {
+    final repo = FakePlannerRepository();
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    await tester.tap(find.byKey(const ValueKey('planner-date-picker-button')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byType(DatePickerDialog), findsOneWidget);
+    await tester.tap(find.text('15').last);
+    await tester.tap(find.text('OK'));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(repo.requestedDates.last.endsWith('-15'), isTrue);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('contador acompanha concluidas e estado vazio e explicito',
+      (tester) async {
+    final repo = FakePlannerRepository(
+      mockTodos: [_todo(id: 1, completed: true), _todo(id: 2)],
+    );
+    final (_, timer, _) = await _pump(tester, repository: repo);
+    expect(find.textContaining('1 / 2'), findsOneWidget);
+    expect(find.text('50%'), findsOneWidget);
+    await _disposeTimer(tester, timer);
+
+    final empty = FakePlannerRepository();
+    final (_, secondTimer, _) = await _pump(tester, repository: empty);
+    expect(find.textContaining('Nenhuma tarefa'), findsOneWidget);
+    expect(find.textContaining('0 / 0'), findsOneWidget);
+    expect(find.text('0%'), findsOneWidget);
+    await _disposeTimer(tester, secondTimer);
+  });
+
+  testWidgets('tarefa concluida desabilita inicio com tooltip', (tester) async {
+    final repo = FakePlannerRepository(
+      mockTodos: [_todo(subjectId: 9, completed: true)],
+    );
+    final (_, timer, timerRepo) = await _pump(tester, repository: repo);
+
+    final button = tester.widget<IconButton>(
+      find.ancestor(
+        of: find.byIcon(Icons.play_arrow_rounded),
+        matching: find.byType(IconButton),
+      ),
+    );
+    expect(button.onPressed, isNull);
+    expect(button.tooltip, isNotNull);
+    expect(timerRepo.taskIds, isEmpty);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('toggle success updates the completed counter', (tester) async {
+    final repo = FakePlannerRepository(
+      mockTodos: [_todo(id: 1, completed: true), _todo(id: 2)],
+    );
+    final (_, timer, _) = await _pump(tester, repository: repo);
+
+    await tester.tap(find.byType(Checkbox).at(1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(repo.toggledIds, equals([2]));
+    expect(find.textContaining('2 / 2'), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
+    await _disposeTimer(tester, timer);
+  });
+
+  testWidgets('planner uses the effective country day rule', (tester) async {
+    const country = CountryModel(
+      id: 144,
+      name: 'SRI LANKA',
+      code: 'LK',
+      timezone: 'Asia/Colombo',
+      continent: 'Asia',
+      gmtOffset: 5.5,
+    );
+    final settings = _DaySettingsNotifier(SettingsRepository())
+      ..state = const SettingsState(
+        selectedCountry: country,
+        dayResetHour: 7,
+      );
+    final repo = FakePlannerRepository();
+    final (_, timer, _) = await _pump(
+      tester,
+      repository: repo,
+      settings: settings,
+    );
+
+    expect(repo.resetHours.single, 7);
+    expect(repo.gmtOffsets.single, const Duration(hours: 5, minutes: 30));
     await _disposeTimer(tester, timer);
   });
 }

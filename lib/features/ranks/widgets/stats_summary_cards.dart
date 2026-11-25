@@ -211,6 +211,12 @@ class StatsMaximaCard extends ConsumerWidget {
           fallback: 'No study day yet to compute records.'),
       child: Column(
         children: [
+          Text(
+            t.tr('stats_records_scope',
+                fallback: 'Período selecionado e equivalente anterior'),
+            style: TextStyle(color: context.appTextMuted, fontSize: 11),
+          ),
+          const SizedBox(height: 12),
           _MaximaRow(
             label: t.tr('stats_best_day', fallback: 'Best day'),
             value: formatDurationShort(maxima.bestDayMs, t),

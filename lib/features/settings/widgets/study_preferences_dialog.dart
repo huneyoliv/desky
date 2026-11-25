@@ -169,6 +169,24 @@ class StudyPreferencesDialog extends ConsumerWidget {
                     ),
                     Divider(color: context.appBorder, height: 16),
 
+                    // Optional Classic top tabs: same destinations as the sidebar.
+                    SwitchListTile(
+                      key: const ValueKey('classic-top-tabs-switch'),
+                      contentPadding: EdgeInsets.zero,
+                      activeColor: context.appPrimary,
+                      title: Text(
+                        t.tr('classic_top_tabs', fallback: 'Top tabs (Classic layout)'),
+                        style: TextStyle(color: context.appTextPrimary, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(
+                        t.tr('classic_top_tabs_desc', fallback: 'Shows the sidebar items as tabs along the top of the window'),
+                        style: TextStyle(color: context.appTextSecondary, fontSize: 12),
+                      ),
+                      value: settings.classicTopTabs,
+                      onChanged: (val) => notifier.toggleClassicTopTabs(val),
+                    ),
+                    Divider(color: context.appBorder, height: 16),
+
                     // Nudge / Wake Notifications Toggle
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,

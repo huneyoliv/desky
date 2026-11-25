@@ -79,7 +79,11 @@ class StatsDerivations {
   ///
   /// Windows that are still in progress are included as they are; the label in
   /// the UI makes clear they are partial.
-  static StatsMaxima maxima(Map<String, int> byDayMs) {
+  static StatsMaxima maxima(
+    Map<String, int> byDayMs, {
+    DateTime? start,
+    DateTime? end,
+  }) {
     String? bestDayKey;
     var bestDayMs = 0;
     final byWeek = <String, int>{};
@@ -88,6 +92,13 @@ class StatsDerivations {
     for (final entry in byDayMs.entries) {
       final day = DateTime.tryParse(entry.key);
       if (day == null || entry.value <= 0) continue;
+      if (start != null &&
+          day.isBefore(DateTime(start.year, start.month, start.day))) {
+        continue;
+      }
+      if (end != null && day.isAfter(DateTime(end.year, end.month, end.day))) {
+        continue;
+      }
       if (entry.value > bestDayMs) {
         bestDayMs = entry.value;
         bestDayKey = entry.key;

@@ -19,6 +19,10 @@ class SettingsState {
   final bool discordRpcEnabled;
   final bool obsOverlayMode;
   final bool classicYptLook;
+
+  /// Classic YPT layout: the same destinations as the sidebar, as tabs along
+  /// the top of the window. Off by default.
+  final bool classicTopTabs;
   final double classicUiScale;
   final bool betaChannel;
   final String timerBackground;
@@ -41,6 +45,7 @@ class SettingsState {
     this.discordRpcEnabled = true,
     this.obsOverlayMode = false,
     this.classicYptLook = false,
+    this.classicTopTabs = false,
     this.classicUiScale = 1.0,
     this.betaChannel = false,
     this.timerBackground = timerBackgroundTheme,
@@ -64,6 +69,7 @@ class SettingsState {
     bool? discordRpcEnabled,
     bool? obsOverlayMode,
     bool? classicYptLook,
+    bool? classicTopTabs,
     double? classicUiScale,
     bool? betaChannel,
     String? timerBackground,
@@ -87,6 +93,7 @@ class SettingsState {
       discordRpcEnabled: discordRpcEnabled ?? this.discordRpcEnabled,
       obsOverlayMode: obsOverlayMode ?? this.obsOverlayMode,
       classicYptLook: classicYptLook ?? this.classicYptLook,
+      classicTopTabs: classicTopTabs ?? this.classicTopTabs,
       classicUiScale: classicUiScale ?? this.classicUiScale,
       betaChannel: betaChannel ?? this.betaChannel,
       timerBackground: normalizeTimerBackground(
