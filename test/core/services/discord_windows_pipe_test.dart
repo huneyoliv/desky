@@ -166,11 +166,13 @@ void _serve(int handle) {
     if (_Native.connectNamedPipe(handle, nullptr) == 0) {
       throw StateError('ConnectNamedPipe failed');
     }
+    stderr.writeln('SERVER: client connected');
     final handshake =
         jsonDecode(utf8.decode(_readFrame(handle))) as Map<String, dynamic>;
     if (handshake['v'] != 1 || handshake['client_id'] != '123') {
       throw StateError('Unexpected handshake');
     }
+    stderr.writeln('SERVER: handshake read');
 
     final ready = encodeDiscordIpcFrame(
       DiscordIpcOpcode.frame,
@@ -186,6 +188,7 @@ void _serve(int handle) {
     _writeAll(handle, ready.sublist(0, 3));
     _writeAll(handle, ready.sublist(3, 11));
     _writeAll(handle, ready.sublist(11));
+    stderr.writeln('SERVER: READY sent');
 
     final activity =
         jsonDecode(utf8.decode(_readFrame(handle))) as Map<String, dynamic>;
@@ -213,6 +216,9 @@ void main() {
       var serverDone = false;
       final server = Isolate.run(() => _serve(handle))
           .whenComplete(() => serverDone = true);
+      server.catchError((Object error) {
+        stderr.writeln('SERVER_ERROR: $error');
+      });
       final service = DiscordRpcService(
         clientId: '123',
         handshakeTimeout: const Duration(seconds: 5),
