@@ -47,6 +47,30 @@ class DeskyThemePalette {
     this.brightness = Brightness.dark,
   });
 
+  DeskyThemePalette copy() => DeskyThemePalette(
+    id: id,
+    nameKey: nameKey,
+    background: background,
+    surface: surface,
+    surfaceLight: surfaceLight,
+    card: card,
+    border: border,
+    primary: primary,
+    primaryDark: primaryDark,
+    primaryLight: primaryLight,
+    accent: accent,
+    accentDark: accentDark,
+    outline: outline,
+    textPrimary: textPrimary,
+    textSecondary: textSecondary,
+    textMuted: textMuted,
+    heatmapL1: heatmapL1,
+    heatmapL2: heatmapL2,
+    heatmapL3: heatmapL3,
+    heatmapL4: heatmapL4,
+    brightness: brightness,
+  );
+
   bool get isLight => brightness == Brightness.light;
 
   // 1. AMOLED Lilac (Default Brand Theme)

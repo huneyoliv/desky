@@ -58,6 +58,7 @@ class ThemeNotifier extends StateNotifier<DeskyThemePalette> {
   }
 
   Future<void> setSystemTheme() async {
+    final previousId = state.id;
     _userExplicitlySet = true;
     _systemMode = true;
     if (state.isLight) {
@@ -66,6 +67,9 @@ class ThemeNotifier extends StateNotifier<DeskyThemePalette> {
       _darkThemeId = state.id;
     }
     updateSystemBrightness();
+    // The palette can stay identical while System becomes active. Notify in
+    // that case so the dialog repaints the selected System tile.
+    if (state.id == previousId) state = state.copy();
     await _repository.saveSystemThemePresetIds(
       darkId: _darkThemeId,
       lightId: _lightThemeId,
@@ -74,6 +78,7 @@ class ThemeNotifier extends StateNotifier<DeskyThemePalette> {
   }
 
   Future<void> setTheme(DeskyThemePalette palette) async {
+    final previousId = state.id;
     _userExplicitlySet = true;
     _systemMode = false;
     state = palette;
@@ -82,6 +87,9 @@ class ThemeNotifier extends StateNotifier<DeskyThemePalette> {
     } else {
       _darkThemeId = palette.id;
     }
+    // Leaving System can keep the same effective palette too. Repaint the
+    // explicit selection even when the state object did not change.
+    if (state.id == previousId) state = state.copy();
     try {
       await _repository.saveSystemThemePresetIds(
         darkId: _darkThemeId,
