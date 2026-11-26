@@ -102,9 +102,10 @@ void main() {
       expect(notifier.state.sessionElapsedMs, equals(12000));
       expect(timerRepo.stopStudyCalled, isTrue);
       expect(timerRepo.lastStudyMs, equals(12000));
+      expect(timerRepo.recordRestCalled, isFalse);
     });
 
-    test('resuming after pause records accumulated rest time via recordRest', () async {
+    test('resuming starts a new study slice without recording planner rest', () async {
       final timerRepo = FakeTimerRepository();
       final subjectRepo = FakeSubjectRepository();
 
@@ -125,11 +126,11 @@ void main() {
       expect(notifier.state.isRunning, isTrue);
       expect(notifier.state.isPaused, isFalse);
       expect(notifier.state.sessionRestMs, equals(0));
-      expect(timerRepo.recordRestCalled, isTrue);
-      expect(timerRepo.lastRestMs, equals(15000));
+      expect(timerRepo.startStudyCalled, isTrue);
+      expect(timerRepo.recordRestCalled, isFalse);
     });
 
-    test('stopStudy while paused records rest and does not inflate subject hours with rest time', () async {
+    test('stopStudy while paused does not record planner rest or inflate study time', () async {
       final timerRepo = FakeTimerRepository();
       final subjectRepo = FakeSubjectRepository();
 
@@ -156,9 +157,8 @@ void main() {
 
       expect(notifier.state.isRunning, isFalse);
       expect(notifier.state.isPaused, isFalse);
-      expect(timerRepo.recordRestCalled, isTrue);
-      expect(timerRepo.lastRestMs, equals(3000000));
-      // Subject received strictly the 20000 ms, rest of 3000000 ms went to recordRest
+      expect(timerRepo.recordRestCalled, isFalse);
+      // Subject received strictly the 20000 ms; the derived gap stayed local.
       expect(timerRepo.lastStudyMs, equals(20000));
     });
 
@@ -186,6 +186,26 @@ void main() {
       expect(timerRepo.lastStudyStart, equals(customStart));
       expect(timerRepo.lastStudyStop, equals(customStart.add(const Duration(milliseconds: 600000))));
       expect(timerRepo.lastStudyStop!.difference(timerRepo.lastStudyStart!).inMilliseconds, equals(600000));
+    });
+    test('finishing a Pomodoro break does not write a separate rest record', () async {
+      final timerRepo = FakeTimerRepository();
+      final notifier = TimerNotifier(
+        timerRepository: timerRepo,
+        subjectRepository: FakeSubjectRepository(),
+      );
+      await Future.delayed(const Duration(milliseconds: 10));
+      notifier.state = notifier.state.copyWith(
+        mode: TimerMode.pomodoro,
+        pomodoroPhase: PomodoroPhase.shortBreak,
+        restStartAt: DateTime.now().subtract(const Duration(seconds: 5)),
+        sessionRestMs: 5000,
+        autoStartFocus: false,
+      );
+
+      await notifier.skipPomodoroPhase();
+
+      expect(notifier.state.pomodoroPhase, PomodoroPhase.focus);
+      expect(timerRepo.recordRestCalled, isFalse);
     });
   });
 }

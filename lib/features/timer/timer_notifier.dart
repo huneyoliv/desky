@@ -574,16 +574,6 @@ class TimerNotifier extends StateNotifier<TimerState> {
     }
     final now = DateTime.now();
 
-    if (state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
-      final rStart = state.restStartAt!;
-      final rElapsed = state.sessionRestMs;
-      _timerRepository.recordRest(
-        startAt: rStart,
-        stopAt: now,
-        restMs: rElapsed,
-      );
-    }
-
     if (state.pomodoroPhase == PomodoroPhase.focus && state.currentSubject != null) {
       _serverConfirmedSession = false;
       try {
@@ -757,14 +747,6 @@ class TimerNotifier extends StateNotifier<TimerState> {
         _ticker?.cancel();
       }
     } else {
-      if (state.restStartAt != null && state.sessionRestMs > 0) {
-        _timerRepository.recordRest(
-          startAt: state.restStartAt!,
-          stopAt: now,
-          restMs: state.sessionRestMs,
-        );
-      }
-
       if (state.autoStartFocus && state.currentSubject != null) {
         try {
           await _timerRepository.startStudy(
@@ -894,17 +876,6 @@ class TimerNotifier extends StateNotifier<TimerState> {
   Future<void> stopStudy() async {
     _ticker?.cancel();
     _cancelReconcileTimer();
-    final now = DateTime.now();
-
-    if (state.isPaused && state.restStartAt != null && state.sessionRestMs > 0) {
-      try {
-        await _timerRepository.recordRest(
-          startAt: state.restStartAt!,
-          stopAt: now,
-          restMs: state.sessionRestMs,
-        ).timeout(const Duration(seconds: 2), onTimeout: () => false);
-      } catch (_) {}
-    }
 
     if (state.isRunning ||
         (state.sessionStartAt != null && !state.isPaused) ||
