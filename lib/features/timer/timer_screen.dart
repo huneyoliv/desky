@@ -482,7 +482,9 @@ class TimerScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 36),
+                    // Keep the action reachable when the title bar leaves only
+                    // 448 logical pixels: 36 px would overflow by exactly 28 px.
+                    SizedBox(height: MediaQuery.sizeOf(context).height < 560 ? 8 : 36),
 
                     // Timer Action Buttons
                     Row(
