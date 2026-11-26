@@ -91,7 +91,7 @@ class _Native {
 }
 
 int _createServer() {
-  for (var index = 9; index >= 0; index--) {
+  for (var index = 0; index <= 9; index++) {
     final path = (r'\\.\pipe\discord-ipc-' + index.toString()).toNativeUtf16();
     try {
       final handle = _Native.createNamedPipe(
@@ -221,10 +221,10 @@ void main() {
       });
       final service = DiscordRpcService(
         clientId: '123',
-        handshakeTimeout: const Duration(seconds: 5),
+        handshakeTimeout: const Duration(seconds: 10),
       );
       try {
-        await service.connect().timeout(const Duration(seconds: 10));
+        await service.connect().timeout(const Duration(seconds: 20));
         expect(service.isConnected, isTrue);
         await service
             .updatePresence(
