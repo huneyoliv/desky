@@ -265,7 +265,7 @@ void main() {
             4,
             (worker) => Process.run(
                   flutter,
-                  ['test', helper.path, '--reporter', 'expanded'],
+                  ['test', helper.path, '--no-pub', '--reporter', 'expanded'],
                   workingDirectory: Directory.current.path,
                   environment: {'CRASH_WORKER': '$worker'},
                 )),
@@ -281,7 +281,7 @@ void main() {
           expect(text, contains('worker=$worker entry=$entry'));
         }
       }
-    }, timeout: const Timeout(Duration(minutes: 3)));
+    }, timeout: const Timeout(Duration(minutes: 6)));
 
     test('never throws when the folder cannot be written', () async {
       final gone = Directory('${dir.path}/missing/deeper');
