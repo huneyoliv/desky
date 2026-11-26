@@ -13,6 +13,7 @@ import 'widgets/pomodoro_config_dialog.dart';
 import 'widgets/manual_study_log_dialog.dart';
 import 'offline_sync_notifier.dart';
 import 'focus_mode_notifier.dart';
+import 'widgets/timer_video_background.dart';
 import '../settings/settings_notifier.dart';
 
 class TimerScreen extends ConsumerWidget {
@@ -622,6 +623,7 @@ class _TimerBackground extends ConsumerWidget {
     final settings = ref.watch(settingsNotifierProvider);
     final style = settings.timerBackground;
     final imagePath = settings.timerBackgroundImagePath;
+    final videoPath = settings.timerBackgroundVideoPath;
     final gradient = switch (style) {
       timerBackgroundAurora => const LinearGradient(
           begin: Alignment.topLeft,
@@ -643,7 +645,8 @@ class _TimerBackground extends ConsumerWidget {
         ColoredBox(color: context.palette.background),
         if (gradient != null)
           DecoratedBox(decoration: BoxDecoration(gradient: gradient))
-        else if (style == timerBackgroundCustomImage &&
+        else if ((style == timerBackgroundCustomImage ||
+                style == timerBackgroundCustomVideo) &&
             imagePath != null &&
             imagePath.isNotEmpty)
           Image.file(
@@ -651,6 +654,13 @@ class _TimerBackground extends ConsumerWidget {
             fit: BoxFit.cover,
             cacheWidth: 1920,
             errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        if (style == timerBackgroundCustomVideo &&
+            videoPath != null &&
+            videoPath.isNotEmpty)
+          TimerVideoBackground(
+            path: videoPath,
+            fallback: const SizedBox.shrink(),
           ),
         if (style != timerBackgroundTheme)
           ColoredBox(color: Colors.black.withValues(alpha: 0.45)),

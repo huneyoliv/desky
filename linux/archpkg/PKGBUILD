@@ -12,6 +12,7 @@ depends=(
   'jsoncpp'
   'xdg-utils'
   'glib2'
+  'mpv'
 )
 optdepends=(
   'libnotify: desktop notifications support'
