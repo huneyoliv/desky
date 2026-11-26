@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/timer_appearance.dart';
+import '../../../core/theme/timer_media_store.dart';
 import '../../../core/localization/app_translation.dart';
 import '../../../core/utils/package_helper.dart';
 import '../../../core/window/overlay_window_channel.dart';
@@ -11,8 +12,9 @@ import '../settings_notifier.dart';
 
 Future<void> _pickTimerBackgroundImage(
   BuildContext context,
-  WidgetRef ref,
-) async {
+  WidgetRef ref, {
+  bool forVideoFallback = false,
+}) async {
   final t = ref.read(appTranslationProvider);
   try {
     final result = await FilePicker.pickFiles(
@@ -37,15 +39,70 @@ Future<void> _pickTimerBackgroundImage(
       }
       return;
     }
-    await ref
-        .read(settingsNotifierProvider.notifier)
-        .setTimerBackgroundImage(path);
+    final notifier = ref.read(settingsNotifierProvider.notifier);
+    if (forVideoFallback) {
+      final store = await TimerMediaStore.application();
+      final storedPath = await store.importMedia(
+        path,
+        previousOwnedPath: ref.read(settingsNotifierProvider).timerBackgroundImagePath,
+      );
+      await notifier.setTimerBackgroundFallbackImage(storedPath);
+    } else {
+      await notifier.setTimerBackgroundImage(path);
+    }
   } catch (_) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t.tr('timer_background_file_error',
               fallback: 'Não foi possível usar essa imagem.')),
+        ),
+      );
+    }
+  }
+}
+
+Future<void> _pickTimerBackgroundVideo(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final t = ref.read(appTranslationProvider);
+  try {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp4', 'webm'],
+      allowMultiple: false,
+      withData: false,
+    );
+    if (result == null || result.files.isEmpty) return;
+    final path = result.files.single.path;
+    if (path == null) return;
+    final valid = await isValidTimerBackgroundVideoFile(path);
+    if (!valid) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(t.tr('timer_background_video_error',
+                fallback: 'Não foi possível usar esse vídeo.')),
+          ),
+        );
+      }
+      return;
+    }
+    final store = await TimerMediaStore.application();
+    final storedPath = await store.importMedia(
+      path,
+      previousOwnedPath: ref.read(settingsNotifierProvider).timerBackgroundVideoPath,
+    );
+    await ref
+        .read(settingsNotifierProvider.notifier)
+        .setTimerBackgroundVideo(storedPath);
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t.tr('timer_background_video_error',
+              fallback: 'Não foi possível usar esse vídeo.')),
         ),
       );
     }
@@ -266,7 +323,7 @@ class StudyPreferencesDialog extends ConsumerWidget {
                       ),
                       subtitle: Text(
                         t.tr('timer_background_image_desc',
-                            fallback: 'PNG/JPEG/WebP até 20 MB; vídeo não incluído'),
+                            fallback: 'PNG/JPEG/WebP até 20 MB; MP4/WebM até 50 MB; vídeo usa imagem como fallback'),
                         style: TextStyle(color: context.appTextSecondary, fontSize: 12),
                       ),
                       trailing: DropdownButton<String>(
@@ -291,11 +348,17 @@ class StudyPreferencesDialog extends ConsumerWidget {
                             value: timerBackgroundCustomImage,
                             child: Text(t.tr('timer_background_image', fallback: 'Imagem local')),
                           ),
+                          DropdownMenuItem(
+                            value: timerBackgroundCustomVideo,
+                            child: Text(t.tr('timer_background_video', fallback: 'Vídeo local')),
+                          ),
                         ],
                         onChanged: (value) {
                           if (value == null) return;
                           if (value == timerBackgroundCustomImage) {
                             _pickTimerBackgroundImage(context, ref);
+                          } else if (value == timerBackgroundCustomVideo) {
+                            _pickTimerBackgroundVideo(context, ref);
                           } else {
                             notifier.setTimerBackground(value);
                           }
@@ -309,6 +372,30 @@ class StudyPreferencesDialog extends ConsumerWidget {
                           onPressed: () => _pickTimerBackgroundImage(context, ref),
                           icon: Icon(Icons.folder_open_rounded, size: 18),
                           label: Text(t.tr('timer_choose_image', fallback: 'Escolher imagem')),
+                        ),
+                      ),
+                    if (settings.timerBackground == timerBackgroundCustomVideo)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Wrap(
+                          spacing: 8,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () => _pickTimerBackgroundVideo(context, ref),
+                              icon: Icon(Icons.video_file_rounded, size: 18),
+                              label: Text(t.tr('timer_choose_video', fallback: 'Escolher vídeo')),
+                            ),
+                            TextButton.icon(
+                              onPressed: () => _pickTimerBackgroundImage(
+                                context,
+                                ref,
+                                forVideoFallback: true,
+                              ),
+                              icon: Icon(Icons.image_rounded, size: 18),
+                              label: Text(t.tr('timer_choose_fallback_image',
+                                  fallback: 'Imagem de fallback')),
+                            ),
+                          ],
                         ),
                       ),
                     Divider(color: context.appBorder, height: 16),

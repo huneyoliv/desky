@@ -39,7 +39,7 @@ jobs:
       - name: Install Linux build dependencies for tests
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq libsecret-1-dev libjsoncpp-dev
+          sudo apt-get install -y -qq libsecret-1-dev libjsoncpp-dev libmpv-dev mpv
 
       - name: Get Flutter dependencies
         run: flutter pub get
@@ -77,7 +77,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libsecret-1-dev libjsoncpp-dev
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libsecret-1-dev libjsoncpp-dev libmpv-dev mpv
 
       - name: Get Flutter dependencies
         run: flutter pub get
@@ -98,3 +98,13 @@ jobs:
             macOS)   flutter build macos --debug ;;
             Linux)   flutter build linux --debug ;;
           esac
+
+      - name: Smoke test local MP4 playback
+        if: runner.os == 'Windows'
+        timeout-minutes: 3
+        shell: pwsh
+        run: |
+          $env:TEMP = $env:RUNNER_TEMP
+          $env:TMP = $env:RUNNER_TEMP
+          & 'build\windows\x64\runner\Debug\desky.exe'
+          exit $LASTEXITCODE

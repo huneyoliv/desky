@@ -27,6 +27,7 @@ class SettingsState {
   final bool betaChannel;
   final String timerBackground;
   final String? timerBackgroundImagePath;
+  final String? timerBackgroundVideoPath;
   final String timerFont;
 
   const SettingsState({
@@ -50,6 +51,7 @@ class SettingsState {
     this.betaChannel = false,
     this.timerBackground = timerBackgroundTheme,
     this.timerBackgroundImagePath,
+    this.timerBackgroundVideoPath,
     this.timerFont = timerFontDigital,
   });
 
@@ -75,6 +77,8 @@ class SettingsState {
     String? timerBackground,
     String? timerBackgroundImagePath,
     bool clearTimerBackgroundImagePath = false,
+    String? timerBackgroundVideoPath,
+    bool clearTimerBackgroundVideoPath = false,
     String? timerFont,
   }) {
     return SettingsState(
@@ -102,6 +106,9 @@ class SettingsState {
       timerBackgroundImagePath: clearTimerBackgroundImagePath
           ? null
           : (timerBackgroundImagePath ?? this.timerBackgroundImagePath),
+      timerBackgroundVideoPath: clearTimerBackgroundVideoPath
+          ? null
+          : (timerBackgroundVideoPath ?? this.timerBackgroundVideoPath),
       timerFont: normalizeTimerFont(timerFont ?? this.timerFont),
     );
   }

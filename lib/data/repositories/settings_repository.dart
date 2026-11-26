@@ -40,6 +40,7 @@ class SettingsRepository {
   static const String keyBetaChannel = 'beta_update_channel';
   static const String keyTimerBackground = 'timer_background_style';
   static const String keyTimerBackgroundImagePath = 'timer_background_image_path';
+  static const String keyTimerBackgroundVideoPath = 'timer_background_video_path';
   static const String keyTimerFont = 'timer_font_family';
 
   static const CountryModel defaultCountry = CountryModel(
@@ -408,6 +409,27 @@ class SettingsRepository {
         await prefs.remove(keyTimerBackgroundImagePath);
       } else {
         await prefs.setString(keyTimerBackgroundImagePath, path.trim());
+      }
+    } catch (_) {}
+  }
+
+  Future<String?> getTimerBackgroundVideoPath() async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      final path = prefs.getString(keyTimerBackgroundVideoPath)?.trim();
+      return path == null || path.isEmpty ? null : path;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveTimerBackgroundVideoPath(String? path) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      if (path == null || path.trim().isEmpty) {
+        await prefs.remove(keyTimerBackgroundVideoPath);
+      } else {
+        await prefs.setString(keyTimerBackgroundVideoPath, path.trim());
       }
     } catch (_) {}
   }

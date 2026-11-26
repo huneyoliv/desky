@@ -41,13 +41,19 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       final discordRpc = await _repository.getDiscordRpcEnabled();
       final betaChannel = await _repository.getBetaChannel();
       final timerBackground = await _repository.getTimerBackground();
-      final timerBackgroundImagePath =
-          await _repository.getTimerBackgroundImagePath();
-      final timerFont = await _repository.getTimerFont();
+      final timerAppearance = await Future.wait<Object?>([
+        _repository.getTimerBackgroundImagePath(),
+        _repository.getTimerBackgroundVideoPath(),
+        _repository.getTimerFont(),
+      ]);
+      final timerBackgroundImagePath = timerAppearance[0] as String?;
+      final timerBackgroundVideoPath = timerAppearance[1] as String?;
+      final timerFont = timerAppearance[2] as String;
       if (!mounted) return;
       state = state.copyWith(
         timerBackground: timerBackground,
         timerBackgroundImagePath: timerBackgroundImagePath,
+        timerBackgroundVideoPath: timerBackgroundVideoPath,
         timerFont: timerFont,
       );
       final obsOverlayMode = await _repository.getObsOverlayMode();
@@ -72,6 +78,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
         betaChannel: betaChannel,
         timerBackground: timerBackground,
         timerBackgroundImagePath: timerBackgroundImagePath,
+        timerBackgroundVideoPath: timerBackgroundVideoPath,
         timerFont: timerFont,
         countryCategories: SettingsRepository.defaultFallbackCategories,
         availableCountries: SettingsRepository.defaultFallbackCountries,
@@ -177,6 +184,20 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     );
     await _repository.saveTimerBackgroundImagePath(path);
     await _repository.saveTimerBackground(timerBackgroundCustomImage);
+  }
+
+  Future<void> setTimerBackgroundVideo(String path) async {
+    state = state.copyWith(
+      timerBackground: timerBackgroundCustomVideo,
+      timerBackgroundVideoPath: path,
+    );
+    await _repository.saveTimerBackgroundVideoPath(path);
+    await _repository.saveTimerBackground(timerBackgroundCustomVideo);
+  }
+
+  Future<void> setTimerBackgroundFallbackImage(String path) async {
+    state = state.copyWith(timerBackgroundImagePath: path);
+    await _repository.saveTimerBackgroundImagePath(path);
   }
 
   Future<void> setTimerFont(String value) async {
