@@ -120,7 +120,7 @@ void main() {
       expect(timerRepo.lastStudyMs, equals(15000));
     });
 
-    test('stopStudy while paused records rest time and resets state', () async {
+    test('stopStudy while paused resets state without recording planner rest', () async {
       final timerRepo = MockTimerRepository();
       final subjectRepo = MockSubjectRepository();
 
@@ -144,8 +144,7 @@ void main() {
 
       expect(notifier.state.isRunning, isFalse);
       expect(notifier.state.isPaused, isFalse);
-      expect(timerRepo.recordRestCalled, isTrue);
-      expect(timerRepo.lastRestMs, equals(4000));
+      expect(timerRepo.recordRestCalled, isFalse);
     });
 
     test('stopStudy does not block indefinitely if network hangs and falls back to offline queue', () async {
