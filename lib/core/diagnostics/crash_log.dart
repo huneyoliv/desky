@@ -129,6 +129,23 @@ String truncateUtf8(String text, int maxBytes,
 ///
 /// Writes are synchronous, and fatal entries are explicitly flushed before
 /// the handler returns. Failures are exposed through [lastError], not thrown.
+void _acquireExclusiveLock(RandomAccessFile lock) {
+  final wait = Stopwatch()..start();
+  while (true) {
+    try {
+      lock.lockSync(FileLock.exclusive);
+      return;
+    } on FileSystemException catch (error) {
+      // Windows reports an already-held lock as ERROR_LOCK_VIOLATION (33).
+      // Wait briefly instead of losing a valid crash entry during contention.
+      if (error.osError?.errorCode != 33 || wait.elapsedMilliseconds >= 2000) {
+        rethrow;
+      }
+      sleep(const Duration(milliseconds: 2));
+    }
+  }
+}
+
 class CrashLogWriter {
   CrashLogWriter(
     this.directory, {
@@ -202,7 +219,7 @@ class CrashLogWriter {
       // The size check, rotation, and append must be one operation across
       // processes; otherwise concurrent writers can lose or corrupt entries.
       lock = File('${f.path}.lock').openSync(mode: FileMode.write);
-      lock.lockSync(FileLock.exclusive);
+      _acquireExclusiveLock(lock);
       locked = true;
       final current = f.existsSync() ? f.lengthSync() : 0;
       if (current + entryBytes.length > maxFileBytes) _rotate();
