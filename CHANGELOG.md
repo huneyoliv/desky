@@ -84,6 +84,11 @@ Before creating and pushing any release tag, the version string and build number
   persistent task-session association remains unconfirmed and is not claimed.
 - Localized the new Planner subject/start/failure controls in the 11 languages exercised by the timer layout test.
 
+- Local MP4/WebM video backgrounds up to 50 MiB, with mute, loop, an injectable
+  lifecycle-safe media backend and independent static-image fallback. Selected
+  media is copied into app-owned storage, with bounded replacement cleanup and
+  no upload. Windows CI includes a real MP4 decode smoke test; Linux packaging
+  declares the required system mpv dependency (#10).
 - Timer appearance now includes persisted Aurora and Sunset gradients, local
   PNG/JPEG/WebP images up to 20 MB, and Digital, SF Pro or Pretendard font
   selection. Missing/unreadable images fall back safely; no media is uploaded.
@@ -174,6 +179,9 @@ Before creating and pushing any release tag, the version string and build number
 - Group chat permission changes are saved with failure reporting, messages show full date and time, and ranking scope persists across screens (#5 R4, R7, R9).
 - Study-day boundaries now use the selected country's start hour when available and fixed GMT offset, with the manual reset preference preserved. Timer, Planner, Calendar and Timeline share the effective rule (#10 R4).
 - Timer reconciliation now applies that same effective country offset and reset hour when choosing the `/logs/day` query date. Fixed-instant regression tests cover GMT+5:30 immediately before and at both 05:00 and midnight resets, with the device in a different timezone (#10).
+- Pause/resume now remains strictly stop/start: no unverified separate rest record is written to the Planner task route. No new rest button is required by the original app; Timeline gaps remain derived (#11).
+- System theme selection now repaints even when the effective palette is identical, and the full-shell timer layout fits 640×480 without the previous 28 px overflow (#12, #10).
+- Crash-log writers now retry bounded Windows lock contention instead of dropping entries. Native pipe/worker tests use reliable readiness and no repeated pub resolution (#23, #24).
 
 ### Known Limitations
 
@@ -181,11 +189,11 @@ Before creating and pushing any release tag, the version string and build number
   crash logging are not included in the selected PR #9 integration. OBS focus/
   z-order and real OS behavior still require manual native verification.
 
-- Group creation is not supported: the create contract is unconfirmed (three attempts failed).
+- Group creation remains unsupported: the supplied Firestore HAR contains only `userbooks`, and the APK exposes candidates but no successful create response, group id, full call order or cleanup contract (#5).
 - Starting a session from a to-do sends taskId, but no association is observable on the API.
 - Recurring tasks: editing affects only the selected occurrence; deleting offers one occurrence or the whole series.
 - Nudge reception on desktop is not possible yet (no nudge notification type; the official app uses FCM push).
-- Background videos (issue #10) were not implemented in this maintenance batch. They remain a separate multiplatform feature requiring product and media-stack decisions, lifecycle/resource validation and a static-image fallback.
+- Local MP4/WebM video backgrounds are implemented, but macOS/Linux playback, security-scoped file behavior, reduced-motion preference and long memory/GPU soak remain unvalidated. HEVC/AV1/4K and mobile are not claimed (#10).
 - Study vs rest breakdown is not available (rest contract unknown).
 - Study vs rest data is not available from the API; gaps are derived from session times.
 - A Windows release was observed repainting from AMOLED Lilás to Lilás Diurno when
