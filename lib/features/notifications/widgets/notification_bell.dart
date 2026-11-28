@@ -22,6 +22,8 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
     with SingleTickerProviderStateMixin {
   int _unreadCount = 0;
   Timer? _pollingTimer;
+  bool _isFetchingUnread = false;
+  bool _refreshUnreadAfterFetch = false;
   late AnimationController _wobbleController;
   late Animation<double> _wobbleAnimation;
 
@@ -40,7 +42,8 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
       TweenSequenceItem(tween: Tween(begin: -0.1, end: 0.1), weight: 2),
       TweenSequenceItem(tween: Tween(begin: 0.1, end: 0.0), weight: 1),
       TweenSequenceItem(tween: ConstantTween(0.0), weight: 4),
-    ]).animate(CurvedAnimation(parent: _wobbleController, curve: Curves.easeInOut));
+    ]).animate(
+        CurvedAnimation(parent: _wobbleController, curve: Curves.easeInOut));
 
     _fetchUnread();
 
@@ -57,20 +60,37 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
     super.dispose();
   }
 
-  Future<void> _fetchUnread() async {
+  Future<void> _fetchUnread({bool refreshWhenPending = false}) async {
+    if (_isFetchingUnread) {
+      if (refreshWhenPending) _refreshUnreadAfterFetch = true;
+      return;
+    }
+    _isFetchingUnread = true;
+
+    int? count;
     try {
       final repo = ref.read(notificationRepositoryProvider);
-      final count = await repo.fetchUnreadCount();
-      if (mounted) {
-        setState(() => _unreadCount = count);
-        if (count > 0 && !_wobbleController.isAnimating) {
-          _wobbleController.repeat();
-        } else if (count == 0 && _wobbleController.isAnimating) {
-          _wobbleController.stop();
-          _wobbleController.reset();
-        }
+      count = await repo.fetchUnreadCount();
+    } catch (_) {
+      // Keep the last count when the repository fails.
+    }
+
+    final nextCount = count;
+    if (nextCount != null && mounted) {
+      setState(() => _unreadCount = nextCount);
+      if (nextCount > 0 && !_wobbleController.isAnimating) {
+        _wobbleController.repeat();
+      } else if (nextCount == 0 && _wobbleController.isAnimating) {
+        _wobbleController.stop();
+        _wobbleController.reset();
       }
-    } catch (_) {}
+    }
+
+    _isFetchingUnread = false;
+    if (!_refreshUnreadAfterFetch) return;
+
+    _refreshUnreadAfterFetch = false;
+    if (mounted) await _fetchUnread(refreshWhenPending: true);
   }
 
   void _openNotifications() {
@@ -80,7 +100,7 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
       _wobbleController.reset();
     });
     NotificationPanelDialog.show(context).then((_) {
-      _fetchUnread();
+      if (mounted) _fetchUnread(refreshWhenPending: true);
     });
   }
 
@@ -119,7 +139,9 @@ class _NotificationBellState extends ConsumerState<NotificationBell>
                   },
                   child: Icon(
                     Icons.notifications_outlined,
-                    color: _unreadCount > 0 ? context.appPrimary : context.appTextSecondary,
+                    color: _unreadCount > 0
+                        ? context.appPrimary
+                        : context.appTextSecondary,
                     size: 19,
                   ),
                 ),
